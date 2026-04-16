@@ -1,0 +1,2088 @@
+﻿SMART RESEARCH
+COLLABORATION PLATFORM
+
+
+40-Day Production Sprint Plan
+
+
+
+
+Mostofa Aminur Rashid
+MIT Programme  ·  Master's Project  ·  2026
+
+
+Phase 1Days 1–10
+	Phase 2Days 11–20
+	Phase 3Days 21–30
+	Phase 4Days 31–40
+	
+
+Zero code  →  Deployed  →  Documented  →  Demo-ready in 40 days
+________________
+
+
+Sprint Overview
+This document is the complete, day-by-day development plan for the Smart Research Collaboration Platform (SRCP). Every day includes a user story, concrete technical tasks with file names and code snippets, and a clear deliverable. The plan is designed for a single developer working full-time.
+
+
+Phase
+	Days
+	Focus
+	Milestone
+	1
+	Days 1–10
+	Foundation: repo, Docker, DB schema, Node API, ML service, ES indexing, Next.js auth
+	All services running locally; auth working; profiles searchable
+	2
+	Days 11–20
+	Core features: CF+CB matching, TrustRank, workspace, Kanban, Socket.IO, papers, forum, publication
+	All core features live; E2E tests passing; v0.2.0 tagged
+	3
+	Days 21–30
+	Enhancements: OAuth, milestones, collaborative docs, advanced search, DMs, endorsements, admin, security, performance
+	Production-hardened; security audited; 50+ tests; v0.3.0 tagged
+	4
+	Days 31–40
+	Deployment: Docker, CI/CD, VPS + HTTPS, monitoring, backups, API docs, architecture docs, user manual, demo
+	Live at public URL; fully documented; demo-ready; v1.0.0 tagged
+	
+
+________________
+
+
+Day
+1
+	Project Scaffold & Git Setup
+Phase 1
+	SRCP 40-Day Plan
+Mostofa Aminur Rashid
+	
+
+User Story:  As the lead developer, I want a clean mono-repo structure so that every team member can start from the same baseline.
+	
+
+Technical Tasks
+#
+	Area
+	Task / Command / Code Snippet
+	1
+	Repo Init
+	mkdir srcp && cd srcp && git init && git flow init (main / dev / feature/*)
+	2
+	Folder Structure
+	srcp/ → backend/ | ml-service/ | frontend/ | infra/ | docs/ | scripts/ | .github/workflows/
+	3
+	README
+	Write README.md: project goals, tech stack overview, local setup commands, contribution guide.
+	4
+	Linting / Formatting
+	backend: ESLint + Prettier (.eslintrc.json); frontend: same + Tailwind; ml: Black + isort (pyproject.toml)
+	5
+	.env Template
+	Create .env.example listing all required env vars: DB_URL, JWT_SECRET, REDIS_URL, ES_URL, ML_URL, etc.
+	6
+	Pre-commit hooks
+	npm i -D husky lint-staged && npx husky install; run linters on staged files automatically.
+	
+
+Deliverable:  Mono-repo on GitHub with all folders, linting config, .env template, husky hooks, and README committed.
+	
+
+
+
+
+
+Day
+2
+	Docker Compose Dev Environment
+Phase 1
+	SRCP 40-Day Plan
+Mostofa Aminur Rashid
+	
+
+User Story:  As a developer, I want one command to spin up all services locally so I don't waste time on environment issues.
+	
+
+Technical Tasks
+#
+	Area
+	Task / Command / Code Snippet
+	1
+	docker-compose.yml
+	Services: postgres:16, redis:7, elasticsearch:8.12.0 (single-node), adminer (DB GUI). All with named volumes.
+	2
+	Env vars
+	Pass secrets via .env file; POSTGRES_PASSWORD, POSTGRES_DB=srcp, ES_JAVA_OPTS=-Xms512m -Xmx512m.
+	3
+	Health checks
+	Add healthcheck blocks: pg_isready for Postgres; curl -f http://localhost:9200 for ES.
+	4
+	Makefile
+	Targets: make up (compose up -d), make down, make logs, make psql, make test.
+	5
+	Smoke test
+	Run make up; verify psql -U srcp works; curl localhost:9200/_cluster/health shows green.
+	
+
+Deliverable:  docker-compose.yml running Postgres, Redis, ES; Makefile; all containers healthy.
+	
+
+Trade-off / Note:  MVP: No Kafka in dev compose (too heavy). Post-MVP: Add Kafka + Zookeeper later in Day 21+.
+	
+
+
+
+
+
+________________
+
+
+Day
+3
+	PostgreSQL Schema & Migrations
+Phase 1
+	SRCP 40-Day Plan
+Mostofa Aminur Rashid
+	
+
+User Story:  As a researcher, I want my profile, skills, and papers persisted reliably so I never lose my work.
+	
+
+Technical Tasks
+#
+	Area
+	Task / Command / Code Snippet
+	1
+	Knex / Migrations
+	cd backend && npm init && npm i knex pg; knex init → knexfile.js with dev/test/prod configs.
+	2
+	Migration 001
+	users: id UUID PK, email UNIQUE, password_hash, full_name, institution, bio, avatar_url, trust_score FLOAT DEFAULT 0, created_at, updated_at.
+	3
+	Migration 002
+	research_interests: id, user_id FK, tag VARCHAR(100), domain VARCHAR(100). skills: id, user_id FK, skill_name, level ENUM(beginner/intermediate/expert).
+	4
+	Migration 003
+	papers: id, user_id FK, title, abstract TEXT, doi VARCHAR, venue, year INT, embedding_vector FLOAT[] (for later). projects: id, title, description, status ENUM.
+	5
+	Migration 004
+	project_members(project_id, user_id, role), tasks(id, project_id, title, status, assignee_id, due_date), notifications(id, user_id, type, payload JSONB, read BOOL).
+	6
+	Indexes
+	CREATE INDEX ON users(email); CREATE INDEX ON research_interests(user_id); CREATE INDEX ON papers(user_id); GIN index on papers.abstract for full-text.
+	7
+	Run & Verify
+	knex migrate:latest; psql -c '\dt' — verify all 8 tables created.
+	
+
+Deliverable:  PostgreSQL schema fully migrated with all core tables, indexes, and FK constraints.
+	
+
+
+
+
+
+Day
+4
+	Node.js API Skeleton + Auth (Register / Login)
+Phase 1
+	SRCP 40-Day Plan
+Mostofa Aminur Rashid
+	
+
+User Story:  As a new researcher, I want to register an account so that I can start building my profile.
+	
+
+Technical Tasks
+#
+	Area
+	Task / Command / Code Snippet
+	1
+	Express Setup
+	npm i express helmet cors morgan express-validator bcrypt jsonwebtoken; server.js → app.listen(3001).
+	2
+	Route structure
+	routes/auth.js, routes/users.js, routes/projects.js, routes/search.js; mount under /api/v1.
+	3
+	POST /auth/register
+	Validate email+password; bcrypt.hash(password, 12); INSERT user; return 201 + userId. File: controllers/authController.js.
+	4
+	POST /auth/login
+	Find user by email; bcrypt.compare; sign JWT (accessToken 15m, refreshToken 7d); return tokens. Store refreshToken in httpOnly cookie.
+	5
+	POST /auth/refresh
+	Verify refreshToken from cookie; issue new accessToken. controllers/authController.js.
+	6
+	Auth Middleware
+	middleware/auth.js: verify JWT, attach req.user = { id, email }; used on all protected routes.
+	7
+	Input Validation
+	express-validator chain: email().normalizeEmail(), password min 8 chars, sanitizeBody. centralized error handler in middleware/errorHandler.js.
+	
+
+Deliverable:  Working register + login + token refresh endpoints; Postman collection with all 3 calls passing.
+	
+
+
+
+
+
+________________
+
+
+Day
+5
+	User Profile CRUD + File Upload (Avatar)
+Phase 1
+	SRCP 40-Day Plan
+Mostofa Aminur Rashid
+	
+
+User Story:  As a logged-in researcher, I want to edit my bio, skills, and interests so that the matching engine can find me relevant collaborators.
+	
+
+Technical Tasks
+#
+	Area
+	Task / Command / Code Snippet
+	1
+	GET /users/:id
+	Return user + joined research_interests + skills + paper count. JOIN query in Knex. Route: routes/users.js.
+	2
+	PATCH /users/:id
+	Update bio, institution, full_name. Validate ownership (req.user.id === param id). Return updated record.
+	3
+	POST /users/:id/interests
+	Upsert array of tags into research_interests; DELETE existing then bulk INSERT. Return 200.
+	4
+	POST /users/:id/skills
+	Bulk upsert skills with level. Same pattern.
+	5
+	Avatar Upload
+	npm i multer sharp; POST /users/:id/avatar; resize to 256x256 WEBP; save to uploads/avatars/; store relative path in DB.
+	6
+	Static files
+	Express static middleware: app.use('/static', express.static('uploads')).
+	
+
+Deliverable:  Full profile CRUD; avatar upload working; GET /users/:id returns complete profile JSON.
+	
+
+
+
+
+
+Day
+6
+	Python FastAPI ML Service Scaffold
+Phase 1
+	SRCP 40-Day Plan
+Mostofa Aminur Rashid
+	
+
+User Story:  As the system, I want a dedicated ML microservice so that heavy AI computation doesn't block the Node.js API.
+	
+
+Technical Tasks
+#
+	Area
+	Task / Command / Code Snippet
+	1
+	Setup
+	cd ml-service && python -m venv venv && pip install fastapi uvicorn sentence-transformers numpy scipy psycopg2-binary python-dotenv.
+	2
+	main.py
+	FastAPI app; include routers for /embed, /match, /recommend. Add startup event to load SBERT model once.
+	3
+	SBERT Load
+	from sentence_transformers import SentenceTransformer; model = SentenceTransformer('all-MiniLM-L6-v2') — 90MB, fast inference.
+	4
+	POST /embed
+	Accept { text: str }; return { embedding: list[float] } — 384-dim vector. File: routers/embed.py.
+	5
+	Health endpoint
+	GET /health → { status: ok, model_loaded: true }. Used by Docker healthcheck.
+	6
+	Dockerfile (ML)
+	FROM python:3.11-slim; COPY requirements.txt; RUN pip install; COPY . .; CMD uvicorn main:app --host 0.0.0.0 --port 8000.
+	7
+	Add to compose
+	Add ml-service to docker-compose.yml with depends_on: [postgres]. Node API calls ML via ML_URL=http://ml-service:8000.
+	
+
+Deliverable:  FastAPI ML service running in Docker; POST /embed returns 384-dim vector for any input text; Node API can call it.
+	
+
+Trade-off / Note:  MVP: Use all-MiniLM-L6-v2 (fast, 90MB). Post-MVP: Fine-tune on academic abstracts or use allenai-specter.
+	
+
+
+
+
+
+________________
+
+
+Day
+7
+	Elasticsearch Setup + Profile Indexing
+Phase 1
+	SRCP 40-Day Plan
+Mostofa Aminur Rashid
+	
+
+User Story:  As the system, I want researcher profiles indexed so that searches can find relevant people in under 200ms.
+	
+
+Technical Tasks
+#
+	Area
+	Task / Command / Code Snippet
+	1
+	ES Index mapping
+	PUT /researchers — mapping: user_id keyword, full_name text, bio text, institution text, interests keyword[], skills keyword[], embedding dense_vector(384, similarity: cosine).
+	2
+	Indexing script
+	scripts/index_profiles.js: query all users + interests + skills from PG; GET embedding from /embed; bulk index to ES. Run: node scripts/index_profiles.js.
+	3
+	GET /search/researchers
+	Query param: q. Build ES query: multi_match on (full_name, bio, institution) + filter on interests. Return top 10. File: routes/search.js.
+	4
+	kNN search route
+	GET /search/semantic?q=text: call ML /embed; use ES knn query { field: embedding, query_vector, k: 10 }. Return results.
+	5
+	Test
+	Index 5 seed users (see seed file). Search 'machine learning' → relevant users appear in <200ms. Log query time.
+	
+
+Deliverable:  Elasticsearch index with mappings; indexing script; two search endpoints (keyword + semantic) returning results.
+	
+
+Trade-off / Note:  MVP: Manual re-indexing via script. Post-MVP: Event-driven indexing on profile update via queue.
+	
+
+
+
+
+
+Day
+8
+	Next.js Frontend Scaffold + Auth UI
+Phase 1
+	SRCP 40-Day Plan
+Mostofa Aminur Rashid
+	
+
+User Story:  As a new researcher, I want a clean registration and login page so I can access the platform from a browser.
+	
+
+Technical Tasks
+#
+	Area
+	Task / Command / Code Snippet
+	1
+	Next.js Init
+	cd frontend && npx create-next-app@latest . --ts --tailwind --app --no-src-dir. Install: axios, react-query, zustand, react-hook-form, zod.
+	2
+	Folder structure
+	app/(auth)/login page.tsx, app/(auth)/register page.tsx, app/(dashboard)/layout.tsx, components/ui/, lib/api.ts, store/authStore.ts.
+	3
+	API client
+	lib/api.ts: axios instance with baseURL = process.env.NEXT_PUBLIC_API_URL; interceptor to attach Bearer token; refresh on 401.
+	4
+	Register Page
+	Form: full_name, email, password, institution. Zod schema validation. POST /auth/register → redirect to /login.
+	5
+	Login Page
+	Form: email, password. POST /auth/login → store accessToken in Zustand; save refresh in memory; redirect to /dashboard.
+	6
+	Auth Store
+	Zustand: { user, token, setAuth, logout }. Persist token in sessionStorage. middleware.ts: redirect unauthenticated to /login.
+	
+
+Deliverable:  Next.js app running on :3000; register → login flow working end-to-end in browser.
+	
+
+
+
+
+
+________________
+
+
+Day
+9
+	Redis Caching + Seed Data
+Phase 1
+	SRCP 40-Day Plan
+Mostofa Aminur Rashid
+	
+
+User Story:  As a researcher, I want my dashboard to load in under 50ms so I don't wait for recommendations every visit.
+	
+
+Technical Tasks
+#
+	Area
+	Task / Command / Code Snippet
+	1
+	Redis client
+	npm i ioredis. lib/redis.js: new Redis(process.env.REDIS_URL); export set/get/del wrappers with JSON parse/stringify.
+	2
+	Cache middleware
+	middleware/cache.js: check Redis key; if hit return JSON; if miss call next, store result with TTL. Use on GET /users/:id (TTL 300s).
+	3
+	Invalidation
+	On PATCH /users/:id, del cache key: user:${id}. Helper: cache.invalidate('user', id).
+	4
+	Seed Script
+	scripts/seed.js: Insert 20 researchers with varied interests (NLP, CV, bioinformatics, HCI, robotics). 5 papers each. Run: node scripts/seed.js.
+	5
+	Verify cache
+	GET /users/1 twice; second call served from Redis; log shows 'cache hit'. Use redis-cli monitor to confirm.
+	
+
+Deliverable:  Redis caching layer working on profile routes; seed database with 20 realistic researchers and 100 papers.
+	
+
+
+
+
+
+Day
+10
+	Phase 1 Test Day + Integration Smoke Tests
+Phase 1
+	SRCP 40-Day Plan
+Mostofa Aminur Rashid
+	
+
+User Story:  As the QA engineer, I want automated tests covering the foundation so that regressions are caught immediately.
+	
+
+Technical Tasks
+#
+	Area
+	Task / Command / Code Snippet
+	1
+	Test setup
+	npm i -D jest supertest @jest/globals. jest.config.js: testEnvironment node, separate test DB (SRCP_TEST). Run: npm test.
+	2
+	Auth tests
+	test/auth.test.js: register new user; login; get 401 with bad token; refresh token. 6 test cases.
+	3
+	Profile tests
+	test/users.test.js: GET /users/:id; PATCH /users/:id; add interests; avatar upload; cache hit on second GET.
+	4
+	Search tests
+	test/search.test.js: keyword search returns results; semantic search returns results; empty query returns 400.
+	5
+	ML service tests
+	test_embed.py (pytest): POST /embed with text returns 384-dim array; /health returns ok.
+	6
+	CI pipeline
+	.github/workflows/ci.yml: trigger on PR to dev; steps: checkout, npm ci, docker compose up -d, npm test, docker compose down.
+	7
+	Bug fixing
+	Allocate last 2 hours to fix any failing tests found. Update CHANGELOG.md: Phase 1 complete.
+	
+
+Deliverable:  25+ automated tests passing; GitHub Actions CI running green; Phase 1 sign-off checklist complete.
+	
+
+
+
+
+
+________________
+
+
+Day
+11
+	CF+CB Hybrid Matching Engine
+Phase 2
+	SRCP 40-Day Plan
+Mostofa Aminur Rashid
+	
+
+User Story:  As a new researcher, I want the platform to suggest relevant collaborators on first login based on my profile tags.
+	
+
+Technical Tasks
+#
+	Area
+	Task / Command / Code Snippet
+	1
+	CBF (Content-Based)
+	routers/match.py: get user embedding; ES kNN search for top-20 similar researchers. Weight: cosine(embedding_i, embedding_j) → content_score.
+	2
+	CF (Collaborative)
+	Build user-item interaction matrix from project_members + paper co-authors. Compute item-item cosine similarity. If no interactions yet: CF weight = 0.
+	3
+	Hybrid blend
+	final_score = alpha * content_score + (1-alpha) * cf_score. Alpha = 0.8 (cold start) → 0.5 (experienced). Store alpha_lookup in user record.
+	4
+	POST /match
+	Accept { user_id }. Return list[{ user_id, score, reason: 'shared interests: NLP, CV' }]. Top 10 results.
+	5
+	Schedule on signup
+	Node API: after register, fire async POST to ML /match; store results in Redis as rec:{user_id} TTL 3600.
+	6
+	Refresh job
+	Node cron (node-cron): every 6 hours, for active users call /match and refresh Redis cache.
+	
+
+Deliverable:  CF+CB matching returning top-10 collaborator suggestions; cold-start works with only profile tags; results cached in Redis.
+	
+
+Trade-off / Note:  MVP: In-memory matrix, 1000 user limit. Post-MVP: Spark/distributed CF for 100k+ users.
+	
+
+
+
+
+
+Day
+12
+	Recommendations Feed API + Dashboard UI
+Phase 2
+	SRCP 40-Day Plan
+Mostofa Aminur Rashid
+	
+
+User Story:  As a researcher, I want to see my personalized recommendations on the dashboard the moment I log in.
+	
+
+Technical Tasks
+#
+	Area
+	Task / Command / Code Snippet
+	1
+	GET /recommendations
+	Protected route. Read rec:{user_id} from Redis. If miss: call ML synchronously. Return array of user cards + match score + reason.
+	2
+	Dashboard Layout
+	app/(dashboard)/dashboard/page.tsx: sidebar nav + main content area. Tailwind grid layout. Responsive (mobile: drawer).
+	3
+	RecommendationCard
+	components/RecommendationCard.tsx: avatar, name, institution, top 3 interests, match %, 'Connect' button. Skeleton loader while fetching.
+	4
+	React Query
+	useRecommendations() hook: useQuery key ['recommendations', userId]; staleTime 5min; background refresh.
+	5
+	Search Bar
+	components/SearchBar.tsx: input → debounced 300ms → GET /search/researchers?q=. Display results dropdown.
+	6
+	Toast notifications
+	Install react-hot-toast. Show toast on connect request sent, profile save success, errors.
+	
+
+Deliverable:  Dashboard page showing personalized recommendations; search bar working; responsive layout on mobile.
+	
+
+
+
+
+
+________________
+
+
+Day
+13
+	TrustRank Scoring Algorithm
+Phase 2
+	SRCP 40-Day Plan
+Mostofa Aminur Rashid
+	
+
+User Story:  As a researcher, I want scores that reflect real credibility so that spam profiles appear at the bottom.
+	
+
+Technical Tasks
+#
+	Area
+	Task / Command / Code Snippet
+	1
+	Graph model
+	routers/trustrank.py: represent researchers as nodes; edges = citation (weight 2) + co-author (weight 1.5) + endorsement (weight 1) + institutional_verify (weight 3).
+	2
+	PageRank impl
+	Use networkx.pagerank(G, alpha=0.85, personalization=seed_nodes). Seed nodes = verified professors + DOI-verified papers.
+	3
+	Score normalize
+	Normalize scores to [0,1]; store in users.trust_score via UPDATE query. Log: 'Trust scores updated for N users'.
+	4
+	POST /trust/compute
+	Admin-only endpoint. Triggers full recompute. Returns { updated: N, duration_ms: X }.
+	5
+	Display
+	Add trust badge to RecommendationCard: green shield for >0.7, yellow for 0.4-0.7, none below. Tooltip explains score.
+	6
+	Verified badge
+	Backend: POST /users/:id/verify (admin only). Sets verified=true. Frontend: blue checkmark on profile.
+	
+
+Deliverable:  TrustRank computes scores for all seeded users; badges display correctly on frontend; verified admin endpoint working.
+	
+
+Trade-off / Note:  MVP: NetworkX in-process (fine for <5000 nodes). Post-MVP: Neo4j graph traversal for large-scale.
+	
+
+
+
+
+
+Day
+14
+	Projects & Workspace — Create/Join
+Phase 2
+	SRCP 40-Day Plan
+Mostofa Aminur Rashid
+	
+
+User Story:  As a researcher, I want to create a research project and invite collaborators so we can work together in one place.
+	
+
+Technical Tasks
+#
+	Area
+	Task / Command / Code Snippet
+	1
+	POST /projects
+	Create project: { title, description, research_domain, max_members }. Auto-add creator as OWNER. Return project object.
+	2
+	POST /projects/:id/invite
+	Send invite to user_id. Create record in project_invites(project_id, invitee_id, status=pending). Emit Socket event.
+	3
+	POST /projects/:id/join
+	Accept invite. Insert into project_members. Update invite status=accepted.
+	4
+	GET /projects/:id
+	Return project + members list + task counts + milestone summary.
+	5
+	Projects List Page
+	app/(dashboard)/projects/page.tsx: grid of project cards. 'New Project' modal with react-hook-form. Join via invite link.
+	6
+	Project Detail Page
+	app/(dashboard)/projects/[id]/page.tsx: Tabs: Overview | Tasks | Members | Documents | Milestones.
+	
+
+Deliverable:  Create project flow working end-to-end; invite + join working; project detail page with tabs.
+	
+
+
+
+
+
+________________
+
+
+Day
+15
+	Task Board (Kanban) for Projects
+Phase 2
+	SRCP 40-Day Plan
+Mostofa Aminur Rashid
+	
+
+User Story:  As a project member, I want a Kanban board to track tasks so everyone knows what needs to be done.
+	
+
+Technical Tasks
+#
+	Area
+	Task / Command / Code Snippet
+	1
+	Tasks API
+	POST /projects/:id/tasks: { title, description, assignee_id, due_date, status: todo|in_progress|done }. GET /projects/:id/tasks returns grouped by status.
+	2
+	PATCH /tasks/:id
+	Update status, assignee, due_date. Emit Socket event task:updated to project room.
+	3
+	Kanban UI
+	components/KanbanBoard.tsx: 3 columns (Todo / In Progress / Done). Drag-and-drop using @dnd-kit/core. Cards show title + assignee avatar + due date.
+	4
+	Real-time sync
+	On task drag-and-drop → PATCH API → WS emit → other users see move in real-time.
+	5
+	Task Detail Modal
+	Click task → modal: edit title/description, change assignee (member dropdown), set due date, add comment.
+	
+
+Deliverable:  Fully functional Kanban board with drag-and-drop; real-time updates for all project members; task CRUD working.
+	
+
+
+
+
+
+Day
+16
+	Socket.IO Real-time Layer
+Phase 2
+	SRCP 40-Day Plan
+Mostofa Aminur Rashid
+	
+
+User Story:  As a project member, I want to see live updates when teammates change tasks or send messages, without refreshing.
+	
+
+Technical Tasks
+#
+	Area
+	Task / Command / Code Snippet
+	1
+	Socket setup
+	npm i socket.io. server.js: const io = new Server(httpServer, { cors: { origin: FRONTEND_URL } }); attach to same HTTP server as Express.
+	2
+	Auth on connect
+	io.use((socket, next) => { verify JWT from socket.handshake.auth.token; attach socket.userId; next() }).
+	3
+	Rooms
+	On connect: socket.join('user:' + socket.userId). On join project: socket.join('project:' + projectId).
+	4
+	Events emitted
+	task:updated, task:created, invite:received, notification:new, member:joined. All carry { payload, timestamp, actorId }.
+	5
+	Frontend client
+	lib/socket.ts: singleton socket.io-client; connect on auth. useSocket() hook: subscribe to events, update React Query cache on task events.
+	6
+	Notification Bell
+	components/NotificationBell.tsx: unread count badge; dropdown list; mark-all-read endpoint; real-time new badge on socket event.
+	
+
+Deliverable:  Real-time task updates + notifications across browser tabs; socket authentication working; notification bell with live count.
+	
+
+
+
+
+
+________________
+
+
+Day
+17
+	Paper Library & DOI Integration
+Phase 2
+	SRCP 40-Day Plan
+Mostofa Aminur Rashid
+	
+
+User Story:  As a researcher, I want to add papers to my profile and have metadata auto-filled by DOI so I don't retype everything.
+	
+
+Technical Tasks
+#
+	Area
+	Task / Command / Code Snippet
+	1
+	DOI lookup
+	GET /papers/doi?doi=10.xxxx: fetch https://api.semanticscholar.org/graph/v1/paper/{doi}?fields=title,authors,year,venue,abstract. Return metadata.
+	2
+	POST /papers
+	Save paper to DB; trigger ML embedding: POST ml/embed({ text: title + ' ' + abstract }); store vector in papers.embedding_vector.
+	3
+	GET /papers?user_id=
+	Return user's papers sorted by year DESC. Include embedding present indicator.
+	4
+	DELETE /papers/:id
+	Soft delete (deleted_at timestamp). Verify ownership.
+	5
+	Paper Library Page
+	app/(dashboard)/library/page.tsx: list of papers; 'Add Paper' → DOI input → autofill form. Manual entry fallback.
+	6
+	Paper Card
+	components/PaperCard.tsx: title, authors, venue/year, abstract excerpt, DOI link, delete button.
+	
+
+Deliverable:  Paper library page; DOI auto-fill working via Semantic Scholar API; papers saved with embeddings.
+	
+
+Trade-off / Note:  MVP: Semantic Scholar free API (no key). Post-MVP: Crossref + Scopus for richer metadata.
+	
+
+
+
+
+
+Day
+18
+	Community Forum + TrustRank-Sorted Feed
+Phase 2
+	SRCP 40-Day Plan
+Mostofa Aminur Rashid
+	
+
+User Story:  As a researcher, I want a Q&A forum where high-quality answers bubble up so I trust the information I find.
+	
+
+Technical Tasks
+#
+	Area
+	Task / Command / Code Snippet
+	1
+	Schema
+	Migration 005: posts(id, author_id, title, content TEXT, category ENUM, created_at), comments(id, post_id, author_id, content, parent_id), votes(post_id/comment_id, user_id, value +1/-1).
+	2
+	Posts API
+	POST /forum/posts, GET /forum/posts?sort=trust|recent|hot, GET /forum/posts/:id, PATCH, DELETE (author only).
+	3
+	Comments API
+	POST /forum/posts/:id/comments (threaded via parent_id). GET returns tree structure.
+	4
+	TrustRank sort
+	GET /forum/posts: sort = trust → ORDER BY (vote_score * author.trust_score) DESC. Spam posts with low-trust authors buried.
+	5
+	Forum Page
+	app/(dashboard)/forum/page.tsx: category filter, sort toggle, post list, 'New Post' modal with markdown editor (react-markdown).
+	6
+	Vote UI
+	Upvote/downvote buttons; optimistic update in React Query; debounced API call.
+	
+
+Deliverable:  Community forum with posts, threaded comments, voting, and TrustRank-sorted feed.
+	
+
+
+
+
+
+________________
+
+
+Day
+19
+	Publication Assistant — Journal Finder
+Phase 2
+	SRCP 40-Day Plan
+Mostofa Aminur Rashid
+	
+
+User Story:  As a researcher, I want journal recommendations based on my paper abstract so I know where to submit without weeks of research.
+	
+
+Technical Tasks
+#
+	Area
+	Task / Command / Code Snippet
+	1
+	DOAJ integration
+	GET /publication/journals?abstract=<text>: extract keywords (top-5 TF-IDF terms); query https://doaj.org/api/search/journals/{keyword}; return matches.
+	2
+	Scimago fallback
+	If DOAJ returns <3 results: parse local Scimago CSV (pre-downloaded, ~30MB); filter by domain; return top 5 by SJR score.
+	3
+	Score journals
+	Rank by semantic similarity: embed abstract + journal aims_scope; cosine rank top 5. Return { name, issn, sjr_score, open_access, url, match_pct }.
+	4
+	Paper Templates
+	Store 5 LaTeX templates (IEEE, ACM, Springer, Elsevier, APA) in /public/templates/. GET /publication/templates returns list + download link.
+	5
+	Publication Page
+	app/(dashboard)/publication/page.tsx: textarea for abstract → 'Find Journals' button → result cards with SJR badge + OA indicator + template download.
+	
+
+Deliverable:  Publication Assistant returning top journal recommendations from DOAJ; template downloads working.
+	
+
+Trade-off / Note:  MVP: DOAJ free API + local Scimago CSV. Post-MVP: Paid Scopus API for impact factors.
+	
+
+
+
+
+
+Day
+20
+	Phase 2 Test Day + End-to-End Tests
+Phase 2
+	SRCP 40-Day Plan
+Mostofa Aminur Rashid
+	
+
+User Story:  As QA, I want E2E tests covering the full researcher journey so that the core features are verifiably working.
+	
+
+Technical Tasks
+#
+	Area
+	Task / Command / Code Snippet
+	1
+	Playwright setup
+	cd frontend && npm i -D @playwright/test && npx playwright install. Config: playwright.config.ts with baseURL :3000, 2 workers.
+	2
+	E2E: Register→Recommend
+	test: register → login → dashboard loads → recommendations visible → click collaborator → view profile. Full happy path.
+	3
+	E2E: Project flow
+	Create project → invite user (second browser context) → accept invite → create task → drag to In Progress → verify WS update.
+	4
+	E2E: Forum
+	Post question → add comment → upvote → verify trust-sorted order.
+	5
+	API integration tests
+	test/matching.test.js: seed 2 users with overlapping interests; run match; verify cosine score > 0.5.
+	6
+	Performance check
+	k6 smoke: 10 VUs, 30s. GET /recommendations must p95 < 50ms (Redis hit). GET /search p95 < 200ms.
+	7
+	Fix & document
+	Fix top 3 bugs. Update docs/API.md with all Phase 2 endpoints. Commit with tag v0.2.0.
+	
+
+Deliverable:  E2E test suite; k6 performance baselines; API docs updated; v0.2.0 tagged on main.
+	
+
+
+
+
+
+________________
+
+
+Day
+21
+	OAuth 2.0 (Google Login) + Email Verification
+Phase 3
+	SRCP 40-Day Plan
+Mostofa Aminur Rashid
+	
+
+User Story:  As a researcher, I want to sign in with my Google account so I don't need another password to remember.
+	
+
+Technical Tasks
+#
+	Area
+	Task / Command / Code Snippet
+	1
+	Passport.js
+	npm i passport passport-google-oauth20. Configure GoogleStrategy: clientID/SECRET from env; callback /auth/google/callback.
+	2
+	OAuth flow
+	GET /auth/google → Google consent → callback → find-or-create user → issue JWT → redirect frontend with token in query param.
+	3
+	Email verification
+	On register: generate 6-digit code; store in Redis email_verify:{code} = userId TTL 600s. POST /auth/verify-email { code } to confirm.
+	4
+	Email service
+	npm i nodemailer. Use Gmail SMTP (free dev). Template: plain HTML with verification code. Also send on password reset.
+	5
+	Google button UI
+	Login page: 'Continue with Google' button → window.open /auth/google. Handle token from callback URL.
+	
+
+Deliverable:  Google OAuth login working; email verification flow complete; welcome email sent on register.
+	
+
+Trade-off / Note:  MVP: Gmail SMTP. Post-MVP: SES/SendGrid for production deliverability.
+	
+
+
+
+
+
+Day
+22
+	Milestone Tracker + Gantt-style Timeline
+Phase 3
+	SRCP 40-Day Plan
+Mostofa Aminur Rashid
+	
+
+User Story:  As a project owner, I want milestones with deadlines so the team stays on track toward research goals.
+	
+
+Technical Tasks
+#
+	Area
+	Task / Command / Code Snippet
+	1
+	Schema
+	Migration 006: milestones(id, project_id, title, description, due_date, completed_at). ALTER tasks ADD milestone_id FK.
+	2
+	Milestones API
+	CRUD /projects/:id/milestones. PATCH /milestones/:id/complete. GET returns with task progress %.
+	3
+	Timeline UI
+	components/MilestoneTimeline.tsx: horizontal bar chart using recharts. Each milestone = colored bar from created_at to due_date. Completed = green.
+	4
+	Progress calc
+	GET /projects/:id: include milestone_progress = { completed_tasks / total_tasks } per milestone.
+	5
+	Overdue alert
+	Cron: daily check overdue milestones; emit notification:new to project members via Socket.
+	
+
+Deliverable:  Milestone tracker with visual Gantt timeline; overdue alerts working; task-milestone linking.
+	
+
+
+
+
+
+________________
+
+
+Day
+23
+	Collaborative Document Editor (Rich Text)
+Phase 3
+	SRCP 40-Day Plan
+Mostofa Aminur Rashid
+	
+
+User Story:  As project members, we want to co-edit research notes in real-time so we don't overwrite each other's work.
+	
+
+Technical Tasks
+#
+	Area
+	Task / Command / Code Snippet
+	1
+	Tiptap setup
+	npm i @tiptap/react @tiptap/starter-kit @tiptap/extension-collaboration @tiptap/extension-collaboration-cursor yjs y-websocket.
+	2
+	Y.js WS server
+	ws-server.js: import { setupWSConnection } from 'y-websocket/bin/utils'; use on path /docs/:docId. Run on port 3002.
+	3
+	Doc storage
+	Migration 007: documents(id, project_id, title, content JSONB, updated_at). Persist Y.js state to DB every 30s via provider.on('synced').
+	4
+	TiptapEditor
+	components/TiptapEditor.tsx: Editor with CollaborationCursor showing other users' cursors with name + color. Toolbar: Bold/Italic/H1/H2/List/Code.
+	5
+	Documents Tab
+	Project detail Documents tab: list docs, 'New Document' button, click to open TiptapEditor. Real-time multi-user editing.
+	
+
+Deliverable:  Collaborative rich-text editor in project workspace; multiple users can edit simultaneously with named cursors.
+	
+
+Trade-off / Note:  MVP: Y.js in-memory with DB snapshot. Post-MVP: Liveblocks or PartyKit for managed CRDT hosting.
+	
+
+
+
+
+
+Day
+24
+	Advanced Search (Filters + Faceted)
+Phase 3
+	SRCP 40-Day Plan
+Mostofa Aminur Rashid
+	
+
+User Story:  As a researcher, I want to filter search results by domain, institution, and paper count so I find exactly the right collaborator.
+	
+
+Technical Tasks
+#
+	Area
+	Task / Command / Code Snippet
+	1
+	ES aggregations
+	Add aggs to search query: terms on interests.keyword, terms on institution.keyword, range on paper_count. Return buckets as facets.
+	2
+	Filter params
+	GET /search/researchers?q=NLP&interests=ML,CV&institution=MIT&min_papers=5. Build ES bool filter from params.
+	3
+	Search Page
+	app/(dashboard)/search/page.tsx: full search page with sidebar filters (checkboxes per facet), result list, pagination.
+	4
+	Autocomplete
+	GET /search/autocomplete?q=: ES suggest query on full_name + institution. Return top 5 completions. Use in SearchBar dropdown.
+	5
+	Search history
+	Store last 10 searches in localStorage. Show as 'Recent' below empty search box.
+	
+
+Deliverable:  Advanced search with faceted filtering, autocomplete, pagination, and search history.
+	
+
+
+
+
+
+________________
+
+
+Day
+25
+	Direct Messaging (DMs)
+Phase 3
+	SRCP 40-Day Plan
+Mostofa Aminur Rashid
+	
+
+User Story:  As a researcher, I want to message a potential collaborator privately before committing to a project.
+	
+
+Technical Tasks
+#
+	Area
+	Task / Command / Code Snippet
+	1
+	Schema
+	Migration 008: conversations(id, created_at), conversation_members(conversation_id, user_id), messages(id, conversation_id, sender_id, content, read_at, created_at).
+	2
+	Conversations API
+	POST /conversations { recipient_id }: find-or-create DM. GET /conversations: list user's conversations with last message + unread count.
+	3
+	Messages API
+	GET /conversations/:id/messages (paginated, 50/page). POST /conversations/:id/messages { content }. Mark read on GET.
+	4
+	Real-time DMs
+	On POST message: io.to('user:' + recipientId).emit('message:new', { conversationId, message }). Update unread badge.
+	5
+	DM UI
+	app/(dashboard)/messages/page.tsx: left pane = conversation list; right = message thread; input at bottom. Auto-scroll to latest.
+	
+
+Deliverable:  Full DM system with real-time delivery, unread count badges, and paginated message history.
+	
+
+
+
+
+
+Day
+26
+	User Connections + Endorsements
+Phase 3
+	SRCP 40-Day Plan
+Mostofa Aminur Rashid
+	
+
+User Story:  As a researcher, I want to endorse a collaborator's skills so the community can vouch for expertise.
+	
+
+Technical Tasks
+#
+	Area
+	Task / Command / Code Snippet
+	1
+	Schema
+	Migration 009: connections(id, requester_id, addressee_id, status ENUM(pending/accepted/blocked), created_at). endorsements(id, endorser_id, recipient_id, skill_name).
+	2
+	Connection API
+	POST /connections { addressee_id }. PATCH /connections/:id { status }. GET /connections?status=accepted (user's network).
+	3
+	Endorsements API
+	POST /endorsements { recipient_id, skill_name }. One endorsement per skill per pair. GET /users/:id/endorsements: grouped by skill with count.
+	4
+	Trust recalc
+	On new endorsement: increment edge weight in TrustRank graph; recalculate score for recipient.
+	5
+	Profile UI
+	Profile page: 'Connect' / 'Pending' / 'Connected' button. Skills section shows endorsement count per skill. 'Endorse' button for connected users.
+	
+
+Deliverable:  Connection requests + endorsements working; trust scores update on endorsement; profile shows network connections.
+	
+
+
+
+
+
+________________
+
+
+Day
+27
+	Admin Dashboard + Moderation
+Phase 3
+	SRCP 40-Day Plan
+Mostofa Aminur Rashid
+	
+
+User Story:  As an admin, I want a dashboard to see platform metrics and moderate inappropriate content.
+	
+
+Technical Tasks
+#
+	Area
+	Task / Command / Code Snippet
+	1
+	Admin role
+	Add role ENUM('user','admin','moderator') to users. Middleware: requireRole('admin'). Seed one admin user.
+	2
+	Metrics API
+	GET /admin/stats: { total_users, active_today, total_projects, total_papers, avg_trust_score, top_domains: [...] }. Query PG + ES.
+	3
+	User management
+	GET /admin/users?page=&search=. PATCH /admin/users/:id { verified, banned, role }. Suspend user: set banned=true + invalidate sessions.
+	4
+	Content moderation
+	GET /admin/reports: flagged posts/comments. POST /forum/posts/:id/report { reason }. Admin can delete + warn author.
+	5
+	Admin UI
+	app/(admin)/layout.tsx: separate admin layout. Dashboard with charts (recharts): user growth, active projects, search query volume.
+	
+
+Deliverable:  Admin dashboard with platform metrics; user management (ban/verify/promote); content moderation queue.
+	
+
+
+
+
+
+Day
+28
+	Rate Limiting + Security Hardening
+Phase 3
+	SRCP 40-Day Plan
+Mostofa Aminur Rashid
+	
+
+User Story:  As the platform owner, I want protection against abuse and brute-force attacks so the platform stays reliable.
+	
+
+Technical Tasks
+#
+	Area
+	Task / Command / Code Snippet
+	1
+	Rate limiting
+	npm i express-rate-limit rate-limit-redis. Auth routes: 5 req/15min per IP. API: 100 req/min per user. ES search: 30 req/min.
+	2
+	Helmet
+	Already installed. Add: contentSecurityPolicy, HSTS, X-Frame-Options: DENY, referrerPolicy strict-origin.
+	3
+	Input sanitization
+	npm i dompurify isomorphic-dompurify. Sanitize all user-input HTML (forum posts, bio) before storage. Strip script tags.
+	4
+	SQL injection guard
+	Audit all Knex queries — use parameterized (knex.raw with bindings only). No string interpolation in queries.
+	5
+	OWASP checklist
+	Run npm audit --fix. Check: no secrets in code (use dotenv-vault). Add CORS allowlist. Review all admin endpoints require role check.
+	6
+	Password policy
+	Enforce: min 8 chars, 1 upper, 1 number, 1 special. Add POST /auth/forgot-password + /reset-password flow with secure token.
+	
+
+Deliverable:  Rate limiting on all sensitive routes; security headers via Helmet; OWASP top-10 audit complete; password reset flow.
+	
+
+
+
+
+
+________________
+
+
+Day
+29
+	Performance Optimization + Query Tuning
+Phase 3
+	SRCP 40-Day Plan
+Mostofa Aminur Rashid
+	
+
+User Story:  As a user with 10,000 concurrent users on the platform, I want pages to stay fast so my experience doesn't degrade.
+	
+
+Technical Tasks
+#
+	Area
+	Task / Command / Code Snippet
+	1
+	EXPLAIN ANALYZE
+	Run EXPLAIN ANALYZE on top 5 slowest queries (profile fetch, search, recommendation). Add missing indexes. Target: all queries <20ms.
+	2
+	N+1 fix
+	Audit all routes returning lists. Replace N+1 queries with JOINs or batch Knex.whereIn(). Example: project members list.
+	3
+	ES caching
+	Add Redis cache (TTL 60s) on popular searches: /search/researchers?q=. Key: search:{hash(query+filters)}.
+	4
+	Next.js optimization
+	Add next/image for all avatars (auto-compress, lazy load). Enable ISR on public profile pages: revalidate: 300.
+	5
+	Bundle analysis
+	npx @next/bundle-analyzer. Remove unused imports. Lazy-load heavy components (KanbanBoard, TiptapEditor) with next/dynamic.
+	6
+	Load test
+	k6 run: 50 VUs, 2min. Target: p99 /dashboard < 200ms, /search < 300ms. Document results in docs/performance.md.
+	
+
+Deliverable:  Queries optimized (all <20ms); bundle size reduced by >20%; k6 load test passes at 50 VUs.
+	
+
+
+
+
+
+Day
+30
+	Phase 3 Test Day + Regression Suite
+Phase 3
+	SRCP 40-Day Plan
+Mostofa Aminur Rashid
+	
+
+User Story:  As QA, I want a full regression suite so I'm confident no features broke during enhancements.
+	
+
+Technical Tasks
+#
+	Area
+	Task / Command / Code Snippet
+	1
+	Playwright regression
+	Extend E2E suite: test OAuth login, DM flow, milestone creation, document editing (headless WS). Total E2E: 20+ tests.
+	2
+	Unit tests
+	test/trustrank.test.py: seed graph; verify scores; test verified-node seeding. test/matching.test.py: cold start vs warm start alpha.
+	3
+	Security tests
+	test/security.test.js: verify rate limit triggers at 6th auth attempt; verify admin routes return 403 for regular user.
+	4
+	Accessibility
+	npx @axe-core/playwright audit on all 6 main pages. Fix critical/serious violations (color contrast, aria-labels, focus order).
+	5
+	Load test v2
+	k6 realistic: 100 VUs, 5min ramp. Verify system stable. Check memory leak: Node process memory before/after.
+	6
+	Tag & changelog
+	git tag v0.3.0. Update CHANGELOG.md. Create GitHub milestone 'Phase 3 Complete' and close all issues.
+	
+
+Deliverable:  Full regression suite (50+ tests); accessibility audit clean; v0.3.0 tagged; no P1 bugs open.
+	
+
+
+
+
+
+________________
+
+
+Day
+31
+	Dockerize All Services
+Phase 4
+	SRCP 40-Day Plan
+Mostofa Aminur Rashid
+	
+
+User Story:  As DevOps, I want every service containerized so that deployment to any cloud is one command.
+	
+
+Technical Tasks
+#
+	Area
+	Task / Command / Code Snippet
+	1
+	backend/Dockerfile
+	FROM node:20-alpine; WORKDIR /app; COPY package*.json; RUN npm ci --only=production; COPY .; EXPOSE 3001; CMD node server.js.
+	2
+	ml-service/Dockerfile
+	FROM python:3.11-slim; RUN pip install -r requirements.txt; COPY . .; EXPOSE 8000; CMD uvicorn main:app --host 0.0.0.0.
+	3
+	frontend/Dockerfile
+	Multi-stage: stage 1 builder (npm run build); stage 2 runner (FROM node:20-alpine, copy .next/standalone). EXPOSE 3000.
+	4
+	.dockerignore
+	Add node_modules, .env, .git, __pycache__, *.pyc, .next to all .dockerignore files.
+	5
+	docker-compose.prod.yml
+	Production compose: all 6 services (backend, ml, frontend, postgres, redis, elasticsearch). Network: srcp_net. No port 5432 exposed externally.
+	6
+	Build test
+	docker compose -f docker-compose.prod.yml build. All images build clean. docker images: check sizes (backend <200MB, ml <800MB, frontend <150MB).
+	
+
+Deliverable:  All 3 app services Dockerized; production compose file; multi-stage frontend build; all images <1GB.
+	
+
+
+
+
+
+Day
+32
+	CI/CD Pipeline (GitHub Actions)
+Phase 4
+	SRCP 40-Day Plan
+Mostofa Aminur Rashid
+	
+
+User Story:  As a developer, I want every push to automatically test and deploy so releases are safe and hands-off.
+	
+
+Technical Tasks
+#
+	Area
+	Task / Command / Code Snippet
+	1
+	CI workflow
+	.github/workflows/ci.yml: on push/PR to dev. Jobs: test-backend (npm ci, npm test), test-ml (pip install, pytest), test-e2e (playwright).
+	2
+	CD workflow
+	.github/workflows/deploy.yml: on push to main. Jobs: build → push to Docker Hub (docker/build-push-action) → SSH deploy to VPS.
+	3
+	Secrets
+	GitHub Secrets: DOCKER_USERNAME, DOCKER_PASSWORD, VPS_HOST, VPS_SSH_KEY, VPS_USER. Never hardcode.
+	4
+	Deploy script
+	scripts/deploy.sh on VPS: docker compose -f docker-compose.prod.yml pull && docker compose up -d --no-deps. Zero-downtime via depends_on.
+	5
+	Slack notification
+	Add step: curl to Slack webhook on deploy success/failure. Message: 'SRCP v{TAG} deployed to production ✅'.
+	
+
+Deliverable:  Full CI/CD pipeline; every PR runs tests; every merge to main deploys automatically; Slack notifications.
+	
+
+
+
+
+
+________________
+
+
+Day
+33
+	VPS Deployment + HTTPS + Nginx
+Phase 4
+	SRCP 40-Day Plan
+Mostofa Aminur Rashid
+	
+
+User Story:  As a researcher worldwide, I want to access SRCP at a public URL over HTTPS so my data is secure in transit.
+	
+
+Technical Tasks
+#
+	Area
+	Task / Command / Code Snippet
+	1
+	VPS setup
+	Provision: DigitalOcean $24/mo (4GB RAM, 2 CPU) or Railway/Render free tier. Install: Docker, Docker Compose, Nginx, Certbot.
+	2
+	Nginx config
+	/etc/nginx/sites-available/srcp: upstream backend { server localhost:3001; }. Location /api/ proxy_pass backend. Location / proxy_pass frontend:3000. gzip on.
+	3
+	SSL/TLS
+	certbot --nginx -d srcp.yourdomain.com. Auto-renew via cron: 0 3 * * * certbot renew --quiet. Force HTTPS redirect.
+	4
+	DNS
+	Add A record: srcp.yourdomain.com → VPS IP. TTL 300. Verify propagation with dig srcp.yourdomain.com.
+	5
+	Env vars on VPS
+	Create /opt/srcp/.env from .env.example. Set all production values. chmod 600 .env. Never commit to git.
+	6
+	First deploy
+	Run deploy.sh. Verify: https://srcp.yourdomain.com loads. Login works. API responds. SSL green lock in browser.
+	
+
+Deliverable:  SRCP live at public HTTPS URL; Nginx reverse proxy; auto-renewing SSL; production env configured.
+	
+
+
+
+
+
+Day
+34
+	Monitoring: Logs + Uptime + Error Tracking
+Phase 4
+	SRCP 40-Day Plan
+Mostofa Aminur Rashid
+	
+
+User Story:  As the platform owner, I want real-time alerts when the system is down or has errors so I can respond within minutes.
+	
+
+Technical Tasks
+#
+	Area
+	Task / Command / Code Snippet
+	1
+	Structured logging
+	npm i winston. logger.js: JSON format logs with { level, timestamp, service, message, requestId }. Replace all console.log. Output to stdout (Docker captures).
+	2
+	Request logging
+	Morgan with JSON stream to winston. Log: method, url, status, responseTime, userId. Exclude /health endpoint.
+	3
+	Uptime monitoring
+	UptimeRobot free: add HTTP monitor for https://srcp.yourdomain.com/api/v1/health. Alert via email+Slack on downtime.
+	4
+	Error tracking
+	Sign up Sentry free (5K errors/mo). npm i @sentry/node. Init in server.js before routes. Sentry.captureException in global error handler.
+	5
+	ML monitoring
+	FastAPI: log each /match call with { user_id, result_count, latency_ms } to stdout. Parse with: docker logs srcp_ml | grep 'match' | tail -100.
+	6
+	Health endpoint
+	GET /api/v1/health: check DB connection (SELECT 1), Redis ping, ES cluster health. Return { status, db, redis, es, uptime_s }.
+	
+
+Deliverable:  Structured logging to Docker stdout; Sentry error tracking live; UptimeRobot monitoring; /health endpoint.
+	
+
+
+
+
+
+________________
+
+
+Day
+35
+	Database Backups + Disaster Recovery
+Phase 4
+	SRCP 40-Day Plan
+Mostofa Aminur Rashid
+	
+
+User Story:  As the platform owner, I want daily backups so I can recover data if something catastrophic happens.
+	
+
+Technical Tasks
+#
+	Area
+	Task / Command / Code Snippet
+	1
+	PG backup script
+	scripts/backup.sh: pg_dump -U srcp srcp | gzip > /backups/srcp_$(date +%Y%m%d_%H%M).sql.gz. Schedule: cron 0 2 * * *.
+	2
+	Offsite storage
+	Install rclone. Configure rclone remote (B2 free tier 10GB or S3 free tier). Post-backup: rclone copy /backups remote:srcp-backups/ --max-age 7d.
+	3
+	Restore test
+	Test full restore: gunzip backup.sql.gz; psql -U srcp srcp < backup.sql. Verify row counts match. Document in docs/runbook.md.
+	4
+	Data retention
+	Keep 7 daily, 4 weekly, 3 monthly backups. cleanup.sh: find /backups -mtime +7 -delete. Add to cron.
+	5
+	ES snapshot
+	PUT /_snapshot/srcp_backup (filesystem or S3). PUT /_snapshot/srcp_backup/snapshot_$(date +%Y%m%d)?wait_for_completion=true. Weekly cron.
+	
+
+Deliverable:  Automated daily PG backups; offsite upload to B2/S3; restore procedure tested and documented; ES snapshots.
+	
+
+
+
+
+
+Day
+36
+	API Documentation (OpenAPI / Swagger)
+Phase 4
+	SRCP 40-Day Plan
+Mostofa Aminur Rashid
+	
+
+User Story:  As a future developer integrating with SRCP, I want interactive API docs so I can test endpoints without reading code.
+	
+
+Technical Tasks
+#
+	Area
+	Task / Command / Code Snippet
+	1
+	swagger-jsdoc
+	npm i swagger-jsdoc swagger-ui-express. Configure openapi: 3.0.0 in swagger.js. Mount /api/docs on Express.
+	2
+	Annotate routes
+	Add JSDoc @swagger comments to all 30+ endpoints: description, parameters, requestBody, responses with examples.
+	3
+	FastAPI autodocs
+	FastAPI auto-generates /docs (Swagger) and /redoc. Add response_model to all endpoints. Add docstrings to routers.
+	4
+	Auth in docs
+	Add securitySchemes: { bearerAuth: { type: http, scheme: bearer } }. Add security: [bearerAuth] to protected endpoints.
+	5
+	Export
+	Generate static docs/api-reference.html from swagger spec: npx swagger-codegen-cli generate -i swagger.json -l html2 -o docs/api/.
+	
+
+Deliverable:  Interactive Swagger UI at /api/docs; all 30+ endpoints documented with examples; static HTML export in /docs.
+	
+
+
+
+
+
+________________
+
+
+Day
+37
+	Architecture Diagram + Technical Documentation
+Phase 4
+	SRCP 40-Day Plan
+Mostofa Aminur Rashid
+	
+
+User Story:  As the thesis examiner, I want complete technical documentation so I can evaluate the system architecture.
+	
+
+Technical Tasks
+#
+	Area
+	Task / Command / Code Snippet
+	1
+	Architecture diagram
+	Draw.io (free, export SVG/PNG): Layer diagram showing Presentation → API Gateway → ML Service → Data Layer. Include CDN, Nginx, Socket.IO, Redis, ES, PG. Export to docs/architecture.png.
+	2
+	Data flow diagram
+	Sequence diagram: User registers → API → ML embeds → ES indexes → Redis caches → Dashboard loads. Use Mermaid in README.
+	3
+	docs/ARCHITECTURE.md
+	Describe each component: why chosen, what it does, how it connects. 500 words per layer. Include trade-off section: MVP vs. post-MVP.
+	4
+	Database schema diagram
+	Use DBeaver or dbdiagram.io: export ERD of all 10 tables with relationships. Save docs/schema.png.
+	5
+	Setup Guide
+	docs/SETUP.md: step-by-step local setup (prerequisites, env vars, make up, seed, access). Target: new developer set up in <30 min.
+	6
+	Deployment Guide
+	docs/DEPLOYMENT.md: VPS provisioning, Nginx config, SSL, env vars, first deploy, rollback procedure.
+	
+
+Deliverable:  Architecture diagram (SVG); ERD; sequence diagrams in Mermaid; ARCHITECTURE.md, SETUP.md, DEPLOYMENT.md all complete.
+	
+
+
+
+
+
+Day
+38
+	User Manual + Onboarding Flow
+Phase 4
+	SRCP 40-Day Plan
+Mostofa Aminur Rashid
+	
+
+User Story:  As a first-time user, I want an interactive tutorial so I can understand all platform features without reading a manual.
+	
+
+Technical Tasks
+#
+	Area
+	Task / Command / Code Snippet
+	1
+	In-app onboarding
+	npm i react-joyride. Create onboarding tour for 6 steps: profile setup → interests → explore recommendations → view project → forum → publication. Only shown on first login (localStorage flag).
+	2
+	Welcome modal
+	On first login after register: modal with 3 slides: 'Find Collaborators' / 'Manage Projects' / 'Publish Research'. Skip button.
+	3
+	Help tooltips
+	Add ? icon with tooltip on: Trust Score, Match %, Kanban board, Publication Assistant. Use Headless UI Popover.
+	4
+	User Manual PDF
+	docs/user-manual.md: 15-page illustrated guide with screenshots for every feature. Convert to PDF: pandoc user-manual.md -o user-manual.pdf.
+	5
+	FAQ page
+	app/(dashboard)/help/page.tsx: accordion FAQ (10 questions). How does matching work? What is Trust Score? etc.
+	
+
+Deliverable:  Interactive onboarding tour; welcome modal; help tooltips; user manual PDF; FAQ page.
+	
+
+
+
+
+
+________________
+
+
+Day
+39
+	Pre-Demo Polish + Bug Bash
+Phase 4
+	SRCP 40-Day Plan
+Mostofa Aminur Rashid
+	
+
+User Story:  As the demo presenter, I want a pixel-perfect, bug-free experience so the judges are impressed in the final demo.
+	
+
+Technical Tasks
+#
+	Area
+	Task / Command / Code Snippet
+	1
+	UI polish pass
+	Walk every page: check spacing, typography, dark/light consistency, mobile responsiveness. Fix any layout shifts. Ensure Tailwind classes consistent.
+	2
+	Loading states
+	Every data-fetching component has skeleton loader. Every form submit button shows spinner + disables during request.
+	3
+	Error boundaries
+	Wrap major page sections in React error boundaries. Friendly error state: 'Something went wrong. Please refresh.' with retry button.
+	4
+	Demo data
+	scripts/demo-seed.js: Insert 50 realistic researchers (varied domains), 200 papers, 10 active projects, 30 forum posts. Run on production.
+	5
+	Demo script
+	docs/DEMO_SCRIPT.md: 10-minute walkthrough: register → see recommendations → explore profile → create project → invite → task board → forum → publication assistant.
+	6
+	Final smoke test
+	Walk through entire demo script on production. Fix all blockers. Check HTTPS, no console errors, all images load, mobile OK.
+	
+
+Deliverable:  Polished UI across all pages; demo data seeded on production; DEMO_SCRIPT.md written; zero P1 bugs.
+	
+
+
+
+
+
+Day
+40
+	Final Demo Day + Project Handoff
+Phase 4
+	SRCP 40-Day Plan
+Mostofa Aminur Rashid
+	
+
+User Story:  As Mostofa, I want to present a complete, deployed, documented research platform that proves the value of SRCP.
+	
+
+Technical Tasks
+#
+	Area
+	Task / Command / Code Snippet
+	1
+	Demo presentation
+	Present 10-min demo following DEMO_SCRIPT.md. Highlight: matching algorithm, real-time collaboration, TrustRank forum, Publication Assistant. Show live production URL.
+	2
+	Architecture Q&A
+	Prepare 5 deep-dive answers: Why not Neo4j? (NetworkX MVP rationale). Why not Kafka? (direct call MVP). How does SBERT work? Trust score formula. Scaling path.
+	3
+	Performance metrics
+	Show k6 results: p95 response times. Show Redis hit rate (redis-cli INFO stats → keyspace_hits/misses). Show Sentry: 0 unhandled exceptions.
+	4
+	GitHub final commit
+	Tag v1.0.0 on main. Final commit: 'feat: SRCP v1.0.0 — production ready'. Push all docs. Update README with live URL + demo video link.
+	5
+	Handoff doc
+	docs/HANDOFF.md: credentials location, backup schedule, how to add features, known limitations, post-MVP roadmap (Kafka, Neo4j, K8s, mobile app).
+	6
+	Reflection
+	Write 500-word reflection in docs/REFLECTION.md: what went well, trade-offs made, what you'd do differently. Attach as appendix to thesis.
+	
+
+Deliverable:  Live demo delivered; v1.0.0 tagged; all documentation complete; handoff document written. SRCP is production-ready.
+	
+
+
+
+
+
+________________
+
+
+Summary: 40-Day Delivery Matrix
+Every day, one deliverable. The table below shows the full plan at a glance.
+
+
+Day
+	Title
+	Phase
+	Key Deliverable
+	1
+	Project Scaffold & Git Setup
+	P1
+	Mono-repo on GitHub with all folders, linting config, .env template, husky hooks, and README committed.
+	2
+	Docker Compose Dev Environment
+	P1
+	docker-compose.yml running Postgres, Redis, ES; Makefile; all containers healthy.
+	3
+	PostgreSQL Schema & Migrations
+	P1
+	PostgreSQL schema fully migrated with all core tables, indexes, and FK constraints.
+	4
+	Node.js API Skeleton + Auth (Register / Login)
+	P1
+	Working register + login + token refresh endpoints; Postman collection with all 3 calls passing.
+	5
+	User Profile CRUD + File Upload (Avatar)
+	P1
+	Full profile CRUD; avatar upload working; GET /users/:id returns complete profile JSON.
+	6
+	Python FastAPI ML Service Scaffold
+	P1
+	FastAPI ML service running in Docker; POST /embed returns 384-dim vector for any input text; Node API can call it.
+	7
+	Elasticsearch Setup + Profile Indexing
+	P1
+	Elasticsearch index with mappings; indexing script; two search endpoints (keyword + semantic) returning results.
+	8
+	Next.js Frontend Scaffold + Auth UI
+	P1
+	Next.js app running on :3000; register → login flow working end-to-end in browser.
+	9
+	Redis Caching + Seed Data
+	P1
+	Redis caching layer working on profile routes; seed database with 20 realistic researchers and 100 papers.
+	10
+	Phase 1 Test Day + Integration Smoke Tests
+	P1
+	25+ automated tests passing; GitHub Actions CI running green; Phase 1 sign-off checklist complete.
+	11
+	CF+CB Hybrid Matching Engine
+	P2
+	CF+CB matching returning top-10 collaborator suggestions; cold-start works with only profile tags; results cached in Redis.
+	12
+	Recommendations Feed API + Dashboard UI
+	P2
+	Dashboard page showing personalized recommendations; search bar working; responsive layout on mobile.
+	13
+	TrustRank Scoring Algorithm
+	P2
+	TrustRank computes scores for all seeded users; badges display correctly on frontend; verified admin endpoint working.
+	14
+	Projects & Workspace — Create/Join
+	P2
+	Create project flow working end-to-end; invite + join working; project detail page with tabs.
+	15
+	Task Board (Kanban) for Projects
+	P2
+	Fully functional Kanban board with drag-and-drop; real-time updates for all project members; task CRUD working.
+	16
+	Socket.IO Real-time Layer
+	P2
+	Real-time task updates + notifications across browser tabs; socket authentication working; notification bell with live count.
+	17
+	Paper Library & DOI Integration
+	P2
+	Paper library page; DOI auto-fill working via Semantic Scholar API; papers saved with embeddings.
+	18
+	Community Forum + TrustRank-Sorted Feed
+	P2
+	Community forum with posts, threaded comments, voting, and TrustRank-sorted feed.
+	19
+	Publication Assistant — Journal Finder
+	P2
+	Publication Assistant returning top journal recommendations from DOAJ; template downloads working.
+	20
+	Phase 2 Test Day + End-to-End Tests
+	P2
+	E2E test suite; k6 performance baselines; API docs updated; v0.2.0 tagged on main.
+	21
+	OAuth 2.0 (Google Login) + Email Verification
+	P3
+	Google OAuth login working; email verification flow complete; welcome email sent on register.
+	22
+	Milestone Tracker + Gantt-style Timeline
+	P3
+	Milestone tracker with visual Gantt timeline; overdue alerts working; task-milestone linking.
+	23
+	Collaborative Document Editor (Rich Text)
+	P3
+	Collaborative rich-text editor in project workspace; multiple users can edit simultaneously with named cursors.
+	24
+	Advanced Search (Filters + Faceted)
+	P3
+	Advanced search with faceted filtering, autocomplete, pagination, and search history.
+	25
+	Direct Messaging (DMs)
+	P3
+	Full DM system with real-time delivery, unread count badges, and paginated message history.
+	26
+	User Connections + Endorsements
+	P3
+	Connection requests + endorsements working; trust scores update on endorsement; profile shows network connections.
+	27
+	Admin Dashboard + Moderation
+	P3
+	Admin dashboard with platform metrics; user management (ban/verify/promote); content moderation queue.
+	28
+	Rate Limiting + Security Hardening
+	P3
+	Rate limiting on all sensitive routes; security headers via Helmet; OWASP top-10 audit complete; password reset flow.
+	29
+	Performance Optimization + Query Tuning
+	P3
+	Queries optimized (all <20ms); bundle size reduced by >20%; k6 load test passes at 50 VUs.
+	30
+	Phase 3 Test Day + Regression Suite
+	P3
+	Full regression suite (50+ tests); accessibility audit clean; v0.3.0 tagged; no P1 bugs open.
+	31
+	Dockerize All Services
+	P4
+	All 3 app services Dockerized; production compose file; multi-stage frontend build; all images <1GB.
+	32
+	CI/CD Pipeline (GitHub Actions)
+	P4
+	Full CI/CD pipeline; every PR runs tests; every merge to main deploys automatically; Slack notifications.
+	33
+	VPS Deployment + HTTPS + Nginx
+	P4
+	SRCP live at public HTTPS URL; Nginx reverse proxy; auto-renewing SSL; production env configured.
+	34
+	Monitoring: Logs + Uptime + Error Tracking
+	P4
+	Structured logging to Docker stdout; Sentry error tracking live; UptimeRobot monitoring; /health endpoint.
+	35
+	Database Backups + Disaster Recovery
+	P4
+	Automated daily PG backups; offsite upload to B2/S3; restore procedure tested and documented; ES snapshots.
+	36
+	API Documentation (OpenAPI / Swagger)
+	P4
+	Interactive Swagger UI at /api/docs; all 30+ endpoints documented with examples; static HTML export in /docs.
+	37
+	Architecture Diagram + Technical Documentation
+	P4
+	Architecture diagram (SVG); ERD; sequence diagrams in Mermaid; ARCHITECTURE.md, SETUP.md, DEPLOYMENT.md all complete.
+	38
+	User Manual + Onboarding Flow
+	P4
+	Interactive onboarding tour; welcome modal; help tooltips; user manual PDF; FAQ page.
+	39
+	Pre-Demo Polish + Bug Bash
+	P4
+	Polished UI across all pages; demo data seeded on production; DEMO_SCRIPT.md written; zero P1 bugs.
+	40
+	Final Demo Day + Project Handoff
+	P4
+	Live demo delivered; v1.0.0 tagged; all documentation complete; handoff document written. SRCP is production-ready.
+	
+
+________________
+
+
+MVP vs. Post-MVP Trade-off Decisions
+These architectural decisions were consciously made to deliver a working product in 40 days. Each can be upgraded post-MVP with the upgrade path documented below.
+
+
+Feature
+	MVP Choice
+	Post-MVP Upgrade
+	Rationale
+	Graph DB
+	NetworkX (in-process)
+	Neo4j (proper graph DB)
+	NetworkX fine for <5K users; add Neo4j when graph traversal becomes bottleneck
+	Message Queue
+	Direct HTTP calls (sync)
+	Apache Kafka (async)
+	Kafka adds ops complexity; direct calls fine for <100 req/s
+	Infrastructure
+	Docker Compose on 1 VPS
+	Kubernetes (K8s)
+	K8s overhead unjustified for MVP; add when you have 3+ replicas per service
+	Semantic Models
+	all-MiniLM-L6-v2 (90MB)
+	allenai-specter (fine-tuned academic)
+	MiniLM is 5x faster; upgrade if semantic relevance needs improvement
+	CF Algorithm
+	In-memory cosine similarity
+	Spark ALS distributed CF
+	In-memory fine for <1000 users; Spark needed at 100K+
+	Email Service
+	Gmail SMTP
+	AWS SES / SendGrid
+	Gmail has 500/day limit; upgrade before launch to researchers
+	File Storage
+	Local disk (VPS)
+	S3 / R2 object storage
+	Local disk = no horizontal scaling; move to S3 if adding more servers
+	Search
+	Elasticsearch single-node
+	ES cluster (3 nodes)
+	Single node = no redundancy; cluster when availability SLA matters
+	Database
+	PostgreSQL (single)
+	PG + read replica
+	Read replica needed at >10K concurrent users for analytics queries
+	Real-time Docs
+	Y.js in-memory + DB snapshot
+	Liveblocks / PartyKit managed CRDT
+	Self-hosted Y.js works; managed service removes ops burden post-MVP
+	
+
+________________
+
+
+Technology Stack Reference
+Layer
+	Technology
+	Version
+	Role in SRCP
+	Frontend
+	Next.js (React)
+	14 (App Router)
+	SSR + dashboard UI + real-time via Socket.IO client
+	UI
+	Tailwind CSS
+	3.4
+	Utility-first styling; zero runtime overhead
+	State
+	Zustand + React Query
+	latest
+	Auth store + server state caching
+	API Gateway
+	Node.js + Express
+	20 LTS + 4.x
+	REST API; JWT auth; rate limiting; proxy to ML
+	ML Service
+	Python + FastAPI
+	3.11 + 0.110
+	SBERT embedding; CF+CB matching; TrustRank computation
+	Matching
+	Sentence-BERT (MiniLM)
+	all-MiniLM-L6-v2
+	384-dim dense embeddings for semantic profile similarity
+	Trust
+	NetworkX PageRank
+	3.x
+	TrustRank graph computation; credibility scoring
+	Primary DB
+	PostgreSQL
+	16
+	ACID-compliant relational data (users, projects, tasks)
+	Search
+	Elasticsearch
+	8.12
+	BM25 + kNN vector search; faceted filtering; autocomplete
+	Cache
+	Redis
+	7
+	Recommendation feed cache; session tokens; rate limit counters
+	Real-time
+	Socket.IO
+	4.x
+	WebSocket + fallback; task updates; DMs; notifications
+	Rich Text
+	Tiptap + Y.js
+	2.x + 13.x
+	Collaborative document editing with CRDT
+	Infra
+	Docker + Compose
+	latest
+	Containerization; dev + prod parity
+	CI/CD
+	GitHub Actions
+	—
+	Automated test + deploy pipeline
+	Proxy
+	Nginx + Certbot
+	1.24 + latest
+	Reverse proxy; HTTPS termination; gzip
+	Monitoring
+	Sentry + UptimeRobot
+	free tier
+	Error tracking + uptime alerting
+	
+
+
+
+
+
+SRCP Sprint Plan  ·  Mostofa Aminur Rashid  ·  MIT Programme  ·  2026

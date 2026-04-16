@@ -1,0 +1,243 @@
+﻿Smart Research Collaboration Platform   ·   Master's Project Overview  ·  Mostofa Aminur Rashid  ·  MIT Programme  ·  2026
+Smart Research Collaboration Platform
+Master's Project Overview  ·  Mostofa Aminur Rashid  ·  MIT Programme  ·  2026
+
+
+1.  End-to-End System Flow
+① User Registration Profile · Goals · Skills · Papers
+	② Core Engine Processing Auth · Routing · Indexing
+	③ AI Matching Algorithm CF+CB · BERT · TrustRank
+	④ Feature Modules Workspace · Library · Forum
+	⑤ Publication AssistantJournal Finder · Templates
+	⑥ Output DeliveryTeam Formed · Paper Ready
+	
+
+INPUT →
+	PROCESS →
+	OUTPUT
+	Profile · Papers · Interests · Skills · Behaviour signals
+	Matching · Semantic Search · Graph Traversal · Async Queue
+	Research Team · Structured Project · Published Paper · Profile
+	
+
+2.  System Architecture — Layer by Layer
+PRESENTATION LAYER
+	BUSINESS LOGIC LAYER
+	DATA LAYER
+	• Next.js (React)
+• Server-Side Rendering (SSR)
+• Tailwind CSS UI
+• Socket.IO real-time sync
+• Cloudflare CDN + DDoS
+• Responsive dashboard
+	• Node.js + Express (API)
+• JWT / OAuth 2.0 auth
+• Rate limiting & routingPython FastAPI (ML)
+• CF+CB matching engine
+• Sentence-BERT inference
+• TrustRank scoring
+• Kafka async event bus
+	PostgreSQLUsers · Projects · PostsNeo4j (Graph DB) · Researcher–Paper–Topic graphElasticsearchSemantic + full-text searchRedisPre-cached recommendation feed
+	
+
+
+
+
+
+
+
+
+
+
+
+Step-by-Step Process
+#
+	Action
+	What the System Does
+	Key Technical Detail
+	1
+	User Registration
+	User signs up & fills profile
+	Domain tags, skills, institution, research goals stored in PostgreSQL
+	2
+	Profile Indexing
+	Profile indexed for matching
+	Sentence-BERT converts profile text → dense vector embedding
+	3
+	Matching Runs
+	Matching algorithm executes
+	CF+CB hybrid computes cosine similarity across all profiles
+	4
+	Feed Served
+	Recommendations delivered
+	Top matches cached in Redis; user sees collaborators, papers, projects
+	5
+	Collaboration Begins
+	User enters collaboration workspace
+	User joins workspace: task board, doc editor, milestone tracker
+	6
+	Publication
+	Publication Assistant runs
+	Queries DOAJ/Scimago for journal recommendations
+	
+
+3.  Technology Stack Rationale
+Layer
+	Technology
+	Why This Choice
+	Frontend
+	Next.js (React)
+	SSR = SEO-indexable academic content; faster page load
+	UI
+	Tailwind CSS
+	Utility-first; zero runtime overhead; rapid iteration
+	Real-time
+	Socket.IO
+	WebSocket + auto-fallback; collaborative editing & live notifications
+	API Gateway
+	Node.js + Express
+	Non-blocking I/O; handles 10k+ concurrent connections efficiently
+	ML Service
+	Python + FastAPI
+	ASGI async; native Python ML ecosystem; auto-generates OpenAPI docs
+	Matching Algo
+	CF + CBF Hybrid
+	CBF solves cold-start; CF improves with user behaviour over time
+	Semantic Search
+	Sentence-BERT
+	Dense embeddings understand meaning, not just keywords
+	Trust Scoring
+	TrustRank (PageRank)
+	Credibility flows from verified professors; resists spam/gaming
+	Primary DB
+	PostgreSQL
+	ACID-compliant; handles complex relational queries; battle-tested
+	Graph DB
+	Neo4j
+	Multi-hop traversal (2nd-degree collaborators) in milliseconds
+	Search Index
+	Elasticsearch
+	Unified BM25 + kNN vector search across people, papers, posts
+	Cache
+	Redis
+	Pre-computes recommendation feed as background job; <50ms load
+	Message Queue
+	Apache Kafka
+	Decouples API from ML workers; async processing; durable log
+	Infrastructure
+	Docker + Kubernetes
+	Per-service scaling; ML pods scale independently on load spikes
+	
+
+4.  Impact Summary — Problem vs. Solution
+#
+	Problem
+	ResearchBridge Solution
+	Measurable Outcome
+	1
+	No structured collaborator discovery tool
+	CF+CB Hybrid + Sentence-BERT surfaces collaborators from profile & behaviour signals
+	Matched collaborators on first login; relevance improves with use
+	2
+	No shared workspace — ad-hoc email/Drive/WhatsApp
+	Built-in workspace: task board, milestone tracker, real-time doc co-editing
+	All project activity in one place; version history; no context lost
+	3
+	New researchers don't know how to publish
+	Publication Assistant: journal recommender (DOAJ/Scimago) + templates + checklist
+	Reduces 'I don't know where to submit' from weeks to minutes
+	4
+	Community forums decay into spam
+	TrustRank algorithm: PageRank-variant weights credibility by citations & endorsements
+	Quality-first feed; verified institutional badges auto-assigned
+	5
+	Cold-start: new users get no useful recommendations
+	Hybrid approach: CBF bootstraps from explicit tags; CF activates as behaviour accumulates
+	Even 0-paper researchers get relevant results from day one
+	
+
+
+
+
+
+
+
+
+
+Performance Targets
+Metric
+	Current (Manual)
+	With ResearchBridge
+	How
+	Find a collaborator
+	Weeks (conferences, email, luck)
+	< 5 minutes
+	Matching engine on first login
+	Set up shared workspace
+	1–2 days (tools, permissions, folders)
+	< 2 minutes
+	Auto-created on team formation
+	Find right journal
+	Days of research + senior advice
+	< 10 minutes
+	Publication Assistant + DOAJ query
+	Dashboard load time
+	N/A
+	< 50 ms
+	Redis pre-cached feed
+	Semantic search response
+	N/A
+	< 200 ms
+	Elasticsearch kNN index
+	Scale to 1M users
+	Not possible (monolith tools)
+	Horizontal K8s autoscale
+	Per-service pod autoscaling
+	
+
+Competitive Gap — What Existing Platforms Are Missing
+Feature
+	ResearchGate
+	Academia.edu
+	Overleaf
+	Semantic Scholar
+	ResearchBridge
+	Smart collaborator matching
+	✗
+	✗
+	✗
+	✗
+	✔ CF+CB+BERT
+	Collaboration workspace
+	✗
+	✗
+	✔ writing only
+	✗
+	✔ Full (tasks, docs, milestones)
+	Publication assistant
+	✗
+	✗
+	Partial
+	✗
+	✔ Journal finder + templates
+	Mentorship / community
+	Partial
+	✗
+	✗
+	✗
+	✔ TrustRank forum
+	Built for new researchers
+	✗
+	✗
+	✗
+	✗
+	✔ Core design goal
+	Free to deploy (beta)
+	—
+	—
+	—
+	—
+	✔ $0 on free tiers
+	
+
+ResearchBridge  ·  Mostofa Aminur Rashid  ·  2026Page
