@@ -122,10 +122,15 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ message: 'Please verify your email first' });
     }
 
-    // Validate password (In real: bcrypt.compare)
-    // For this mock/demo, we'll assume any password works or check against a hash if available
-    // const isMatch = await bcrypt.compare(password, user.password);
-    // if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
+    // Validate password
+    const isMatch = await bcrypt.compare(password, user.password).catch(e => {
+        // Fallback for demo if password was not hashed (e.g. mock user)
+        return password === user.password;
+    });
+
+    if (!isMatch) {
+      return res.status(400).json({ message: 'Invalid credentials' });
+    }
 
     // Generate 6-digit OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
