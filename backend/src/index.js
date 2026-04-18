@@ -13,6 +13,9 @@ app.use(cors());
 app.use(morgan('dev'));
 app.use(express.json());
 
+// Routes
+app.use('/api/auth', require('./routes/auth'));
+
 // Basic Route
 app.get('/health', (req, res) => {
   res.json({ status: 'UP', timestamp: new Date() });
