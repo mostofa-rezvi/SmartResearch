@@ -1,19 +1,21 @@
-# System Architecture
+# System Architecture: ResearchBridge (SRCP)
 
 ## Layers
-1. **Presentation**: Next.js 15 (App Router), SSR, Tailwind, Socket.IO client
+1. **Presentation (The Face)**: 
+   - Next.js 15 (App Router) for high-performance SSR.
+   - Tailwind for "Academic Aesthetic" styling.
+   - Socket.IO for real-time Community (Living Room) updates.
 2. **Business Logic**:
-   - Node.js + Express (REST + WebSocket)
-   - Python FastAPI (ML inference only)
-   - Kafka for cross-service events
-3. **Data**:
-   - PostgreSQL: Users, Projects, Posts, Subscriptions
-   - Neo4j: (Researcher)-[:AUTHORED]->(Paper)-[:HAS_TOPIC]->(Topic)
-   - Elasticsearch: Full-text + vector search
-   - Redis: Session store, pre‑cached feeds, rate limiting
+   - **Node.js (Express)**: Centralized coordination for Identity, Auth, and Library management.
+   - **Python (FastAPI)**: Heavy lifting for the Discovery Engine (Sentence-Embeddings) and TrustRank calculations.
+   - **Kafka**: Asynchronous backbone for cross-domain events (e.g., scoring reputation after an answer is accepted).
+3. **Data Ecosystem**:
+   - **PostgreSQL**: Source of truth for users, credentials, journals, and the Q&A ledger.
+   - **Neo4j**: Relationships between Researchers, Papers, and Topics. Powers the "TrustScore" graph.
+   - **Elasticsearch**: Personalized search provider with vector-similarity boosting.
+   - **Redis**: Low-latency caching for researcher feeds and OTP session rate-limiting.
 
 ## Principles
-- Clean separation between Node (business) and Python (ML)
-- Event-driven communication via Kafka
-- All APIs are versioned and documented
-- Zero trust security model
+- **Unbypassable Security**: The "Gate" and "Onboarding" checks are baked into the request lifecycle.
+- **Trust-Centric**: Every data node contributes to the overall credibility of the platform.
+- **Zero Trust Architecture**: No internal service trusts another; all cross-service events are validated.

@@ -1,19 +1,19 @@
-# Architecture Decision Records (ADR)
+# Architectural Decisions (ADR)
 
-## ADR-001: Use Kafka for async events instead of direct HTTP calls
-- **Date**: 2024-01-15
-- **Context**: ML inference is slow; we don't want to block user requests.
-- **Decision**: Node produces events to Kafka; ML service consumes and updates scores.
-- **Consequences**: Added operational complexity but improved responsiveness.
+## ADR 001: Deliberate Authentication Friction
+- **Status**: Accepted
+- **Context**: Chapter 1 (Redirect to Login after Verify) and Chapter 2 (Mandatory OTP).
+- **Decision**: We will not implement auto-login after email verification or credential entry.
+- **Rationale**: To establish a "Credentialed Environment" habit. Users must feel that ResearchBridge is a secure repository for their identity and intellectual property.
 
-## ADR-002: Neo4j for researcher‑paper graph
-- **Date**: 2024-02-01
-- **Context**: Need to traverse co‑authorship and citation networks efficiently.
-- **Decision**: Use Neo4j alongside PostgreSQL.
-- **Consequences**: Dual‑write pattern required; eventual consistency accepted.
+## ADR 002: Mandatory Discovery Conversation (Onboarding)
+- **Status**: Accepted
+- **Context**: Chapter 4 Discovery.
+- **Decision**: Prevent all platform access (except Auth) until a user profile and research keywords are established.
+- **Rationale**: Solves the cold-start problem and ensures the platform is immediately useful.
 
-## ADR-003: Server‑Side Rendering for public pages
-- **Date**: 2024-03-10
-- **Context**: SEO critical for research platform.
-- **Decision**: Next.js App Router with SSR for all public routes.
-- **Consequences**: Increased server load; mitigated by Cloudflare caching.
+## ADR 003: Multi-modal Search Strategy
+- **Status**: Accepted
+- **Context**: Chapter 7 Discovery Engine.
+- **Decision**: Combine Elasticsearch (text/meta) with Python ML models (semantic/vector) and Neo4j (relationship boosting).
+- **Rationale**: Provides superior relevance compared to generic Google Scholar indexing.

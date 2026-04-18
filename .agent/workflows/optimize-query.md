@@ -1,7 +1,19 @@
-# Database Query Optimization
+# Workflow: Optimize ResearchBridge Query
 
-1. **Identify slow query** from logs or monitoring.
-2. **Explain plan**: Use `EXPLAIN ANALYSE` for PG / `PROFILE` for Neo4j.
-3. **Suggest**: Missing index, query rewrite, or denormalization.
-4. **Validate**: Compare execution times before/after.
-5. **Document**: Update `memory/decisions.md` with reasoning.
+Focus on the performance of the **Discovery Engine** and **Trust Graph**.
+
+## 1. Relational (PostgreSQL)
+- Analyse long-running queries in the Library (Journal Directory).
+- Add partial indices for `onboarding_completed=true` or quality tiers (Q1/Q2).
+
+## 2. Graph (Neo4j)
+- Use `PROFILE` on TrustRank traversals.
+- Refactor deep relationships (e.g., citation chains) to use optimized edge-weights.
+- Ensure all Researcher IDs have corresponding indices.
+
+## 3. Search (Elasticsearch)
+- Update analyzer settings for the Natural Language search to handle academic terminology.
+- Balance Vector Similarity weights against traditional text scoring.
+
+## 4. Cache (Redis)
+- Identify hot feeds and increase TTL where appropriate to reduce DB load.
