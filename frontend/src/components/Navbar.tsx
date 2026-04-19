@@ -22,9 +22,9 @@ export default function Navbar() {
       <div className="flex items-center gap-4">
         {user ? (
           <>
-            <span className="text-sm font-medium text-slate-600 dark:text-slate-300 hidden sm:inline">
+            <Link href={`/profile/${user.id}`} className="text-sm font-medium text-slate-600 dark:text-slate-300 hidden sm:inline hover:text-primary transition-colors cursor-pointer">
               Hello, {user.name}
-            </span>
+            </Link>
             <button 
               onClick={logout}
               className="text-sm font-medium text-red-500 hover:text-red-600 transition-colors"

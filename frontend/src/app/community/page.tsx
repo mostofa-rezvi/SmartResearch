@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MessageSquare, ThumbsUp, ThumbsDown, Share2, Tag, Search, Sparkles, HelpCircle, Lightbulb } from "lucide-react";
+import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import { useAuth } from "@/context/AuthContext";
 
@@ -104,7 +105,9 @@ export default function CommunityFeedPage() {
                         {post.author_name[0]}
                       </div>
                       <div>
-                        <h4 className="font-bold text-slate-900 dark:text-white text-sm">{post.author_name}</h4>
+                        <Link href={`/profile/${post.user_id}`}>
+                          <h4 className="font-bold text-slate-900 dark:text-white text-sm hover:underline cursor-pointer">{post.author_name}</h4>
+                        </Link>
                         <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Researcher • {new Date(post.created_at).toLocaleDateString()}</p>
                       </div>
                     </div>

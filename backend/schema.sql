@@ -28,7 +28,13 @@ CREATE TABLE IF NOT EXISTS invited_user_profiles (
     publications_count INTEGER DEFAULT 0,
     h_index INTEGER,
     verified_publications JSONB, -- List of verified DOIs
-    academic_bio TEXT
+    academic_bio TEXT,
+    department VARCHAR(255),
+    ongoing_projects JSONB,
+    editorial_roles JSONB,
+    students_supervised INTEGER DEFAULT 0,
+    conference_participation JSONB,
+    contact_preferences TEXT
 );
 
 -- Invitations table for Invited Users (Academic standing)

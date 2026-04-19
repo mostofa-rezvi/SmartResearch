@@ -1,0 +1,212 @@
+"use client";
+
+import React, { useState, useEffect } from "react";
+import { useParams } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
+import Navbar from "@/components/Navbar";
+import { motion } from "framer-motion";
+import { User, Award, ShieldCheck, Mail, MapPin, Building, BookOpen, Clock, Activity, MessageSquare, Lightbulb, Users, Bookmark, Settings } from "lucide-react";
+import Link from "next/link";
+
+export default function ProfilePage() {
+  const { id } = useParams();
+  const { user: currentUser } = useAuth();
+  const [profile, setProfile] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const response = await fetch(`http://localhost:5000/api/users/${id}/profile`);
+        if (response.ok) {
+          const data = await response.json();
+          setProfile(data);
+        } else {
+          setProfile(null);
+        }
+      } catch (err) {
+        console.error("Failed to fetch profile");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProfile();
+  }, [id]);
+
+  if (loading) return <div className="min-h-screen bg-slate-50 dark:bg-slate-900 pt-32 text-center text-slate-400">Loading Academic Profile...</div>;
+  if (!profile) return <div className="min-h-screen bg-slate-50 dark:bg-slate-900 pt-32 text-center text-slate-400">Researcher not found.</div>;
+
+  const isOwnProfile = currentUser?.id?.toString() === id;
+  const isInvited = profile.role === 'invited_user';
+
+  return (
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 pb-20">
+      <Navbar />
+
+      {/* Hero Header */}
+      <div className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-800 pt-32 pb-12">
+        <div className="max-w-5xl mx-auto px-6 flex flex-col md:flex-row items-center md:items-start gap-8">
+          <div className="w-32 h-32 bg-gradient-to-br from-primary to-secondary rounded-3xl flex items-center justify-center text-white text-5xl font-bold shadow-2xl shrink-0">
+            {profile.name[0]}
+          </div>
+          <div className="flex-1 text-center md:text-left">
+            <div className="flex flex-col md:flex-row md:items-center gap-3 mb-2">
+              <h1 className="text-4xl font-extrabold text-slate-900 dark:text-white">
+                {isInvited && profile.extended_profile?.title ? `${profile.extended_profile.title} ` : ''}{profile.name}
+              </h1>
+              {isInvited && (
+                <span className="flex items-center gap-1 text-[10px] uppercase tracking-widest font-bold bg-amber-50 text-amber-600 px-3 py-1 rounded-full border border-amber-100">
+                  <ShieldCheck size={14} /> Verified Scholar
+                </span>
+              )}
+            </div>
+            
+            <p className="text-slate-500 font-medium flex items-center justify-center md:justify-start gap-2 mb-6">
+              <Building size={16} /> {profile.institution} 
+              {isInvited && profile.extended_profile?.department && ` • ${profile.extended_profile.department}`}
+            </p>
+
+            <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
+              {profile.research_interests?.interests?.slice(0, 4).map((tag: string) => (
+                <span key={tag} className="text-xs font-bold text-slate-400 bg-slate-100 dark:bg-slate-900 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800">
+                  #{tag}
+                </span>
+              ))}
+            </div>
+          </div>
+          
+          {isOwnProfile && (
+            <button className="px-6 py-2.5 bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-300 font-bold rounded-xl flex items-center gap-2 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">
+              <Settings size={18} /> Edit Profile
+            </button>
+          )}
+        </div>
+      </div>
+
+      <main className="max-w-5xl mx-auto px-6 pt-12 grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        {/* Left Column: Stats & Contact */}
+        <div className="space-y-6">
+          <div className="bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-xl">
+            <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-6 flex items-center gap-2">
+              <Activity size={16} /> Living CV
+            </h3>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-slate-50 dark:bg-slate-900 p-4 rounded-2xl text-center">
+                <MessageSquare className="mx-auto text-blue-500 mb-2 opacity-50" size={20} />
+                <p className="text-2xl font-bold text-slate-900 dark:text-white">{profile.activity_stats?.questions_asked + profile.activity_stats?.comments_made || 0}</p>
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-1">Discussions</p>
+              </div>
+              <div className="bg-slate-50 dark:bg-slate-900 p-4 rounded-2xl text-center">
+                <Lightbulb className="mx-auto text-amber-500 mb-2 opacity-50" size={20} />
+                <p className="text-2xl font-bold text-slate-900 dark:text-white">{profile.activity_stats?.thoughts_shared || 0}</p>
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-1">Insights</p>
+              </div>
+              <div className="bg-slate-50 dark:bg-slate-900 p-4 rounded-2xl text-center">
+                <Bookmark className="mx-auto text-emerald-500 mb-2 opacity-50" size={20} />
+                <p className="text-2xl font-bold text-slate-900 dark:text-white">{profile.activity_stats?.saved_papers_count || 0}</p>
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-1">Library</p>
+              </div>
+              <div className="bg-slate-50 dark:bg-slate-900 p-4 rounded-2xl text-center">
+                <Users className="mx-auto text-purple-500 mb-2 opacity-50" size={20} />
+                <p className="text-2xl font-bold text-slate-900 dark:text-white">{profile.activity_stats?.joined_groups_count || 0}</p>
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-1">Circles</p>
+              </div>
+            </div>
+          </div>
+
+          {isInvited && (
+            <div className="bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-xl space-y-4">
+              <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2">
+                <Mail size={16} /> Contact & Preferences
+              </h3>
+              <p className="text-sm text-slate-600 dark:text-slate-300">
+                {profile.extended_profile?.contact_preferences || "Contact preferences not strictly defined. Open to academic inquiries."}
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* Right Column: Dynamic Timeline & Portfolio */}
+        <div className="lg:col-span-2 space-y-6">
+          
+          {/* Invited User Extended Data */}
+          {isInvited && profile.extended_profile?.academic_bio && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="bg-white dark:bg-slate-800 p-8 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-xl">
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-4">Academic Biography</h3>
+              <p className="text-slate-600 dark:text-slate-300 leading-relaxed font-serif">
+                {profile.extended_profile.academic_bio}
+              </p>
+            </motion.div>
+          )}
+
+          {isInvited && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-sm">
+                <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2">
+                  <Award size={16} /> Verified Metrics
+                </h3>
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-2">
+                    <span className="text-sm text-slate-500">Publications</span>
+                    <span className="font-bold text-slate-900 dark:text-white">{profile.extended_profile?.publications_count || 0}</span>
+                  </div>
+                  <div className="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-2">
+                    <span className="text-sm text-slate-500">h-index</span>
+                    <span className="font-bold text-slate-900 dark:text-white">{profile.extended_profile?.h_index || 'N/A'}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-slate-500">Supervised</span>
+                    <span className="font-bold text-slate-900 dark:text-white">{profile.extended_profile?.students_supervised || 0}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-sm">
+                <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2">
+                  <BookOpen size={16} /> Ongoing Projects
+                </h3>
+                {profile.extended_profile?.ongoing_projects ? (
+                  <ul className="list-disc pl-4 text-sm text-slate-600 dark:text-slate-300 space-y-2">
+                    {(profile.extended_profile.ongoing_projects as string[]).map((proj, i) => <li key={i}>{proj}</li>)}
+                  </ul>
+                ) : (
+                  <p className="text-sm italic text-slate-400">No public ongoing projects listed.</p>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Common Timeline */}
+          <div className="bg-white dark:bg-slate-800 p-8 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-xl">
+            <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-3">
+              <Clock className="text-primary" /> Community Activity
+            </h3>
+            
+            {profile.recent_activity?.length > 0 ? (
+              <div className="space-y-6 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-slate-200 dark:before:via-slate-700 before:to-transparent">
+                {profile.recent_activity.map((activity: any, idx: number) => (
+                  <div key={idx} className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+                    <div className="flex items-center justify-center w-10 h-10 rounded-full border-4 border-white dark:border-slate-800 bg-primary/20 text-primary shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow-sm relative z-10 text-xs">
+                      {activity.type === 'post' ? <MessageSquare size={14} /> : <MessageSquare size={14} strokeWidth={1.5} />}
+                    </div>
+                    <div className="bg-slate-50 dark:bg-slate-900 w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 rounded-2xl border border-slate-100 dark:border-slate-700">
+                      <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1 block">
+                        {new Date(activity.created_at).toLocaleDateString()}
+                      </span>
+                      {activity.title && <h4 className="font-bold text-sm text-slate-900 dark:text-white mb-1 line-clamp-1">{activity.title}</h4>}
+                      <p className="text-xs text-slate-500 line-clamp-2">{activity.content}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-center italic text-slate-400 py-10">No recent open activity found on the platform.</p>
+            )}
+          </div>
+
+        </div>
+      </main>
+    </div>
+  );
+}

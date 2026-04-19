@@ -8,6 +8,7 @@ type User = {
   role: 'super_admin' | 'admin' | 'user' | 'invited_user';
   researcher_type?: 'new_researcher' | 'amateur_researcher';
   onboarding_completed: boolean;
+  research_interests?: any;
 } | null;
 
 type AuthContextType = {

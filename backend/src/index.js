@@ -20,6 +20,7 @@ app.use('/api/groups', require('./routes/groups'));
 app.use('/api/community', require('./routes/community'));
 app.use('/api/journals', require('./routes/journals'));
 app.use('/api/discovery', require('./routes/discovery'));
+app.use('/api/users', require('./routes/users'));
 
 // Basic Route
 app.get('/health', (req, res) => {
