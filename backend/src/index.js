@@ -16,6 +16,8 @@ app.use(express.json());
 // Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/admin', require('./routes/admin'));
+app.use('/api/groups', require('./routes/groups'));
+app.use('/api/community', require('./routes/community'));
 
 // Basic Route
 app.get('/health', (req, res) => {

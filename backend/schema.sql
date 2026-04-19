@@ -64,3 +64,36 @@ CREATE TABLE IF NOT EXISTS group_members (
 );
 
 -- Note: Community posts will have an optional group_id for grouping discussions.
+CREATE TABLE IF NOT EXISTS community_posts (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    group_id INTEGER REFERENCES groups(id) ON DELETE SET NULL,
+    type VARCHAR(20) NOT NULL CHECK (type IN ('question', 'thought')),
+    title VARCHAR(500), -- Nullable for thoughts
+    content TEXT NOT NULL,
+    tags JSONB DEFAULT '[]',
+    view_count INTEGER DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Comments / Answers Table
+CREATE TABLE IF NOT EXISTS comments (
+    id SERIAL PRIMARY KEY,
+    post_id INTEGER REFERENCES community_posts(id) ON DELETE CASCADE,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    content TEXT NOT NULL,
+    is_answer BOOLEAN DEFAULT FALSE, -- To distinguish answers in Q&A
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Votes Table (for ranking posts and comments)
+CREATE TABLE IF NOT EXISTS votes (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    post_id INTEGER REFERENCES community_posts(id) ON DELETE CASCADE,
+    comment_id INTEGER REFERENCES comments(id) ON DELETE CASCADE,
+    value INTEGER CHECK (value IN (1, -1)), -- Upvote or Downvote
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(user_id, post_id, comment_id) -- Only one vote per item per user
+);
