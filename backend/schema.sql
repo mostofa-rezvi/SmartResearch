@@ -117,6 +117,7 @@ CREATE TABLE IF NOT EXISTS journals (
     impact_factor DECIMAL(5, 3),
     description TEXT,
     website_url VARCHAR(500),
+    status VARCHAR(20) DEFAULT 'approved' CHECK (status IN ('pending', 'approved', 'rejected')),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -140,4 +141,26 @@ CREATE TABLE IF NOT EXISTS author_follows (
     author_name VARCHAR(255) NOT NULL,
     followed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (user_id, author_name)
+);
+
+-- Audit Logs (Moderation Tracking)
+CREATE TABLE IF NOT EXISTS audit_logs (
+    id SERIAL PRIMARY KEY,
+    admin_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+    action VARCHAR(255) NOT NULL,
+    target_type VARCHAR(50) NOT NULL,
+    target_id INTEGER,
+    details JSONB,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Content Flags (Moderation Queue)
+CREATE TABLE IF NOT EXISTS content_flags (
+    id SERIAL PRIMARY KEY,
+    reporter_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+    post_id INTEGER REFERENCES community_posts(id) ON DELETE CASCADE,
+    comment_id INTEGER REFERENCES comments(id) ON DELETE CASCADE,
+    reason TEXT NOT NULL,
+    status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'resolved', 'dismissed')),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

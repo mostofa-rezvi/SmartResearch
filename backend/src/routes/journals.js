@@ -7,7 +7,7 @@ const db = require('../config/db');
 router.get('/', async (req, res) => {
   const { category, subcategory, tier, geography, group } = req.query;
   
-  let queryParts = ['SELECT * FROM journals WHERE 1=1'];
+  let queryParts = ["SELECT * FROM journals WHERE status = 'approved'"];
   let params = [];
   let paramCount = 1;
 
