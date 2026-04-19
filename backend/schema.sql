@@ -8,6 +8,8 @@ CREATE TABLE IF NOT EXISTS users (
     researcher_type VARCHAR(20) CHECK (researcher_type IN ('new_researcher', 'amateur_researcher')),
     status VARCHAR(50) NOT NULL, -- Keep status for active/inactive/suspended
     institution VARCHAR(255) NOT NULL,
+    onboarding_completed BOOLEAN DEFAULT FALSE,
+    research_interests JSONB DEFAULT '[]',
     is_verified BOOLEAN DEFAULT FALSE,
     verification_token VARCHAR(255),
     login_otp VARCHAR(6),
@@ -40,3 +42,25 @@ CREATE TABLE IF NOT EXISTS invitations (
     expires_at TIMESTAMP NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Groups Table
+CREATE TABLE IF NOT EXISTS groups (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    focus_area VARCHAR(255),
+    type VARCHAR(20) DEFAULT 'public' CHECK (type IN ('public', 'private')),
+    creator_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Group Members Table
+CREATE TABLE IF NOT EXISTS group_members (
+    group_id INTEGER REFERENCES groups(id) ON DELETE CASCADE,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    role VARCHAR(20) DEFAULT 'member' CHECK (role IN ('member', 'admin')),
+    joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (group_id, user_id)
+);
+
+-- Note: Community posts will have an optional group_id for grouping discussions.

@@ -4,6 +4,24 @@ const bcrypt = require('bcryptjs');
 const db = require('../config/db');
 const { auth, requireRole } = require('../middleware/auth');
 
+// @route   POST /api/auth/onboarding/complete
+// @desc    Complete the mandatory onboarding conversation
+router.post('/onboarding/complete', auth, async (req, res) => {
+  const { interests, preferences } = req.body;
+
+  try {
+    await db.query(
+      'UPDATE users SET research_interests = $1, onboarding_completed = TRUE WHERE id = $2',
+      [JSON.stringify({ interests, preferences }), req.user.id]
+    );
+
+    res.json({ message: 'Onboarding completed. Welcome to ResearchBridge.' });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
+});
+
 // @route   GET /api/auth/admin/stats
 // @desc    Get platform stats (Admin only)
 router.get('/admin/stats', auth, requireRole(['super_admin', 'admin']), (req, res) => {
@@ -268,7 +286,8 @@ router.post('/verify-otp', async (req, res) => {
             name: user.name, 
             email: user.email,
             role: user.role || 'user',
-            researcher_type: user.researcher_type || 'new_researcher'
+            researcher_type: user.researcher_type || 'new_researcher',
+            onboarding_completed: user.onboarding_completed || false
         } 
     };
     

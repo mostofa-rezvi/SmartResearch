@@ -1,9 +1,22 @@
 import Navbar from "@/components/Navbar";
 import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
-  const { user } = useAuth();
+  const { user, isLoading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isLoading && user && !user.onboarding_completed) {
+      router.push("/onboarding");
+    }
+  }, [user, isLoading, router]);
+
+  if (isLoading || (user && !user.onboarding_completed)) {
+    return <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex items-center justify-center italic text-slate-400">Loading your research universe...</div>;
+  }
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900 overflow-x-hidden">
       <Navbar />

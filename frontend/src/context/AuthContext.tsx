@@ -5,9 +5,9 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 type User = {
   id: string;
   name: string;
-  email: string;
   role: 'super_admin' | 'admin' | 'user' | 'invited_user';
   researcher_type?: 'new_researcher' | 'amateur_researcher';
+  onboarding_completed: boolean;
 } | null;
 
 type AuthContextType = {
@@ -15,6 +15,7 @@ type AuthContextType = {
   token: string | null;
   login: (token: string, user: NonNullable<User>) => void;
   logout: () => void;
+  completeOnboarding: () => void;
   isLoading: boolean;
   isAdmin: boolean;
   isSuperAdmin: boolean;
@@ -54,11 +55,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     window.location.href = "/login";
   };
 
+  const completeOnboarding = () => {
+    if (user) {
+      const updatedUser = { ...user, onboarding_completed: true };
+      setUser(updatedUser);
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+    }
+  };
+
   const isAdmin = user?.role === 'admin' || user?.role === 'super_admin';
   const isSuperAdmin = user?.role === 'super_admin';
 
   return (
-    <AuthContext.Provider value={{ user, token, login, logout, isLoading, isAdmin, isSuperAdmin }}>
+    <AuthContext.Provider value={{ user, token, login, logout, completeOnboarding, isLoading, isAdmin, isSuperAdmin }}>
       {children}
     </AuthContext.Provider>
   );
