@@ -116,3 +116,22 @@ CREATE TABLE IF NOT EXISTS journals (
 
 -- Index for category search
 CREATE INDEX IF NOT EXISTS idx_journals_category ON journals(category);
+
+-- Saved Papers for Researchers
+CREATE TABLE IF NOT EXISTS saved_papers (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    paper_title TEXT NOT NULL,
+    paper_doi VARCHAR(100),
+    journal_name VARCHAR(500),
+    abstract TEXT,
+    saved_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Author Follows
+CREATE TABLE IF NOT EXISTS author_follows (
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    author_name VARCHAR(255) NOT NULL,
+    followed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (user_id, author_name)
+);
