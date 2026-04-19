@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Book, Search, Filter, Globe, School, Award, ChevronRight, ExternalLink, Library as LibraryIcon, Bookmark, Info } from "lucide-react";
 import Navbar from "@/components/Navbar";
+import { API } from "@/config/api";
 
 export default function JournalDirectoryPage() {
   const [journals, setJournals] = useState<any[]>([]);
@@ -21,7 +22,7 @@ export default function JournalDirectoryPage() {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/journals/categories");
+      const response = await fetch(API.library.categories);
       const data = await response.json();
       setCategories(data);
     } catch (err) {
@@ -32,7 +33,7 @@ export default function JournalDirectoryPage() {
   const fetchJournals = async () => {
     setLoading(true);
     try {
-      let url = "http://localhost:5000/api/journals?";
+      let url = `${API.library.journals}?`;
       if (selectedTier) url += `tier=${selectedTier}&`;
       if (selectedCategory) url += `category=${selectedCategory}&`;
       

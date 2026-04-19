@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import Navbar from "@/components/Navbar";
+import { API } from "@/config/api";
 import { motion } from "framer-motion";
 import { User, Award, ShieldCheck, Mail, MapPin, Building, BookOpen, Clock, Activity, MessageSquare, Lightbulb, Users, Bookmark, Settings } from "lucide-react";
 import Link from "next/link";
@@ -17,7 +18,7 @@ export default function ProfilePage() {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/users/${id}/profile`);
+        const response = await fetch(API.users.profile(id as string));
         if (response.ok) {
           const data = await response.json();
           setProfile(data);

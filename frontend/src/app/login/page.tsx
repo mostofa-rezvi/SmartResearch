@@ -6,6 +6,8 @@ import { motion } from "framer-motion";
 import { Lock, Mail, ArrowRight, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
+import { API } from "@/config/api";
+import { useAuth } from "@/context/AuthContext";
 
 function LoginContent() {
   const searchParams = useSearchParams();
@@ -24,7 +26,7 @@ function LoginContent() {
     setError(null);
 
     try {
-      const response = await fetch("http://localhost:5000/api/auth/login", {
+      const response = await fetch(API.auth.login, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -50,7 +52,7 @@ function LoginContent() {
     setError(null);
 
     try {
-      const response = await fetch("http://localhost:5000/api/auth/verify-otp", {
+      const response = await fetch(API.auth.verifyOtp, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, otp }),

@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { BookOpen, Lock, AtSign, Loader2, CheckCircle2, ShieldCheck, GraduationCap } from "lucide-react";
 import Navbar from "@/components/Navbar";
+import { API } from "@/config/api";
 
 function AcceptInviteContent() {
   const searchParams = useSearchParams();
@@ -29,7 +30,7 @@ function AcceptInviteContent() {
 
     const fetchInvite = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/auth/invitation/${token}`);
+        const response = await fetch(API.auth.validateInvite(token));
         const data = await response.json();
         if (response.ok) {
           setInviteData(data);
@@ -52,7 +53,7 @@ function AcceptInviteContent() {
     setError(null);
 
     try {
-      const response = await fetch("http://localhost:5000/api/auth/accept-invite", {
+      const response = await fetch(API.auth.acceptInvite, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token, password, title, bio }),

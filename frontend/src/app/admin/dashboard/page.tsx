@@ -7,6 +7,7 @@ import Navbar from "@/components/Navbar";
 import { useAuth } from "@/context/AuthContext";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { API } from "@/config/api";
 
 export default function AdminDashboardPage() {
   const { user, token, isSuperAdmin, isAdmin } = useAuth();
@@ -29,13 +30,16 @@ export default function AdminDashboardPage() {
     try {
       const headers = { "x-auth-token": token || "" };
       const [statsRes, queueRes, logsRes] = await Promise.all([
-        fetch("http://localhost:5000/api/moderation/stats", { headers }),
-        fetch("http://localhost:5000/api/moderation/queue", { headers }),
-        fetch("http://localhost:5000/api/moderation/audit_logs", { headers })
+        fetch(API.admin.moderationStats, { headers }),
+        fetch(API.admin.moderationQueue, { headers }),
+        fetch(API.admin.auditLogs, { headers })
       ]);
-      setStats(await statsRes.json());
-      setQueue(await queueRes.json());
-      setLogs(await logsRes.json());
+      const statsData = await statsRes.json();
+      const queueData = await queueRes.json();
+      const logsData = await logsRes.json();
+      setStats(statsData.data || statsData);
+      setQueue(queueData.data || queueData);
+      setLogs(logsData.data || logsData);
     } catch (err) {
       console.error("Dashboard fetch error", err);
     } finally {
@@ -46,7 +50,7 @@ export default function AdminDashboardPage() {
   const resolveFlag = async (id: number, action: string) => {
     if (!confirm("Are you sure?")) return;
     try {
-      await fetch(`http://localhost:5000/api/moderation/resolve_flag/${id}`, {
+      await fetch(API.admin.resolveFlag(String(id)), {
         method: "POST",
         headers: { "Content-Type": "application/json", "x-auth-token": token || "" },
         body: JSON.stringify({ action, reason: "Admin Discretion" })
@@ -57,7 +61,7 @@ export default function AdminDashboardPage() {
 
   const updateJournalStatus = async (id: number, status: string) => {
     try {
-      await fetch(`http://localhost:5000/api/moderation/journals/${id}/status`, {
+      await fetch(API.admin.journalStatus(String(id)), {
         method: "POST",
         headers: { "Content-Type": "application/json", "x-auth-token": token || "" },
         body: JSON.stringify({ status })

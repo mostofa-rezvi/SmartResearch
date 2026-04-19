@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import Navbar from "@/components/Navbar";
+import { API } from "@/config/api";
 import { motion } from "framer-motion";
 import { Users, Globe, Lock, MessageSquare, Plus, ArrowLeft, Send } from "lucide-react";
 import Link from "next/link";
@@ -20,7 +21,7 @@ export default function GroupDetailPage() {
     // Mock fetch for now as I haven't implemented single group GET yet
     const fetchGroup = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/groups");
+        const response = await fetch(API.groups.list);
         const data = await response.json();
         const found = data.find((g: any) => g.id.toString() === id);
         setGroup(found);
@@ -37,7 +38,7 @@ export default function GroupDetailPage() {
     if (!user) return router.push("/login");
     setJoining(true);
     try {
-       await fetch(`http://localhost:5000/api/groups/${id}/join`, {
+       await fetch(API.groups.join(String(id)), {
         method: "POST",
         headers: { "x-auth-token": token || "" }
       });

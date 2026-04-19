@@ -30,4 +30,17 @@ const requireRole = (roles) => {
   };
 };
 
-module.exports = { auth, requireRole };
+const requireOnboarding = (req, res, next) => {
+  if (!req.user) {
+    return res.status(401).json({ message: 'Authorization denied' });
+  }
+
+  // Allow bypass only if onboarding_completed is true
+  if (!req.user.onboarding_completed) {
+    return res.status(403).json({ message: 'Onboarding completion is mandatory to access this resource' });
+  }
+
+  next();
+};
+
+module.exports = { auth, requireRole, requireOnboarding };

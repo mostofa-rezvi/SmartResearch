@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Search, Sparkles, Brain, Cpu, Microscope, Globe, CheckCircle2, ArrowRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import { API } from "@/config/api";
 
 const DOMAINS = [
   { id: 'cs', name: 'Computer Science', icon: <Cpu />, keywords: ['AI', 'Cryptography', 'Algorithms', 'Quantum Computing', 'Web3'] },
@@ -30,7 +31,7 @@ export default function OnboardingPage() {
   const handleSubmit = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch("http://localhost:5000/api/auth/onboarding/complete", {
+      const response = await fetch(API.auth.onboardingComplete, {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",

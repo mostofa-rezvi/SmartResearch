@@ -1,12 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../config/db');
-const { auth } = require('../middleware/auth');
+const { auth, requireOnboarding } = require('../middleware/auth');
 const { envelope } = require('../utils/responseEnvelope');
 
 // @route   GET /api/v1/discovery/search
 // @desc    Personalized research discovery search
-router.get('/search', auth, async (req, res) => {
+router.get('/search', [auth, requireOnboarding], async (req, res) => {
   const { query } = req.query;
   const user = req.user;
 
@@ -54,13 +54,18 @@ router.get('/search', auth, async (req, res) => {
 
 // @route   POST /api/v1/discovery/save
 // @desc    Save a paper to profile
-router.post('/save', auth, async (req, res) => {
+router.post('/save', [auth, requireOnboarding], async (req, res) => {
   const { title, doi, journal } = req.body;
   try {
     await db.query(
       'INSERT INTO saved_papers (user_id, paper_title, paper_doi, journal_name) VALUES ($1, $2, $3, $4)',
       [req.user.id, title, doi, journal]
     );
+
+    // Architectural Rule: Event-Driven cross-module sync
+    const { emitEvent } = require('../utils/kafkaEmitter');
+    emitEvent('library.paper.saved', `user_${req.user.id}`, { userId: req.user.id, doi, timestamp: new Date().toISOString() });
+
     res.json(envelope({ message: 'Paper saved' }));
   } catch (err) {
     res.status(500).json(envelope(null, { error: 'Server error' }));

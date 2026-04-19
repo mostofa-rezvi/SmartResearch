@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Search, Sparkles, Filter, Bookmark, Share2, User, ChevronRight, Hash, FileText, Send, CheckCircle2 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { useAuth } from "@/context/AuthContext";
+import { API } from "@/config/api";
 
 export default function DiscoveryEnginePage() {
   const [query, setQuery] = useState("");
@@ -17,7 +18,7 @@ export default function DiscoveryEnginePage() {
     e?.preventDefault();
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:5000/api/discovery/search?query=${query}`, {
+      const response = await fetch(`${API.discovery.search}?query=${query}`, {
         headers: { "x-auth-token": token || "" }
       });
       const data = await response.json();
@@ -32,7 +33,7 @@ export default function DiscoveryEnginePage() {
   const handleSave = async (paper: any) => {
     if (!token) return;
     try {
-      await fetch("http://localhost:5000/api/discovery/save", {
+      await fetch(API.discovery.save, {
         method: "POST",
         headers: { "Content-Type": "application/json", "x-auth-token": token },
         body: JSON.stringify({ title: paper.title, doi: paper.doi, journal: paper.journal })

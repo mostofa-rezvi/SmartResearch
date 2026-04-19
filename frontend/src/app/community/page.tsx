@@ -6,6 +6,7 @@ import { MessageSquare, ThumbsUp, ThumbsDown, Share2, Tag, Search, Sparkles, Hel
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import { useAuth } from "@/context/AuthContext";
+import { API, API_BASE } from "@/config/api";
 import { io } from "socket.io-client";
 
 export default function CommunityFeedPage() {
@@ -23,7 +24,7 @@ export default function CommunityFeedPage() {
     if (!token || !user) return;
 
     // Connect to Socket.IO backend
-    const socket = io("http://localhost:5000");
+    const socket = io(API_BASE);
     
     socket.on("connect", () => {
       setSocketConnected(true);
@@ -45,7 +46,7 @@ export default function CommunityFeedPage() {
 
   const fetchPosts = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/community/posts", {
+      const response = await fetch(API.community.posts, {
         headers: { "x-auth-token": token || "" }
       });
       const data = await response.json();
@@ -60,7 +61,7 @@ export default function CommunityFeedPage() {
   const handleVote = async (id: number, val: number) => {
     if (!token) return;
     try {
-      await fetch(`http://localhost:5000/api/community/posts/${id}/vote`, {
+      await fetch(API.community.vote(String(id)), {
         method: "POST",
         headers: { "Content-Type": "application/json", "x-auth-token": token },
         body: JSON.stringify({ value: val })

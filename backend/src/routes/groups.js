@@ -1,12 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../config/db');
-const { auth } = require('../middleware/auth');
+const { auth, requireOnboarding } = require('../middleware/auth');
+const { emitEvent } = require('../utils/kafkaEmitter');
 const { envelope } = require('../utils/responseEnvelope');
 
 // @route   POST /api/v1/groups
 // @desc    Create a new research group
-router.post('/', auth, async (req, res) => {
+router.post('/', [auth, requireOnboarding], async (req, res) => {
   const { name, description, focus_area, type } = req.body;
 
   try {
@@ -43,7 +44,7 @@ router.get('/', async (req, res) => {
 
 // @route   POST /api/v1/groups/:id/join
 // @desc    Join a public group
-router.post('/:id/join', auth, async (req, res) => {
+router.post('/:id/join', [auth, requireOnboarding], async (req, res) => {
   try {
     const groupResult = await db.query('SELECT * FROM groups WHERE id = $1', [req.params.id]);
     if (groupResult.rows.length === 0) return res.status(404).json(envelope(null, { error: 'Group not found' }));
@@ -55,6 +56,9 @@ router.post('/:id/join', auth, async (req, res) => {
       'INSERT INTO group_members (group_id, user_id, role) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING',
       [group.id, req.user.id, 'member']
     );
+
+    // Architect: event-driven cross-module sync (community.group.joined)
+    emitEvent('community.group.joined', `user_${req.user.id}`, { userId: req.user.id, groupId: group.id, timestamp: new Date().toISOString() });
 
     res.json(envelope({ message: 'Joined group successfully' }));
   } catch (err) {

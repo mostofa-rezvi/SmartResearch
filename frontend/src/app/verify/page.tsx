@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { CheckCircle2, XCircle, Loader2 } from "lucide-react";
 import Navbar from "@/components/Navbar";
+import { API } from "@/config/api";
 
 function VerifyContent() {
   const searchParams = useSearchParams();
@@ -22,7 +23,7 @@ function VerifyContent() {
 
     const verifyEmail = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/auth/verify-email?token=${token}`);
+        const response = await fetch(`${API.auth.verifyEmail}?token=${token}`);
         const data = await response.json();
 
         if (response.ok) {

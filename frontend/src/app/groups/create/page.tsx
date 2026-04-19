@@ -7,6 +7,7 @@ import { Users, Globe, Lock, ArrowLeft, Info, Hash } from "lucide-react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import { useAuth } from "@/context/AuthContext";
+import { API } from "@/config/api";
 
 export default function CreateGroupPage() {
   const [name, setName] = useState("");
@@ -22,7 +23,7 @@ export default function CreateGroupPage() {
     setIsLoading(true);
 
     try {
-      const response = await fetch("http://localhost:5000/api/groups", {
+      const response = await fetch(API.groups.create, {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",
@@ -32,7 +33,8 @@ export default function CreateGroupPage() {
       });
 
       if (response.ok) {
-        const group = await response.json();
+        const result = await response.json();
+        const group = result.data || result;
         router.push(`/groups/${group.id}`);
       }
     } catch (err) {

@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { User, Mail, Lock, Building, GraduationCap, ArrowRight, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
+import { API } from "@/config/api";
 
 type RegisterFormData = {
   name: string;
@@ -31,7 +32,7 @@ export default function RegisterPage() {
     setError(null);
 
     try {
-      const response = await fetch("http://localhost:5000/api/auth/register", {
+      const response = await fetch(API.auth.register, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),

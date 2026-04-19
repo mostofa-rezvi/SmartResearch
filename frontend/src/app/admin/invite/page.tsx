@@ -6,6 +6,7 @@ import { UserPlus, Mail, ShieldAlert, CheckCircle2, ArrowLeft } from "lucide-rea
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import Navbar from "@/components/Navbar";
+import { API } from "@/config/api";
 
 export default function SuperAdminInvitePage() {
   const { isSuperAdmin, token } = useAuth();
@@ -33,7 +34,7 @@ export default function SuperAdminInvitePage() {
     setMessage(null);
 
     try {
-      const response = await fetch("http://localhost:5000/api/admin/invite", {
+      const response = await fetch(API.admin.invite, {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",

@@ -1,12 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../config/db');
-const { auth } = require('../middleware/auth');
+const { auth, requireOnboarding } = require('../middleware/auth');
 const { envelope } = require('../utils/responseEnvelope');
+const { emitEvent } = require('../utils/kafkaEmitter');
 
 // @route   POST /api/v1/community/posts
 // @desc    Create a new post (Question or Thought)
-router.post('/posts', auth, async (req, res) => {
+router.post('/posts', [auth, requireOnboarding], async (req, res) => {
   const { type, title, content, tags, group_id } = req.body;
 
   try {
@@ -23,10 +24,13 @@ router.post('/posts', auth, async (req, res) => {
     newPost.vote_score = 0;
     newPost.comment_count = 0;
 
-    // Emitting live update to everyone
+    // Emit live update via Socket.IO
     if (req.io) {
       req.io.emit('new_post', newPost);
     }
+
+    // Architect: event-driven — triggers TrustScore computation downstream
+    emitEvent('community.post.created', `user_${req.user.id}`, { userId: req.user.id, postId: newPost.id, type, timestamp: new Date().toISOString() });
 
     res.json(envelope(newPost));
   } catch (err) {
@@ -37,7 +41,7 @@ router.post('/posts', auth, async (req, res) => {
 
 // @route   GET /api/v1/community/posts
 // @desc    Get blended feed posts ranked by discovery module
-router.get('/posts', auth, async (req, res) => {
+router.get('/posts', [auth, requireOnboarding], async (req, res) => {
   try {
     const userResult = await db.query('SELECT research_interests FROM users WHERE id = $1', [req.user.id]);
     const interests = userResult.rows[0]?.research_interests?.interests || [];
@@ -86,7 +90,7 @@ router.get('/posts', auth, async (req, res) => {
 
 // @route   POST /api/v1/community/posts/:id/vote
 // @desc    Vote on a post
-router.post('/posts/:id/vote', auth, async (req, res) => {
+router.post('/posts/:id/vote', [auth, requireOnboarding], async (req, res) => {
   const { value } = req.body; // 1 or -1
 
   try {

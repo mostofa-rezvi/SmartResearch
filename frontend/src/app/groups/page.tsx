@@ -6,6 +6,7 @@ import { Users, Plus, Hash, Globe, Lock, Search, ArrowRight } from "lucide-react
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import { useAuth } from "@/context/AuthContext";
+import { API } from "@/config/api";
 
 export default function GroupsListingPage() {
   const [groups, setGroups] = useState<any[]>([]);
@@ -15,7 +16,7 @@ export default function GroupsListingPage() {
   useEffect(() => {
     const fetchGroups = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/groups");
+        const response = await fetch(API.groups.list);
         const data = await response.json();
         setGroups(data);
       } catch (err) {

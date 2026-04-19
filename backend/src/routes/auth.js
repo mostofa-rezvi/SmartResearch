@@ -276,38 +276,58 @@ router.post('/verify-otp', async (req, res) => {
 
     const user = result.rows[0];
 
-    // Clear OTP
+    // Clear OTP after successful verification
     await db.query('UPDATE users SET login_otp = NULL, login_otp_expires = NULL WHERE id = $1', [user.id]);
 
-    // Create and sign JWT
+    const jwt = require('jsonwebtoken');
     const payload = { 
-        user: { 
-            id: user.id, 
-            name: user.name, 
-            email: user.email,
-            role: user.role || 'user',
-            researcher_type: user.researcher_type || 'new_researcher',
-            onboarding_completed: user.onboarding_completed || false
-        } 
+      user: { 
+        id: user.id, 
+        name: user.name, 
+        email: user.email,
+        role: user.role || 'user',
+        researcher_type: user.researcher_type || 'new_researcher',
+        onboarding_completed: user.onboarding_completed || false
+      } 
     };
-    
-    jwt.sign(
-      payload,
-      process.env.JWT_SECRET,
-      { expiresIn: '24h' },
-      (err, token) => {
-        if (err) throw err;
-        res.json({ 
-            token, 
-            user: payload.user,
-            message: 'Access granted. Welcome to ResearchBridge.' 
-        });
-      }
-    );
+
+    // Architect: Dual-Token strategy (access 15m + refresh 7d)
+    const accessToken = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '15m' });
+    const refreshToken = jwt.sign({ userId: user.id }, process.env.JWT_REFRESH_SECRET, { expiresIn: '7d' });
+
+    // Send refresh token as httpOnly cookie (not accessible to JS)
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
+
+    return res.json({ 
+      token: accessToken, 
+      user: payload.user,
+      message: 'Access granted. Welcome to ResearchBridge.' 
+    });
 
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Server error');
+  }
+});
+
+// @route   POST /api/v1/auth/refresh
+// @desc    Issue new access token using refresh token cookie
+router.post('/refresh', (req, res) => {
+  const jwt = require('jsonwebtoken');
+  const refreshToken = req.cookies?.refreshToken;
+  if (!refreshToken) return res.status(401).json({ message: 'No refresh token' });
+
+  try {
+    const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+    const newAccessToken = jwt.sign({ user: { id: decoded.userId } }, process.env.JWT_SECRET, { expiresIn: '15m' });
+    res.json({ token: newAccessToken });
+  } catch {
+    res.status(401).json({ message: 'Invalid or expired refresh token' });
   }
 });
 
