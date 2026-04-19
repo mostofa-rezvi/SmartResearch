@@ -6,6 +6,8 @@ const morgan = require('morgan');
 const http = require('http');
 const { Server } = require('socket.io');
 const cookieParser = require('cookie-parser');
+const { errors } = require('celebrate');
+const logger = require('./utils/logger');
 const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
@@ -57,14 +59,14 @@ app.use('/api/reputation', require('./routes/reputation.routes'));
 
 // Socket.IO Connection Event
 io.on('connection', (socket) => {
-  console.log('A user connected via WebSocket');
+  logger.info('A user connected via WebSocket');
   
   socket.on('join_feed', (userId) => {
     socket.join(`user_${userId}`);
   });
 
   socket.on('disconnect', () => {
-    console.log('User disconnected');
+    logger.info('User disconnected');
   });
 });
 
@@ -74,9 +76,10 @@ app.get('/health', (req, res) => {
 });
 
 // Global Error Handler (standards.md §1: centralized error middleware)
+app.use(errors()); // Handle Joi validation errors
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  logger.info(`Server running on port ${PORT}`);
 });

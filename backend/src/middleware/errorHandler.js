@@ -4,12 +4,20 @@
  */
 
 const { errorEnvelope } = require('../utils/responseEnvelope');
+const logger = require('../utils/logger');
 
 const errorHandler = (err, req, res, _next) => {
-  console.error(`[ERROR] ${req.method} ${req.originalUrl}:`, err.message);
-  
-  const statusCode = err.statusCode || 500;
+  const statusCode = err.statusCode || (err.isJoi ? 400 : 500);
   const message = err.message || 'Internal Server Error';
+
+  logger.error({
+    method: req.method,
+    url: req.originalUrl,
+    error: err.message,
+    stack: process.env.NODE_ENV === 'development' ? err.stack : undefined,
+    body: req.body,
+    user: req.user ? req.user.id : 'anonymous'
+  }, 'Request Error');
 
   res.status(statusCode).json(errorEnvelope(message, statusCode));
 };

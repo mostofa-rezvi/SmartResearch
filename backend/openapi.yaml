@@ -1,0 +1,85 @@
+openapi: 3.0.0
+info:
+  title: ResearchBridge (SRCP) API
+  description: High-integrity API for academic research discovery and community interaction.
+  version: 1.0.0
+servers:
+  - url: http://localhost:5000/api/v1
+    description: Local Development Server
+
+paths:
+  /auth/register:
+    post:
+      summary: Register a new researcher
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, email, password, status, institution]
+              properties:
+                name: { type: string }
+                email: { type: string, format: email }
+                password: { type: string, minLength: 8 }
+                status: { type: string }
+                institution: { type: string }
+      responses:
+        '201':
+          description: Created
+  
+  /auth/login:
+    post:
+      summary: Step 1 of OTP Login
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email: { type: string, format: email }
+                password: { type: string }
+      responses:
+        '200':
+          description: OTP Sent
+
+  /community/posts:
+    get:
+      summary: Get personalized research feed
+      tags: [Community]
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: List of ranked posts
+    post:
+      summary: Create a new research question or thought
+      tags: [Community]
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [type, title, content]
+              properties:
+                type: { type: string, enum: [Question, Thought] }
+                title: { type: string }
+                content: { type: string }
+                tags: { type: array, items: { type: string } }
+      responses:
+        '201':
+          description: Post Created
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: apiKey
+      in: header
+      name: x-auth-token
