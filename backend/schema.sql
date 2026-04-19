@@ -34,7 +34,8 @@ CREATE TABLE IF NOT EXISTS invited_user_profiles (
     editorial_roles JSONB,
     students_supervised INTEGER DEFAULT 0,
     conference_participation JSONB,
-    contact_preferences TEXT
+    contact_preferences TEXT,
+    impact_score INTEGER DEFAULT 0
 );
 
 -- Invitations table for Invited Users (Academic standing)

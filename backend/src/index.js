@@ -30,6 +30,7 @@ app.use('/api/journals', require('./routes/journals'));
 app.use('/api/discovery', require('./routes/discovery'));
 app.use('/api/users', require('./routes/users'));
 app.use('/api/moderation', require('./routes/moderation'));
+app.use('/api/reputation', require('./routes/reputation.routes'));
 
 // Make io accessible in routes if needed (e.g., via req.app.get('io') or just by exporting it, but here we can just attach it to req)
 app.use((req, res, next) => {
