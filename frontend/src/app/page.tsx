@@ -2,9 +2,22 @@
 
 import Navbar from "@/components/Navbar";
 import Image from "next/image";
+import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
+import { 
+  CheckCircle2, 
+  ArrowRight, 
+  Search, 
+  Users, 
+  Lightbulb, 
+  ShieldCheck, 
+  Globe, 
+  Zap,
+  Quote
+} from "lucide-react";
 
 export default function Home() {
   const { user, isLoading } = useAuth();
@@ -17,118 +30,332 @@ export default function Home() {
   }, [user, isLoading, router]);
 
   if (isLoading || (user && !user.onboarding_completed)) {
-    return <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex items-center justify-center italic text-slate-400">Loading your research universe...</div>;
+    return (
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+          <p className="italic text-slate-500 animate-pulse">Initializing research universe...</p>
+        </div>
+      </div>
+    );
   }
+
+  const fadeInUp = {
+    initial: { opacity: 0, y: 20 },
+    animate: { opacity: 1, y: 0 },
+    transition: { duration: 0.5 }
+  };
+
+  const stagger = {
+    animate: {
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 overflow-x-hidden">
+    <div className="min-h-screen bg-white dark:bg-[#020617] overflow-x-hidden selection:bg-primary/20">
       <Navbar />
       
-      <main>
+      <main className="pt-20">
         {/* Hero Section */}
-        <section className="relative pt-32 pb-20 md:pt-48 md:pb-32 px-6 md:px-12 max-w-7xl mx-auto flex flex-col items-center text-center">
-          <div className="absolute top-0 right-0 -z-10 w-96 h-96 bg-primary/10 rounded-full blur-3xl" />
-          <div className="absolute bottom-0 left-0 -z-10 w-80 h-80 bg-accent/10 rounded-full blur-3xl" />
+        <section className="relative px-6 pt-20 pb-24 md:pt-32 md:pb-40 overflow-hidden">
+          {/* Background Elements */}
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 -z-10 w-full max-w-7xl h-full opacity-30 dark:opacity-20 bg-grid pointer-events-none" />
+          <div className="absolute top-[-10%] right-[-10%] -z-10 w-[500px] h-[500px] bg-primary/20 rounded-full blur-[120px]" />
+          <div className="absolute bottom-[-10%] left-[-10%] -z-10 w-[500px] h-[500px] bg-accent/20 rounded-full blur-[120px]" />
 
-          <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight text-slate-900 dark:text-white mb-6 animate-in fade-in slide-in-from-bottom-8 duration-700">
-            A Hub for the Global <br />
-            <span className="text-primary italic">Research Community</span>
-          </h1>
+          <div className="max-w-7xl mx-auto text-center">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5 }}
+              className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/5 border border-primary/10 text-primary text-sm font-semibold mb-8"
+            >
+              <Zap size={14} className="fill-primary" />
+              <span>The Future of Collaborative Research</span>
+            </motion.div>
+
+            <motion.h1 
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.1 }}
+              className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tight text-slate-900 dark:text-white mb-8 leading-[1.1]"
+            >
+              The Ultimate <br />
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary via-accent to-primary animate-gradient-x">
+                Research Companion
+              </span>
+            </motion.h1>
+            
+            <motion.p 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.2 }}
+              className="text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto mb-12 leading-relaxed"
+            >
+              Empowering the next generation of scientists and scholars. Discover breakthroughs, 
+              collaborate instantly, and organize your knowledge with AI-driven insights.
+            </motion.p>
+
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.3 }}
+              className="flex flex-col sm:flex-row justify-center gap-5"
+            >
+              <Link href="/register" className="group bg-primary text-white px-8 py-4 rounded-2xl text-lg font-bold hover:bg-primary/90 transition-all shadow-2xl shadow-primary/25 flex items-center justify-center gap-2">
+                Get Started for Free
+                <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+              </Link>
+              <Link href="/features" className="bg-white dark:bg-white/5 text-slate-900 dark:text-white px-8 py-4 rounded-2xl text-lg font-bold border border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-white/10 transition-all flex items-center justify-center">
+                Explore Features
+              </Link>
+            </motion.div>
+
+            {/* Dashboard Mockup Preview */}
+            <motion.div 
+              initial={{ opacity: 0, y: 60 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1, delay: 0.5 }}
+              className="mt-24 relative max-w-5xl mx-auto group"
+            >
+              <div className="absolute inset-0 bg-gradient-to-tr from-primary/30 to-accent/30 rounded-3xl blur-3xl -z-10 opacity-50 group-hover:opacity-100 transition-opacity duration-700" />
+              <div className="relative rounded-3xl overflow-hidden border border-slate-200 dark:border-white/10 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.2)] dark:shadow-none">
+                <Image 
+                  src="/hero.png" 
+                  alt="ResearchBridge Dashboard" 
+                  width={1200}
+                  height={675}
+                  className="w-full h-auto object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/40 via-transparent to-transparent" />
+              </div>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* Trust Section */}
+        <section className="py-16 bg-slate-50 dark:bg-white/[0.02] border-y border-slate-100 dark:border-white/5">
+          <div className="max-w-7xl mx-auto px-6">
+            <p className="text-center text-sm font-semibold text-slate-500 uppercase tracking-widest mb-10">
+              Trusted by Researchers from World-Class Institutions
+            </p>
+            <div className="flex flex-wrap justify-center items-center gap-12 md:gap-20 opacity-50 grayscale hover:grayscale-0 transition-all duration-500">
+              {/* Placeholders for logos */}
+              {["MIT", "Stanford", "CERN", "Oxford", "Harvard"].map((name) => (
+                <span key={name} className="text-2xl font-black text-slate-400 dark:text-slate-600">{name}</span>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Features Section */}
+        <section className="py-32 px-6 max-w-7xl mx-auto" id="features">
+          <div className="text-center mb-20">
+            <h2 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white mb-6">Built for Modern Science</h2>
+            <p className="text-slate-600 dark:text-slate-400 text-lg max-w-2xl mx-auto">
+              Everything you need to accelerate your research workflow, from initial hypothesis to final publication.
+            </p>
+          </div>
+
+          <motion.div 
+            variants={stagger}
+            initial="initial"
+            whileInView="animate"
+            viewport={{ once: true }}
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+          >
+            {[
+              { icon: <Search className="text-primary" />, title: "Semantic Discovery", desc: "Find exactly what you need with our AI-powered semantic search that understands context, not just keywords." },
+              { icon: <Users className="text-blue-500" />, title: "Team Collaboration", desc: "Real-time shared workspaces for labs and remote teams. Track progress, share datasets, and co-write papers." },
+              { icon: <Zap className="text-amber-500" />, title: "Instant Citations", desc: "Automated citation management that supports thousands of styles. Focus on writing, not formatting." },
+              { icon: <ShieldCheck className="text-emerald-500" />, title: "Verify & Secure", desc: "Blockchain-backed version control for your data ensuring integrity and clear lineage of your breakthroughs." },
+              { icon: <Globe className="text-indigo-500" />, title: "Global Network", desc: "Connect with experts in your niche. Peer review, mentorship, and networking redefined for the digital age." },
+              { icon: <Lightbulb className="text-accent" />, title: "Smart Insights", desc: "Receive automated summaries and trend analysis in your field. Stay ahead of the curve without the noise." }
+            ].map((f, i) => (
+              <motion.div 
+                key={i} 
+                variants={fadeInUp}
+                className="group p-8 rounded-3xl bg-white dark:bg-white/5 border border-slate-100 dark:border-white/10 hover:border-primary/50 transition-all duration-300 hover:shadow-2xl hover:shadow-primary/5 hover:-translate-y-1"
+              >
+                <div className="w-14 h-14 rounded-2xl bg-slate-50 dark:bg-white/5 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                  {f.icon}
+                </div>
+                <h3 className="text-xl font-bold mb-3 text-slate-900 dark:text-white">{f.title}</h3>
+                <p className="text-slate-600 dark:text-slate-400 leading-relaxed">{f.desc}</p>
+              </motion.div>
+            ))}
+          </motion.div>
+        </section>
+
+        {/* How It Works */}
+        <section className="py-32 px-6 bg-slate-900 text-white rounded-[40px] md:rounded-[60px] mx-4 md:mx-8 mb-32 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-primary/20 rounded-full blur-[120px] -z-0" />
           
-          <p className="text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-3xl mb-10 leading-relaxed animate-in fade-in slide-in-from-bottom-10 delay-200 duration-700">
-            ResearchBridge is a unified digital platform built to empower scholars, 
-            undergraduates, and professors to discover breakthroughs, collaborate on 
-            innovations, and share knowledge that changes the world.
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-4 animate-in fade-in slide-in-from-bottom-12 delay-400 duration-700">
-            <button className="bg-primary text-white px-8 py-4 rounded-xl text-lg font-bold hover:bg-secondary transition-all shadow-xl hover:shadow-primary/30 flex items-center gap-2 group">
-              Get Started
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5 group-hover:translate-x-1 transition-transform">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
-              </svg>
-            </button>
-            <button className="bg-white dark:bg-slate-800 text-slate-900 dark:text-white px-8 py-4 rounded-xl text-lg font-bold border border-slate-200 dark:border-slate-700 hover:bg-slate-50 transition-all">
-              Explore Research
-            </button>
-          </div>
-
-          {/* Hero Image / Mockup */}
-          <div className="mt-20 relative w-full aspect-video md:aspect-[21/9] rounded-2xl overflow-hidden shadow-2xl border-4 border-white dark:border-slate-800 animate-in fade-in zoom-in delay-600 duration-1000">
-            <Image 
-              src="/hero.png" 
-              alt="ResearchBridge Platform" 
-              fill
-              className="object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
-          </div>
-        </section>
-
-        {/* Value Propositions */}
-        <section className="py-20 px-6 md:px-12 max-w-7xl mx-auto" id="features">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-            <div className="p-8 rounded-2xl bg-white dark:bg-slate-800 shadow-lg border border-slate-100 dark:border-slate-700 hover:-translate-y-2 transition-transform">
-              <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center text-primary mb-6">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-bold mb-3 text-slate-900 dark:text-white">Smart Discovery</h3>
-              <p className="text-slate-600 dark:text-slate-400">
-                Advanced semantic search and personalized recommendations to find relevant papers and collaborators instantly.
-              </p>
+          <div className="relative z-10 max-w-7xl mx-auto">
+            <div className="text-center mb-20">
+              <h2 className="text-4xl md:text-5xl font-bold mb-6">How It Works</h2>
+              <p className="text-slate-400 text-lg max-w-2xl mx-auto">Start your journey to breakthrough in minutes.</p>
             </div>
 
-            <div className="p-8 rounded-2xl bg-white dark:bg-slate-800 shadow-lg border border-slate-100 dark:border-slate-700 hover:-translate-y-2 transition-transform">
-              <div className="w-12 h-12 bg-accent/10 rounded-xl flex items-center justify-center text-accent mb-6">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-bold mb-3 text-slate-900 dark:text-white">Seamless Collaboration</h3>
-              <p className="text-slate-600 dark:text-slate-400">
-                Connect with researchers worldwide. Build teams, share datasets, and co-author publications from anywhere.
-              </p>
-            </div>
-
-            <div className="p-8 rounded-2xl bg-white dark:bg-slate-800 shadow-lg border border-slate-100 dark:border-slate-700 hover:-translate-y-2 transition-transform">
-              <div className="w-12 h-12 bg-secondary/10 rounded-xl flex items-center justify-center text-secondary mb-6">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0 0 12 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75Z" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-bold mb-3 text-slate-900 dark:text-white">Open Knowledge</h3>
-              <p className="text-slate-600 dark:text-slate-400">
-                A home for research at every stage. We bridge the gap between amateur curiosity and professional expertise.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* Personalized Recommendations Section */}
-        {user && (
-          <section className="py-20 px-6 md:px-12 max-w-7xl mx-auto border-t border-slate-200 dark:border-slate-800">
-            <h2 className="text-3xl font-bold mb-8 text-slate-900 dark:text-white">
-              Recommended for {user.researcher_type === 'new_researcher' ? 'Early Discovery' : 'Advanced Analysis'}
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {[1, 2, 3, 4].map((item) => (
-                <div key={item} className="p-4 rounded-xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700">
-                  <div className="h-32 bg-primary/5 rounded-lg mb-4 flex items-center justify-center text-primary/20">
-                    <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-16 md:gap-8">
+              {[
+                { step: "01", title: "Join the Network", desc: "Create your researcher profile and specify your areas of expertise and interest." },
+                { step: "02", title: "Discover & Connect", desc: "Use our discovery tools to find relevant papers, datasets, and potential collaborators." },
+                { step: "03", title: "Collaborate & Publish", desc: "Build groups, share insights, and get your work verified and published to the world." }
+              ].map((s, i) => (
+                <div key={i} className="relative flex flex-col items-center text-center">
+                  <div className="text-8xl font-black text-white/5 absolute -top-12 left-1/2 -translate-x-1/2 select-none">{s.step}</div>
+                  <div className="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center text-2xl font-bold mb-8 shadow-xl shadow-primary/40 relative z-10">
+                    {i + 1}
                   </div>
-                  <h4 className="font-bold mb-1 text-slate-900 dark:text-white line-clamp-2">The Future of ResearchBridge: A Study on {item}</h4>
-                  <p className="text-xs text-slate-500 mb-2">Dec 2026 • 12 Citations</p>
-                  <button className="text-primary text-xs font-bold hover:underline">Read Abstract →</button>
+                  <h3 className="text-2xl font-bold mb-4">{s.title}</h3>
+                  <p className="text-slate-400">{s.desc}</p>
                 </div>
               ))}
             </div>
-          </section>
-        )}
+          </div>
+        </section>
+
+        {/* Testimonials */}
+        <section className="py-32 px-6 max-w-7xl mx-auto">
+          <div className="text-center mb-20">
+            <h2 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white mb-6">What Pioneers Say</h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[
+              { name: "Dr. Sarah Chen", role: "Biotech Researcher", text: "ResearchBridge changed how our lab operates. The ability to share live datasets and get instant peer feedback is revolutionary." },
+              { name: "Prof. James Wilson", role: "Physics Lead, CERN", text: "The cleanest interface I've seen in academia. It actually makes the administrative side of research enjoyable." },
+              { name: "Alex Rivera", role: "PhD Candidate", text: "Finding collaborators for cross-disciplinary studies used to take months. Now it takes a few clicks." }
+            ].map((t, i) => (
+              <div key={i} className="p-8 rounded-3xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 relative">
+                <Quote className="text-primary/20 absolute top-8 right-8" size={48} />
+                <p className="text-lg text-slate-700 dark:text-slate-300 italic mb-8 relative z-10">"{t.text}"</p>
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-slate-200 to-slate-300 dark:from-slate-700 dark:to-slate-600" />
+                  <div>
+                    <h4 className="font-bold text-slate-900 dark:text-white">{t.name}</h4>
+                    <p className="text-sm text-slate-500">{t.role}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Pricing Preview */}
+        <section className="py-32 px-6 max-w-7xl mx-auto" id="pricing">
+          <div className="text-center mb-20">
+            <h2 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white mb-6">Simple, Transparent Pricing</h2>
+            <p className="text-slate-600 dark:text-slate-400 text-lg">Scales with your research needs.</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            {[
+              { name: "Individual", price: "0", features: ["Up to 5 Projects", "Community Access", "Standard Search", "Basic Storage"] },
+              { name: "Professional", price: "29", popular: true, features: ["Unlimited Projects", "AI Research Assistant", "Semantic Search", "100GB Storage", "Priority Support"] },
+              { name: "Institutional", price: "Custom", features: ["Everything in Pro", "Single Sign-On (SSO)", "Admin Controls", "API Access", "Dedicated Manager"] }
+            ].map((p, i) => (
+              <div key={i} className={`p-8 rounded-[32px] border ${p.popular ? 'border-primary ring-4 ring-primary/10 bg-primary/5 scale-105' : 'border-slate-100 dark:border-white/10 bg-white dark:bg-white/5'} flex flex-col relative`}>
+                {p.popular && <span className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary text-white px-4 py-1 rounded-full text-xs font-bold">MOST POPULAR</span>}
+                <h3 className="text-xl font-bold mb-2 text-slate-900 dark:text-white">{p.name}</h3>
+                <div className="mb-6">
+                  <span className="text-4xl font-black text-slate-900 dark:text-white">${p.price}</span>
+                  {p.price !== "Custom" && <span className="text-slate-500 text-sm">/mo</span>}
+                </div>
+                <ul className="space-y-4 mb-8 flex-grow">
+                  {p.features.map((f, fi) => (
+                    <li key={fi} className="flex items-center gap-3 text-slate-600 dark:text-slate-400 text-sm">
+                      <CheckCircle2 size={18} className="text-primary shrink-0" />
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+                <button className={`w-full py-4 rounded-xl font-bold transition-all ${p.popular ? 'bg-primary text-white hover:bg-primary/90 shadow-xl shadow-primary/20' : 'bg-slate-100 dark:bg-white/10 text-slate-900 dark:text-white hover:bg-slate-200 dark:hover:bg-white/20'}`}>
+                  {p.price === "Custom" ? "Contact Sales" : "Get Started"}
+                </button>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Final CTA Banner */}
+        <section className="py-24 px-6 max-w-7xl mx-auto">
+          <div className="relative bg-primary rounded-[48px] p-12 md:p-24 text-center overflow-hidden">
+            <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-white/10 rounded-full blur-[100px]" />
+            <div className="relative z-10 max-w-3xl mx-auto">
+              <h2 className="text-4xl md:text-6xl font-black text-white mb-8">Ready to Accelerate Your Research?</h2>
+              <p className="text-white/80 text-lg md:text-xl mb-12">
+                Join 50,000+ researchers making breakthroughs every day with ResearchBridge.
+              </p>
+              <div className="flex flex-col sm:flex-row justify-center gap-4">
+                <Link href="/register" className="bg-white text-primary px-10 py-4 rounded-2xl text-lg font-bold hover:bg-slate-100 transition-all shadow-2xl overflow-hidden group">
+                   Create Free Account
+                </Link>
+                <Link href="/contact" className="bg-primary-700/50 backdrop-blur-md text-white border border-white/20 px-10 py-4 rounded-2xl text-lg font-bold hover:bg-primary-700/70 transition-all">
+                  Contact Sales
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
 
         {/* Footer */}
-        <footer className="py-12 border-t border-slate-200 dark:border-slate-800 text-center text-sm text-slate-500">
-          <p>© 2026 ResearchBridge. All rights reserved.</p>
+        <footer className="py-20 border-t border-slate-100 dark:border-white/5 bg-white dark:bg-[#020617]">
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-12 mb-16">
+              <div className="col-span-2 lg:col-span-2">
+                <div className="flex items-center gap-2.5 mb-6">
+                  <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white font-bold text-sm">RB</div>
+                  <span className="text-xl font-bold text-slate-900 dark:text-white">ResearchBridge</span>
+                </div>
+                <p className="text-slate-500 dark:text-slate-400 max-w-sm mb-6 leading-relaxed">
+                  The ultimate platform for modern researchers. Bridging the gap between theory and breakthrough through global collaboration.
+                </p>
+              </div>
+              
+              <div>
+                <h4 className="font-bold text-slate-900 dark:text-white mb-6 uppercase text-xs tracking-widest">Platform</h4>
+                <ul className="space-y-4 text-sm text-slate-500 dark:text-slate-400">
+                  <li><Link href="/features" className="hover:text-primary transition-colors">Features</Link></li>
+                  <li><Link href="/discovery" className="hover:text-primary transition-colors">Discovery</Link></li>
+                  <li><Link href="/pricing" className="hover:text-primary transition-colors">Pricing</Link></li>
+                  <li><Link href="/community" className="hover:text-primary transition-colors">Community</Link></li>
+                </ul>
+              </div>
+
+              <div>
+                <h4 className="font-bold text-slate-900 dark:text-white mb-6 uppercase text-xs tracking-widest">Company</h4>
+                <ul className="space-y-4 text-sm text-slate-500 dark:text-slate-400">
+                  <li><Link href="/about" className="hover:text-primary transition-colors">About Us</Link></li>
+                  <li><Link href="/contact" className="hover:text-primary transition-colors">Contact</Link></li>
+                  <li><Link href="/careers" className="hover:text-primary transition-colors">Careers</Link></li>
+                  <li><Link href="/blog" className="hover:text-primary transition-colors">Blog</Link></li>
+                </ul>
+              </div>
+
+              <div>
+                <h4 className="font-bold text-slate-900 dark:text-white mb-6 uppercase text-xs tracking-widest">Legal</h4>
+                <ul className="space-y-4 text-sm text-slate-500 dark:text-slate-400">
+                  <li><Link href="/privacy" className="hover:text-primary transition-colors">Privacy</Link></li>
+                  <li><Link href="/terms" className="hover:text-primary transition-colors">Terms</Link></li>
+                  <li><Link href="/cookies" className="hover:text-primary transition-colors">Cookies</Link></li>
+                </ul>
+              </div>
+            </div>
+            
+            <div className="pt-8 border-t border-slate-100 dark:border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-slate-500">
+              <p>© 2026 ResearchBridge. All rights reserved.</p>
+              <div className="flex gap-6">
+                <a href="#" className="hover:text-primary transition-colors">Twitter</a>
+                <a href="#" className="hover:text-primary transition-colors">LinkedIn</a>
+                <a href="#" className="hover:text-primary transition-colors">GitHub</a>
+              </div>
+            </div>
+          </div>
         </footer>
       </main>
     </div>

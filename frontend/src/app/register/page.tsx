@@ -87,33 +87,39 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
+    <div className="min-h-screen bg-white dark:bg-[#020617] relative overflow-hidden">
+      {/* Background Decor */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 -z-10 w-full max-w-7xl h-full opacity-30 dark:opacity-20 bg-grid pointer-events-none" />
+      <div className="absolute top-[-10%] right-[-10%] -z-10 w-[400px] h-[400px] bg-primary/10 rounded-full blur-[120px]" />
+      <div className="absolute bottom-[-10%] left-[-10%] -z-10 w-[400px] h-[400px] bg-accent/10 rounded-full blur-[120px]" />
+
       <Navbar />
 
       <main className="pt-32 pb-20 px-6 flex justify-center">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="max-w-xl w-full bg-white dark:bg-slate-800 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-700 overflow-hidden"
+          className="max-w-xl w-full bg-white dark:bg-slate-900/50 backdrop-blur-xl rounded-[40px] shadow-2xl border border-slate-100 dark:border-white/10 overflow-hidden"
         >
-          <div className="bg-primary p-8 text-white text-center">
-            <h1 className="text-3xl font-bold mb-2">
-              {step === 1 ? "Join ResearchBridge" : "Verify Email"}
+          <div className="bg-primary p-10 text-white text-center relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl" />
+            <h1 className="text-3xl font-black mb-2 relative z-10">
+              {step === 1 ? "Join the Vanguard" : "Verify Your Identity"}
             </h1>
-            <p className="text-primary-foreground/80">
-              {step === 1 ? "Start your journey in the global research community." : `We sent a code to ${email}`}
+            <p className="text-primary-foreground/80 relative z-10">
+              {step === 1 ? "Empowering the next generation of researchers." : `Sent code to ${email}`}
             </p>
           </div>
 
-          <div className="p-8 space-y-6">
+          <div className="p-10 space-y-8">
             {(successMessage || error) && (
               <motion.div 
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className={`p-4 rounded-xl text-sm font-medium border flex items-center gap-3 ${
+                className={`p-4 rounded-2xl text-sm font-bold border flex items-center gap-3 ${
                   error 
                   ? "bg-red-50 text-red-600 border-red-100" 
-                  : "bg-accent/10 text-accent border-accent/20"
+                  : "bg-emerald-50 text-emerald-600 border-emerald-100"
                 }`}
               >
                 <CheckCircle2 size={18} className="shrink-0" />
@@ -123,90 +129,97 @@ export default function RegisterPage() {
 
             {step === 1 ? (
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-                {/* Full Name */}
-                <div className="space-y-2">
-                  <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
-                    <User size={16} /> Full Name
-                  </label>
-                  <input
-                    {...register("name", { required: "Name is required" })}
-                    className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-primary outline-none transition-all"
-                    placeholder="John Doe"
-                    disabled={isSubmitting}
-                  />
-                  {errors.name && <p className="text-xs text-red-500 mt-1">{errors.name.message}</p>}
-                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Full Name */}
+                  <div className="space-y-2">
+                    <label className="text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 ml-1">Full Name</label>
+                    <div className="relative">
+                      <User size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                      <input
+                        {...register("name", { required: "Name is required" })}
+                        className="w-full pl-12 pr-4 py-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-white/10 focus:ring-2 focus:ring-primary outline-none transition-all"
+                        placeholder="Dr. Jane Doe"
+                        disabled={isSubmitting}
+                      />
+                    </div>
+                    {errors.name && <p className="text-xs text-red-500 mt-1">{errors.name.message}</p>}
+                  </div>
 
-                {/* Email */}
-                <div className="space-y-2">
-                  <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
-                    <Mail size={16} /> Email Address
-                  </label>
-                  <input
-                    {...register("email", { 
-                      required: "Email is required",
-                      pattern: {
-                        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                        message: "Invalid email address"
-                      }
-                    })}
-                    className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-primary outline-none transition-all"
-                    placeholder="john@university.edu"
-                    disabled={isSubmitting}
-                  />
-                  {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email.message}</p>}
+                  {/* Email */}
+                  <div className="space-y-2">
+                    <label className="text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 ml-1">Email Address</label>
+                    <div className="relative">
+                      <Mail size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                      <input
+                        {...register("email", { 
+                          required: "Email is required",
+                          pattern: {
+                            value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                            message: "Invalid email address"
+                          }
+                        })}
+                        className="w-full pl-12 pr-4 py-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-white/10 focus:ring-2 focus:ring-primary outline-none transition-all"
+                        placeholder="jane@university.edu"
+                        disabled={isSubmitting}
+                      />
+                    </div>
+                    {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email.message}</p>}
+                  </div>
                 </div>
 
                 {/* Password */}
                 <div className="space-y-2">
-                  <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
-                    <Lock size={16} /> Password
-                  </label>
-                  <input
-                    type="password"
-                    {...register("password", { 
-                      required: "Password is required",
-                      minLength: { value: 8, message: "Minimum 8 characters" }
-                    })}
-                    className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-primary outline-none transition-all"
-                    placeholder="••••••••"
-                    disabled={isSubmitting}
-                  />
+                  <label className="text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 ml-1">Secure Password</label>
+                  <div className="relative">
+                    <Lock size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                    <input
+                      type="password"
+                      {...register("password", { 
+                        required: "Password is required",
+                        minLength: { value: 8, message: "Minimum 8 characters" }
+                      })}
+                      className="w-full pl-12 pr-4 py-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-white/10 focus:ring-2 focus:ring-primary outline-none transition-all"
+                      placeholder="••••••••"
+                      disabled={isSubmitting}
+                    />
+                  </div>
                   {errors.password && <p className="text-xs text-red-500 mt-1">{errors.password.message}</p>}
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Status */}
                   <div className="space-y-2">
-                    <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
-                      <GraduationCap size={16} /> Status
-                    </label>
-                    <select
-                      {...register("status", { required: "Please select your status" })}
-                      className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-primary outline-none transition-all appearance-none"
-                      disabled={isSubmitting}
-                    >
-                      <option value="">Select status...</option>
-                      <option value="undergraduate">Undergraduate Student</option>
-                      <option value="graduate">Graduate Student</option>
-                      <option value="phd">PhD Researcher</option>
-                      <option value="professor">Professor / Faculty</option>
-                      <option value="industry">Industry Specialist</option>
-                    </select>
+                    <label className="text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 ml-1">Current Status</label>
+                    <div className="relative">
+                      <GraduationCap size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                      <select
+                        {...register("status", { required: "Please select your status" })}
+                        className="w-full pl-12 pr-4 py-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-white/10 focus:ring-2 focus:ring-primary outline-none transition-all appearance-none"
+                        disabled={isSubmitting}
+                      >
+                        <option value="">Select status...</option>
+                        <option value="undergraduate">Undergraduate Student</option>
+                        <option value="graduate">Graduate Student</option>
+                        <option value="phd">PhD Researcher</option>
+                        <option value="professor">Professor / Faculty</option>
+                        <option value="industry">Industry Specialist</option>
+                      </select>
+                    </div>
                     {errors.status && <p className="text-xs text-red-500 mt-1">{errors.status.message}</p>}
                   </div>
 
                   {/* Institution */}
                   <div className="space-y-2">
-                    <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
-                      <Building size={16} /> Institution
-                    </label>
-                    <input
-                      {...register("institution", { required: "Institution is required" })}
-                      className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-primary outline-none transition-all"
-                      placeholder="University of Science"
-                      disabled={isSubmitting}
-                    />
+                    <label className="text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 ml-1">Institution</label>
+                    <div className="relative">
+                      <Building size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                      <input
+                        {...register("institution", { required: "Institution is required" })}
+                        className="w-full pl-12 pr-4 py-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-white/10 focus:ring-2 focus:ring-primary outline-none transition-all"
+                        placeholder="University Name"
+                        disabled={isSubmitting}
+                      />
+                    </div>
                     {errors.institution && <p className="text-xs text-red-500 mt-1">{errors.institution.message}</p>}
                   </div>
                 </div>
@@ -214,19 +227,19 @@ export default function RegisterPage() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full bg-primary text-white py-4 rounded-xl font-bold text-lg hover:bg-secondary transition-all shadow-xl hover:shadow-primary/25 flex items-center justify-center gap-2 disabled:opacity-70"
+                  className="w-full bg-primary text-white py-5 rounded-2xl font-black text-lg hover:bg-primary/90 transition-all shadow-xl shadow-primary/20 flex items-center justify-center gap-2 active:scale-[0.98] disabled:opacity-70"
                 >
                   {isSubmitting ? (
                     <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                   ) : (
-                    <>Complete Registration <ArrowRight size={20} /></>
+                    <>Create Account <ArrowRight size={20} /></>
                   )}
                 </button>
               </form>
             ) : (
-              <form onSubmit={handleVerifyOtp} className="space-y-6">
-                <div className="space-y-2 text-center mb-6">
-                  <p className="text-sm text-slate-500 mb-4">Please enter the 6-digit verification code sent to your email.</p>
+              <form onSubmit={handleVerifyOtp} className="space-y-8 text-center">
+                <div className="space-y-4">
+                  <p className="text-sm text-slate-500">Security Check: Enter the 6-digit code sent to your academic email.</p>
                   <input
                     type="text"
                     maxLength={6}
@@ -234,7 +247,7 @@ export default function RegisterPage() {
                     onChange={(e) => setOtp(e.target.value)}
                     required
                     autoFocus
-                    className="w-full text-center text-3xl tracking-[0.5em] font-mono px-4 py-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-primary outline-none transition-all"
+                    className="w-full text-center text-4xl tracking-[0.5em] font-black px-4 py-5 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-white/10 focus:ring-2 focus:ring-primary outline-none transition-all"
                     placeholder="000000"
                     disabled={isSubmitting}
                   />
@@ -242,23 +255,23 @@ export default function RegisterPage() {
                 <button 
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full bg-accent text-white py-4 rounded-xl font-bold text-lg hover:bg-emerald-600 transition-all shadow-xl hover:shadow-accent/25 flex items-center justify-center gap-2 disabled:opacity-70"
+                  className="w-full bg-primary text-white py-5 rounded-2xl font-black text-lg hover:bg-primary/90 transition-all shadow-xl shadow-primary/20 flex items-center justify-center gap-2 active:scale-[0.98] disabled:opacity-70"
                 >
-                  {isSubmitting ? <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <>Verify Account <ArrowRight size={20} /></>}
+                  {isSubmitting ? <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <>Complete Enrollment <ArrowRight size={20} /></>}
                 </button>
                 <button 
                   type="button"
                   onClick={() => setStep(1)}
-                  className="w-full text-slate-500 text-sm hover:underline"
+                  className="w-full text-slate-500 text-sm font-bold hover:text-primary transition-colors"
                 >
-                  Back to form
+                  Back to Registration
                 </button>
               </form>
             )}
 
             <p className="text-center text-sm text-slate-500">
-              Already have an account?{" "}
-              <Link href="/login" className="text-primary font-semibold hover:underline">Log in</Link>
+              Already a member?{" "}
+              <Link href="/login" className="text-primary font-black hover:underline underline-offset-4">Sign In</Link>
             </p>
           </div>
         </motion.div>

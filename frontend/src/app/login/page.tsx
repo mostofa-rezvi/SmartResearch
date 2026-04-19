@@ -76,31 +76,32 @@ function LoginContent() {
   };
 
   return (
-    <main className="pt-32 pb-20 px-6 flex justify-center">
+    <main className="pt-40 pb-20 px-6 flex justify-center">
       <motion.div 
         key={step}
-        initial={{ opacity: 0, x: step === 1 ? -20 : 20 }}
-        animate={{ opacity: 1, x: 0 }}
-        className="max-w-md w-full bg-white dark:bg-slate-800 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-700 overflow-hidden"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="max-w-md w-full bg-white dark:bg-slate-900/50 backdrop-blur-xl rounded-[40px] shadow-2xl border border-slate-100 dark:border-white/10 overflow-hidden"
       >
-        <div className="bg-primary p-8 text-white text-center">
-          <h1 className="text-3xl font-bold mb-2">
-            {step === 1 ? "Welcome Back" : "One-Time Passcode"}
+        <div className="bg-primary p-10 text-white text-center relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl" />
+          <h1 className="text-3xl font-black mb-2 relative z-10">
+            {step === 1 ? "Welcome Back" : "Security Shield"}
           </h1>
-          <p className="text-primary-foreground/80">
-            {step === 1 ? "Log in to ResearchBridge" : `Sent to ${email}`}
+          <p className="text-primary-foreground/80 relative z-10">
+            {step === 1 ? "Sign in to your research hub" : `Code sent to your inbox`}
           </p>
         </div>
 
-        <div className="p-8 space-y-6">
+        <div className="p-10 space-y-8">
           {(successMessage || error) && (
             <motion.div 
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              className={`p-4 rounded-xl text-sm font-medium border flex items-center gap-3 ${
+              className={`p-4 rounded-2xl text-sm font-bold border flex items-center gap-3 ${
                 error 
                 ? "bg-red-50 text-red-600 border-red-100" 
-                : "bg-accent/10 text-accent border-accent/20"
+                : "bg-emerald-50 text-emerald-600 border-emerald-100"
               }`}
             >
               <CheckCircle2 size={18} className="shrink-0" />
@@ -109,45 +110,51 @@ function LoginContent() {
           )}
 
           {step === 1 ? (
-            <form onSubmit={handleInitialLogin} className="space-y-4">
+            <form onSubmit={handleInitialLogin} className="space-y-6">
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
-                  <Mail size={16} /> Email
+                <label className="text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 ml-1">
+                  Email Address
                 </label>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-primary outline-none transition-all"
-                  placeholder="email@example.com"
-                />
+                <div className="relative">
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    className="w-full pl-12 pr-4 py-4 rounded-2xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-white/10 focus:ring-2 focus:ring-primary outline-none transition-all"
+                    placeholder="name@university.edu"
+                  />
+                </div>
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
-                  <Lock size={16} /> Password
+                <label className="text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 ml-1">
+                  Password
                 </label>
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-primary outline-none transition-all"
-                  placeholder="••••••••"
-                />
+                <div className="relative">
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    className="w-full pl-12 pr-4 py-4 rounded-2xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-white/10 focus:ring-2 focus:ring-primary outline-none transition-all"
+                    placeholder="••••••••"
+                  />
+                </div>
               </div>
               <button 
                 type="submit"
                 disabled={isLoading}
-                className="w-full bg-primary text-white py-4 rounded-xl font-bold text-lg hover:bg-secondary transition-all shadow-xl hover:shadow-primary/25 flex items-center justify-center gap-2"
+                className="w-full bg-primary text-white py-4 rounded-2xl font-black text-lg hover:bg-primary/90 transition-all shadow-xl shadow-primary/20 flex items-center justify-center gap-2 active:scale-[0.98] disabled:opacity-70"
               >
                 {isLoading ? <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <>Continue <ArrowRight size={20} /></>}
               </button>
             </form>
           ) : (
-            <form onSubmit={handleVerifyOtp} className="space-y-4">
-              <div className="space-y-2 text-center mb-6">
-                <p className="text-sm text-slate-500 mb-4">Please enter the 6-digit code sent to your email.</p>
+            <form onSubmit={handleVerifyOtp} className="space-y-6">
+              <div className="space-y-6 text-center">
+                <p className="text-sm text-slate-500">A verification code has been sent to your email. It expires in 10 minutes.</p>
                 <input
                   type="text"
                   maxLength={6}
@@ -155,30 +162,30 @@ function LoginContent() {
                   onChange={(e) => setOtp(e.target.value)}
                   required
                   autoFocus
-                  className="w-full text-center text-3xl tracking-[0.5em] font-mono px-4 py-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-primary outline-none transition-all"
+                  className="w-full text-center text-4xl tracking-widest font-black px-4 py-5 rounded-2xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-white/10 focus:ring-2 focus:ring-primary outline-none transition-all"
                   placeholder="000000"
                 />
               </div>
               <button 
                 type="submit"
                 disabled={isLoading}
-                className="w-full bg-accent text-white py-4 rounded-xl font-bold text-lg hover:bg-emerald-600 transition-all shadow-xl hover:shadow-accent/25 flex items-center justify-center gap-2"
+                className="w-full bg-primary text-white py-4 rounded-2xl font-black text-lg hover:bg-primary/90 transition-all shadow-xl shadow-primary/20 flex items-center justify-center gap-2 active:scale-[0.98] disabled:opacity-70"
               >
-                {isLoading ? <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <>Verify & Enter <ArrowRight size={20} /></>}
+                {isLoading ? <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <>Verify & Access <ArrowRight size={20} /></>}
               </button>
               <button 
                 type="button"
                 onClick={() => setStep(1)}
-                className="w-full text-slate-500 text-sm hover:underline"
+                className="w-full text-slate-500 text-sm font-bold hover:text-primary transition-colors"
               >
-                Back to login
+                Back to credentials
               </button>
             </form>
           )}
 
           <p className="text-center text-sm text-slate-500">
-            Don't have an account?{" "}
-            <Link href="/register" className="text-primary font-semibold hover:underline">Register</Link>
+            New to ResearchBridge?{" "}
+            <Link href="/register" className="text-primary font-black hover:underline underline-offset-4">Create Account</Link>
           </p>
         </div>
       </motion.div>
@@ -188,11 +195,16 @@ function LoginContent() {
 
 export default function LoginPage() {
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
+    <div className="min-h-screen bg-white dark:bg-[#020617] relative overflow-hidden">
+      {/* Background Decor */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 -z-10 w-full max-w-7xl h-full opacity-30 dark:opacity-20 bg-grid pointer-events-none" />
+      <div className="absolute top-[-10%] right-[-10%] -z-10 w-[400px] h-[400px] bg-primary/10 rounded-full blur-[120px]" />
+      <div className="absolute bottom-[-10%] left-[-10%] -z-10 w-[400px] h-[400px] bg-accent/10 rounded-full blur-[120px]" />
+
       <Navbar />
       <Suspense fallback={
-        <main className="pt-32 pb-20 px-6 flex justify-center italic text-slate-400">
-          Loading login...
+        <main className="pt-40 pb-20 px-6 flex justify-center">
+          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
         </main>
       }>
         <LoginContent />
