@@ -34,7 +34,7 @@ router.get('/invitation/:token', async (req, res) => {
   try {
     const result = await db.query(
       'SELECT * FROM invitations WHERE token = $1 AND status = $2 AND expires_at > NOW()',
-      [req.params.token, 'panding']
+      [req.params.token, 'pending']
     );
 
     if (result.rows.length === 0) {
@@ -55,7 +55,7 @@ router.post('/accept-invite', async (req, res) => {
   try {
     const inviteResult = await db.query(
       'SELECT * FROM invitations WHERE token = $1 AND status = $2 AND expires_at > NOW()',
-      [token, 'panding']
+      [token, 'pending']
     );
 
     if (inviteResult.rows.length === 0) {

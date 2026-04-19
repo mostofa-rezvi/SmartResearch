@@ -2,8 +2,9 @@ const express = require('express');
 const router = express.Router();
 const db = require('../config/db');
 const { auth } = require('../middleware/auth');
+const { envelope } = require('../utils/responseEnvelope');
 
-// @route   GET /api/discovery/search
+// @route   GET /api/v1/discovery/search
 // @desc    Personalized research discovery search
 router.get('/search', auth, async (req, res) => {
   const { query } = req.query;
@@ -23,24 +24,35 @@ router.get('/search', auth, async (req, res) => {
       { id: 5, title: 'Epidemiological Trends in Urban Environments', authors: ['S. Gupta'], journal: 'The Lancet', tier: 'Q1', year: 2023, doi: '10.1016/lan.7890', citations: 215, tags: ['Epidemiology'] }
     ];
 
-    // 3. Simple Personalization Logic
-    // Boost results that match user interests
+    // 3. Personalization Logic with explainability (constraint #8)
     results = results.map(item => {
       const matchCount = item.tags.filter(tag => interests.includes(tag)).length;
-      return { ...item, score: matchCount * 10 + (item.tier === 'Q1' ? 5 : 0), matchedInterest: matchCount > 0 ? item.tags.find(tag => interests.includes(tag)) : null };
+      const score = matchCount * 10 + (item.tier === 'Q1' ? 5 : 0);
+      const matchedInterest = matchCount > 0 ? item.tags.find(tag => interests.includes(tag)) : null;
+      return { 
+        ...item, 
+        score, 
+        matchedInterest,
+        // Constraint #8: Every recommendation must be explainable
+        discovery_reason: matchedInterest 
+          ? `Matches your research interest in "${matchedInterest}"` 
+          : item.tier === 'Q1' 
+            ? 'Highly cited paper in a top-tier journal' 
+            : 'Trending in your broader field'
+      };
     });
 
     results.sort((a, b) => b.score - a.score);
 
-    res.json(results);
+    res.json(envelope(results));
 
   } catch (err) {
     console.error(err.message);
-    res.status(500).send('Server error');
+    res.status(500).json(envelope(null, { error: 'Server error' }));
   }
 });
 
-// @route   POST /api/discovery/save
+// @route   POST /api/v1/discovery/save
 // @desc    Save a paper to profile
 router.post('/save', auth, async (req, res) => {
   const { title, doi, journal } = req.body;
@@ -49,9 +61,9 @@ router.post('/save', auth, async (req, res) => {
       'INSERT INTO saved_papers (user_id, paper_title, paper_doi, journal_name) VALUES ($1, $2, $3, $4)',
       [req.user.id, title, doi, journal]
     );
-    res.json({ message: 'Paper saved' });
+    res.json(envelope({ message: 'Paper saved' }));
   } catch (err) {
-    res.status(500).send('Server error');
+    res.status(500).json(envelope(null, { error: 'Server error' }));
   }
 });
 

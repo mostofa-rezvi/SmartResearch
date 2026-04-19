@@ -2,8 +2,9 @@ const express = require('express');
 const router = express.Router();
 const db = require('../config/db');
 const { auth } = require('../middleware/auth');
+const { envelope } = require('../utils/responseEnvelope');
 
-// @route   POST /api/groups
+// @route   POST /api/v1/groups
 // @desc    Create a new research group
 router.post('/', auth, async (req, res) => {
   const { name, description, focus_area, type } = req.body;
@@ -22,42 +23,42 @@ router.post('/', auth, async (req, res) => {
       [group.id, req.user.id, 'admin']
     );
 
-    res.json(group);
+    res.json(envelope(group));
   } catch (err) {
     console.error(err.message);
-    res.status(500).send('Server error');
+    res.status(500).json(envelope(null, { error: err.message }));
   }
 });
 
-// @route   GET /api/groups
+// @route   GET /api/v1/groups
 // @desc    Get all public groups
 router.get('/', async (req, res) => {
   try {
     const result = await db.query('SELECT * FROM groups WHERE type = $1 ORDER BY created_at DESC', ['public']);
-    res.json(result.rows);
+    res.json(envelope(result.rows));
   } catch (err) {
-    res.status(500).send('Server error');
+    res.status(500).json(envelope(null, { error: 'Server error' }));
   }
 });
 
-// @route   POST /api/groups/:id/join
+// @route   POST /api/v1/groups/:id/join
 // @desc    Join a public group
 router.post('/:id/join', auth, async (req, res) => {
   try {
     const groupResult = await db.query('SELECT * FROM groups WHERE id = $1', [req.params.id]);
-    if (groupResult.rows.length === 0) return res.status(404).json({ message: 'Group not found' });
+    if (groupResult.rows.length === 0) return res.status(404).json(envelope(null, { error: 'Group not found' }));
 
     const group = groupResult.rows[0];
-    if (group.type === 'private') return res.status(403).json({ message: 'Cannot join private group without invitation' });
+    if (group.type === 'private') return res.status(403).json(envelope(null, { error: 'Cannot join private group without invitation' }));
 
     await db.query(
       'INSERT INTO group_members (group_id, user_id, role) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING',
       [group.id, req.user.id, 'member']
     );
 
-    res.json({ message: 'Joined group successfully' });
+    res.json(envelope({ message: 'Joined group successfully' }));
   } catch (err) {
-    res.status(500).send('Server error');
+    res.status(500).json(envelope(null, { error: 'Server error' }));
   }
 });
 

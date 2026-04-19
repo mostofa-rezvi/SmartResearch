@@ -2,8 +2,9 @@ const express = require('express');
 const router = express.Router();
 const db = require('../config/db');
 const { auth } = require('../middleware/auth');
+const { envelope } = require('../utils/responseEnvelope');
 
-// @route   POST /api/community/posts
+// @route   POST /api/v1/community/posts
 // @desc    Create a new post (Question or Thought)
 router.post('/posts', auth, async (req, res) => {
   const { type, title, content, tags, group_id } = req.body;
@@ -22,23 +23,22 @@ router.post('/posts', auth, async (req, res) => {
     newPost.vote_score = 0;
     newPost.comment_count = 0;
 
-    // Emitting live update to everyone (basic implementation)
+    // Emitting live update to everyone
     if (req.io) {
       req.io.emit('new_post', newPost);
     }
 
-    res.json(newPost);
+    res.json(envelope(newPost));
   } catch (err) {
     console.error(err.message);
-    res.status(500).send('Server error');
+    res.status(500).json(envelope(null, { error: 'Server error' }));
   }
 });
 
-// @route   GET /api/community/posts
+// @route   GET /api/v1/community/posts
 // @desc    Get blended feed posts ranked by discovery module
 router.get('/posts', auth, async (req, res) => {
   try {
-    const userRole = req.user.role;
     const userResult = await db.query('SELECT research_interests FROM users WHERE id = $1', [req.user.id]);
     const interests = userResult.rows[0]?.research_interests?.interests || [];
 
@@ -55,7 +55,6 @@ router.get('/posts', auth, async (req, res) => {
     // Discovery Ranking Logic
     let posts = result.rows.map(post => {
       const matchCount = post.tags ? post.tags.filter(tag => interests.includes(tag)).length : 0;
-      // Base score is vote score PLUS matches
       let score = (parseInt(post.vote_score) || 0) + (matchCount * 10);
       
       // Boost posts from Verified Scholars (Invited Users)
@@ -66,21 +65,26 @@ router.get('/posts', auth, async (req, res) => {
       return { 
         ...post, 
         discovery_score: score, 
-        matchedInterest: matchCount > 0 ? post.tags.find(tag => interests.includes(tag)) : null 
+        matchedInterest: matchCount > 0 ? post.tags.find(tag => interests.includes(tag)) : null,
+        // Constraint #8: Every recommendation must be explainable
+        discovery_reason: matchCount > 0 
+          ? `Matched your interest in "${post.tags.find(tag => interests.includes(tag))}"` 
+          : post.author_role === 'invited_user' 
+            ? 'From a verified scholar in your field' 
+            : 'Trending in the community'
       };
     });
 
-    // Sort by discovery score
     posts.sort((a, b) => b.discovery_score - a.discovery_score);
 
-    res.json(posts);
+    res.json(envelope(posts));
   } catch (err) {
     console.error(err.message);
-    res.status(500).send('Server error');
+    res.status(500).json(envelope(null, { error: 'Server error' }));
   }
 });
 
-// @route   POST /api/community/posts/:id/vote
+// @route   POST /api/v1/community/posts/:id/vote
 // @desc    Vote on a post
 router.post('/posts/:id/vote', auth, async (req, res) => {
   const { value } = req.body; // 1 or -1
@@ -93,9 +97,9 @@ router.post('/posts/:id/vote', auth, async (req, res) => {
       DO UPDATE SET value = $3
     `, [req.user.id, req.params.id, value]);
 
-    res.json({ message: 'Vote recorded' });
+    res.json(envelope({ message: 'Vote recorded' }));
   } catch (err) {
-    res.status(500).send('Server error');
+    res.status(500).json(envelope(null, { error: 'Server error' }));
   }
 });
 

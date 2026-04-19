@@ -13,6 +13,12 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+export const metadata: Metadata = {
+  title: "ResearchBridge — A Hub for the Global Research Community",
+  description:
+    "A unified digital platform for discovery, collaboration, and knowledge-sharing across the global research community.",
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{

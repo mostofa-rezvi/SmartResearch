@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../config/db');
+const { envelope } = require('../utils/responseEnvelope');
 
-// @route   GET /api/journals
-// @desc    Get filtered list of journals
+// @route   GET /api/v1/journals
+// @desc    Get filtered list of approved journals
 router.get('/', async (req, res) => {
   const { category, subcategory, tier, geography, group } = req.query;
   
@@ -36,21 +37,21 @@ router.get('/', async (req, res) => {
 
   try {
     const result = await db.query(queryParts.join(' '), params);
-    res.json(result.rows);
+    res.json(envelope(result.rows));
   } catch (err) {
     console.error(err.message);
-    res.status(500).send('Server error');
+    res.status(500).json(envelope(null, { error: 'Server error' }));
   }
 });
 
-// @route   GET /api/journals/categories
+// @route   GET /api/v1/journals/categories
 // @desc    Get unique categories for navigation
 router.get('/categories', async (req, res) => {
   try {
     const result = await db.query('SELECT DISTINCT category FROM journals');
-    res.json(result.rows.map(r => r.category));
+    res.json(envelope(result.rows.map(r => r.category)));
   } catch (err) {
-    res.status(500).send('Server error');
+    res.status(500).json(envelope(null, { error: 'Server error' }));
   }
 });
 

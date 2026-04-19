@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../config/db');
+const { envelope } = require('../utils/responseEnvelope');
 
-// @route   GET /api/users/:id/profile
+// @route   GET /api/v1/users/:id/profile
 // @desc    Get complete user profile including stats and extended fields
 router.get('/:id/profile', async (req, res) => {
   try {
@@ -15,7 +16,7 @@ router.get('/:id/profile', async (req, res) => {
     );
 
     if (userResult.rows.length === 0) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json(envelope(null, { error: 'User not found' }));
     }
 
     const userProfile = userResult.rows[0];
@@ -55,10 +56,10 @@ router.get('/:id/profile', async (req, res) => {
 
     userProfile.recent_activity = recentActivity.rows;
 
-    res.json(userProfile);
+    res.json(envelope(userProfile));
   } catch (err) {
     console.error(err.message);
-    res.status(500).send('Server error');
+    res.status(500).json(envelope(null, { error: 'Server error' }));
   }
 });
 
