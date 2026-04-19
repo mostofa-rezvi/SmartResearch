@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS invitations (
     invitee_email VARCHAR(255) UNIQUE NOT NULL,
     invitee_name VARCHAR(255) NOT NULL,
     token VARCHAR(255) UNIQUE NOT NULL,
-    status VARCHAR(20) DEFAULT 'panding' CHECK (status IN ('panding', 'accepted', 'expired')),
+    status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'accepted', 'expired')),
     expires_at TIMESTAMP NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -165,3 +165,19 @@ CREATE TABLE IF NOT EXISTS content_flags (
     status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'resolved', 'dismissed')),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Performance Indexes (DB Rule #1)
+CREATE INDEX IF NOT EXISTS idx_community_posts_discovery ON community_posts(created_at DESC, type);
+CREATE INDEX IF NOT EXISTS idx_votes_ranking ON votes(post_id, value) WHERE comment_id IS NULL;
+CREATE INDEX IF NOT EXISTS idx_comments_post_sorting ON comments(post_id, created_at);
+
+-- Enhanced Integrity for Votes (Fix for Postgres NULL uniqueness)
+-- Ensures a user can only vote ONCE per post (post vote)
+CREATE UNIQUE INDEX IF NOT EXISTS idx_votes_user_post_unique 
+ON votes (user_id, post_id) 
+WHERE comment_id IS NULL;
+
+-- Ensures a user can only vote ONCE per comment
+CREATE UNIQUE INDEX IF NOT EXISTS idx_votes_user_comment_unique 
+ON votes (user_id, comment_id) 
+WHERE post_id IS NOT NULL; -- A comment vote still links to a post

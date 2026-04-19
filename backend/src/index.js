@@ -9,6 +9,7 @@ const cookieParser = require('cookie-parser');
 const { errors } = require('celebrate');
 const logger = require('./utils/logger');
 const errorHandler = require('./middleware/errorHandler');
+const { apiLimiter, authLimiter } = require('./middleware/rateLimit');
 
 const app = express();
 const server = http.createServer(app);
@@ -23,11 +24,24 @@ const io = new Server(server, {
 });
 
 // Middleware
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", "data:", "https:"],
+      connectSrc: ["'self'", "ws:", "wss:"],
+    },
+  },
+}));
 app.use(cors({ origin: FRONTEND_ORIGIN, credentials: true }));
 app.use(cookieParser());
 app.use(morgan('dev'));
 app.use(express.json());
+
+// Global Rate Limiting
+app.use('/api', apiLimiter);
 
 // Make io accessible in routes BEFORE route registration (architecture fix)
 app.use((req, res, next) => {
@@ -36,7 +50,7 @@ app.use((req, res, next) => {
 });
 
 // API v1 Routes (standards.md §2: All APIs must be versioned)
-app.use('/api/v1/auth', require('./routes/auth'));
+app.use('/api/v1/auth', authLimiter, require('./routes/auth'));
 app.use('/api/v1/admin', require('./routes/admin'));
 app.use('/api/v1/groups', require('./routes/groups'));
 app.use('/api/v1/community', require('./routes/community'));
@@ -47,13 +61,13 @@ app.use('/api/v1/moderation', require('./routes/moderation'));
 app.use('/api/v1/reputation', require('./routes/reputation.routes'));
 
 // Backward-compatible non-versioned routes (transitional)
-app.use('/api/auth', require('./routes/auth'));
+app.use('/api/auth', authLimiter, require('./routes/auth'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/groups', require('./routes/groups'));
 app.use('/api/community', require('./routes/community'));
 app.use('/api/journals', require('./routes/journals'));
-app.use('/api/discovery', require('./routes/discovery'));
-app.use('/api/users', require('./routes/users'));
+app.use('/api/discovery', apiLimiter, require('./routes/discovery'));
+app.use('/api/users', apiLimiter, require('./routes/users'));
 app.use('/api/moderation', require('./routes/moderation'));
 app.use('/api/reputation', require('./routes/reputation.routes'));
 

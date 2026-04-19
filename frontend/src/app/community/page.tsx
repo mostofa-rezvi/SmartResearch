@@ -60,17 +60,33 @@ export default function CommunityFeedPage() {
 
   const handleVote = async (id: number, val: number) => {
     if (!token) return;
+
+    // Optimistic UI Update (Frontend Rule #3)
+    setPosts(prevPosts => prevPosts.map(p => {
+      if (p.id === id) {
+        return { ...p, vote_score: (parseInt(p.vote_score) || 0) + val };
+      }
+      return p;
+    }));
+
     try {
       await fetch(API.community.vote(String(id)), {
         method: "POST",
         headers: { "Content-Type": "application/json", "x-auth-token": token },
         body: JSON.stringify({ value: val })
       });
-      fetchPosts(); // Refresh
+      // Optionally re-fetch to ensure server-side discovery ranking is correct
+      // but the optimistic update handles the immediate feedback.
     } catch (err) {
       console.error("Vote failed");
+      // Rollback if needed
+      fetchPosts(); 
     }
   };
+
+  const filteredPosts = React.useMemo(() => {
+    return posts.filter(p => filter === 'all' || p.type === filter);
+  }, [posts, filter]);
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
@@ -124,7 +140,7 @@ export default function CommunityFeedPage() {
             <div className="py-20 text-center animate-pulse italic text-slate-400">Blending your personalized research feed...</div>
           ) : (
             <AnimatePresence>
-              {posts.filter(p => filter === 'all' || p.type === filter).map((post, idx) => (
+              {filteredPosts.map((post, idx) => (
                 <motion.div 
                   key={post.id}
                   initial={{ opacity: 0, y: 10, scale: post.isLive ? 0.95 : 1 }}
@@ -155,11 +171,18 @@ export default function CommunityFeedPage() {
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                       {post.matchedInterest && (
-                         <span className="hidden sm:flex items-center gap-1 text-[10px] font-bold text-accent bg-accent/5 px-2 py-1 rounded-md border border-accent/10">
-                            <Sparkles size={10} /> {post.matchedInterest.toUpperCase()} MATCH
-                         </span>
-                       )}
+                      <div className="hidden sm:flex flex-col items-end gap-1">
+                        {post.matchedInterest && (
+                          <span className="flex items-center gap-1 text-[10px] font-bold text-accent bg-accent/5 px-2 py-1 rounded-md border border-accent/10">
+                              <Sparkles size={10} /> {post.matchedInterest.toUpperCase()} MATCH
+                          </span>
+                        )}
+                        {post.discovery_reason && (
+                          <span className="text-[9px] text-slate-400 italic">
+                            {post.discovery_reason}
+                          </span>
+                        )}
+                      </div>
                       <span className={`text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full ${post.type === 'question' ? 'bg-blue-50 text-blue-600' : 'bg-amber-50 text-amber-600'}`}>
                         {post.type}
                       </span>
