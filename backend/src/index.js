@@ -18,6 +18,7 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/groups', require('./routes/groups'));
 app.use('/api/community', require('./routes/community'));
+app.use('/api/journals', require('./routes/journals'));
 
 // Basic Route
 app.get('/health', (req, res) => {

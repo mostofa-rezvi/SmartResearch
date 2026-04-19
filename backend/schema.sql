@@ -97,3 +97,22 @@ CREATE TABLE IF NOT EXISTS votes (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UNIQUE(user_id, post_id, comment_id) -- Only one vote per item per user
 );
+
+-- Journals Table (The Library)
+CREATE TABLE IF NOT EXISTS journals (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(500) NOT NULL,
+    issn VARCHAR(20),
+    category VARCHAR(255) NOT NULL,
+    subcategory VARCHAR(255),
+    quality_tier VARCHAR(2) NOT NULL CHECK (quality_tier IN ('Q1', 'Q2', 'Q3')),
+    geography VARCHAR(100), -- Country or Region
+    institutional_group VARCHAR(100), -- University, Association, etc.
+    impact_factor DECIMAL(5, 3),
+    description TEXT,
+    website_url VARCHAR(500),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Index for category search
+CREATE INDEX IF NOT EXISTS idx_journals_category ON journals(category);
