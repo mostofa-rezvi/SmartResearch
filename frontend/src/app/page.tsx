@@ -1,7 +1,9 @@
 import Navbar from "@/components/Navbar";
 import Image from "next/image";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Home() {
+  const { user } = useAuth();
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900 overflow-x-hidden">
       <Navbar />
@@ -87,6 +89,27 @@ export default function Home() {
             </div>
           </div>
         </section>
+
+        {/* Personalized Recommendations Section */}
+        {user && (
+          <section className="py-20 px-6 md:px-12 max-w-7xl mx-auto border-t border-slate-200 dark:border-slate-800">
+            <h2 className="text-3xl font-bold mb-8 text-slate-900 dark:text-white">
+              Recommended for {user.researcher_type === 'new_researcher' ? 'Early Discovery' : 'Advanced Analysis'}
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {[1, 2, 3, 4].map((item) => (
+                <div key={item} className="p-4 rounded-xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700">
+                  <div className="h-32 bg-primary/5 rounded-lg mb-4 flex items-center justify-center text-primary/20">
+                    <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                  </div>
+                  <h4 className="font-bold mb-1 text-slate-900 dark:text-white line-clamp-2">The Future of ResearchBridge: A Study on {item}</h4>
+                  <p className="text-xs text-slate-500 mb-2">Dec 2026 • 12 Citations</p>
+                  <button className="text-primary text-xs font-bold hover:underline">Read Abstract →</button>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* Footer */}
         <footer className="py-12 border-t border-slate-200 dark:border-slate-800 text-center text-sm text-slate-500">

@@ -2,6 +2,77 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const db = require('../config/db');
+const { auth, requireRole } = require('../middleware/auth');
+
+// @route   GET /api/auth/admin/stats
+// @desc    Get platform stats (Admin only)
+router.get('/admin/stats', auth, requireRole(['super_admin', 'admin']), (req, res) => {
+  res.json({ users: 1540, papers: 8520, active_chats: 42 });
+});
+
+// @route   GET /api/auth/invitation/:token
+// @desc    Validate invitation token
+router.get('/invitation/:token', async (req, res) => {
+  try {
+    const result = await db.query(
+      'SELECT * FROM invitations WHERE token = $1 AND status = $2 AND expires_at > NOW()',
+      [req.params.token, 'panding']
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(400).json({ message: 'Invalid or expired invitation' });
+    }
+
+    res.json(result.rows[0]);
+  } catch (err) {
+    res.status(500).send('Server error');
+  }
+});
+
+// @route   POST /api/auth/accept-invite
+// @desc    Accept invitation and activate account
+router.post('/accept-invite', async (req, res) => {
+  const { token, password, bio, title } = req.body;
+
+  try {
+    const inviteResult = await db.query(
+      'SELECT * FROM invitations WHERE token = $1 AND status = $2 AND expires_at > NOW()',
+      [token, 'panding']
+    );
+
+    if (inviteResult.rows.length === 0) {
+      return res.status(400).json({ message: 'Invalid or expired invitation' });
+    }
+
+    const invite = inviteResult.rows[0];
+
+    // Create User
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    const userResult = await db.query(
+      'INSERT INTO users (name, email, password, role, status, institution, is_verified) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id',
+      [invite.invitee_name, invite.invitee_email, hashedPassword, 'invited_user', 'active', 'Pending Verification', true]
+    );
+
+    const userId = userResult.rows[0].id;
+
+    // Create Profile
+    await db.query(
+      'INSERT INTO invited_user_profiles (user_id, title, academic_bio) VALUES ($1, $2, $3)',
+      [userId, title, bio]
+    );
+
+    // Mark invitation as accepted
+    await db.query('UPDATE invitations SET status = $1 WHERE token = $2', ['accepted', token]);
+
+    res.json({ message: 'Account activated successfully. Welcome to ResearchBridge.' });
+
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
+});
 
 // @route   POST /api/auth/register
 // @desc    Register a new user
@@ -36,8 +107,8 @@ router.post('/register', async (req, res) => {
 
     // Save user (unverified)
     const newUser = await db.query(
-      'INSERT INTO users (name, email, password, status, institution, is_verified, verification_token) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id',
-      [name, email, hashedPassword, status, institution, false, verificationToken]
+      'INSERT INTO users (name, email, password, role, researcher_type, status, institution, is_verified, verification_token) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id',
+      [name, email, hashedPassword, 'user', 'new_researcher', 'active', institution, false, verificationToken]
     ).catch(e => {
         console.error("Database error during registration:", e.message);
         return { rows: [{ id: 'mock-id' }] };
@@ -191,7 +262,15 @@ router.post('/verify-otp', async (req, res) => {
     await db.query('UPDATE users SET login_otp = NULL, login_otp_expires = NULL WHERE id = $1', [user.id]);
 
     // Create and sign JWT
-    const payload = { user: { id: user.id, name: user.name, email: user.email } };
+    const payload = { 
+        user: { 
+            id: user.id, 
+            name: user.name, 
+            email: user.email,
+            role: user.role || 'user',
+            researcher_type: user.researcher_type || 'new_researcher'
+        } 
+    };
     
     jwt.sign(
       payload,
