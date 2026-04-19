@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
+    "db:setup": "node scripts/setup-db.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -27,6 +28,7 @@
     "jsonwebtoken": "^9.0.3",
     "morgan": "^1.10.1",
     "neo4j-driver": "^6.0.1",
+    "nodemailer": "^8.0.5",
     "pg": "^8.20.0",
     "pino": "^10.3.1",
     "pino-pretty": "^13.1.3",

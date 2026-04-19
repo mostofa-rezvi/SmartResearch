@@ -15,7 +15,7 @@ router.post('/posts',
 // @route   GET /api/v1/community/posts
 // @desc    Get blended feed posts ranked by discovery module
 router.get('/posts', 
-  [auth, requireOnboarding], 
+  [auth], 
   communityController.getFeed
 );
 

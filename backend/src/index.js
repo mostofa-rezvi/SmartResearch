@@ -8,13 +8,14 @@ const { Server } = require('socket.io');
 const cookieParser = require('cookie-parser');
 const { errors } = require('celebrate');
 const logger = require('./utils/logger');
+const db = require('./config/db');
 const errorHandler = require('./middleware/errorHandler');
 const { apiLimiter, authLimiter } = require('./middleware/rateLimit');
 
 const app = express();
 const server = http.createServer(app);
 
-const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN || 'http://localhost:3000';
+const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN ? process.env.FRONTEND_ORIGIN.split(',') : ['http://localhost:3000'];
 
 const io = new Server(server, {
   cors: {
@@ -94,6 +95,12 @@ app.use(errors()); // Handle Joi validation errors
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
-server.listen(PORT, () => {
+server.listen(PORT, async () => {
   logger.info(`Server running on port ${PORT}`);
+  try {
+    await db.query('SELECT NOW()');
+    logger.info('PostgreSQL connected successfully');
+  } catch (err) {
+    logger.error('PostgreSQL connection failed:', err.message);
+  }
 });

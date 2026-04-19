@@ -11,7 +11,11 @@ export default function DiscoveryEnginePage() {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-  const { user, token } = useAuth();
+  const { user, token, isLoading } = useAuth();
+
+  if (isLoading) {
+    return <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex items-center justify-center italic text-slate-400">Loading discovery session...</div>;
+  }
   const [savedIds, setSavedIds] = useState<number[]>([]);
 
   const handleSearch = async (e?: React.FormEvent) => {

@@ -12,6 +12,8 @@ import { useAuth } from "@/context/AuthContext";
 function LoginContent() {
   const searchParams = useSearchParams();
   const message = searchParams.get("message");
+  const auth = useAuth();
+  
   const [step, setStep] = useState<1 | 2>(1);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -31,13 +33,13 @@ function LoginContent() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
-      const data = await response.json();
+      const result = await response.json();
 
-      if (response.ok && data.otp_required) {
+      if (response.ok && result.data?.otp_required) {
         setStep(2);
-        setSuccessMessage(data.message);
+        setSuccessMessage(result.data.message);
       } else {
-        setError(data.message || "Invalid credentials");
+        setError(result.error?.message || result.data?.message || "Invalid credentials");
       }
     } catch (err) {
       setError("Server error. Please check your connection.");
@@ -57,15 +59,14 @@ function LoginContent() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, otp }),
       });
-      const data = await response.json();
+      const result = await response.json();
 
       if (response.ok) {
-        // Save token (localStorage for now) and redirect
-        localStorage.setItem("token", data.token);
-        setSuccessMessage("Access granted! Redirecting...");
-        setTimeout(() => window.location.href = "/", 2000);
+        auth.login(result.data.accessToken, result.data.user);
+        setSuccessMessage("Access granted! Redirecting to dashboard...");
+        setTimeout(() => window.location.href = "/dashboard", 1500);
       } else {
-        setError(data.message || "Invalid OTP");
+        setError(result.error?.message || "Invalid OTP");
       }
     } catch (err) {
       setError("Verification failed. Please try again.");

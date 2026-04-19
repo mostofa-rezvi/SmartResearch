@@ -8,14 +8,14 @@ const { auth, requireOnboarding } = require('../middleware/auth');
 // @route   GET /api/v1/discovery/search
 // @desc    Personalized research discovery search
 router.get('/search', 
-  [auth, requireOnboarding, celebrate(discoveryValidation.search)], 
+  [auth, celebrate(discoveryValidation.search)], 
   discoveryController.search
 );
 
 // @route   POST /api/v1/discovery/save
 // @desc    Save a paper to profile
 router.post('/save', 
-  [auth, requireOnboarding, celebrate(discoveryValidation.savePaper)], 
+  [auth, celebrate(discoveryValidation.savePaper)], 
   discoveryController.save
 );
 
