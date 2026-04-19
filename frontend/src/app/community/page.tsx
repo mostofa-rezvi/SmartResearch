@@ -2,24 +2,52 @@
 
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { MessageSquare, ThumbsUp, ThumbsDown, Share2, Tag, Search, Sparkles, HelpCircle, Lightbulb } from "lucide-react";
+import { MessageSquare, ThumbsUp, ThumbsDown, Share2, Tag, Search, Sparkles, HelpCircle, Lightbulb, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import { useAuth } from "@/context/AuthContext";
+import { io } from "socket.io-client";
 
 export default function CommunityFeedPage() {
   const [posts, setPosts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'question' | 'thought'>('all');
+  const [socketConnected, setSocketConnected] = useState(false);
   const { user, token } = useAuth();
 
   useEffect(() => {
-    fetchPosts();
-  }, []);
+    if (token) fetchPosts();
+  }, [token]);
+
+  useEffect(() => {
+    if (!token || !user) return;
+
+    // Connect to Socket.IO backend
+    const socket = io("http://localhost:5000");
+    
+    socket.on("connect", () => {
+      setSocketConnected(true);
+      socket.emit("join_feed", user.id);
+    });
+
+    // Listen for real-time new posts
+    socket.on("new_post", (newPost) => {
+      setPosts((prevPosts) => {
+        // Simple logic: if it's a new post, inject at the top with a minor boost to make it visible, though real discovery ranking normally happens server-side
+        return [{ ...newPost, matchedInterest: null, isLive: true }, ...prevPosts];
+      });
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [token, user]);
 
   const fetchPosts = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/community/posts");
+      const response = await fetch("http://localhost:5000/api/community/posts", {
+        headers: { "x-auth-token": token || "" }
+      });
       const data = await response.json();
       setPosts(data);
     } catch (err) {
@@ -51,9 +79,13 @@ export default function CommunityFeedPage() {
         {/* Left Sidebar - Filters */}
         <div className="lg:col-span-1 space-y-4">
           <div className="bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-xl sticky top-24">
-            <h3 className="font-bold mb-4 text-slate-900 dark:text-white flex items-center gap-2">
-              <Sparkles size={18} className="text-primary" /> Filter Feed
-            </h3>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <Sparkles size={18} className="text-primary" /> Filter Feed
+              </h3>
+              {socketConnected && <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" title="Live Connection Active" />}
+            </div>
+            
             <div className="space-y-2">
               {[
                 { label: 'All Activity', id: 'all', icon: <MessageSquare size={16} /> },
@@ -94,30 +126,47 @@ export default function CommunityFeedPage() {
               {posts.filter(p => filter === 'all' || p.type === filter).map((post, idx) => (
                 <motion.div 
                   key={post.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: idx * 0.05 }}
-                  className="bg-white dark:bg-slate-800 rounded-3xl p-8 border border-slate-100 dark:border-slate-700 shadow-xl hover:shadow-primary/5 transition-all group"
+                  initial={{ opacity: 0, y: 10, scale: post.isLive ? 0.95 : 1 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  transition={{ delay: post.isLive ? 0 : idx * 0.05 }}
+                  className={`bg-white dark:bg-slate-800 rounded-3xl p-8 border border-slate-100 dark:border-slate-700 shadow-xl hover:shadow-primary/5 transition-all group relative overflow-hidden ${post.isLive ? 'ring-2 ring-primary ring-opacity-50' : ''}`}
                 >
+                  {post.isLive && (
+                    <div className="absolute top-0 right-0 bg-primary text-white text-[10px] font-bold px-3 py-1 rounded-bl-xl uppercase tracking-widest">
+                       Live Update
+                    </div>
+                  )}
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 bg-slate-100 dark:bg-slate-900 rounded-full flex items-center justify-center font-bold text-primary">
-                        {post.author_name[0]}
+                        {post.author_name ? post.author_name[0] : '?'}
                       </div>
                       <div>
                         <Link href={`/profile/${post.user_id}`}>
-                          <h4 className="font-bold text-slate-900 dark:text-white text-sm hover:underline cursor-pointer">{post.author_name}</h4>
+                          <h4 className="font-bold text-slate-900 dark:text-white text-sm hover:underline cursor-pointer flex items-center gap-1">
+                            {post.author_name}
+                            {post.author_role === 'invited_user' && <span title="Verified Scholar"><ShieldCheck size={14} className="text-amber-500" /></span>}
+                          </h4>
                         </Link>
-                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Researcher • {new Date(post.created_at).toLocaleDateString()}</p>
+                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">
+                          {post.author_role === 'invited_user' ? 'Senior Researcher' : 'Researcher'} • {new Date(post.created_at).toLocaleDateString()}
+                        </p>
                       </div>
                     </div>
-                    <span className={`text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full ${post.type === 'question' ? 'bg-blue-50 text-blue-600' : 'bg-amber-50 text-amber-600'}`}>
-                      {post.type}
-                    </span>
+                    <div className="flex items-center gap-2">
+                       {post.matchedInterest && (
+                         <span className="hidden sm:flex items-center gap-1 text-[10px] font-bold text-accent bg-accent/5 px-2 py-1 rounded-md border border-accent/10">
+                            <Sparkles size={10} /> {post.matchedInterest.toUpperCase()} MATCH
+                         </span>
+                       )}
+                      <span className={`text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full ${post.type === 'question' ? 'bg-blue-50 text-blue-600' : 'bg-amber-50 text-amber-600'}`}>
+                        {post.type}
+                      </span>
+                    </div>
                   </div>
 
-                  {post.title && <h2 className="text-xl font-bold mb-3 text-slate-900 dark:text-white">{post.title}</h2>}
-                  <p className="text-slate-600 dark:text-slate-300 leading-relaxed mb-6">{post.content}</p>
+                  {post.title && <h2 className="text-xl font-bold mb-3 text-slate-900 dark:text-white group-hover:text-primary transition-colors">{post.title}</h2>}
+                  <p className="text-slate-600 dark:text-slate-300 leading-relaxed mb-6 font-serif">{post.content}</p>
 
                   <div className="flex flex-wrap gap-2 mb-6">
                     {(post.tags || []).map((tag: string) => (
