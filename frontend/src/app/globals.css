@@ -6,10 +6,12 @@
   --color-ring: var(--ring);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-primary: #4F46E5;
+  --color-primary: #0A192F;
   --color-primary-foreground: #FFFFFF;
-  --color-secondary: #0EA5E9;
-  --color-accent: #8B5CF6;
+  --color-secondary: #991B1B;
+  --color-secondary-foreground: #FFFFFF;
+  --color-accent: #F59E0B;
+  --color-accent-foreground: #0F172A;
   --color-muted: #64748B;
   --color-muted-foreground: #94A3B8;
   --color-card: #FFFFFF;
@@ -17,12 +19,18 @@
 }
 
 :root {
-  --background: #FFFFFF;
+  --background: #F8FAFC;
   --foreground: #0F172A;
-  --primary: #4F46E5;
+  --primary: #0A192F;
+  --secondary: #991B1B;
+  --accent: #F59E0B;
   --border: #E2E8F0;
   --input: #E2E8F0;
-  --ring: #4F46E5;
+  --ring: #0A192F;
+  
+  --font-serif: var(--font-fraunces), serif;
+  --font-sans: var(--font-outfit), var(--font-inter), sans-serif;
+  --font-mono: var(--font-jetbrains-mono), monospace;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -37,9 +45,18 @@
 body {
   background-color: var(--background);
   color: var(--foreground);
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: var(--font-sans);
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-serif);
+}
+
+.mono-academic {
+  font-family: var(--font-mono);
+  font-variant-caps: all-small-caps;
 }
 
 .glass-morphism {

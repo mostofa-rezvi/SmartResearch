@@ -11,12 +11,8 @@ export default function DiscoveryEnginePage() {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-  const { user, token, isLoading } = useAuth();
-
-  if (isLoading) {
-    return <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex items-center justify-center italic text-slate-400">Loading discovery session...</div>;
-  }
   const [savedIds, setSavedIds] = useState<number[]>([]);
+  const { user, token, isLoading } = useAuth();
 
   const handleSearch = async (e?: React.FormEvent) => {
     e?.preventDefault();
@@ -26,9 +22,10 @@ export default function DiscoveryEnginePage() {
         headers: { "x-auth-token": token || "" }
       });
       const data = await response.json();
-      setResults(data);
+      setResults(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error("Search failed");
+      setResults([]);
     } finally {
       setLoading(false);
     }
@@ -48,32 +45,36 @@ export default function DiscoveryEnginePage() {
     }
   };
 
+  if (isLoading) {
+    return <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex items-center justify-center italic text-slate-400">Loading discovery session...</div>;
+  }
+
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
       <Navbar />
       
       <main className="pt-32 pb-20 px-6 max-w-5xl mx-auto">
         <header className="mb-12 text-center">
-            <h1 className="text-5xl font-extrabold text-slate-900 dark:text-white mb-4 tracking-tight">
-                Personalized <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Discovery</span>
+            <h1 className="text-5xl font-serif font-black text-primary dark:text-white mb-4 tracking-tight">
+                The <span className="text-secondary italic">Discovery Engine</span>
             </h1>
-            <p className="text-slate-500 text-lg">Leveraging your research profile to find what truly matters.</p>
+            <p className="text-slate-500 text-lg max-w-2xl mx-auto italic font-medium">"Leveraging your research profile to solve the cold-start problem in knowledge discovery."</p>
         </header>
 
-        <form onSubmit={handleSearch} className="relative mb-16 max-w-2xl mx-auto">
-          <div className="absolute inset-y-0 left-6 flex items-center pointer-events-none text-slate-400 group-focus-within:text-primary transition-colors">
-            <Search size={22} />
+        <form onSubmit={handleSearch} className="relative mb-16 max-w-3xl mx-auto group">
+          <div className="absolute inset-y-0 left-6 flex items-center pointer-events-none text-slate-400 group-focus-within:text-secondary transition-colors">
+            <Search size={24} />
           </div>
           <input 
             type="text" 
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search authors, methodologies, DOIs or titles..."
-            className="w-full pl-16 pr-32 py-5 rounded-3xl bg-white dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 shadow-2xl focus:border-primary outline-none text-lg transition-all"
+            placeholder="Type DOI, Author, or natural language query (e.g. 'Recent advances in NLP')..."
+            className="w-full pl-16 pr-40 py-6 rounded-3xl bg-white dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] focus:border-secondary transition-all outline-none text-lg"
           />
           <button 
             type="submit"
-            className="absolute right-3 top-3 bottom-3 px-8 rounded-2xl bg-primary text-white font-bold hover:bg-secondary transition-all shadow-lg hover:shadow-primary/25"
+            className="absolute right-4 top-4 bottom-4 px-10 rounded-2xl bg-secondary text-white font-black hover:bg-secondary/90 transition-all shadow-xl shadow-secondary/20 active:scale-95"
           >
             Explore
           </button>
@@ -113,7 +114,7 @@ export default function DiscoveryEnginePage() {
                                     </span>
                                 </div>
                                 
-                                <h2 className="text-2xl font-bold mb-2 text-slate-900 dark:text-white group-hover:text-primary transition-colors">{paper.title}</h2>
+                                <h2 className="text-2xl font-serif font-black mb-2 text-primary dark:text-white group-hover:text-secondary transition-colors leading-tight">{paper.title}</h2>
                                 <p className="text-slate-500 text-sm mb-6 flex items-center gap-4">
                                     <span className="flex items-center gap-1"><User size={14} /> {paper.authors.join(', ')}</span>
                                     <span className="h-4 w-px bg-slate-200" />

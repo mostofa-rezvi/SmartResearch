@@ -50,9 +50,10 @@ export default function CommunityFeedPage() {
         headers: { "x-auth-token": token || "" }
       });
       const data = await response.json();
-      setPosts(data);
+      setPosts(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error("Failed to fetch feed");
+      setPosts([]);
     } finally {
       setLoading(false);
     }

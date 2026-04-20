@@ -85,11 +85,11 @@ function LoginContent() {
       >
         <div className="bg-primary p-10 text-white text-center relative overflow-hidden">
           <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl" />
-          <h1 className="text-3xl font-black mb-2 relative z-10">
-            {step === 1 ? "Welcome Back" : "Security Shield"}
+          <h1 className="text-3xl font-black mb-2 relative z-10 font-serif">
+            {step === 1 ? "Authentication" : "The Vault"}
           </h1>
-          <p className="text-primary-foreground/80 relative z-10">
-            {step === 1 ? "Sign in to your research hub" : `Code sent to your inbox`}
+          <p className="text-primary-foreground/80 relative z-10 text-sm italic">
+            {step === 1 ? "Your research data and reputation are protected here." : `Mandatory identity verification`}
           </p>
         </div>
 
@@ -154,7 +154,9 @@ function LoginContent() {
           ) : (
             <form onSubmit={handleVerifyOtp} className="space-y-6">
               <div className="space-y-6 text-center">
-                <p className="text-sm text-slate-500">A verification code has been sent to your email. It expires in 10 minutes.</p>
+                <p className="text-sm text-slate-500">
+                  Authentication code sent to <span className="font-bold text-slate-900 dark:text-white">{email}</span>
+                </p>
                 <input
                   type="text"
                   maxLength={6}
@@ -162,16 +164,27 @@ function LoginContent() {
                   onChange={(e) => setOtp(e.target.value)}
                   required
                   autoFocus
-                  className="w-full text-center text-4xl tracking-widest font-black px-4 py-5 rounded-2xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-white/10 focus:ring-2 focus:ring-primary outline-none transition-all"
+                  className="w-full text-center text-5xl tracking-[0.5em] font-black px-4 py-6 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-white/10 focus:ring-2 focus:ring-primary outline-none transition-all mono-academic"
                   placeholder="000000"
                 />
+                
+                <div className="flex flex-col gap-4">
+                  <div className="flex items-center justify-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest">
+                    <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+                    Secure Session Active
+                  </div>
+                  
+                  <div className="text-sm font-medium text-slate-500">
+                    Didn't receive it? <button type="button" className="text-primary font-bold hover:underline">Resend in 59s</button>
+                  </div>
+                </div>
               </div>
               <button 
                 type="submit"
                 disabled={isLoading}
                 className="w-full bg-primary text-white py-4 rounded-2xl font-black text-lg hover:bg-primary/90 transition-all shadow-xl shadow-primary/20 flex items-center justify-center gap-2 active:scale-[0.98] disabled:opacity-70"
               >
-                {isLoading ? <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <>Verify & Access <ArrowRight size={20} /></>}
+                {isLoading ? <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <>Unlock Access <ArrowRight size={20} /></>}
               </button>
               <button 
                 type="button"

@@ -198,6 +198,8 @@ export default function RegisterPage() {
                         disabled={isSubmitting}
                       >
                         <option value="">Select status...</option>
+                        <option value="new">New Researcher</option>
+                        <option value="amateur">Amateur Scholar</option>
                         <option value="undergraduate">Undergraduate Student</option>
                         <option value="graduate">Graduate Student</option>
                         <option value="phd">PhD Researcher</option>
@@ -237,36 +239,34 @@ export default function RegisterPage() {
                 </button>
               </form>
             ) : (
-              <form onSubmit={handleVerifyOtp} className="space-y-8 text-center">
-                <div className="space-y-4">
-                  <p className="text-sm text-slate-500">Security Check: Enter the 6-digit code sent to your academic email.</p>
-                  <input
-                    type="text"
-                    maxLength={6}
-                    value={otp}
-                    onChange={(e) => setOtp(e.target.value)}
-                    required
-                    autoFocus
-                    className="w-full text-center text-4xl tracking-[0.5em] font-black px-4 py-5 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-white/10 focus:ring-2 focus:ring-primary outline-none transition-all"
-                    placeholder="000000"
-                    disabled={isSubmitting}
-                  />
+              <div className="space-y-8 text-center animate-fade-up">
+                <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <Mail size={40} className="text-emerald-600" />
                 </div>
-                <button 
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full bg-primary text-white py-5 rounded-2xl font-black text-lg hover:bg-primary/90 transition-all shadow-xl shadow-primary/20 flex items-center justify-center gap-2 active:scale-[0.98] disabled:opacity-70"
+                <div className="space-y-4">
+                  <h2 className="text-2xl font-black text-slate-900 dark:text-white">Verification Sent</h2>
+                  <p className="text-slate-500">We've sent a secure verification link to <span className="font-bold text-slate-900 dark:text-white">{email}</span>. Please click the link in your email to activate your account.</p>
+                </div>
+                
+                <div className="bg-slate-50 dark:bg-white/5 p-6 rounded-2xl border border-slate-100 dark:border-white/10 italic text-sm text-slate-500">
+                  "Establishing the habit of authenticated, secure entry."
+                </div>
+
+                <Link 
+                  href="/login"
+                  className="block w-full bg-primary text-white py-5 rounded-2xl font-black text-lg hover:bg-primary/90 transition-all shadow-xl shadow-primary/20 flex items-center justify-center gap-2 active:scale-[0.98]"
                 >
-                  {isSubmitting ? <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <>Complete Enrollment <ArrowRight size={20} /></>}
-                </button>
+                  Return to Login <ArrowRight size={20} />
+                </Link>
+                
                 <button 
                   type="button"
                   onClick={() => setStep(1)}
-                  className="w-full text-slate-500 text-sm font-bold hover:text-primary transition-colors"
+                  className="text-slate-500 text-sm font-bold hover:text-primary transition-colors"
                 >
-                  Back to Registration
+                  Change Email Address
                 </button>
-              </form>
+              </div>
             )}
 
             <p className="text-center text-sm text-slate-500">

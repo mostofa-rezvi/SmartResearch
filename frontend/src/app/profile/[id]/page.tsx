@@ -52,12 +52,12 @@ export default function ProfilePage() {
           </div>
           <div className="flex-1 text-center md:text-left">
             <div className="flex flex-col md:flex-row md:items-center gap-3 mb-2">
-              <h1 className="text-4xl font-extrabold text-slate-900 dark:text-white">
+              <h1 className="text-4xl md:text-5xl font-serif font-black text-primary dark:text-white">
                 {isInvited && profile.extended_profile?.title ? `${profile.extended_profile.title} ` : ''}{profile.name}
               </h1>
               {isInvited && (
-                <span className="flex items-center gap-1 text-[10px] uppercase tracking-widest font-bold bg-amber-50 text-amber-600 px-3 py-1 rounded-full border border-amber-100">
-                  <ShieldCheck size={14} /> Verified Scholar
+                <span className="flex items-center gap-1.5 text-[10px] uppercase tracking-[0.2em] font-black bg-accent/10 text-accent px-4 py-1.5 rounded-full border border-accent/20">
+                  <ShieldCheck size={16} /> Verified Expert
                 </span>
               )}
             </div>
@@ -88,31 +88,25 @@ export default function ProfilePage() {
         
         {/* Left Column: Stats & Contact */}
         <div className="space-y-6">
-          <div className="bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-xl">
-            <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-6 flex items-center gap-2">
-              <Activity size={16} /> Living CV
+          <div className={`bg-white dark:bg-slate-800 p-8 rounded-[32px] border ${isInvited ? 'border-accent/30 shadow-accent/5' : 'border-slate-100 dark:border-slate-700'} shadow-2xl`}>
+            <h3 className="mono-academic text-xs font-black tracking-[0.2em] text-slate-400 mb-8 flex items-center gap-2">
+              <Activity size={18} className="text-secondary" /> Academic Stats
             </h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="bg-slate-50 dark:bg-slate-900 p-4 rounded-2xl text-center">
-                <MessageSquare className="mx-auto text-blue-500 mb-2 opacity-50" size={20} />
-                <p className="text-2xl font-bold text-slate-900 dark:text-white">{profile.activity_stats?.questions_asked + profile.activity_stats?.comments_made || 0}</p>
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-1">Discussions</p>
-              </div>
-              <div className="bg-slate-50 dark:bg-slate-900 p-4 rounded-2xl text-center">
-                <Lightbulb className="mx-auto text-amber-500 mb-2 opacity-50" size={20} />
-                <p className="text-2xl font-bold text-slate-900 dark:text-white">{profile.activity_stats?.thoughts_shared || 0}</p>
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-1">Insights</p>
-              </div>
-              <div className="bg-slate-50 dark:bg-slate-900 p-4 rounded-2xl text-center">
-                <Bookmark className="mx-auto text-emerald-500 mb-2 opacity-50" size={20} />
-                <p className="text-2xl font-bold text-slate-900 dark:text-white">{profile.activity_stats?.saved_papers_count || 0}</p>
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-1">Library</p>
-              </div>
-              <div className="bg-slate-50 dark:bg-slate-900 p-4 rounded-2xl text-center">
-                <Users className="mx-auto text-purple-500 mb-2 opacity-50" size={20} />
-                <p className="text-2xl font-bold text-slate-900 dark:text-white">{profile.activity_stats?.joined_groups_count || 0}</p>
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-1">Circles</p>
-              </div>
+            <div className="space-y-4">
+              {[
+                { icon: <MessageSquare size={16} />, label: "Discussions", value: profile.activity_stats?.questions_asked + profile.activity_stats?.comments_made || 0, color: "text-blue-500" },
+                { icon: <Lightbulb size={16} />, label: "Insights", value: profile.activity_stats?.thoughts_shared || 0, color: "text-amber-500" },
+                { icon: <Bookmark size={16} />, label: "Library", value: profile.activity_stats?.saved_papers_count || 0, color: "text-emerald-500" },
+                { icon: <Users size={16} />, label: "Groups", value: profile.activity_stats?.joined_groups_count || 0, color: "text-purple-500" }
+              ].map((stat, i) => (
+                <div key={i} className="flex justify-between items-center bg-slate-50 dark:bg-slate-900/50 p-4 rounded-2xl border border-slate-100 dark:border-slate-700">
+                  <div className="flex items-center gap-3">
+                    <div className={`${stat.color} opacity-80`}>{stat.icon}</div>
+                    <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">{stat.label}</span>
+                  </div>
+                  <span className="text-xl font-black text-slate-900 dark:text-white leading-none">{stat.value}</span>
+                </div>
+              ))}
             </div>
           </div>
 

@@ -18,9 +18,10 @@ export default function GroupsListingPage() {
       try {
         const response = await fetch(API.groups.list);
         const data = await response.json();
-        setGroups(data);
+        setGroups(Array.isArray(data) ? data : []);
       } catch (err) {
         console.error("Failed to fetch groups");
+        setGroups([]);
       } finally {
         setLoading(false);
       }

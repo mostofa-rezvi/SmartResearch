@@ -11,37 +11,45 @@ export default function Navbar() {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 glass-morphism h-20 flex items-center px-6 md:px-12 justify-between">
       <div className="flex items-center gap-8">
-        <Link href="/" className="flex items-center gap-2.5 group">
-          <div className="w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center text-white font-bold shadow-lg shadow-primary/20 group-hover:scale-105 transition-transform duration-300">
-            RB
+        <Link href="/" className="flex items-center gap-3 group">
+          <div className="relative w-10 h-10 flex items-center justify-center">
+            <div className="absolute inset-0 bg-primary rounded-xl rotate-3 group-hover:rotate-6 transition-transform" />
+            <div className="absolute inset-0 bg-secondary rounded-xl -rotate-3 group-hover:-rotate-6 transition-transform opacity-80" />
+            <div className="relative z-10 w-8 h-8 bg-white dark:bg-[#0A192F] rounded-lg flex items-center justify-center overflow-hidden">
+               <div className="w-4 h-0.5 bg-primary absolute top-3" />
+               <div className="w-5 h-4 border-2 border-primary rounded-t-full mt-2" />
+            </div>
           </div>
-          <span className="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-slate-300">
+          <span className="text-2xl font-serif font-black tracking-tight text-primary dark:text-white">
             ResearchBridge
           </span>
         </Link>
 
-        {/* Public Navigation */}
-        <div className="hidden lg:flex items-center gap-8 text-[15px] font-medium text-slate-600 dark:text-slate-400">
-          <Link href="/features" className="hover:text-primary transition-colors">Features</Link>
-          <Link href="/pricing" className="hover:text-primary transition-colors">Pricing</Link>
-          <Link href="/about" className="hover:text-primary transition-colors">About</Link>
-          <Link href="/contact" className="hover:text-primary transition-colors">Contact</Link>
-        </div>
+        {/* Essential Navigation */}
+        {user && (
+          <div className="hidden lg:flex items-center gap-8 text-[15px] font-bold text-slate-600 dark:text-slate-400">
+            <Link href="/library" className="hover:text-primary transition-colors">Library</Link>
+            <Link href="/discovery" className="hover:text-primary transition-colors">Discovery</Link>
+            <Link href="/community" className="hover:text-primary transition-colors">Community</Link>
+            <Link href="/groups" className="hover:text-primary transition-colors">Groups</Link>
+          </div>
+        )}
       </div>
 
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-6">
+        <div className="hidden md:flex items-center gap-6 text-[15px] font-medium text-slate-500">
+          <Link href="/about" className="hover:text-primary transition-colors">About</Link>
+          <Link href="/support" className="hover:text-primary transition-colors">Support</Link>
+        </div>
+
+        <div className="w-px h-6 bg-slate-200 dark:bg-slate-800 hidden md:block" />
+
         {user ? (
           <div className="flex items-center gap-6">
-            <div className="hidden md:flex items-center gap-6 text-[15px] font-medium border-r border-slate-200 dark:border-slate-800 pr-6">
-              <Link href="/discovery" className="hover:text-primary transition-colors flex items-center gap-1.5">
-                <Compass size={18} /> Discovery
-              </Link>
-              <Link href="/community" className="hover:text-primary transition-colors flex items-center gap-1.5">
-                <MessageSquare size={18} /> Community
-              </Link>
-            </div>
-            
-            <div className="flex items-center gap-4">
+            <Link href="/dashboard" className="text-sm font-bold text-primary px-4 py-2 bg-primary/5 rounded-lg hover:bg-primary/10 transition-colors">
+              Lab
+            </Link>
+            <div className="flex items-center gap-4 border-l border-slate-200 dark:border-slate-800 pl-6">
               <Link href={`/profile/${user.id}`} className="text-sm font-semibold text-slate-700 dark:text-slate-200 hover:text-primary transition-colors">
                 {user.name}
               </Link>
@@ -54,15 +62,15 @@ export default function Navbar() {
             </div>
           </div>
         ) : (
-          <div className="flex items-center gap-3">
-            <Link href="/login" className="px-5 py-2.5 text-[15px] font-semibold text-slate-700 dark:text-slate-200 hover:text-primary transition-colors">
-              Log in
+          <div className="flex items-center gap-2">
+            <Link href="/login" className="px-5 py-2.5 text-[15px] font-bold text-slate-700 dark:text-slate-200 hover:text-primary transition-colors">
+              Login
             </Link>
             <Link 
               href="/register" 
-              className="bg-primary text-white px-6 py-2.5 rounded-full text-[15px] font-bold hover:bg-primary/90 transition-all shadow-xl shadow-primary/20 hover:shadow-primary/30 active:scale-95"
+              className="bg-[#0D9488] text-white px-6 py-2.5 rounded-full text-[15px] font-bold hover:bg-[#0D9488]/90 transition-all shadow-xl shadow-teal-500/20 active:scale-95"
             >
-              Get Started
+              Join the Lab
             </Link>
           </div>
         )}

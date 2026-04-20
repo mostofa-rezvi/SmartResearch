@@ -1,20 +1,21 @@
 "use client";
 
 import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 import Image from "next/image";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { 
-  CheckCircle2, 
-  ArrowRight, 
-  Search, 
-  Users, 
-  Lightbulb, 
-  ShieldCheck, 
-  Globe, 
+import {
+  CheckCircle2,
+  ArrowRight,
+  Search,
+  Users,
+  Lightbulb,
+  ShieldCheck,
+  Globe,
   Zap,
   Quote
 } from "lucide-react";
@@ -57,7 +58,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-white dark:bg-[#020617] overflow-x-hidden selection:bg-primary/20">
       <Navbar />
-      
+
       <main className="pt-20">
         {/* Hero Section */}
         <section className="relative px-6 pt-20 pb-24 md:pt-32 md:pb-40 overflow-hidden">
@@ -71,51 +72,52 @@ export default function Home() {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5 }}
-              className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/5 border border-primary/10 text-primary text-sm font-semibold mb-8"
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-secondary/10 border border-secondary/20 text-secondary text-sm font-bold mb-8 uppercase tracking-wider mono-academic"
             >
-              <Zap size={14} className="fill-primary" />
-              <span>The Future of Collaborative Research</span>
+              <Users size={14} className="fill-secondary" />
+              <span>Bridging Academic Isolation</span>
             </motion.div>
 
-            <motion.h1 
+            <motion.h1
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.1 }}
-              className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tight text-slate-900 dark:text-white mb-8 leading-[1.1]"
+              className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tight text-slate-900 dark:text-white mb-8 leading-[1.1] font-serif"
             >
-              The Ultimate <br />
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary via-accent to-primary animate-gradient-x">
-                Research Companion
+              From Curiosity to <br />
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-secondary via-accent to-secondary animate-gradient-x">
+                Contribution.
               </span>
             </motion.h1>
-            
-            <motion.p 
+
+            <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.2 }}
-              className="text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto mb-12 leading-relaxed"
+              className="text-lg md:text-2xl text-slate-600 dark:text-slate-400 max-w-4xl mx-auto mb-12 leading-relaxed font-light"
             >
-              Empowering the next generation of scientists and scholars. Discover breakthroughs, 
-              collaborate instantly, and organize your knowledge with AI-driven insights.
+              Your Unified Research Home. Escaping the isolation of traditional academia with
+              structured, intelligent, and human-centered discovery.
             </motion.p>
 
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.3 }}
               className="flex flex-col sm:flex-row justify-center gap-5"
             >
               <Link href="/register" className="group bg-primary text-white px-8 py-4 rounded-2xl text-lg font-bold hover:bg-primary/90 transition-all shadow-2xl shadow-primary/25 flex items-center justify-center gap-2">
-                Get Started for Free
+                Start Your Journey
                 <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
               </Link>
-              <Link href="/features" className="bg-white dark:bg-white/5 text-slate-900 dark:text-white px-8 py-4 rounded-2xl text-lg font-bold border border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-white/10 transition-all flex items-center justify-center">
-                Explore Features
+              <Link href="/accept-invite" className="bg-white dark:bg-white/5 text-slate-900 dark:text-white px-8 py-4 rounded-2xl text-lg font-bold border border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-white/10 transition-all flex items-center justify-center gap-2 shadow-sm">
+                <Users size={20} className="text-secondary" />
+                Accept Invitation
               </Link>
             </motion.div>
 
             {/* Dashboard Mockup Preview */}
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 60 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1, delay: 0.5 }}
@@ -123,9 +125,9 @@ export default function Home() {
             >
               <div className="absolute inset-0 bg-gradient-to-tr from-primary/30 to-accent/30 rounded-3xl blur-3xl -z-10 opacity-50 group-hover:opacity-100 transition-opacity duration-700" />
               <div className="relative rounded-3xl overflow-hidden border border-slate-200 dark:border-white/10 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.2)] dark:shadow-none">
-                <Image 
-                  src="/hero.png" 
-                  alt="ResearchBridge Dashboard" 
+                <Image
+                  src="/hero.png"
+                  alt="ResearchBridge Dashboard"
                   width={1200}
                   height={675}
                   className="w-full h-auto object-cover"
@@ -160,7 +162,7 @@ export default function Home() {
             </p>
           </div>
 
-          <motion.div 
+          <motion.div
             variants={stagger}
             initial="initial"
             whileInView="animate"
@@ -175,8 +177,8 @@ export default function Home() {
               { icon: <Globe className="text-indigo-500" />, title: "Global Network", desc: "Connect with experts in your niche. Peer review, mentorship, and networking redefined for the digital age." },
               { icon: <Lightbulb className="text-accent" />, title: "Smart Insights", desc: "Receive automated summaries and trend analysis in your field. Stay ahead of the curve without the noise." }
             ].map((f, i) => (
-              <motion.div 
-                key={i} 
+              <motion.div
+                key={i}
                 variants={fadeInUp}
                 className="group p-8 rounded-3xl bg-white dark:bg-white/5 border border-slate-100 dark:border-white/10 hover:border-primary/50 transition-all duration-300 hover:shadow-2xl hover:shadow-primary/5 hover:-translate-y-1"
               >
@@ -193,7 +195,7 @@ export default function Home() {
         {/* How It Works */}
         <section className="py-32 px-6 bg-slate-900 text-white rounded-[40px] md:rounded-[60px] mx-4 md:mx-8 mb-32 relative overflow-hidden">
           <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-primary/20 rounded-full blur-[120px] -z-0" />
-          
+
           <div className="relative z-10 max-w-7xl mx-auto">
             <div className="text-center mb-20">
               <h2 className="text-4xl md:text-5xl font-bold mb-6">How It Works</h2>
@@ -293,7 +295,7 @@ export default function Home() {
               </p>
               <div className="flex flex-col sm:flex-row justify-center gap-4">
                 <Link href="/register" className="bg-white text-primary px-10 py-4 rounded-2xl text-lg font-bold hover:bg-slate-100 transition-all shadow-2xl overflow-hidden group">
-                   Create Free Account
+                  Create Free Account
                 </Link>
                 <Link href="/contact" className="bg-primary-700/50 backdrop-blur-md text-white border border-white/20 px-10 py-4 rounded-2xl text-lg font-bold hover:bg-primary-700/70 transition-all">
                   Contact Sales
@@ -303,60 +305,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Footer */}
-        <footer className="py-20 border-t border-slate-100 dark:border-white/5 bg-white dark:bg-[#020617]">
-          <div className="max-w-7xl mx-auto px-6">
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-12 mb-16">
-              <div className="col-span-2 lg:col-span-2">
-                <div className="flex items-center gap-2.5 mb-6">
-                  <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white font-bold text-sm">RB</div>
-                  <span className="text-xl font-bold text-slate-900 dark:text-white">ResearchBridge</span>
-                </div>
-                <p className="text-slate-500 dark:text-slate-400 max-w-sm mb-6 leading-relaxed">
-                  The ultimate platform for modern researchers. Bridging the gap between theory and breakthrough through global collaboration.
-                </p>
-              </div>
-              
-              <div>
-                <h4 className="font-bold text-slate-900 dark:text-white mb-6 uppercase text-xs tracking-widest">Platform</h4>
-                <ul className="space-y-4 text-sm text-slate-500 dark:text-slate-400">
-                  <li><Link href="/features" className="hover:text-primary transition-colors">Features</Link></li>
-                  <li><Link href="/discovery" className="hover:text-primary transition-colors">Discovery</Link></li>
-                  <li><Link href="/pricing" className="hover:text-primary transition-colors">Pricing</Link></li>
-                  <li><Link href="/community" className="hover:text-primary transition-colors">Community</Link></li>
-                </ul>
-              </div>
-
-              <div>
-                <h4 className="font-bold text-slate-900 dark:text-white mb-6 uppercase text-xs tracking-widest">Company</h4>
-                <ul className="space-y-4 text-sm text-slate-500 dark:text-slate-400">
-                  <li><Link href="/about" className="hover:text-primary transition-colors">About Us</Link></li>
-                  <li><Link href="/contact" className="hover:text-primary transition-colors">Contact</Link></li>
-                  <li><Link href="/careers" className="hover:text-primary transition-colors">Careers</Link></li>
-                  <li><Link href="/blog" className="hover:text-primary transition-colors">Blog</Link></li>
-                </ul>
-              </div>
-
-              <div>
-                <h4 className="font-bold text-slate-900 dark:text-white mb-6 uppercase text-xs tracking-widest">Legal</h4>
-                <ul className="space-y-4 text-sm text-slate-500 dark:text-slate-400">
-                  <li><Link href="/privacy" className="hover:text-primary transition-colors">Privacy</Link></li>
-                  <li><Link href="/terms" className="hover:text-primary transition-colors">Terms</Link></li>
-                  <li><Link href="/cookies" className="hover:text-primary transition-colors">Cookies</Link></li>
-                </ul>
-              </div>
-            </div>
-            
-            <div className="pt-8 border-t border-slate-100 dark:border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-slate-500">
-              <p>© 2026 ResearchBridge. All rights reserved.</p>
-              <div className="flex gap-6">
-                <a href="#" className="hover:text-primary transition-colors">Twitter</a>
-                <a href="#" className="hover:text-primary transition-colors">LinkedIn</a>
-                <a href="#" className="hover:text-primary transition-colors">GitHub</a>
-              </div>
-            </div>
-          </div>
-        </footer>
+        <Footer />
       </main>
     </div>
   );

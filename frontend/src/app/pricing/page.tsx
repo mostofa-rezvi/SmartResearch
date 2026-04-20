@@ -1,7 +1,9 @@
 "use client";
 
 import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 import { motion } from "framer-motion";
+
 import { CheckCircle2, HelpCircle, Zap } from "lucide-react";
 import { useState } from "react";
 
@@ -159,9 +161,7 @@ export default function PricingPage() {
         </div>
       </main>
 
-      <footer className="py-20 border-t border-slate-100 dark:border-white/5 text-center text-slate-500 text-sm">
-        <p>© 2026 ResearchBridge. All rights reserved.</p>
-      </footer>
+      <Footer />
     </div>
   );
 }

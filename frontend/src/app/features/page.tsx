@@ -1,7 +1,9 @@
 "use client";
 
 import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 import { motion } from "framer-motion";
+
 import { Search, Users, Zap, ShieldCheck, Globe, Lightbulb, Database, Award, MessageSquare } from "lucide-react";
 
 export default function FeaturesPage() {
@@ -127,10 +129,7 @@ export default function FeaturesPage() {
         </div>
       </main>
 
-      {/* Reusable Footer should be a component, but for now I'll paste the simple version */}
-      <footer className="py-20 border-t border-slate-100 dark:border-white/5 text-center text-slate-500 text-sm">
-        <p>© 2026 ResearchBridge. All rights reserved.</p>
-      </footer>
+      <Footer />
     </div>
   );
 }

@@ -1,8 +1,10 @@
 "use client";
 
 import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 import { motion } from "framer-motion";
 import Image from "next/image";
+
 
 export default function AboutPage() {
   return (
@@ -105,9 +107,7 @@ export default function AboutPage() {
         </div>
       </main>
 
-      <footer className="py-20 border-t border-slate-100 dark:border-white/5 text-center text-slate-500 text-sm">
-        <p>© 2026 ResearchBridge. All rights reserved.</p>
-      </footer>
+      <Footer />
     </div>
   );
 }

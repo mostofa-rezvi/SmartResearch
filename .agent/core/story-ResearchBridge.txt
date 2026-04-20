@@ -1,0 +1,113 @@
+ResearchBridge — Complete Product Story
+
+SRCP Project (Scholar & Research Community Platform)
+
+
+
+The Vision
+
+ResearchBridge is a unified digital platform built for the global research community — from curious first-year undergraduates to seasoned professors and journal editors. It solves one of academia's oldest problems: researchers are isolated. A student in Dhaka doesn't know a professor in Berlin is working on the exact same problem. A junior researcher wastes months on a question that was answered in an obscure regional journal three years ago. An amateur scientist has brilliant observations but no community to validate or challenge them.
+
+ResearchBridge brings them all into one structured, intelligent, and human-centered space — where discovery, collaboration, and knowledge-sharing happen naturally.
+
+
+
+Chapter 1 — The Door In (Registration & Login)
+
+A new visitor lands on ResearchBridge for the first time. The platform presents a clean welcome page that communicates its purpose immediately: a home for researchers at every stage.
+
+They click Register. The registration form asks for the essentials only — full name, email address, a password, their current academic or professional status, and their institution or affiliation if they have one. No overwhelming forms. No unnecessary friction. Just enough to establish who they are.
+
+Once submitted, a verification email arrives in their inbox. They click the link, their email is confirmed, and the account is created. But here is where ResearchBridge makes a deliberate and important design choice — the platform does not log them in automatically. The user is returned to the login screen. This is intentional. It establishes the habit of authenticated access from the very first interaction, setting the tone that ResearchBridge is a credentialed, trustworthy environment — not a casual social feed.
+
+
+
+Chapter 2 — The Gate (Login with OTP)
+
+The user enters their email and password on the login screen. Upon correct entry, the platform does not immediately let them in. Instead, a one-time passcode is sent to their registered email. They enter this code on a verification screen, and only then does ResearchBridge open its doors.
+
+This two-step login — password plus email OTP — exists because ResearchBridge handles academic work, research data, collaborative projects, and professional reputations. Security is not optional here. Researchers need to trust that their contributions and identities are protected.
+
+
+
+Chapter 3 — The Four Kinds of People (User Roles)
+
+ResearchBridge recognizes that not everyone inside the platform is the same kind of person, and the platform's permission structure reflects real-world academic hierarchy and responsibility.
+
+Super Admin sits at the top. This is the platform operator — the person or small team who manages the entire ResearchBridge ecosystem. They can see everything, configure everything, and are the only ones who can formally invite special external members to the platform. They handle disputes, manage platform-wide settings, and have visibility into all activity.
+
+Admin operates below the super admin. Admins handle day-to-day moderation and management — approving flagged content, managing journal listings, overseeing community groups, and supporting users who have issues. They are the operational backbone of the platform.
+
+Users are the heart of ResearchBridge. But even within this group, the platform makes a meaningful distinction. A New Researcher is someone who has not yet published work or is just beginning their academic journey — a student, a curious amateur, someone exploring research for the first time. A Amateur Researcher is someone who is actively working — perhaps a graduate student mid-thesis, an independent researcher with ongoing projects, or someone contributing to collaborative studies. The platform uses this distinction not to create hierarchy among users, but to better understand context and serve relevant recommendations.
+
+Invited Users are a special category — professors, research supervisors, senior academics, and domain experts who join ResearchBridge not by signing up on their own, but through a formal invitation process initiated by the Super Admin. This ensures that when a professor appears on ResearchBridge, their presence is verified and intentional. They carry a distinct profile type with additional fields relevant to their academic standing.
+
+
+
+Chapter 4 — The First Conversation (Onboarding Research Profile)
+
+After registration, and again after the very first login, ResearchBridge presents the user with a mandatory onboarding experience before they can access anything else on the platform. This is not a popup they can dismiss or a step they can skip. It is a required conversation between the user and the platform.
+
+The onboarding takes the form of a guided research interest form. The user is asked a series of thoughtful questions — what fields of study interest them most, what kind of research they are drawn to, whether they prefer theoretical or applied work, what problems in the world they want to understand better. Alongside these open-ended questions, the platform presents a rich set of predefined keywords organized by research domain. The user selects the ones that feel most relevant to who they are and what they care about.
+
+This step exists because ResearchBridge needs to understand the user before it can be useful to them. Without this profile, the platform cannot recommend relevant papers, suggest useful community discussions, surface matching researchers, or highlight appropriate journals. The cold-start problem — where a new user sees nothing relevant because the system knows nothing about them — is solved here, at the very beginning, by making this conversation a prerequisite rather than an afterthought.
+
+Until this form is completed, the platform holds back its recommendations entirely. It will not show the user research suggestions or community matches. This keeps the experience honest — ResearchBridge only recommends what it can genuinely justify recommending.
+
+
+
+Chapter 5 — The Living Room (Community)
+
+Once onboarded, users step into the ResearchBridge community — the most social and dynamic part of the platform. This is where the platform feels most alive.
+
+The community is built around questions and answers, much in the spirit of platforms like Quora and Stack Overflow, but oriented entirely toward academic and research contexts. Any user can post a question — about a methodology they are struggling with, a statistical concept they cannot grasp, a gap they have noticed in existing literature, or a practical challenge in running a study. Other users read these questions and respond with answers, explanations, references, or follow-up questions of their own. The best answers rise through community engagement. Knowledge is built collaboratively, in public, over time.
+
+But the community is more than just Q&A. Users can also post thoughts — observations, half-formed ideas, reflections on papers they have read, commentary on developments in their field. These posts invite discussion and debate. A researcher who has just read a controversial study can share their reaction and hear from others across the world who have read the same thing.
+
+Beyond open posting, ResearchBridge supports Groups — structured spaces that users can create and manage. A group can be public, visible and joinable by anyone on the platform, organized around a research topic, a methodology, a geographic region, or an academic discipline. Or it can be private, invitation-only, perhaps for a research team working on a sensitive project, a study group preparing for a specific academic challenge, or a closed circle of collaborators.
+
+Groups work much like LinkedIn groups — they have a description, a set of members, a feed of posts and discussions, and a sense of shared identity. But because the ResearchBridge community is academically focused, group discussions tend to be more structured and substantive than typical social media groups.
+
+
+
+Chapter 6 — The Library (Journal Directory)
+
+ResearchBridge maintains an extensive and carefully organized directory of academic journals — one of the most practically useful features the platform offers.
+
+The journal directory is anchored around quality tiers. The platform prominently features Q1, Q2, and Q3 journal listings — reflecting the quartile-based impact ranking system widely used in academia. Researchers looking to publish their work need to know which journals are most prestigious in their field, which are accessible to early-career researchers, and which sit in the middle ground of solid, reputable publishing. ResearchBridge makes this landscape navigable.
+
+Beyond quality tiers, the directory organizes journals along two other meaningful axes. The first is geography — journals are tagged by the country or region most closely associated with them, whether by publishing body, editorial focus, or primary audience. A researcher in Bangladesh interested in journals that publish work relevant to South Asian contexts can filter meaningfully. A researcher in Europe looking for continent-specific publications can do the same.
+
+The second axis is academic and institutional grouping — journals are categorized by the type of educational or research bodies they are associated with, such as university consortiums, professional associations, government research bodies, or independent publishers.
+
+All of this sits within a category and subcategory system. A user browsing journals in the life sciences can drill down into subcategories like molecular biology, ecology, or public health. A user interested in social sciences can navigate through economics, anthropology, sociology, and their respective sub-fields. The taxonomy is deep and the navigation is designed to feel like browsing a well-organized library, not searching through an undifferentiated database.
+
+
+
+Chapter 7 — The Discovery Engine (Research Search)
+
+ResearchBridge includes a dedicated search experience designed to work like a smarter, more connected version of Google Scholar.
+
+Users come to this page when they want to find research — papers, studies, preprints, published findings, and academic work from across the world. The search interface accepts natural language queries, author names, titles, keywords, DOIs, and complex combinations of these. Results appear with rich metadata — abstract previews, author information, publication year, journal name and tier, citation counts, and availability status.
+
+What makes the ResearchBridge search experience distinct from simply pointing users to Google Scholar is context. Because the platform knows who the user is — their interests, their field, their research stage — it can surface relevant results that a generic search engine would not prioritize for them. The search experience is personalized without being opaque. Users can see why something is being highlighted for them and can adjust filters freely.
+
+The search page also allows users to save papers directly to their profile, share papers into community discussions, and follow authors whose work they want to track over time.
+
+
+
+Chapter 8 — The Face (User Profile)
+
+Every user on ResearchBridge has a profile, and that profile is designed to be a genuine academic identity — not a social media vanity page.
+
+For regular users — students, amateur researchers, early-career academics — the profile surfaces their research interests and selected keywords, their community contributions (questions asked, answers given, posts made), the groups they belong to, any papers they have saved or cited, and a timeline of their activity on the platform. It reads like a living academic CV in progress, honest about where the person is in their journey.
+
+For Invited Users — professors, supervisors, and senior researchers — the profile goes further. It accommodates the full range of fields that distinguish an academic professional: institutional affiliation, department, academic rank and title, areas of expertise, graduate students supervised, ongoing research projects, publications list, editorial roles, conference participations, and contact or collaboration preferences. A professor's ResearchBridge profile should be able to stand alongside their university faculty page as a credible representation of their academic identity.
+
+Profiles are visible across the platform. When a user asks a question in the community, other members can click their name and immediately understand who they are, where they are in their career, and what they care about. This context makes interactions richer and more respectful. A student who knows they are getting an answer from a senior researcher at a reputable institution weighs that answer differently — and appropriately so.
+
+
+The World ResearchBridge Creates
+
+Taken together, these pieces build something that does not quite exist yet — a platform where the full lifecycle of research activity has a home. A curious undergraduate discovers their research interests through the onboarding form, finds a community discussion that speaks to exactly what they are wondering about, reads a paper recommended by the search engine, saves it, joins a public group of people working on similar questions, asks a question in that group, gets an answer from a professor whose ResearchBridge profile they can inspect for credibility, and eventually — when they are ready — publishes their own work and lists it on their profile.
+That journey, from curiosity to contribution, is what ResearchBridge is built to support.

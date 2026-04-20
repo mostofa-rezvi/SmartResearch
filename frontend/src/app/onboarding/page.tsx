@@ -58,9 +58,9 @@ export default function OnboardingPage() {
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex flex-col items-center justify-center p-6 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]">
       <div className="max-w-3xl w-full">
         <div className="flex justify-between items-center mb-12">
-          <div className="flex items-center gap-2 text-primary">
-            <Sparkles className="animate-pulse" />
-            <span className="font-bold text-xl uppercase tracking-widest">First Conversation</span>
+          <div className="flex items-center gap-2 text-primary font-serif">
+            <Sparkles className="animate-pulse" size={20} />
+            <span className="font-black text-2xl tracking-tight italic">The First Habit</span>
           </div>
           <div className="flex gap-2">
             {[1, 2, 3].map(i => (
@@ -78,9 +78,11 @@ export default function OnboardingPage() {
               exit={{ opacity: 0, x: -20 }}
               className="space-y-8"
             >
-              <h1 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white leading-tight">
-                How do you approach <span className="text-primary italic">Knowledge?</span>
+              <h1 className="text-4xl md:text-6xl font-black text-slate-900 dark:text-white leading-tight font-serif">
+                How do you <br />
+                <span className="text-secondary italic">approach Knowledge?</span>
               </h1>
+              <p className="text-slate-500 text-lg max-w-xl">Every researcher has a unique intellectual signature. Define your methodology to calibrate our discovery engine.</p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
                 <button 
                   onClick={() => { setResearchType('theoretical'); setStep(2); }}
@@ -110,9 +112,10 @@ export default function OnboardingPage() {
               exit={{ opacity: 0, x: -20 }}
               className="space-y-8"
             >
-              <h1 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white">
-                Define your <span className="text-primary">Domains.</span>
+              <h1 className="text-4xl md:text-5xl font-black text-slate-900 dark:text-white font-serif">
+                Map your <span className="text-accent italic">Intellectual Terrain.</span>
               </h1>
+              <p className="text-slate-500">Select the domains where you intend to pursue breakthroughs.</p>
               <div className="space-y-8 pt-4">
                 {DOMAINS.map(domain => (
                   <div key={domain.id} className="space-y-4">
