@@ -9,6 +9,9 @@ const cookieParser = require('cookie-parser');
 const { errors } = require('celebrate');
 const logger = require('./utils/logger');
 const db = require('./config/db');
+const { initRedis } = require('./config/redis');
+const { initElasticsearch } = require('./config/elasticsearch');
+const { initNeo4j } = require('./config/neo4j');
 const errorHandler = require('./middleware/errorHandler');
 const { apiLimiter, authLimiter } = require('./middleware/rateLimit');
 
@@ -98,9 +101,17 @@ const PORT = process.env.PORT || 5000;
 server.listen(PORT, async () => {
   logger.info(`Server running on port ${PORT}`);
   try {
+    // Principal Database Initialization
     await db.query('SELECT NOW()');
     logger.info('PostgreSQL connected successfully');
+
+    // Secondary Stores Initialization
+    initRedis();
+    initElasticsearch();
+    initNeo4j();
+    
+    logger.info('Multi-database environment initialized successfully');
   } catch (err) {
-    logger.error('PostgreSQL connection failed:', err.message);
+    logger.error('Core database connection failed:', err.message);
   }
 });
