@@ -1,0 +1,1325 @@
+================================================================================
+  RESEARCHBRIDGE — ANTIGRAVITY VIBE-CODING PROJECT OVERVIEW
+  Smart Research Collaboration Platform
+  Mostofa Aminur Rashid · MIT Programme · 2026
+================================================================================
+
+────────────────────────────────────────────────────────────────────────────
+  PROJECT CONTEXT (from SRCP Project Overview)
+────────────────────────────────────────────────────────────────────────────
+
+  End-to-End System Flow:
+  ① User Registration → ② Core Engine Processing → ③ AI Matching →
+  ④ Feature Modules → ⑤ Publication Assistant → ⑥ Output Delivery
+
+  INPUT:   Profile · Papers · Interests · Skills · Behaviour signals
+  PROCESS: Matching · Semantic Search · Graph Traversal · Async Queue
+  OUTPUT:  Research Team · Structured Project · Published Paper
+
+  Architecture Layers:
+  - Presentation: Next.js (SSR) + Tailwind CSS + Socket.IO + Cloudflare
+  - Business Logic: Node.js/Express API + Python FastAPI ML Service
+  - Data: PostgreSQL → Neo4j → Elasticsearch → Redis
+
+  Competitive Advantage (vs ResearchGate, Academia.edu, Overleaf, Semantic Scholar):
+  ✔ Smart CF+CB+BERT collaborator matching (none have this)
+  ✔ Full collaboration workspace with tasks, docs, milestones
+  ✔ Publication assistant with journal finder + templates
+  ✔ TrustRank-powered community forum
+  ✔ Cold-start resilient: CBF bootstraps from tags on day one
+
+────────────────────────────────────────────────────────────────────────────
+  KEY CHANGE: Using Redis (Pub/Sub + Streams) instead of Apache Kafka
+────────────────────────────────────────────────────────────────────────────
+  - Redis Pub/Sub replaces Kafka for event-driven messaging
+  - Redis Streams replaces Kafka topics for durable event logs
+  - Simplifies infrastructure (already have Redis for caching)
+  - Reduces Docker footprint and operational complexity
+
+================================================================================
+  SECTION ONE: .agent/skills — GSD Skills Reference
+================================================================================
+
+Each skill below maps to a specific phase of the ResearchBridge lifecycle.
+Skills are invoked via Antigravity's GSD workflow system.
+Format: /skill-name — Description [When to use]
+
+──────────────────────────────────────────────────────────────────────────────
+  1. PROJECT INITIALIZATION & PLANNING
+──────────────────────────────────────────────────────────────────────────────
+
+/gsd-new-project
+  Initialize project with deep context gathering and PROJECT.md
+  [Day 0 — Before any code. Sets up .planning/ directory, captures
+   tech stack decisions (Redis not Kafka), defines project scope.]
+
+/gsd-new-milestone
+  Start a new milestone cycle with requirements
+  [Beginning of each week/milestone. Week 1: Infra+Auth,
+   Week 2: AI+Search, Week 3: Frontend+Production.]
+
+/gsd-explore
+  Socratic ideation — think through ideas before committing
+  [Before major architecture decisions: Redis Streams vs Kafka,
+   CRDT choice for collab docs, hybrid matching algorithm design.]
+
+/gsd-scan
+  Rapid codebase assessment
+  [Quick health check of existing code before starting new work.
+   Lightweight alternative to full codebase mapping.]
+
+/gsd-map-codebase
+  Deep codebase analysis with parallel mapper agents
+  [After significant code is written. Produces intel documents
+   in .planning/codebase/ for cross-agent context sharing.]
+
+/gsd-ingest-docs
+  Scan repo for mixed ADRs, PRDs, SPECs and bootstrap .planning/
+  [If you have existing design docs, specs, or decision records
+   to import into the GSD workflow from external sources.]
+
+/gsd-settings
+  Configure GSD workflow toggles and model profile
+  [Set quality/balanced/budget profile for agents, toggle
+   features like auto-commit, parallel execution, etc.]
+
+/gsd-graphify
+  Build, query, and inspect the project knowledge graph
+  [Visualize dependencies between phases, services, and
+   data flows in .planning/graphs/ for architecture clarity.]
+
+──────────────────────────────────────────────────────────────────────────────
+  2. PHASE PLANNING & DISCUSSION
+──────────────────────────────────────────────────────────────────────────────
+
+/gsd-discuss-phase
+  Gather phase context through adaptive questioning
+  [Before planning each day's work. Use --auto to skip questions,
+   --chain for discuss→plan→execute, --power for bulk questions.]
+
+/gsd-list-phase-assumptions
+  Surface agent's assumptions before planning
+  [Before complex phases like ML matching engine or TrustRank
+   to catch wrong assumptions early.]
+
+/gsd-plan-phase
+  Create detailed PLAN.md with verification loop
+  [After discussion. Produces step-by-step implementation plan
+   with file targets, dependencies, and UAT criteria.]
+
+/gsd-research-phase
+  Research how to implement a phase (standalone)
+  [For unfamiliar tech: Sentence-BERT integration, Neo4j
+   PageRank, Yjs CRDT setup, Elasticsearch kNN config.]
+
+/gsd-add-phase
+  Add phase to end of current milestone
+  [When you discover new work mid-milestone, e.g., adding
+   Redis Streams consumer layer not originally planned.]
+
+/gsd-insert-phase
+  Insert urgent work as decimal phase (e.g., 72.1)
+  [Hot-fix or critical dependency discovered mid-sprint.
+   Example: Redis connection pooling issue blocking Day 5.]
+
+/gsd-remove-phase
+  Remove a future phase and renumber
+  [When a planned phase becomes unnecessary, e.g., Kafka
+   setup phase removed since we're using Redis instead.]
+
+/gsd-analyze-dependencies
+  Analyze phase dependencies
+  [Before executing phases to understand ordering. E.g.,
+   ES indexing depends on PostgreSQL schema being ready.]
+
+/gsd-spec-phase
+  Socratic spec refinement — clarify WHAT a phase delivers
+  [Before discuss-phase for ambiguous features. Produces
+   SPEC.md with falsifiable requirements. Use for matching
+   engine spec, TrustRank spec, workspace spec.]
+
+/gsd-ui-phase
+  Generate UI design contract (UI-SPEC.md)
+  [Before frontend phases (Days 11-14). Produces component
+   specs, layout wireframes, interaction contracts.]
+
+/gsd-ai-integration-phase
+  Generate AI design contract (AI-SPEC.md)
+  [For ML phases: Sentence-BERT service, matching engine,
+   TrustRank algorithm. Framework selection, implementation
+   guidance from official docs, evaluation strategy.]
+
+/gsd-sketch
+  Sketch UI/design ideas with throwaway HTML mockups
+  [Before committing to UI implementation. Quick visual
+   prototyping of dashboard layouts, search UX, profile pages.]
+
+/gsd-spike
+  Spike an idea through experiential exploration
+  [Proof-of-concept before committing: test Redis Streams
+   throughput, benchmark Sentence-BERT latency, validate
+   Neo4j PageRank convergence speed.]
+
+──────────────────────────────────────────────────────────────────────────────
+  3. EXECUTION & BUILDING
+──────────────────────────────────────────────────────────────────────────────
+
+/gsd-execute-phase
+  Execute all plans with wave-based parallelization
+  [The main build command. Runs PLAN.md steps, spawns
+   parallel subagents for independent tasks.]
+
+/gsd-fast
+  Execute trivial task inline — no subagents
+  [Quick fixes: add an env variable, fix a typo, update
+   a Docker port, small config change.]
+
+/gsd-quick
+  Execute with GSD guarantees but skip optional agents
+  [Medium tasks: add a new route, create a middleware,
+   write a single service function.]
+
+/gsd-autonomous
+  Run all remaining phases autonomously
+  [When you want to batch-execute multiple remaining
+   phases without manual intervention.]
+
+/gsd-do
+  Route freeform text to the right GSD command
+  [Natural language shortcut: "add Redis connection pooling"
+   gets routed to the appropriate skill automatically.]
+
+/gsd-manager
+  Interactive command center for managing multiple phases
+  [When working on parallel tasks: e.g., backend API +
+   ML service + Docker config simultaneously.]
+
+──────────────────────────────────────────────────────────────────────────────
+  4. QUALITY ASSURANCE & REVIEW
+──────────────────────────────────────────────────────────────────────────────
+
+/gsd-code-review
+  Review source files for bugs, security, code quality
+  [After each phase execution. Catches SQL injection,
+   missing auth checks, memory leaks, etc.]
+
+/gsd-code-review-fix
+  Auto-fix issues found by code review
+  [After /gsd-code-review produces REVIEW.md. Spawns
+   fixer agent, commits each fix atomically.]
+
+/gsd-add-tests
+  Generate tests based on UAT criteria
+  [After phase completion. Creates unit/integration tests
+   for auth flows, API endpoints, matching logic.]
+
+/gsd-verify-work
+  Validate built features through conversational UAT
+  [Interactive verification: "Can a user register?",
+   "Does semantic search return results < 200ms?"]
+
+/gsd-validate-phase
+  Audit and fill validation gaps
+  [Retroactive quality check for phases that were
+   executed quickly without full verification.]
+
+/gsd-ui-review
+  6-pillar visual audit of frontend code
+  [After frontend phases. Checks accessibility, responsive
+   design, performance, consistency.]
+
+/gsd-secure-phase
+  Verify threat mitigations for completed phase
+  [After auth system, API endpoints, or any phase
+   handling user data. Security-focused audit.]
+
+/gsd-audit-uat
+  Cross-phase audit of all outstanding UAT items
+  [End of each week. Ensures nothing was skipped.]
+
+/gsd-eval-review
+  Retroactively audit AI phase's evaluation coverage
+  [After ML phases (Days 6-8). Scores each eval dimension
+   as COVERED/PARTIAL/MISSING with remediation plan.]
+
+/gsd-review
+  Request cross-AI peer review of phase plans
+  [Get external AI review of critical plans before
+   execution — matching engine, security, deployment.]
+
+──────────────────────────────────────────────────────────────────────────────
+  5. DEBUGGING & TROUBLESHOOTING
+──────────────────────────────────────────────────────────────────────────────
+
+/gsd-debug
+  Systematic debugging with persistent state
+  [When Docker services fail to connect, Redis Streams
+   consumers hang, Neo4j queries timeout, etc.]
+
+/gsd-forensics
+  Post-mortem for failed GSD workflows
+  [When a phase execution fails unexpectedly. Analyzes
+   git history, artifacts, and state to diagnose.]
+
+/gsd-health
+  Diagnose planning directory health
+  [When .planning/ state seems corrupted or phases
+   are stuck. Can auto-repair issues.]
+
+/gsd-undo
+  Safe git revert with dependency checks
+  [Roll back a bad phase execution or broken commit
+   without disrupting dependent work.]
+
+──────────────────────────────────────────────────────────────────────────────
+  6. DOCUMENTATION & KNOWLEDGE
+──────────────────────────────────────────────────────────────────────────────
+
+/gsd-docs-update
+  Generate/update project documentation
+  [After major features land. Keeps README, API docs,
+   and architecture docs in sync with code.]
+
+/gsd-intel
+  Query or refresh codebase intelligence files
+  [When you need to understand how a specific module
+   works before modifying it.]
+
+/gsd-note
+  Zero-friction idea capture
+  [Quick notes during development: "TODO: add rate
+   limiting to embedding endpoint".]
+
+/gsd-add-todo
+  Capture idea or task as todo
+  [More structured than notes. Creates trackable items.]
+
+/gsd-check-todos
+  List pending todos and select one to work on
+  [Daily standup equivalent — see what's pending.]
+
+/gsd-thread
+  Manage persistent context threads
+  [For cross-session work on complex features like
+   the matching engine or TrustRank algorithm.]
+
+/gsd-extract_learnings
+  Extract decisions, lessons, patterns from completed phases
+  [After each week. Captures what worked, what didn't,
+   and patterns to reuse in future phases.]
+
+/gsd-pause-work
+  Create context handoff when pausing work mid-phase
+  [When you need to stop mid-day. Saves full context
+   so you can resume exactly where you left off.]
+
+/gsd-resume-work
+  Resume work from previous session with context restoration
+  [Start of each coding session. Restores state from
+   the last /gsd-pause-work handoff.]
+
+──────────────────────────────────────────────────────────────────────────────
+  7. MILESTONE MANAGEMENT & SHIPPING
+──────────────────────────────────────────────────────────────────────────────
+
+/gsd-progress
+  Check project progress and route to next action
+  [Daily check: what's done, what's next, any blockers.]
+
+/gsd-next
+  Advance to next logical step automatically
+  [When you're unsure what to do next. GSD figures
+   out the right action based on current state.]
+
+/gsd-audit-milestone
+  Audit milestone completion against original intent
+  [End of each week before archiving. Ensures all
+   milestones from the task list are met.]
+
+/gsd-milestone-summary
+  Generate comprehensive project summary
+  [For team onboarding, stakeholder updates, or
+   your MIT programme progress reports.]
+
+/gsd-complete-milestone
+  Archive completed milestone, prepare for next
+  [Transition between weeks: Week 1→2, Week 2→3.]
+
+/gsd-cleanup
+  Archive phase directories from completed milestones
+  [Housekeeping after milestone completion.]
+
+/gsd-stats
+  Display project statistics and timeline
+  [Overview: phases completed, git metrics, pace.]
+
+/gsd-session-report
+  Generate session report with work summary
+  [End of each coding session. Token usage, outcomes.]
+
+──────────────────────────────────────────────────────────────────────────────
+  8. DEPLOYMENT & PRODUCTION
+──────────────────────────────────────────────────────────────────────────────
+
+/gsd-ship
+  Create PR, run review, prepare for merge
+  [When a feature branch is ready for main.]
+
+/gsd-pr-branch
+  Create clean PR branch filtering .planning/ commits
+  [Before submitting for code review. Clean history.]
+
+/gsd-audit-fix
+  Autonomous audit-to-fix pipeline
+  [Final production sweep: find issues, classify,
+   fix, test, commit — all automated.]
+
+/gsd-add-backlog
+  Add an idea to the backlog parking lot (999.x numbering)
+  [For post-MVP features: advanced analytics, mobile app,
+   API marketplace, multi-language support.]
+
+/gsd-review-backlog
+  Review and promote backlog items to active milestone
+  [After shipping MVP. Prioritize backlog items for
+   the next development cycle.]
+
+/gsd-plant-seed
+  Capture forward-looking idea with trigger conditions
+  [Ideas that should surface at the right milestone.
+   E.g., "Add GraphQL when API surface exceeds 50 endpoints"]
+
+/gsd-import
+  Ingest external plans with conflict detection
+  [Import requirements from your MIT programme docs,
+   advisor feedback, or external specifications.]
+
+/gsd-inbox
+  Triage GitHub issues and PRs against project templates
+  [When contributors submit issues or PRs. Routes
+   to appropriate phases and validates against guidelines.]
+
+
+================================================================================
+  SECTION TWO: .agent/command — Full Command Sequence (Zero to Production)
+================================================================================
+
+All commands are listed in execution order. Each command maps to
+a specific day/phase from the 3-week task list.
+
+══════════════════════════════════════════════════════════════════════════════
+  PHASE 0: PROJECT BOOTSTRAP (Pre-Day 1)
+══════════════════════════════════════════════════════════════════════════════
+
+CMD-001: Initialize GSD Project
+  /gsd-new-project
+  Context: "ResearchBridge — Smart Research Collaboration Platform.
+  Mono-repo: Next.js frontend, Node/Express API, Python FastAPI ML service.
+  Databases: PostgreSQL (source of truth), Redis (cache + message broker
+  via Pub/Sub and Streams — replacing Kafka), Neo4j (trust graph),
+  Elasticsearch (semantic search). Target: 3-week production build."
+
+CMD-002: Scan Existing Codebase
+  /gsd-scan
+  Purpose: Assess what's already built (auth, controllers, services,
+  Docker config) before planning new work.
+
+CMD-003: Create Week 1 Milestone
+  /gsd-new-milestone
+  Title: "Week 1 — Infrastructure, Auth & Core Backend"
+  Scope: Docker infra, auth system, user profiles, Neo4j graph,
+  Redis Streams event bus, Elasticsearch indexing.
+
+══════════════════════════════════════════════════════════════════════════════
+  WEEK 1: INFRASTRUCTURE, AUTH & CORE BACKEND (Days 1-5)
+══════════════════════════════════════════════════════════════════════════════
+
+--- Day 1: Project Scaffold & Infrastructure ---
+
+CMD-004: Discuss Day 1 Phase
+  /gsd-discuss-phase --auto
+  Phase: "Mono-repo scaffold + Docker Compose with all services"
+
+CMD-005: Plan Day 1
+  /gsd-plan-phase
+  Tasks: Docker Compose (Postgres, Redis, Neo4j, ES — NO Kafka),
+  env config with .env + Vault pattern, GitHub Actions CI skeleton.
+
+CMD-006: Execute Day 1
+  /gsd-execute-phase
+  Deliverables: docker-compose.yml updated (remove any Kafka refs),
+  .env.example, CI pipeline YAML, health-check script.
+
+CMD-007: Review Day 1
+  /gsd-code-review
+  Focus: Docker security, env variable exposure, CI config.
+
+--- Day 2: Auth System ---
+
+CMD-008: Discuss Day 2 Phase
+  /gsd-discuss-phase --auto
+  Phase: "JWT + OAuth 2.0 auth with Redis token management"
+
+CMD-009: Plan Day 2
+  /gsd-plan-phase
+  Tasks: JWT access/refresh tokens, OAuth (Google, GitHub),
+  refresh token rotation with Redis blacklist, rate limiting
+  via express-rate-limit + rate-limit-redis, bcrypt hashing,
+  email verification flow with nodemailer.
+
+CMD-010: Execute Day 2
+  /gsd-execute-phase
+
+CMD-011: Security Review Day 2
+  /gsd-secure-phase
+  Focus: Token storage, CSRF, XSS, OAuth callback validation.
+
+CMD-012: Test Day 2
+  /gsd-add-tests
+  Coverage: Register, login, refresh, logout, OAuth flows.
+
+--- Day 3: User Profile & PostgreSQL Schema ---
+
+CMD-013: Plan Day 3
+  /gsd-plan-phase
+  Tasks: PostgreSQL schema (users, skills, domains, institutions,
+  goals), profile CRUD with Joi validation, S3/MinIO file upload,
+  profile completeness scoring.
+
+CMD-014: Execute Day 3
+  /gsd-execute-phase
+
+CMD-015: Review Day 3
+  /gsd-code-review
+
+--- Day 4: Neo4j Graph & Redis Streams Bootstrap ---
+
+CMD-016: Discuss Day 4 (IMPORTANT — Kafka→Redis change)
+  /gsd-discuss-phase
+  Phase: "Neo4j graph schema + Redis Streams event bus (NOT Kafka).
+  Redis Streams topics: profile.created, match.request, event.behaviour.
+  Redis Streams producer in Node.js API. Use ioredis XADD/XREADGROUP."
+
+CMD-017: Plan Day 4
+  /gsd-plan-phase
+  Tasks: Neo4j schema (Researcher→Paper→Topic→Institution),
+  graph sync on registration, Redis Streams topic setup,
+  event producer service using ioredis.
+
+CMD-018: Execute Day 4
+  /gsd-execute-phase
+
+CMD-019: Review Day 4
+  /gsd-code-review
+
+--- Day 5: Elasticsearch Setup & Indexing ---
+
+CMD-020: Plan Day 5
+  /gsd-plan-phase
+  Tasks: ES index mappings with dense_vector, index pipeline
+  (profile save → Redis Stream → consumer → ES), BM25 search
+  endpoint, health-check endpoints for all services.
+
+CMD-021: Execute Day 5
+  /gsd-execute-phase
+
+CMD-022: Verify Week 1
+  /gsd-verify-work
+  UAT: All Docker services up, auth works, profile stored in
+  Postgres + Neo4j + ES, Redis Streams flowing.
+
+CMD-023: Audit Week 1 Milestone
+  /gsd-audit-milestone
+
+CMD-024: Complete Week 1
+  /gsd-complete-milestone
+
+══════════════════════════════════════════════════════════════════════════════
+  WEEK 2: AI MATCHING ENGINE, SEARCH & COLLABORATION (Days 6-10)
+══════════════════════════════════════════════════════════════════════════════
+
+CMD-025: Create Week 2 Milestone
+  /gsd-new-milestone
+  Title: "Week 2 — AI Matching Engine, Search & Collaboration Core"
+
+--- Day 6: Sentence-BERT Embedding Service ---
+
+CMD-026: Research ML Phase
+  /gsd-research-phase
+  Topic: "sentence-transformers FastAPI service, 768-dim vectors,
+  Redis cache for embeddings, Redis Streams consumer trigger."
+
+CMD-027: Plan Day 6
+  /gsd-plan-phase
+  Tasks: Python FastAPI /embed endpoint, sentence-transformers
+  model loading, vector storage in ES + Redis cache, batch
+  embedding job, Redis Streams consumer for profile.created.
+
+CMD-028: Execute Day 6
+  /gsd-execute-phase
+
+CMD-029: Review Day 6
+  /gsd-code-review
+
+--- Day 7: CF + CBF Hybrid Matching Engine ---
+
+CMD-030: Discuss Day 7
+  /gsd-discuss-phase
+  Phase: "Hybrid recommender: CBF (cosine on BERT vectors) +
+  CF (user-user collaborative), cold-start handling, Redis cache."
+
+CMD-031: Plan Day 7
+  /gsd-plan-phase
+
+CMD-032: Execute Day 7
+  /gsd-execute-phase
+
+CMD-033: Test Day 7
+  /gsd-add-tests
+  Coverage: Matching accuracy, cold-start fallback, cache TTL.
+
+--- Day 8: TrustRank & Graph Traversal ---
+
+CMD-034: Plan Day 8
+  /gsd-plan-phase
+  Tasks: Neo4j PageRank-variant, endorsement/citation edges,
+  2nd-degree collaborator traversal, institutional badges.
+
+CMD-035: Execute Day 8
+  /gsd-execute-phase
+
+CMD-036: Review Day 8
+  /gsd-code-review
+
+--- Day 9: Semantic Search & kNN ---
+
+CMD-037: Plan Day 9
+  /gsd-plan-phase
+  Tasks: ES kNN on dense_vector, BM25+kNN hybrid with RRF
+  fusion, search filters, <200ms benchmark.
+
+CMD-038: Execute Day 9
+  /gsd-execute-phase
+
+CMD-039: Validate Performance
+  /gsd-verify-work
+  UAT: Search response < 200ms, filters working, kNN accurate.
+
+--- Day 10: Collaboration Workspace Backend ---
+
+CMD-040: Discuss Day 10
+  /gsd-discuss-phase
+  Phase: "Real-time collaboration: Socket.IO rooms, Yjs CRDT
+  backend adapter, workspace CRUD, milestone state machine."
+
+CMD-041: Plan Day 10
+  /gsd-plan-phase
+
+CMD-042: Execute Day 10
+  /gsd-execute-phase
+
+CMD-043: Verify Week 2
+  /gsd-verify-work
+
+CMD-044: Audit Week 2
+  /gsd-audit-milestone
+
+CMD-045: Complete Week 2
+  /gsd-complete-milestone
+
+══════════════════════════════════════════════════════════════════════════════
+  WEEK 3: FRONTEND, PUB ASSISTANT & PRODUCTION (Days 11-15)
+══════════════════════════════════════════════════════════════════════════════
+
+CMD-046: Create Week 3 Milestone
+  /gsd-new-milestone
+  Title: "Week 3 — Frontend, Publication Assistant & Production"
+
+--- Day 11: Next.js Frontend — Auth & Profile ---
+
+CMD-047: UI Design Phase
+  /gsd-ui-phase
+  Scope: Auth pages, profile builder, layout shell, SSR config.
+
+CMD-048: Plan Day 11
+  /gsd-plan-phase
+
+CMD-049: Execute Day 11
+  /gsd-execute-phase
+
+CMD-050: UI Review Day 11
+  /gsd-ui-review
+
+--- Day 12: Discovery & Matching Dashboard ---
+
+CMD-051: UI Design Phase
+  /gsd-ui-phase
+  Scope: Recommendation feed, search bar, researcher profiles,
+  filter sidebar.
+
+CMD-052: Plan Day 12
+  /gsd-plan-phase
+
+CMD-053: Execute Day 12
+  /gsd-execute-phase
+
+CMD-054: UI Review Day 12
+  /gsd-ui-review
+
+--- Day 13: Collaboration Workspace UI ---
+
+CMD-055: UI Design Phase
+  /gsd-ui-phase
+  Scope: Kanban task board, real-time doc editor, presence
+  indicators, notifications panel.
+
+CMD-056: Plan Day 13
+  /gsd-plan-phase
+  Tasks: Kanban board, Yjs+Tiptap editor, presence indicators,
+  notifications panel.
+
+CMD-057: Execute Day 13
+  /gsd-execute-phase
+
+CMD-058: UI Review Day 13
+  /gsd-ui-review
+
+--- Day 14: Publication Assistant & Forum ---
+
+CMD-059: Plan Day 14
+  /gsd-plan-phase
+  Tasks: DOAJ/Scimago journal recommender, publication checklist,
+  forum with TrustRank-weighted feed, spam filter, badges.
+
+CMD-060: Execute Day 14
+  /gsd-execute-phase
+
+CMD-061: Review Day 14
+  /gsd-code-review
+
+CMD-062: ML Eval Review (TrustRank forum moderation)
+  /gsd-eval-review
+  Scope: TrustRank spam filter — evaluation coverage audit.
+
+--- Day 15: Production Hardening & Deployment ---
+
+CMD-063: Plan Day 15
+  /gsd-plan-phase
+  Tasks: K8s manifests with HPA, Cloudflare CDN+WAF, Playwright
+  E2E tests, k6 load tests (10k connections), Prometheus+Grafana,
+  production deploy checklist.
+
+CMD-064: Execute Day 15
+  /gsd-execute-phase
+
+CMD-065: Full Security Audit
+  /gsd-secure-phase
+  Scope: Entire application — auth, API, data, infra.
+
+CMD-066: Full Code Review
+  /gsd-audit-fix
+  Scope: Autonomous find→classify→fix→test→commit pipeline.
+
+CMD-067: E2E Verification
+  /gsd-verify-work
+  UAT: All performance targets, all features, all flows.
+  Performance: <5min collaborator, <2min workspace, <50ms dash, <200ms search.
+
+CMD-068: Final Milestone Audit
+  /gsd-audit-milestone
+
+CMD-069: Extract Learnings
+  /gsd-extract_learnings
+  Scope: Full 3-week project — decisions, patterns, surprises.
+
+CMD-070: Generate Documentation
+  /gsd-docs-update
+  Deliverables: README, API docs, architecture diagram,
+  deployment guide, contributing guide.
+
+CMD-071: Project Summary
+  /gsd-milestone-summary
+
+CMD-072: Create PR Branch
+  /gsd-pr-branch
+  Purpose: Clean branch filtering out .planning/ commits.
+
+CMD-073: Ship to Production
+  /gsd-ship
+
+CMD-074: Session Report
+  /gsd-session-report
+
+══════════════════════════════════════════════════════════════════════════════
+  POST-MVP: BACKLOG & FUTURE SEEDS
+══════════════════════════════════════════════════════════════════════════════
+
+CMD-075: Capture Backlog Ideas
+  /gsd-add-backlog
+  Ideas: Mobile app, GraphQL API, advanced analytics dashboard,
+  multi-language support, API marketplace, institutional SSO.
+
+CMD-076: Plant Future Seeds
+  /gsd-plant-seed
+  Seeds: "Add GraphQL when API surface > 50 endpoints",
+  "Add mobile app when DAU > 10k", "Add ML model fine-tuning
+  when user data > 100k profiles".
+
+CMD-077: Review Backlog for Next Cycle
+  /gsd-review-backlog
+  Purpose: Prioritize post-MVP features for v2 milestone.
+
+
+================================================================================
+  SECTION THREE: RECOMMENDATIONS & ARCHITECTURAL CHANGES
+================================================================================
+
+1. KAFKA → REDIS STREAMS (CONFIRMED)
+   - Replace all "Kafka" references with Redis Streams (XADD/XREADGROUP)
+   - Use ioredis (already installed) for Streams + Pub/Sub
+   - Consumer groups via XREADGROUP for durable processing
+   - Benefits: One fewer Docker service, simpler ops, sufficient
+     throughput for research platform scale
+
+2. ADD BullMQ FOR JOB QUEUES (RECOMMENDED)
+   - Use BullMQ (Redis-backed) for background jobs:
+     batch embeddings, email sends, PDF generation
+   - Separates job queue concerns from event streaming
+   - npm install bullmq
+
+3. ADD PRISMA ORM (RECOMMENDED)
+   - Replace raw pg queries with Prisma for type safety
+   - Auto-generates TypeScript types from PostgreSQL schema
+   - Migration management built-in
+   - npm install prisma @prisma/client
+
+4. ADD ZUSTAND FOR FRONTEND STATE (RECOMMENDED)
+   - Lightweight state management for Next.js
+   - Better than Context API for complex state (auth, search, workspace)
+   - npm install zustand
+
+5. ADD ZDOG/RECHARTS FOR DATA VISUALIZATION (RECOMMENDED)
+   - TrustRank scores, collaboration graphs, search analytics
+   - npm install recharts
+
+6. ADD DOCKER HEALTH CHECKS (RECOMMENDED)
+   - Add healthcheck directives to each Docker service
+   - Proper depends_on with condition: service_healthy
+
+7. ADD OPENTELEMETRY TRACING (RECOMMENDED)
+   - Distributed tracing across Node.js ↔ FastAPI ↔ databases
+   - Critical for debugging cross-service issues
+   - npm install @opentelemetry/sdk-node
+
+8. CONVERT BACKEND TO TYPESCRIPT (OPTIONAL)
+   - Backend currently uses CommonJS JavaScript
+   - TypeScript would catch bugs earlier and improve DX
+   - Can be done incrementally with allowJs
+
+9. ADD RATE LIMITING TO ML SERVICE (RECOMMENDED)
+   - FastAPI embedding endpoint needs rate limiting
+   - Prevent abuse of expensive GPU/CPU inference
+   - Use slowapi or custom Redis-based limiter
+
+10. ADD REDIS SENTINEL FOR HA (PRODUCTION)
+    - Since Redis now handles caching + messaging + job queues,
+      it's a critical single point of failure
+    - Use Redis Sentinel or Redis Cluster in production
+
+
+================================================================================
+  TECHNOLOGY STACK (UPDATED)
+================================================================================
+
+| Layer            | Technology                              |
+|------------------|-----------------------------------------|
+| Frontend         | Next.js 16 (React 19) + Tailwind CSS 4  |
+| State Management | Zustand (recommended)                   |
+| Real-time        | Socket.IO 4.8                            |
+| API Gateway      | Node.js + Express 5                     |
+| ML Service       | Python + FastAPI                         |
+| Matching         | CF + CBF Hybrid (sentence-transformers)  |
+| Semantic Search  | Sentence-BERT (768-dim vectors)          |
+| Trust Scoring    | TrustRank (Neo4j PageRank-variant)       |
+| Primary DB       | PostgreSQL 16                            |
+| Graph DB         | Neo4j 5                                  |
+| Search Index     | Elasticsearch 8.13                       |
+| Cache            | Redis 7                                  |
+| Message Broker   | Redis Streams + Pub/Sub (NOT Kafka)      |
+| Job Queue        | BullMQ (Redis-backed) (recommended)      |
+| Infrastructure   | Docker + Kubernetes                      |
+| CDN / Security   | Cloudflare                               |
+| CI/CD            | GitHub Actions                           |
+| Monitoring       | Prometheus + Grafana                     |
+| E2E Testing      | Playwright                               |
+| Load Testing     | k6                                       |
+| ORM              | Prisma (recommended) or raw pg           |
+| CRDT / Collab    | Yjs + Tiptap                             |
+| File Storage     | S3 / MinIO (local dev)                   |
+| Tracing          | OpenTelemetry (recommended)              |
+
+
+================================================================================
+  SECTION FOUR: MONO-REPO DIRECTORY STRUCTURE
+================================================================================
+
+  SmartResearch/
+  ├── .agent/                    ← GSD agent config (skills, commands)
+  ├── .planning/                 ← GSD planning state (auto-generated)
+  ├── .todo/                     ← Project documentation
+  │   ├── project-overview.txt   ← THIS FILE (master reference)
+  │   ├── SRCP_3Week_TaskList.md
+  │   └── srcp_3week_tasklist.html
+  ├── backend/                   ← Node.js / Express API
+  │   ├── src/
+  │   │   ├── config/            ← db.js, redis.js, neo4j.js, elasticsearch.js
+  │   │   ├── controllers/       ← auth, users, community, discovery, groups,
+  │   │   │                        admin, reputation
+  │   │   ├── middleware/        ← auth.js, errorHandler.js, rateLimit.js
+  │   │   ├── routes/            ← auth, users, community, discovery, groups,
+  │   │   │                        journals, moderation, reputation
+  │   │   ├── services/          ← auth, users, community, discovery, groups,
+  │   │   │                        admin, reputation
+  │   │   ├── utils/             ← email.js, kafkaEmitter.js*, logger.js,
+  │   │   │                        responseEnvelope.js
+  │   │   ├── validations/       ← auth, community, discovery, groups, admin
+  │   │   └── index.js           ← Express app entry point
+  │   ├── scripts/               ← setup-db.js
+  │   ├── schema.sql             ← PostgreSQL DDL (14 tables)
+  │   ├── trust-graph-schema.cypher ← Neo4j constraints + indexes
+  │   ├── openapi.yaml           ← Partial OpenAPI 3.0 spec
+  │   ├── Dockerfile
+  │   ├── package.json
+  │   └── .env
+  ├── frontend/                  ← Next.js (React 19) + Tailwind CSS
+  │   ├── src/
+  │   ├── public/
+  │   ├── Dockerfile
+  │   ├── next.config.ts
+  │   ├── tsconfig.json
+  │   └── package.json
+  ├── ml-service/                ← Python FastAPI (TO BE BUILT)
+  │   └── integration_plan.md    ← Only a plan doc exists
+  ├── docker-compose.yml         ← 5 services defined (no ML service yet)
+  └── README.md
+
+  * kafkaEmitter.js → MUST be renamed to redisStreamEmitter.js (Day 4)
+
+
+================================================================================
+  SECTION FIVE: PORT MAPPING & DOCKER SERVICES
+================================================================================
+
+  | Service         | Container Name    | Host Port | Internal Port | Image                |
+  |-----------------|-------------------|-----------|---------------|----------------------|
+  | Backend API     | rb-backend        | 5000      | 5000          | Custom (Dockerfile)  |
+  | Frontend        | rb-frontend       | 3000      | 3000          | Custom (Dockerfile)  |
+  | PostgreSQL      | rb-postgres       | 5432      | 5432          | postgres:16-alpine   |
+  | Redis           | rb-redis          | 6379      | 6379          | redis:7-alpine       |
+  | Neo4j (HTTP)    | rb-neo4j          | 7474      | 7474          | neo4j:5              |
+  | Neo4j (Bolt)    | rb-neo4j          | 7687      | 7687          | neo4j:5              |
+  | Elasticsearch   | rb-elasticsearch  | 9200      | 9200          | elasticsearch:8.13.0 |
+  | ML Service      | rb-ml-service     | 8000      | 8000          | Custom (TO BE ADDED) |
+
+  MISSING FROM docker-compose.yml (add on Day 1):
+  - ML service container (Python FastAPI on port 8000)
+  - Redis volume for persistence: redis_data:/data
+  - Docker health checks for all services
+  - Elasticsearch depends_on postgres (for index pipeline)
+
+
+================================================================================
+  SECTION SIX: ENVIRONMENT VARIABLES CHECKLIST
+================================================================================
+
+  Backend (.env) — EXISTING:
+  ✔ PORT, NODE_ENV, FRONTEND_ORIGIN
+  ✔ JWT_SECRET, JWT_REFRESH_SECRET
+  ✔ DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME
+  ✔ NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD
+  ✔ ELASTICSEARCH_NODE
+  ✔ REDIS_URL
+  ✔ SMTP_HOST, SMTP_PORT, SMTP_SECURE, SMTP_USER, SMTP_PASS
+  ✔ EMAIL_FROM_NAME, EMAIL_FROM_ADDRESS
+
+  Backend (.env) — MISSING (add during build):
+  ✗ GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET    ← Day 2 (OAuth)
+  ✗ GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET    ← Day 2 (OAuth)
+  ✗ OAUTH_CALLBACK_URL                        ← Day 2 (OAuth)
+  ✗ S3_ENDPOINT, S3_BUCKET, S3_ACCESS_KEY,
+    S3_SECRET_KEY                             ← Day 3 (file upload)
+  ✗ ML_SERVICE_URL=http://ml-service:8000     ← Day 6
+  ✗ REDIS_STREAMS_GROUP=rb-consumers          ← Day 4
+  ✗ BULLMQ_QUEUE_PREFIX=rb                    ← Day 6 (if BullMQ)
+  ✗ SESSION_SECRET                            ← Day 2
+
+  Frontend (.env.local) — NEEDED:
+  ✗ NEXT_PUBLIC_API_URL=http://localhost:5000
+  ✗ NEXT_PUBLIC_WS_URL=http://localhost:5000
+  ✗ NEXT_PUBLIC_GOOGLE_CLIENT_ID
+  ✗ NEXT_PUBLIC_GITHUB_CLIENT_ID
+
+  ML Service (.env) — NEEDED:
+  ✗ MODEL_NAME=all-MiniLM-L6-v2
+  ✗ REDIS_URL=redis://redis:6379
+  ✗ ELASTICSEARCH_NODE=http://elasticsearch:9200
+  ✗ EMBEDDING_DIM=768
+  ✗ BATCH_SIZE=32
+  ✗ REDIS_STREAMS_GROUP=ml-consumers
+
+  ⚠ SECURITY: backend/.env contains real SMTP password.
+    Move to .env.example with placeholder values before Day 1.
+
+
+================================================================================
+  SECTION SEVEN: EXISTING CODE AUDIT (What's Already Built)
+================================================================================
+
+  BUILT (existing — working):
+  ✔ Express 5 server with CORS, helmet, morgan, cookie-parser
+  ✔ PostgreSQL connection pool (src/config/db.js)
+  ✔ Redis connection (src/config/redis.js) — using ioredis
+  ✔ Neo4j driver (src/config/neo4j.js)
+  ✔ Elasticsearch client (src/config/elasticsearch.js)
+  ✔ Auth: register, login (OTP-based), refresh token, verify email
+  ✔ Community: posts CRUD, comments, votes, feed
+  ✔ Discovery: search endpoint (basic)
+  ✔ Groups: create, join, manage
+  ✔ Reputation: TrustRank service (partial)
+  ✔ Admin: user management, moderation
+  ✔ Rate limiting middleware (express-rate-limit + rate-limit-redis)
+  ✔ Pino logger
+  ✔ PostgreSQL schema: 14 tables (users, invited_user_profiles,
+    invitations, groups, group_members, community_posts, comments,
+    votes, journals, saved_papers, author_follows, audit_logs,
+    content_flags + indexes)
+  ✔ Neo4j schema: Researcher, Paper, Institution, Question, Thought
+    nodes + MENTORS, SUPPORTS, AUTHORED, AFFILIATED_WITH edges
+  ✔ OpenAPI spec (partial — only /auth/register, /auth/login,
+    /community/posts)
+
+  NOT BUILT (to be created during 3-week sprint):
+  ✗ ML service (entire Python FastAPI app) — Day 6
+  ✗ Sentence-BERT embedding pipeline — Day 6
+  ✗ Hybrid matching engine (CF+CBF) — Day 7
+  ✗ TrustRank PageRank algorithm (only service shell exists) — Day 8
+  ✗ Elasticsearch kNN search — Day 9
+  ✗ Socket.IO real-time rooms — Day 10
+  ✗ Yjs CRDT collaborative editing — Day 10
+  ✗ Workspace/project/task/milestone tables — Day 10
+  ✗ Next.js frontend UI (skeleton only) — Days 11-14
+  ✗ Publication assistant (DOAJ/Scimago) — Day 14
+  ✗ Redis Streams consumers — Day 4
+  ✗ BullMQ job queues — Day 6
+  ✗ K8s manifests — Day 15
+  ✗ E2E tests (Playwright) — Day 15
+  ✗ Load tests (k6) — Day 15
+
+  ⚠ ACTION REQUIRED (Day 1/Day 4):
+  - Rename kafkaEmitter.js → redisStreamEmitter.js
+  - Replace Kafka emit logic with ioredis XADD calls
+  - Update all imports referencing kafkaEmitter
+
+
+================================================================================
+  SECTION EIGHT: REDIS STREAMS TOPIC REFERENCE
+================================================================================
+
+  | Stream Key         | Producer        | Consumer(s)          | Trigger           |
+  |--------------------|-----------------|----------------------|-------------------|
+  | profile.created    | Backend API     | ML Service, ES Worker| User registration |
+  | profile.updated    | Backend API     | ES Worker, Neo4j     | Profile save      |
+  | match.request      | Backend API     | ML Service           | User browses feed |
+  | match.completed    | ML Service      | Backend API          | Matching done     |
+  | event.behaviour    | Backend API     | ML Service           | User interaction  |
+  | paper.created      | Backend API     | ES Worker, Neo4j     | Paper upload      |
+  | embed.request      | Backend API     | ML Service           | Embedding needed  |
+  | embed.completed    | ML Service      | Backend API, ES      | Embedding done    |
+  | trust.recalculate  | Backend API     | Neo4j Worker         | Endorsement/cite  |
+  | notification.send  | Any service     | Notification Worker  | Any trigger       |
+
+  Consumer Groups:
+  - rb-consumers       (Node.js backend consumers)
+  - ml-consumers       (Python ML service consumers)
+  - es-consumers       (Elasticsearch indexing workers)
+
+  Redis Pub/Sub Channels (for real-time, non-durable):
+  - workspace:{id}     (presence, cursor, typing indicators)
+  - notification:{uid} (push notifications to connected clients)
+
+
+================================================================================
+  SECTION NINE: DATABASE SCHEMA REFERENCE
+================================================================================
+
+  PostgreSQL Tables (14 existing + 5 needed):
+
+  EXISTING:
+  1.  users              — core user accounts
+  2.  invited_user_profiles — senior researcher details
+  3.  invitations         — invite tokens
+  4.  groups              — research groups
+  5.  group_members       — group membership
+  6.  community_posts     — forum questions/thoughts
+  7.  comments            — post responses
+  8.  votes               — up/downvotes
+  9.  journals            — publication library
+  10. saved_papers        — user paper bookmarks
+  11. author_follows      — followed authors
+  12. audit_logs          — admin action log
+  13. content_flags       — moderation queue
+
+  NEEDED (add during sprint):
+  14. workspaces          — collaboration projects (Day 10)
+  15. workspace_members   — project membership + roles (Day 10)
+  16. tasks               — kanban items within workspace (Day 10)
+  17. milestones          — project milestones with state machine (Day 10)
+  18. document_versions   — Yjs doc snapshots (Day 10)
+  19. notifications       — notification store (Day 13)
+  20. user_skills         — normalized skills table (Day 3)
+  21. user_domains        — normalized domains table (Day 3)
+
+  Neo4j Node Types:
+  - :Researcher (userId, name, role, impactScore)
+  - :Paper (doi, title, publicationYear)
+  - :Institution (name, geography)
+  - :Question (postId) — from community
+  - :Thought (postId) — from community
+  - :Topic (name) — TO ADD (Day 4)
+  - :Workspace (workspaceId) — TO ADD (Day 10)
+
+  Neo4j Relationships:
+  - [:MENTORS] — supervisor→student
+  - [:SUPPORTS] — engagement-based trust
+  - [:AUTHORED] — researcher→paper
+  - [:AFFILIATED_WITH] — researcher→institution
+  - [:INTERESTED_IN] — researcher→topic (TO ADD Day 4)
+  - [:COLLABORATES_WITH] — researcher→researcher (TO ADD Day 10)
+  - [:MEMBER_OF] — researcher→workspace (TO ADD Day 10)
+
+
+================================================================================
+  SECTION TEN: API ENDPOINT INVENTORY
+================================================================================
+
+  EXISTING ROUTES (from backend/src/routes/):
+
+  Auth (/api/v1/auth):
+  - POST   /register        — create account
+  - POST   /login           — OTP step 1
+  - POST   /verify-otp      — OTP step 2
+  - POST   /refresh-token   — rotate tokens
+  - POST   /logout          — invalidate session
+  - GET    /verify-email/:token
+
+  Users (/api/v1/users):
+  - GET    /profile         — get own profile
+  - PUT    /profile         — update profile
+  - GET    /:id             — get user by ID
+
+  Community (/api/v1/community):
+  - GET    /posts           — feed with ranking
+  - POST   /posts           — create post
+  - GET    /posts/:id       — single post
+  - POST   /posts/:id/vote  — upvote/downvote
+  - POST   /posts/:id/comments — add comment
+
+  Discovery (/api/v1/discovery):
+  - GET    /search          — basic search
+  - GET    /recommendations — (TO BE BUILT Day 7)
+
+  Groups (/api/v1/groups):
+  - POST   /                — create group
+  - GET    /                — list groups
+  - POST   /:id/join        — join group
+  - DELETE /:id/leave       — leave group
+
+  Journals (/api/v1/journals):
+  - GET    /                — list journals
+  - GET    /search          — search journals
+
+  Admin (/api/v1/admin):
+  - GET    /users           — list all users
+  - PUT    /users/:id/role  — change role
+  - DELETE /users/:id       — delete user
+
+  Moderation (/api/v1/moderation):
+  - GET    /flags           — pending flags
+  - PUT    /flags/:id       — resolve flag
+
+  Reputation (/api/v1/reputation):
+  - GET    /:id/score       — get trust score
+
+  TO BE ADDED:
+  - POST   /api/v1/auth/oauth/google      ← Day 2
+  - POST   /api/v1/auth/oauth/github      ← Day 2
+  - POST   /api/v1/embed                  ← Day 6 (ML proxy)
+  - GET    /api/v1/match/:userId           ← Day 7
+  - GET    /api/v1/search/semantic         ← Day 9 (kNN)
+  - POST   /api/v1/workspaces             ← Day 10
+  - GET    /api/v1/workspaces/:id          ← Day 10
+  - POST   /api/v1/workspaces/:id/tasks    ← Day 10
+  - PUT    /api/v1/workspaces/:id/tasks/:tid ← Day 10
+  - GET    /api/v1/publications/recommend  ← Day 14
+  - GET    /api/v1/health                  ← Day 5 (all services)
+
+
+================================================================================
+  SECTION ELEVEN: DATA FLOW DIAGRAMS (TEXT)
+================================================================================
+
+  Flow 1: User Registration → Multi-DB Sync
+  ┌─────────┐    ┌──────────┐    ┌───────────────┐
+  │ Frontend │───▶│ Express  │───▶│ PostgreSQL    │ (INSERT user)
+  └─────────┘    │ API      │    └───────────────┘
+                 │          │───▶ Redis Stream: profile.created
+                 └──────────┘            │
+                      ┌──────────────────┼──────────────────┐
+                      ▼                  ▼                  ▼
+               ┌──────────┐      ┌──────────┐      ┌──────────┐
+               │ Neo4j    │      │ ES Index │      │ ML Embed │
+               │ Worker   │      │ Worker   │      │ Service  │
+               └──────────┘      └──────────┘      └──────────┘
+               (create node)     (index profile)   (embed vector)
+
+  Flow 2: Search Request
+  Frontend → Express → Elasticsearch (BM25 + kNN) → ranked results → Frontend
+
+  Flow 3: Matching Request
+  Frontend → Express → Redis Stream: match.request
+  ML Service (consumer) → CBF cosine + CF matrix → Redis Stream: match.completed
+  Express (consumer) → cache in Redis → return to Frontend
+
+  Flow 4: Real-time Collaboration
+  Frontend ←Socket.IO→ Express ←Yjs→ CRDT state
+  Presence → Redis Pub/Sub channel: workspace:{id}
+
+
+================================================================================
+  SECTION TWELVE: DEPENDENCY INSTALL COMMANDS
+================================================================================
+
+  Backend (Node.js) — EXISTING deps in package.json:
+  express, cors, helmet, morgan, cookie-parser, dotenv, jsonwebtoken,
+  bcryptjs, joi, celebrate, ioredis, pg, neo4j-driver,
+  @elastic/elasticsearch, express-rate-limit, rate-limit-redis,
+  socket.io, pino, pino-pretty, nodemailer
+
+  Backend — TO INSTALL (during sprint):
+  npm install bullmq              # Day 4 (job queues)
+  npm install multer              # Day 3 (file upload)
+  npm install passport passport-google-oauth20 passport-github2
+                                  # Day 2 (OAuth)
+  npm install yjs y-protocols     # Day 10 (CRDT)
+  npm install uuid                # Day 3 (file naming)
+  npm install prisma @prisma/client  # Day 1 (if using Prisma)
+  npm install --save-dev jest supertest  # Day 2 (testing)
+  npm install --save-dev @playwright/test  # Day 15 (E2E)
+
+  Frontend (Next.js) — TO INSTALL:
+  npm install zustand             # state management
+  npm install socket.io-client    # real-time
+  npm install @tiptap/react @tiptap/starter-kit  # rich text editor
+  npm install yjs y-webrtc        # CRDT collaboration
+  npm install recharts            # data visualization
+  npm install react-beautiful-dnd # kanban drag-drop
+  npm install date-fns            # date formatting
+
+  ML Service (Python) — TO INSTALL:
+  pip install fastapi uvicorn     # web framework
+  pip install sentence-transformers  # BERT embeddings
+  pip install redis               # Redis client
+  pip install elasticsearch       # ES client
+  pip install numpy scipy         # math/similarity
+  pip install slowapi             # rate limiting
+  pip install pydantic            # data validation
+
+
+================================================================================
+  SECTION THIRTEEN: GIT BRANCHING & WORKFLOW
+================================================================================
+
+  Branch Strategy:
+  - main            — production-ready code
+  - develop         — integration branch
+  - feature/day-XX  — one branch per day (e.g., feature/day-01)
+  - hotfix/XXX      — emergency fixes
+
+  Commit Convention:
+  - feat(day-01): add Docker Compose with all services
+  - fix(day-02): resolve token rotation race condition
+  - refactor(day-04): rename kafkaEmitter to redisStreamEmitter
+  - test(day-02): add auth flow integration tests
+  - docs(day-15): update API documentation
+
+  PR Flow:
+  1. Create feature/day-XX from develop
+  2. Execute GSD commands for that day
+  3. /gsd-code-review → fix issues
+  4. Merge to develop via PR
+  5. End of week: develop → main (after /gsd-audit-milestone)
+
+
+================================================================================
+  SECTION FOURTEEN: TESTING STRATEGY
+================================================================================
+
+  | Layer          | Tool        | When          | Coverage Target |
+  |----------------|-------------|---------------|-----------------|
+  | Unit Tests     | Jest        | After each day| Services, utils |
+  | API Tests      | Supertest   | After each day| All endpoints   |
+  | E2E Tests      | Playwright  | Day 15        | Critical flows  |
+  | Load Tests     | k6          | Day 15        | 10k connections |
+  | Security Tests | /gsd-secure | Day 2, 15     | Auth, API, data |
+  | UI Tests       | /gsd-ui-rev | Days 11-14    | 6-pillar audit  |
+  | ML Tests       | pytest      | Days 6-8      | Model accuracy  |
+
+  Critical Test Scenarios:
+  1. Auth: register → verify email → login → refresh → logout
+  2. Profile: create → update → search → find in ES
+  3. Matching: cold-start user → CBF fallback → cache hit
+  4. Search: keyword → semantic → hybrid → <200ms
+  5. Workspace: create → invite → task → milestone state machine
+  6. Real-time: 2 users → doc edit → presence → sync
+  7. Forum: post → vote → TrustRank recalculate → feed order
+
+
+================================================================================
+  SECTION FIFTEEN: PRE-FLIGHT CHECKLIST (Before Each Day)
+================================================================================
+
+  □ Docker services running: docker compose up -d
+  □ All health checks green: curl localhost:5000/api/v1/health
+  □ Resume context: /gsd-resume-work
+  □ Check progress: /gsd-progress
+  □ Review pending todos: /gsd-check-todos
+  □ Verify git branch: git checkout develop && git pull
+
+  End-of-Day:
+  □ Run code review: /gsd-code-review
+  □ Commit all changes with conventional commit message
+  □ Pause context: /gsd-pause-work
+  □ Push to remote: git push origin feature/day-XX
+
+
+================================================================================
+  SECTION SIXTEEN: PERFORMANCE TARGETS REFERENCE
+================================================================================
+
+  | Metric                    | Target                         | How to Verify          |
+  |---------------------------|--------------------------------|------------------------|
+  | Find a collaborator       | < 5 minutes                    | User flow test         |
+  | Set up shared workspace   | < 2 minutes                    | User flow test         |
+  | Find right journal        | < 10 minutes                   | User flow test         |
+  | Dashboard load time       | < 50ms (Redis pre-cached)      | k6 benchmark           |
+  | Semantic search response  | < 200ms (ES kNN index)         | k6 + Playwright timer  |
+  | API response (95th pct)   | < 100ms                        | k6 benchmark           |
+  | WebSocket latency         | < 50ms (same region)           | Socket.IO ping test    |
+  | Embedding generation      | < 500ms per profile            | ML service benchmark   |
+  | Cold-start matching       | CBF only, < 3 seconds          | API test               |
+  | Scale target              | Horizontal K8s to 1M users     | HPA config validation  |
+
+
+================================================================================
+  ResearchBridge · Mostofa Aminur Rashid · 2026
+================================================================================

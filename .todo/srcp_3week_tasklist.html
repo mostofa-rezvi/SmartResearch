@@ -1,0 +1,304 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans)}
+.wrap{padding:1.5rem 0}
+.week-header{display:flex;align-items:center;gap:12px;margin-bottom:1rem;cursor:pointer;user-select:none}
+.week-badge{font-size:12px;font-weight:500;padding:4px 12px;border-radius:var(--border-radius-md)}
+.w1 .week-badge{background:#EEEDFE;color:#3C3489}
+.w2 .week-badge{background:#E1F5EE;color:#085041}
+.w3 .week-badge{background:#FAEEDA;color:#633806}
+.week-title{font-size:16px;font-weight:500;color:var(--color-text-primary)}
+.week-sub{font-size:13px;color:var(--color-text-secondary);margin-left:auto}
+.chevron{font-size:12px;color:var(--color-text-secondary);transition:transform .2s}
+.chevron.open{transform:rotate(90deg)}
+.day-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-bottom:1.5rem}
+.day-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:14px}
+.day-label{font-size:11px;font-weight:500;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px}
+.task{display:flex;align-items:flex-start;gap:8px;margin-bottom:7px;cursor:pointer}
+.task:last-child{margin-bottom:0}
+.cb{width:15px;height:15px;border:0.5px solid var(--color-border-secondary);border-radius:3px;flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;transition:background .15s}
+.cb.done{background:#1D9E75;border-color:#1D9E75}
+.cb.done::after{content:'';display:block;width:8px;height:4px;border-left:1.5px solid #fff;border-bottom:1.5px solid #fff;transform:rotate(-45deg) translateY(-1px)}
+.task-text{font-size:13px;color:var(--color-text-primary);line-height:1.45}
+.task-text.done{color:var(--color-text-secondary);text-decoration:line-through}
+.tag{display:inline-block;font-size:10px;font-weight:500;padding:2px 7px;border-radius:20px;margin-left:4px;vertical-align:middle}
+.tag-ml{background:#EEEDFE;color:#534AB7}
+.tag-be{background:#E6F1FB;color:#185FA5}
+.tag-fe{background:#EAF3DE;color:#3B6D11}
+.tag-db{background:#FAEEDA;color:#854F0B}
+.tag-ops{background:#FAECE7;color:#993C1D}
+.tag-int{background:#FBEAF0;color:#993556}
+.progress-bar{height:4px;background:var(--color-background-secondary);border-radius:2px;margin-bottom:1.5rem;overflow:hidden}
+.progress-fill{height:100%;border-radius:2px;transition:width .3s}
+.w1 .progress-fill{background:#7F77DD}
+.w2 .progress-fill{background:#1D9E75}
+.w3 .progress-fill{background:#EF9F27}
+.week-block{margin-bottom:1.5rem;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden}
+.week-head-row{padding:14px 16px;background:var(--color-background-secondary);display:flex;align-items:center;gap:12px;cursor:pointer}
+.week-body{padding:14px 16px;display:none}
+.week-body.open{display:block}
+.stats-row{display:flex;gap:10px;margin-bottom:1.5rem;flex-wrap:wrap}
+.stat{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:10px 14px;flex:1;min-width:100px}
+.stat-n{font-size:22px;font-weight:500;color:var(--color-text-primary)}
+.stat-l{font-size:12px;color:var(--color-text-secondary);margin-top:2px}
+.milestone{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--color-background-secondary);border-radius:var(--border-radius-md);margin-bottom:6px;font-size:13px;color:var(--color-text-primary)}
+.ms-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.filter-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1.25rem}
+.filter-btn{font-size:12px;padding:4px 12px;border-radius:20px;border:0.5px solid var(--color-border-secondary);background:transparent;color:var(--color-text-secondary);cursor:pointer}
+.filter-btn.active{background:var(--color-text-primary);color:var(--color-background-primary);border-color:var(--color-text-primary)}
+</style>
+
+<div class="wrap">
+<h2 class="sr-only">ResearchBridge 3-week production task list with daily breakdown</h2>
+
+<div class="stats-row" id="statsRow">
+  <div class="stat"><div class="stat-n" id="s-total">63</div><div class="stat-l">Total tasks</div></div>
+  <div class="stat"><div class="stat-n" id="s-done">0</div><div class="stat-l">Completed</div></div>
+  <div class="stat"><div class="stat-n" id="s-pct">0%</div><div class="stat-l">Progress</div></div>
+  <div class="stat"><div class="stat-n">3</div><div class="stat-l">Weeks / 15 days</div></div>
+</div>
+
+<div class="filter-row">
+  <button class="filter-btn active" onclick="setFilter('all')">All</button>
+  <button class="filter-btn" onclick="setFilter('be')">Backend</button>
+  <button class="filter-btn" onclick="setFilter('ml')">ML / AI</button>
+  <button class="filter-btn" onclick="setFilter('fe')">Frontend</button>
+  <button class="filter-btn" onclick="setFilter('db')">Database</button>
+  <button class="filter-btn" onclick="setFilter('ops')">DevOps</button>
+  <button class="filter-btn" onclick="setFilter('int')">Integration</button>
+</div>
+
+<div id="weeks"></div>
+</div>
+
+<script>
+const data = [
+  {
+    week:1,label:"Week 1",title:"Infrastructure, Auth & Core Backend",color:"#7F77DD",
+    days:[
+      {day:"Day 1",label:"Project scaffold & infra",tasks:[
+        {t:"Mono-repo setup: Next.js, Node/Express, Python FastAPI",tags:["ops"]},
+        {t:"Docker Compose: all services wired (Postgres, Redis, Neo4j, ES)",tags:["ops","db"]},
+        {t:"Environment config, secrets management (.env + Vault pattern)",tags:["ops"]},
+        {t:"GitHub Actions CI pipeline skeleton",tags:["ops"]},
+      ]},
+      {day:"Day 2",label:"Auth system",tasks:[
+        {t:"JWT + OAuth 2.0 (Google, GitHub) — Node/Express",tags:["be"]},
+        {t:"Refresh token rotation, blacklist in Redis",tags:["be","db"]},
+        {t:"Rate limiting middleware (express-rate-limit)",tags:["be"]},
+        {t:"Password hashing (bcrypt), email verification flow",tags:["be"]},
+      ]},
+      {day:"Day 3",label:"User profile & PostgreSQL schema",tasks:[
+        {t:"PostgreSQL schema: users, skills, domains, institutions, goals",tags:["db"]},
+        {t:"Profile CRUD API endpoints with validation (Zod/Joi)",tags:["be"]},
+        {t:"File upload (avatar) — S3-compatible (MinIO local, S3 prod)",tags:["be","ops"]},
+        {t:"Profile completeness scoring logic",tags:["be"]},
+      ]},
+      {day:"Day 4",label:"Neo4j graph + Redis Streams bootstrap",tasks:[
+        {t:"Neo4j schema: Researcher → Paper → Topic → Institution nodes",tags:["db"]},
+        {t:"Node creation on user registration (graph sync)",tags:["db","be"]},
+        {t:"Redis Streams topics defined: profile.created, match.request, event.behaviour",tags:["ops"]},
+        {t:"Redis Streams producer in Node.js API (ioredis XADD)",tags:["be"]},
+      ]},
+      {day:"Day 5",label:"Elasticsearch setup & indexing",tasks:[
+        {t:"ES index mappings: users, papers, projects with dense_vector field",tags:["db"]},
+        {t:"Index pipeline: on profile save → push to ES via Redis Streams consumer",tags:["be","db"]},
+        {t:"Basic keyword search endpoint (BM25)",tags:["be"]},
+        {t:"Health-check endpoints across all services",tags:["ops"]},
+      ]},
+    ],
+    milestones:["All services running in Docker","Auth fully functional","User profile stored in Postgres + Neo4j + ES"]
+  },
+  {
+    week:2,label:"Week 2",title:"AI Matching Engine, Search & Collaboration Core",color:"#1D9E75",
+    days:[
+      {day:"Day 6",label:"Sentence-BERT embedding service",tasks:[
+        {t:"Python FastAPI service: /embed endpoint (sentence-transformers)",tags:["ml","be"]},
+        {t:"Profile text → 768-dim dense vector, stored in ES + Redis cache",tags:["ml","db"]},
+        {t:"Batch embedding job for existing profiles",tags:["ml"]},
+        {t:"Redis Streams consumer: on profile.created → trigger embedding",tags:["ml","be"]},
+      ]},
+      {day:"Day 7",label:"CF + CBF hybrid matching engine",tasks:[
+        {t:"Content-Based Filtering: cosine similarity on BERT vectors",tags:["ml"]},
+        {t:"Collaborative Filtering: user–user matrix from behaviour signals",tags:["ml"]},
+        {t:"Hybrid scorer: weighted blend CBF + CF (cold-start graceful degradation)",tags:["ml"]},
+        {t:"Top-N results cached to Redis per user (TTL 1hr)",tags:["ml","db"]},
+      ]},
+      {day:"Day 8",label:"TrustRank & graph traversal",tasks:[
+        {t:"PageRank-variant on Neo4j: credibility flows from verified profiles",tags:["ml","db"]},
+        {t:"Endorsement + citation edges written to graph",tags:["db"]},
+        {t:"2nd-degree collaborator traversal query",tags:["db"]},
+        {t:"Institutional badge auto-assignment logic",tags:["be","ml"]},
+      ]},
+      {day:"Day 9",label:"Semantic search + kNN",tasks:[
+        {t:"ES kNN search on dense_vector field (people, papers, projects)",tags:["db","be"]},
+        {t:"Unified search endpoint: BM25 + kNN hybrid with RRF fusion",tags:["be"]},
+        {t:"Search filters: domain, skill, institution, availability",tags:["be"]},
+        {t:"Search response < 200ms target — benchmark + tune",tags:["be","ops"]},
+      ]},
+      {day:"Day 10",label:"Collaboration workspace backend",tasks:[
+        {t:"PostgreSQL schema: projects, tasks, milestones, members, versions",tags:["db"]},
+        {t:"Workspace CRUD API: create project, invite members, assign tasks",tags:["be"]},
+        {t:"Milestone tracker: status state machine (todo→in-progress→done)",tags:["be"]},
+        {t:"Socket.IO server: rooms per workspace, presence events",tags:["be"]},
+        {t:"Real-time collaborative doc: OT/CRDT-based text sync (Yjs backend adapter)",tags:["be"]},
+      ]},
+    ],
+    milestones:["Matching engine returning scored results","TrustRank live on graph","Semantic search < 200ms","Workspace CRUD + real-time sockets functional"]
+  },
+  {
+    week:3,label:"Week 3",title:"Frontend, Publication Assistant & Production Hardening",color:"#EF9F27",
+    days:[
+      {day:"Day 11",label:"Next.js frontend — auth & profile",tasks:[
+        {t:"Next.js app router scaffold, Tailwind CSS config, layout shell",tags:["fe"]},
+        {t:"Auth pages: sign-up, login, OAuth callback, email verify",tags:["fe"]},
+        {t:"Profile builder UI: skills tags, domain multi-select, bio, paper upload",tags:["fe"]},
+        {t:"SSR for profile pages (SEO-indexable researcher pages)",tags:["fe"]},
+      ]},
+      {day:"Day 12",label:"Discovery & matching dashboard",tasks:[
+        {t:"Recommendation feed UI: collaborator cards, similarity score badges",tags:["fe"]},
+        {t:"Unified search bar with live suggestions (debounced ES calls)",tags:["fe"]},
+        {t:"Researcher profile page: papers, trust score, shared interests",tags:["fe"]},
+        {t:"Filter sidebar: domain, skill, institution, TrustRank tier",tags:["fe"]},
+      ]},
+      {day:"Day 13",label:"Collaboration workspace UI",tasks:[
+        {t:"Workspace dashboard: task board (kanban), milestone timeline",tags:["fe"]},
+        {t:"Real-time collaborative doc editor (Yjs + Tiptap rich text)",tags:["fe","int"]},
+        {t:"Member presence indicators, live cursor via Socket.IO",tags:["fe","int"]},
+        {t:"Notifications panel: invites, task updates, mentions",tags:["fe"]},
+      ]},
+      {day:"Day 14",label:"Publication Assistant + Forum",tasks:[
+        {t:"DOAJ + Scimago API integration: journal recommender by topic/domain",tags:["be","int"]},
+        {t:"Publication checklist + paper templates (downloadable)",tags:["fe","be"]},
+        {t:"Forum: threaded posts, upvotes, TrustRank-weighted feed",tags:["fe","be"]},
+        {t:"Forum moderation: spam filter using TrustRank threshold gating",tags:["be","ml"]},
+        {t:"Verified institutional badge display across forum + profiles",tags:["fe","be"]},
+      ]},
+      {day:"Day 15",label:"Production hardening & deployment",tasks:[
+        {t:"Kubernetes manifests: per-service Deployments, HPA autoscale for ML pods",tags:["ops"]},
+        {t:"Cloudflare CDN + DDoS rules, WAF config",tags:["ops"]},
+        {t:"Full E2E test suite (Playwright) covering critical flows",tags:["ops","int"]},
+        {t:"Load test: 10k concurrent connections benchmark (k6)",tags:["ops"]},
+        {t:"Monitoring: Prometheus + Grafana dashboards, alerting rules",tags:["ops"]},
+        {t:"Production deploy checklist: secrets, DB migrations, smoke tests",tags:["ops"]},
+      ]},
+    ],
+    milestones:["Full Next.js UI deployed","Publication Assistant live","Forum with TrustRank feed","K8s prod cluster running","All performance targets validated"]
+  }
+];
+
+let filter = 'all';
+let checked = {};
+
+function setFilter(f){
+  filter=f;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  event.target.classList.add('active');
+  render();
+}
+
+function toggleTask(wk,di,ti){
+  const k=`${wk}-${di}-${ti}`;
+  checked[k]=!checked[k];
+  updateStats();
+  const cb=document.getElementById('cb-'+k);
+  const tx=document.getElementById('tx-'+k);
+  if(cb)cb.classList.toggle('done',checked[k]);
+  if(tx)tx.classList.toggle('done',checked[k]);
+}
+
+function totalTasks(){
+  let n=0;
+  data.forEach(w=>w.days.forEach(d=>d.tasks.forEach(t=>{
+    if(filter==='all'||t.tags.includes(filter))n++;
+  })));
+  return n;
+}
+
+function doneTasks(){
+  let n=0;
+  data.forEach((w,wi)=>w.days.forEach((d,di)=>d.tasks.forEach((t,ti)=>{
+    if((filter==='all'||t.tags.includes(filter))&&checked[`${wi}-${di}-${ti}`])n++;
+  })));
+  return n;
+}
+
+function updateStats(){
+  const tot=totalTasks(),done=doneTasks();
+  document.getElementById('s-total').textContent=tot;
+  document.getElementById('s-done').textContent=done;
+  document.getElementById('s-pct').textContent=tot?Math.round(done/tot*100)+'%':'0%';
+  data.forEach((w,wi)=>{
+    const bar=document.getElementById('prog-'+wi);
+    if(!bar)return;
+    let wt=0,wd=0;
+    w.days.forEach((d,di)=>d.tasks.forEach((t,ti)=>{
+      if(filter==='all'||t.tags.includes(filter)){wt++;if(checked[`${wi}-${di}-${ti}`])wd++;}
+    }));
+    bar.style.width=(wt?Math.round(wd/wt*100):0)+'%';
+  });
+}
+
+function tagHtml(tags){
+  return tags.map(tg=>`<span class="tag tag-${tg}">${{be:'Backend',ml:'ML/AI',fe:'Frontend',db:'Database',ops:'DevOps',int:'Integration'}[tg]}</span>`).join('');
+}
+
+function render(){
+  const cont=document.getElementById('weeks');
+  cont.innerHTML='';
+  data.forEach((w,wi)=>{
+    let allTasks=[];
+    w.days.forEach((d,di)=>d.tasks.forEach((t,ti)=>{if(filter==='all'||t.tags.includes(filter))allTasks.push({t,di,ti});}));
+    if(allTasks.length===0)return;
+    const cls=['w1','w2','w3'][wi];
+    const div=document.createElement('div');
+    div.className=`week-block ${cls}`;
+    div.innerHTML=`
+      <div class="week-head-row" onclick="toggleWeek(${wi})">
+        <span class="week-badge">${w.label}</span>
+        <span class="week-title">${w.title}</span>
+        <span class="week-sub" id="wsub-${wi}"></span>
+        <span class="chevron open" id="chev-${wi}">▶</span>
+      </div>
+      <div class="progress-bar" style="margin:0 16px 0;border-radius:0"><div class="progress-fill" id="prog-${wi}" style="width:0%"></div></div>
+      <div class="week-body open" id="wbody-${wi}">
+        <div style="margin-top:12px"></div>
+        ${w.days.map((d,di)=>{
+          const vis=d.tasks.filter(t=>filter==='all'||t.tags.includes(filter));
+          if(!vis.length)return '';
+          return `<div style="margin-bottom:14px">
+            <div style="font-size:11px;font-weight:500;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">${d.day} — ${d.label}</div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:6px">
+              ${vis.map(t=>{
+                const k=`${wi}-${di}-${t.ti!==undefined?t.ti:d.tasks.indexOf(t)}`;
+                const idx=d.tasks.indexOf(t.t!==undefined?t:d.tasks[t.ti]);
+                const realKey=`${wi}-${di}-${d.tasks.indexOf(t)}`;
+                return `<div class="task" onclick="toggleTask(${wi},${di},${d.tasks.indexOf(t)})">
+                  <div class="cb ${checked[realKey]?'done':''}" id="cb-${realKey}"></div>
+                  <span class="task-text ${checked[realKey]?'done':''}" id="tx-${realKey}">${t.t}${tagHtml(t.tags)}</span>
+                </div>`;
+              }).join('')}
+            </div>
+          </div>`;
+        }).join('')}
+        <div style="border-top:0.5px solid var(--color-border-tertiary);padding-top:10px;margin-top:4px">
+          <div style="font-size:11px;font-weight:500;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Week milestones</div>
+          ${w.milestones.map(m=>`<div class="milestone"><div class="ms-dot" style="background:${w.color}"></div>${m}</div>`).join('')}
+        </div>
+      </div>
+    `;
+    cont.appendChild(div);
+  });
+  updateStats();
+}
+
+function toggleWeek(wi){
+  const body=document.getElementById('wbody-'+wi);
+  const chev=document.getElementById('chev-'+wi);
+  const open=body.classList.toggle('open');
+  chev.classList.toggle('open',open);
+}
+
+render();
+</script>

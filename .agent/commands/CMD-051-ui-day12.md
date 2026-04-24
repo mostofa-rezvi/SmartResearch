@@ -1,0 +1,28 @@
+# CMD-051: UI Design Phase
+
+**Phase:** Week 3 / Day 12 — Discovery & Matching Dashboard
+**Skill:** `/gsd-ui-phase`
+
+## Command
+
+```bash
+/gsd-ui-phase
+```
+
+## Scope
+ Recommendation feed, search bar, researcher profiles,
+  filter sidebar.
+
+
+## Tech Stack Tasks (Day 12: Discovery & matching dashboard)
+
+- [ ] Recommendation feed UI: collaborator cards, similarity score badges *(Tags: fe)*
+- [ ] Unified search bar with live suggestions (debounced ES calls) *(Tags: fe)*
+- [ ] Researcher profile page: papers, trust score, shared interests *(Tags: fe)*
+- [ ] Filter sidebar: domain, skill, institution, TrustRank tier *(Tags: fe)*
+
+## Specifications
+
+- **Framework**: Standardized stack (Next.js/Zustand frontend, Node/Express/PostgreSQL backend, Python FastAPI ML service, Redis Streams).
+- **Execution**: Autonomous command execution through GSD framework.
+- **Validation**: Strict adherence to UAT and technical criteria.

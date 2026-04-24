@@ -37,17 +37,17 @@
 
 ---
 
-## ADR-004: Event-Driven Cross-Module Kafka Integration
+## ADR-004: Event-Driven Cross-Module Integration
 
 **Date**: 2026-04-19  
-**Status**: Partially Accepted (Mock)  
-**Context**: The architect rule states "prefer Kafka events for cross-module actions." Three critical cross-domain events were identified:
+**Status**: ~~Partially Accepted~~ → **SUPERSEDED by ADR-006**  
+**Context**: The architect rule states "prefer event-driven events for cross-module actions." Three critical cross-domain events were identified:
 1. `community.post.created` → triggers TrustScore engine update
 2. `library.paper.saved` → triggers ML recommendation model update  
 3. `community.group.joined` → triggers social graph update in Neo4j
 
-**Decision**: Emit events at these action points using a `kafkaEmitter` utility. Currently mock (`console.log`) — ready for drop-in Kafka client replacement.  
-**Consequences**: Every key action that affects the Trust Score or Recommendation Engine now emits a typed event. Real Kafka producer (`kafkajs`) is the next infrastructure step.
+**Decision**: Emit events at these action points using a `kafkaEmitter` utility. Currently mock (`console.log`) — see ADR-006 for the production implementation.  
+**Consequences**: Every key action that affects the Trust Score or Recommendation Engine now emits a typed event. See ADR-006 for the Redis Streams replacement.
 
 ---
 
@@ -58,3 +58,17 @@
 **Context**: API responses were inconsistent — some returned bare objects, some returned `{ message }`, some returned arrays directly. This makes frontend pagination, caching, and error handling brittle.  
 **Decision**: All API responses use `{ success: bool, data: any, meta?: {} }` via the `responseEnvelope.js` utility.  
 **Consequences**: Frontend must unwrap `response.data` instead of using the raw response directly. Admin dashboard updated to handle both envelope and legacy formats during transition.
+
+---
+
+## ADR-006: Kafka → Redis Streams Migration
+
+**Date**: 2026-04-24  
+**Status**: Accepted  
+**Context**: ADR-004 proposed Kafka for event-driven messaging. However, Kafka adds significant operational complexity (ZooKeeper, brokers, partition management) for a research platform that doesn't need millions of messages/sec throughput. Redis is already deployed for caching, rate limiting, and OTP sessions.  
+**Decision**: Replace all Kafka references with Redis Streams (XADD/XREADGROUP) for durable event logs and Redis Pub/Sub for real-time non-durable events.
+- Rename `kafkaEmitter.js` → `redisStreamEmitter.js`
+- Use `ioredis` (already installed) for both Streams and Pub/Sub
+- Consumer groups via XREADGROUP for durable processing
+- 10 stream topics defined (see project-overview.txt Section Eight)
+**Consequences**: One fewer Docker service. Simpler ops. Sufficient throughput for research platform scale. All imports referencing `kafkaEmitter` must be updated.
