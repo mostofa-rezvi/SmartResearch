@@ -7,8 +7,8 @@
 | # | Phase | Goal | Requirements | Success Criteria |
 |---|-------|------|--------------|------------------|
 | 1 | Infrastructure & ML Wiring | Secure and orchestrate all services | INFRA-01, INFRA-02, INFRA-04 | 2 |
-| 2 | Redis Streams Event Bus | Establish reliable cross-DB sync | BUS-01, BUS-02, INFRA-03 | 2 |
-| 3 | Auth Expansion & Sync | Enhance profiles and trigger events | AUTH-01, AUTH-02, AUTH-03, BUS-03 | 3 |
+| 2 | Auth System & Token Mgmt | JWT, OAuth 2.0, and Redis blacklisting | AUTH-01, AUTH-02, AUTH-03, INFRA-03 | 2 |
+| 3 | Redis Streams Event Bus | Establish reliable cross-DB sync | BUS-01, BUS-02, BUS-03 | 3 |
 | 4 | Knowledge Graph & Search | Implement Neo4j and Elasticsearch | DATA-01, DATA-02, DATA-03, DATA-04 | 3 |
 
 ---

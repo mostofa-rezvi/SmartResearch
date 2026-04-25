@@ -3,11 +3,13 @@ CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
-    password VARCHAR(255) NOT NULL,
-    role VARCHAR(20) NOT NULL CHECK (role IN ('super_admin', 'admin', 'user', 'invited_user')),
+    password VARCHAR(255),
+    provider VARCHAR(50) DEFAULT 'local',
+    provider_id VARCHAR(255),
+    role VARCHAR(20) DEFAULT 'user' CHECK (role IN ('super_admin', 'admin', 'user', 'invited_user')),
     researcher_type VARCHAR(20) CHECK (researcher_type IN ('new_researcher', 'amateur_researcher')),
-    status VARCHAR(50) NOT NULL, -- Keep status for active/inactive/suspended
-    institution VARCHAR(255) NOT NULL,
+    status VARCHAR(50) DEFAULT 'active', -- Keep status for active/inactive/suspended
+    institution VARCHAR(255),
     onboarding_completed BOOLEAN DEFAULT FALSE,
     research_interests JSONB DEFAULT '[]',
     is_verified BOOLEAN DEFAULT FALSE,

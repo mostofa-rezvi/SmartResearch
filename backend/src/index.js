@@ -44,6 +44,11 @@ app.use(cookieParser());
 app.use(morgan('dev'));
 app.use(express.json());
 
+// Initialize Passport
+require('./config/passport');
+const passport = require('passport');
+app.use(passport.initialize());
+
 // Global Rate Limiting
 app.use('/api', apiLimiter);
 

@@ -3,3 +3,10 @@
 - CMD-003: week 01 milestone.
 - CMD-004: discuss day 01.
 - CMD-005: plan day 01.
+- CMD-006: execute day 01.
+- CMD-007: review day 01.
+- CMD-008: discuss day 02.
+- CMD-009: plan day 02.
+- CMD-010: execute day 02.
+- CMD-011: secure day 02.
+- CMD-012: test day 02.

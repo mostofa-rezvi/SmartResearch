@@ -5,14 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-04-25)
 
 **Core value**: Empowering research collaboration through a verifiable trust graph, advanced semantic discovery, and real-time event-driven synchronization.
-**Current focus**: Phase 2 — Redis Streams Event Bus
 
-## Current Position
+## Current Status
+- **Current Phase**: Phase 3 — Redis Streams Event Bus
+- **Overall Progress**: 50% (2/4 Phases Complete)
 
-Phase: 1 — Infrastructure & ML Wiring (Complete)
-Plan: 01-PLAN.md (Complete)
-Status: Infrastructure orchestrated, ML service wired, environment validated.
-Last activity: 2026-04-25 — Phase 1 verification complete (structural).
+## Phase Progress
+- [x] Phase 1: Infrastructure & ML Wiring (Complete)
+- [x] Phase 2: Auth System & Token Mgmt (Complete)
+- [/] Phase 3: Redis Streams Event Bus (Pending)
+- [ ] Phase 4: Knowledge Graph & Search (Pending)
 
 ## Accumulated Context
 
