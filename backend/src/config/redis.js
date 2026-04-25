@@ -1,5 +1,6 @@
 const Redis = require('ioredis');
 const logger = require('../utils/logger');
+const config = require('./index');
 
 let redisClient;
 
@@ -7,7 +8,7 @@ let redisClient;
  * Initializes the Redis client for caching and rate limiting.
  */
 const initRedis = () => {
-  const url = process.env.REDIS_URL || 'redis://localhost:6379';
+  const url = config.redis.url;
   
   try {
     redisClient = new Redis(url, {

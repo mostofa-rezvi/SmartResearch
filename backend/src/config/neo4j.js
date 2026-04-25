@@ -1,4 +1,5 @@
 const neo4j = require('neo4j-driver');
+const config = require('./index');
 
 let driver;
 
@@ -6,9 +7,8 @@ let driver;
  * Initializes the Neo4j Trust-Graph Driver connection.
  */
 const initNeo4j = () => {
-  const uri = process.env.NEO4J_URI || 'neo4j://localhost:7687';
-  const user = process.env.NEO4J_USER || 'neo4j';
-  const password = process.env.NEO4J_PASSWORD || 'password';
+  const uri = config.neo4j.uri;
+  const [user, password] = config.neo4j.auth.split('/');
 
   try {
     driver = neo4j.driver(uri, neo4j.auth.basic(user, password));

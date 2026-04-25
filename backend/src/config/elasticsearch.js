@@ -1,5 +1,6 @@
 const { Client } = require('@elastic/elasticsearch');
 const logger = require('../utils/logger');
+const config = require('./index');
 
 let esClient;
 
@@ -7,7 +8,7 @@ let esClient;
  * Initializes the Elasticsearch client for advanced research discovery.
  */
 const initElasticsearch = () => {
-  const node = process.env.ELASTICSEARCH_NODE || 'http://localhost:9200';
+  const node = config.elasticsearch.node;
 
   try {
     esClient = new Client({

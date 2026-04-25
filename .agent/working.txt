@@ -1,0 +1,5 @@
+- CMD-001: init project.
+- CMD-002: scan codebase.
+- CMD-003: week 01 milestone.
+- CMD-004: discuss day 01.
+- CMD-005: plan day 01.
