@@ -88,6 +88,35 @@ export default function ProfilePage() {
         
         {/* Left Column: Stats & Contact */}
         <div className="space-y-6">
+          
+          {/* Trust Score & Shared Interests */}
+          <div className="bg-white dark:bg-slate-800 p-8 rounded-[32px] border border-slate-100 dark:border-slate-700 shadow-xl">
+            <h3 className="mono-academic text-xs font-black tracking-[0.2em] text-slate-400 mb-6 flex items-center gap-2">
+              <ShieldCheck size={18} className="text-emerald-500" /> Trust Score
+            </h3>
+            <div className="mb-6 flex flex-col items-center justify-center p-6 bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800">
+              <div className="text-4xl font-black text-slate-900 dark:text-white mb-2">94/100</div>
+              <div className="text-sm font-bold text-amber-500 bg-amber-50 dark:bg-amber-500/10 px-3 py-1 rounded-full border border-amber-200 dark:border-amber-500/20">
+                Gold Tier
+              </div>
+            </div>
+
+            {!isOwnProfile && (
+              <>
+                <h3 className="mono-academic text-xs font-black tracking-[0.2em] text-slate-400 mb-4 flex items-center gap-2 mt-8">
+                  <Users size={18} className="text-primary" /> Shared Interests
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  {["Machine Learning", "Quantum Computing"].map((interest, idx) => (
+                    <span key={idx} className="text-xs font-bold text-primary bg-primary/10 px-3 py-1.5 rounded-lg border border-primary/20">
+                      {interest}
+                    </span>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+
           <div className={`bg-white dark:bg-slate-800 p-8 rounded-[32px] border ${isInvited ? 'border-accent/30 shadow-accent/5' : 'border-slate-100 dark:border-slate-700'} shadow-2xl`}>
             <h3 className="mono-academic text-xs font-black tracking-[0.2em] text-slate-400 mb-8 flex items-center gap-2">
               <Activity size={18} className="text-secondary" /> Academic Stats
