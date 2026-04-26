@@ -1,9 +1,11 @@
 import asyncio
 import os
 import logging
+import time
 from redis import asyncio as aioredis
 from ml_model import get_model
 from cache import get_cache
+from elasticsearch import Elasticsearch
 import json
 
 # Configure logging
@@ -11,9 +13,13 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+ES_URL = os.getenv("ELASTICSEARCH_URL", "http://localhost:9200")
 STREAM_NAME = "profile.created"
 GROUP_NAME = "ml_workers"
 CONSUMER_NAME = os.getenv("HOSTNAME", "ml_worker_1")
+
+# Initialize ES client
+es = Elasticsearch(ES_URL)
 
 async def process_message(msg_id, data):
     try:
@@ -35,8 +41,18 @@ async def process_message(msg_id, data):
             vector = await asyncio.to_thread(model.encode, text)
             cache.set(text, vector)
 
-        # TODO: Store in Elasticsearch (Task 6.5 will provide the client)
-        logger.info(f"Generated embedding for profile {profile_id}")
+        # Store in Elasticsearch
+        try:
+            es.index(index="profiles", id=profile_id, document={
+                "id": profile_id,
+                "embedding": vector,
+                "updated_at": time.time()
+            })
+            logger.info(f"Generated and stored embedding for profile {profile_id} in ES")
+        except Exception as e:
+            logger.error(f"Elasticsearch index error for profile {profile_id}: {str(e)}")
+            return False
+
         return True
     except Exception as e:
         logger.error(f"Error processing message {msg_id}: {str(e)}")
