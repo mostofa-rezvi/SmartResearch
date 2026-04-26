@@ -1,6 +1,7 @@
 # Roadmap: Milestone v1.1
 
-## Phase 6: AI Foundation & Embedding Service
+## [✓] Phase 6: AI Foundation & Embedding Service
+- **Status**: Completed (2026-04-26)
 - **Goal**: Setup the ML service for semantic embeddings and async sync.
 - **Requirements**: AI-01, AI-02
 - **Success Criteria**:
