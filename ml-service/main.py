@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from typing import List, Union, Optional
 import asyncio
 from ml_model import get_model
+from cache import get_cache
 import logging
 
 # Configure logging
@@ -26,7 +27,19 @@ async def health():
 async def embed(request: EmbedRequest):
     try:
         model = get_model()
-        # Offload CPU-bound inference to threadpool to avoid blocking event loop
+        cache = get_cache()
+        
+        # Handle single string case with caching
+        if isinstance(request.text, str):
+            cached = cache.get(request.text)
+            if cached:
+                return {"vectors": cached, "cached": True}
+            
+            vector = await asyncio.to_thread(model.encode, request.text)
+            cache.set(request.text, vector)
+            return {"vectors": vector, "cached": False}
+        
+        # Handle list case (batch caching is more complex, simple pass-through for now)
         vectors = await asyncio.to_thread(model.encode, request.text)
         return {"vectors": vectors}
     except Exception as e:
