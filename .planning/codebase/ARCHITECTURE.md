@@ -1,23 +1,21 @@
-# System Architecture
+# Architecture
 
-## Patterns & Principles
-- **Controller-Service-Model (CSM)**: Backend separation of concerns for maintainability.
-- **Envelope-Pattern**: Unified JSON response structure across all API endpoints.
-- **Centralized Error Handling**: Middleware-driven error management with Joi/Celebrate validation.
-- **Stateless API**: JWT-based authentication to ensure horizontal scalability.
+## System Paradigm
+**Event-Driven Multi-Database Architecture**
+ResearchBridge utilizes a "Triple Store" synchronization strategy. Data sovereignty is maintained by a relational primary database, while specialized read-optimized databases handle complex querying scenarios. State propagation is handled asynchronously.
 
-## Data Flow
-1. **Primary Write**: `Backend` -> `PostgreSQL`
-2. **Event Emit**: `Backend` -> `Event Bus (Redis Streams)`
-3. **Downstream Consume**: `Sync Workers` -> `Elasticsearch` / `Neo4j`
-4. **Read/Search**: `Frontend` -> `Backend` -> `Elasticsearch` / `Neo4j`
+## Core Flow (The Triple Store Sync)
+1. **Primary Write**: A user profile is created/updated via Express API. Data is saved transactionally in PostgreSQL.
+2. **Event Emission**: The `eventBus.service.js` produces a `profile.created` event to Redis Streams (`XADD`).
+3. **Graph Sync**: A background worker (`graphSync.worker.js`) consumes the event and executes a `MERGE` query to update/create the `Researcher` node in Neo4j.
+4. **Search Sync**: A parallel worker (`searchSync.worker.js`) consumes the same event and `index`es the profile data (including embeddings) into Elasticsearch.
 
-## Security Layer
-- **Helmet**: Secures Express apps by setting various HTTP headers.
-- **CORS**: Strict origin whitelist configured from environment variables.
-- **CSRF Protection**: Mitigated via SameSite cookies and custom header requirements for JWT.
-- **Input Validation**: Strict schema enforcement using Joi at the route level.
+## API Architecture (CSM)
+The backend enforces a strict **Controller-Service-Model** pattern:
+- **Routes**: Define HTTP methods, paths, and attach validation middlewares.
+- **Controllers**: Handle HTTP request/response envelope extraction and formatting.
+- **Services**: Contain pure business logic and cross-service orchestration. They do not know about HTTP requests or responses.
+- **Data Access (Models/Config)**: Direct DB querying (Postgres, Neo4j, ES) is typically isolated to service or config layers currently, favoring raw SQL/Cypher for performance.
 
-## Deployment
-- **Containerization**: Single `docker-compose.yml` orchestrates the local development environment.
-- **Service Isolation**: Backend and Databases run in separate containers, communicating over a private Docker network.
+## Background Workers
+Background workers run within the main Node.js process space but asynchronously poll Redis Streams using `Promise.all` loops. They implement Pending Entries List (PEL) reclamation on boot to ensure zero-data-loss event processing.

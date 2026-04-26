@@ -1,31 +1,20 @@
-# Project Structure
+# Directory Structure
 
-## Mono-repo Overview
-```text
-/backend          # Node.js Express API
-/frontend         # Next.js 16 Application
-/ml-service       # Python FastAPI (Scaffolded)
-/others           # Documentation and supplemental docker configs
-```
+## Repository Root
+- `.planning/` - GSD AI agent state, milestones, and planning documents.
+- `backend/` - Node.js Express API.
+- `frontend/` - Next.js UI (Scaffold).
+- `ml-service/` - Python FastAPI application.
+- `docker-compose.yml` - Main orchestration file.
 
-## Backend Detail (`/backend`)
-- `src/config/`: Database initializations (Postgres, Redis, ES, Neo4j)
-- `src/controllers/`: Route handlers (mapping request to service)
-- `src/middleware/`: Auth, error handling, rate limiting
-- `src/models/`: SQL schema definitions (logic currently in services/schema.sql)
-- `src/routes/`: Express router definitions (versioned v1)
-- `src/services/`: Core business logic and database interactions
-- `src/utils/`: Shared utilities (logger, email, event emitter)
-- `src/validations/`: Joi/Celebrate schemas for input validation
-- `schema.sql`: Principal PostgreSQL schema definition
-- `openapi.yaml`: API documentation
-
-## Frontend Detail (`/frontend`)
-- `src/app/`: Next.js App Router (Pages and layouts)
-- `src/components/`: Reusable React components
-- `src/hooks/`: Custom React hooks (e.g., auth, socket)
-- `public/`: Static assets
-
-## Infrastructure
-- `docker-compose.yml`: Orchestrates Backend, Frontend, and 4 database services.
-- `Dockerfile`: Multi-stage build definitions for each service.
+## Backend Structure (`backend/src/`)
+- `config/` - Database initialization and environment bindings (`db.js`, `redis.js`, `neo4j.js`, `elasticsearch.js`).
+- `controllers/` - HTTP request handlers (e.g., `auth.controller.js`, `profile.controller.js`).
+- `middleware/` - Express middlewares (`auth.js`, `error.js`, `rateLimiter.js`).
+- `routes/` - Express router definitions (`auth.routes.js`, `profile.routes.js`).
+- `services/` - Business logic and event orchestration (`auth.service.js`, `eventBus.service.js`, `storage.service.js`).
+- `utils/` - Shared utilities.
+- `validations/` - Joi schema definitions for payload validation (`profile.validation.js`).
+- `workers/` - Background processes for Redis Streams consumption (`graphSync.worker.js`, `searchSync.worker.js`).
+- `tests/` - Unit and integration test suites.
+- `index.js` - Application entry point, Express configuration, worker bootstrapping, and deep health check logic.
