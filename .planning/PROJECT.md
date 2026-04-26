@@ -8,20 +8,16 @@ ResearchBridge is a Smart Research Collaboration Platform designed to facilitate
 
 Empowering research collaboration through a verifiable trust graph, advanced semantic discovery, and real-time event-driven synchronization across a distributed research ecosystem.
 
-## Current State (v1.0)
-The platform is currently an **Infrastructure-Complete Engine**. It features a multi-database sync bus (Postgres, Redis, Neo4j, ES), production-ready auth, and a Python ML service bridge. The backend is 100% functional for profiles and discovery.
+## Current Milestone: v1.1 Week 2 — AI Matching Engine, Search & Collaboration Core
 
-## Shipped in v1.0
-- **Multi-DB Sync**: Resilient Redis Streams pipeline for real-time Postgres-to-Graph-to-Search propagation.
-- **Academic Profiles**: Expanded Joi-validated schemas with completeness scoring and S3-compatible avatar storage.
-- **Neo4j Trust Graph**: Bootstrapped with automated schema constraints and sync workers.
-- **Elasticsearch discovery**: BM25 keyword search wired to dynamic sync workers.
-- **Docker Hardening**: Comprehensive orchestration with deep dependency health probes.
+**Goal:** Implement the AI-driven matching engine, search infrastructure, and core collaboration features using a Sentence-BERT embedding service.
 
-## Next Milestone Goals (Week 2)
-- **Collaboration UI**: Group dashboards, paper libraries, and shared feeds.
-- **Semantic Discovery**: LLM-based abstract summarization and cross-researcher graph pathfinding.
-- **Trust Modeling**: Reputation score calculation using Neo4j centrality metrics.
+**Target features:**
+- **AI Matching Engine**: Sentence-BERT embedding service for semantic researcher matching.
+- **Search Infrastructure**: Enhanced Graph-based search and semantic discovery.
+- **Collaboration Core**: Group dashboards, shared paper libraries, and activity feeds.
+- **LLM Integration**: Abstract summarization service integration.
+- **Trust Modeling**: Automated reputation scoring via Neo4j centrality metrics.
 
 ## Requirements
 
@@ -84,4 +80,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-25 after initialization and initial codebase scan*
+*Last updated: 2026-04-26 after starting Milestone v1.1*
