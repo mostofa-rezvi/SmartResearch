@@ -1,36 +1,28 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.1
-milestone_name: "AI Matching & Collaboration"
-status: planning
-last_updated: "2026-04-26T09:00:00.000Z"
-last_activity: "2026-04-26 -- Phase 6 (AI Foundation) completed"
+milestone: v1.2
+milestone_name: "Week 3 — Frontend, Publication Assistant & Production"
+status: active
+last_updated: "2026-04-26T17:40:00.000Z"
+last_activity: "2026-04-26 -- Milestone v1.2 Started"
 progress:
-  total_phases: 4
-  completed_phases: 1
-  total_plans: 2
-  completed_plans: 2
-  percent: 25
+  total_phases: 0
+  completed_phases: 0
+  percent: 0
 ---
 
 # STATE
 
 ## Project Reference
-
-See: .planning/PROJECT.md (updated 2026-04-25)
-
-**Core value**: Empowering research collaboration through a verifiable trust graph, advanced semantic discovery, and real-time event-driven synchronization.
+See: .planning/PROJECT.md (updated 2026-04-26)
 
 ## Current Position
 
-Phase: 7 (Hybrid Search & Summarization) — PLANNING
-Status: Phase 6 completed successfully. Transitioning to hybrid search integration.
-Last activity: 2026-04-26 -- Phase 6 (AI Foundation) completed
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-04-26 — Milestone v1.2 started
 
 ## Milestone History
-
-- [✓ **Milestone 1: Infrastructure & Core Backend**](file:///d:/github/SmartResearch/.planning/milestones/v1.0-ROADMAP.md) (Archived)
-
-## Accumulated Context
-
-- **Phase 6 (AI Foundation)**: Established Python FastAPI ML service with `all-mpnet-base-v2` SBERT model. Implemented SHA256 caching and Redis Streams consumer group worker. Integrated `dense_vector` fields into Elasticsearch for profiles and papers.
+- [✓ **Milestone 1.0: Infrastructure & Core Backend**](file:///d:/github/SmartResearch/.planning/milestones/v1.0-ROADMAP.md)
+- [✓ **Milestone 1.1: AI Matching & Collaboration**](file:///d:/github/SmartResearch/.planning/milestones/v1.1-ROADMAP.md)

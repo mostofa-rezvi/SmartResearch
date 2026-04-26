@@ -108,14 +108,20 @@ class GraphSyncWorker {
       const session = getSession();
       try {
         await session.run(`
-          MERGE (r:Researcher {id: $id})
+          MERGE (r:Researcher {userId: $id})
           SET r.name = $name,
               r.email = $email
+          WITH r
+          WHERE $institutionName IS NOT NULL
+          MERGE (i:Institution {name: $institutionName})
+          MERGE (r)-[:AFFILIATED_WITH]->(i)
+          SET r.isVerifiedInstitutional = true
           RETURN r
         `, {
-          id: payload.id,
+          id: parseInt(payload.id),
           name: payload.name || 'Unknown',
-          email: payload.email || ''
+          email: payload.email || '',
+          institutionName: payload.institution_name || null
         });
         
         logger.info(`[GraphSync] Researcher node created/updated for user ${payload.id}`);

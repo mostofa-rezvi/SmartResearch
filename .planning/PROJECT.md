@@ -8,16 +8,24 @@ ResearchBridge is a Smart Research Collaboration Platform designed to facilitate
 
 Empowering research collaboration through a verifiable trust graph, advanced semantic discovery, and real-time event-driven synchronization across a distributed research ecosystem.
 
-## Current Milestone: v1.1 Week 2 — AI Matching Engine, Search & Collaboration Core
+## Shipped: v1.1 — Intelligence & Collaboration (2026-04-26)
 
-**Goal:** Implement the AI-driven matching engine, search infrastructure, and core collaboration features using a Sentence-BERT embedding service.
+**Accomplishments:**
+- **AI Discovery Engine**: SBERT-based embedding service for semantic researcher matching.
+- **Hybrid Search**: Elasticsearch RRF fusion merging BM25 and kNN search results.
+- **Real-Time Collaboration**: Socket.IO project rooms with Yjs CRDT document sync.
+- **Trust Analytics**: PageRank and Co-authorship discovery in Neo4j GDS.
+
+## Current Milestone: v1.2 — Week 3 — Frontend, Publication Assistant & Production
+
+**Goal:** Build the Next.js frontend with Authentication, User Profiles, and the Publication Assistant, preparing for production.
 
 **Target features:**
-- **AI Matching Engine**: Sentence-BERT embedding service for semantic researcher matching.
-- **Search Infrastructure**: Enhanced Graph-based search and semantic discovery.
-- **Collaboration Core**: Group dashboards, shared paper libraries, and activity feeds.
-- **LLM Integration**: Abstract summarization service integration.
-- **Trust Modeling**: Automated reputation scoring via Neo4j centrality metrics.
+- **Next.js Frontend Scaffold**: Modern React framework setup with a premium design system.
+- **Auth & Session Management**: Login, Registration, and JWT-based session persistence.
+- **Academic Profiles**: User-facing profile system with research stats and completeness scoring.
+- **Publication Assistant**: AI-powered utility for assisting researchers with paper submissions.
+- **Production Readiness**: Final performance audits, Dockerization, and deployment prep.
 
 ## Requirements
 
@@ -32,16 +40,20 @@ Empowering research collaboration through a verifiable trust graph, advanced sem
 - ✓ **User Profiles** — Expanded academic profiles with completeness scoring.
 - ✓ **ML Service Integration** — FastAPI service wired via Docker.
 - ✓ **Infrastructure Hardening** — Production-ready healthchecks and CI/CD skeleton.
+- ✓ **Hybrid Search (RRF)** — BM25 + kNN merging in ES 8.
+- ✓ **Collaborative Workspace** — Yjs CRDT sync with Postgres binary storage.
 
 ### Active
 
-- [ ] **Collaboration UI** — Build the group collaboration and paper sharing interface.
-- [ ] **Graph Search** — Implement Cypher-based graph search for discovering researchers via network distance.
-- [ ] **LLM Summarization** — Integrate ML service to summarize research paper abstracts.
+- [ ] **Frontend Scaffold** — Initialize Next.js app with design tokens.
+- [ ] **Authentication UI** — Build Login/Register/Social Auth screens.
+- [ ] **Academic Profiles** — Implement profile management and stats visualization.
+- [ ] **Publication Assistant** — Develop the AI assistant for researcher support.
+- [ ] **Production Infrastructure** — Configure Docker, CI/CD, and monitoring.
 
 ### Out of Scope
 
-- **Native Mobile Apps** — Focus is currently 100% on the web platform (3-week build).
+- **Native Mobile Apps** — Focus is currently 100% on the web platform.
 - **Payment Processing** — Not required for initial production build.
 
 ## Context
@@ -52,32 +64,15 @@ ResearchBridge is built as a high-performance mono-repo. The architecture emphas
 
 - **Tech Stack**: Node/Express, Next.js, Python FastAPI, PostgreSQL, Redis 7, Neo4j 5, Elasticsearch 8.
 - **Timeline**: 3-week target for production-ready MVP.
-- **Messaging**: Redis Streams must replace the current mock event emitter to ensure reliable state propagation.
 
 ## Key Decisions
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Multi-Database | Each DB solves a specific "hard problem" (Search, Speed, Graph) better than SQL alone. | ✓ Good |
-| Redis Streams | Simpler than Kafka for a 3-week build while providing necessary persistence for event-driven sync. | — Pending |
-| Mono-repo | Simplifies orchestration and shared typing across backend, frontend, and ML services. | ✓ Good |
-
-## Evolution
-
-This document evolves at phase transitions and milestone boundaries.
-
-**After each phase transition** (via `/gsd-transition`):
-1. Requirements invalidated? → Move to Out of Scope with reason
-2. Requirements validated? → Move to Validated with phase reference
-3. New requirements emerged? → Add to Active
-4. Decisions to log? → Add to Key Decisions
-5. "What This Is" still accurate? → Update if drifted
-
-**After each milestone** (via `/gsd-complete-milestone`):
-1. Full review of all sections
-2. Core Value check — still the right priority?
-3. Audit Out of Scope — reasons still valid?
-4. Update Context with current state
+| Multi-Database | Each DB solves a specific "hard problem" better than SQL alone. | ✓ Good |
+| Redis Streams | Simpler than Kafka for a 3-week build while providing persistence. | ✓ Stable |
+| Mono-repo | Simplifies orchestration and shared typing across services. | ✓ Good |
+| Yjs CRDT | Handles complex concurrent document editing without locks. | ✓ Validated |
 
 ---
-*Last updated: 2026-04-26 after starting Milestone v1.1*
+*Last updated: 2026-04-26 after starting Milestone v1.2*

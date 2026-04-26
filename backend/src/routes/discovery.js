@@ -19,4 +19,11 @@ router.post('/save',
   discoveryController.save
 );
 
+// @route   GET /api/v1/discovery/suggested-collaborators
+// @desc    Find 2nd-degree collaborator suggestions
+router.get('/suggested-collaborators',
+  auth,
+  discoveryController.getSuggestedCollaborators
+);
+
 module.exports = router;

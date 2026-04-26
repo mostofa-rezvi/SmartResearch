@@ -69,6 +69,7 @@ app.use('/api/v1/users', require('./routes/users'));
 app.use('/api/v1/moderation', require('./routes/moderation'));
 app.use('/api/v1/reputation', require('./routes/reputation.routes'));
 app.use('/api/v1/profiles', require('./routes/profile.routes'));
+app.use('/api/v1/recommendations', require('./routes/recommendationRoutes'));
 
 // Backward-compatible non-versioned routes (transitional)
 app.use('/api/auth', authLimiter, require('./routes/auth'));
@@ -81,6 +82,7 @@ app.use('/api/users', apiLimiter, require('./routes/users'));
 app.use('/api/moderation', require('./routes/moderation'));
 app.use('/api/reputation', require('./routes/reputation.routes'));
 app.use('/api/profiles', require('./routes/profile.routes'));
+app.use('/api/recommendations', require('./routes/recommendationRoutes'));
 
 
 // Socket.IO Connection Event
@@ -91,8 +93,46 @@ io.on('connection', (socket) => {
     socket.join(`user_${userId}`);
   });
 
+  // --- Collaboration Workspace Logic ---
+  socket.on('join_project', (projectId, user) => {
+    const room = `project_${projectId}`;
+    socket.join(room);
+    
+    // Broadcast presence
+    socket.to(room).emit('presence:join', user);
+    logger.info(`User ${user.id} joined project room ${room}`);
+
+    // Load initial document state
+    const collaborationService = require('./services/CollaborationService');
+    collaborationService.getDocumentState(projectId).then(state => {
+      socket.emit('sync:init', state);
+    }).catch(err => logger.error('Failed to load document state:', err));
+  });
+
+  socket.on('sync:update', async (projectId, updateBinary) => {
+    const room = `project_${projectId}`;
+    // Broadcast to others immediately for low latency
+    socket.to(room).emit('sync:update', updateBinary);
+
+    // Persist to Postgres via Yjs adapter
+    try {
+      const collaborationService = require('./services/CollaborationService');
+      await collaborationService.applyUpdate(projectId, updateBinary);
+    } catch (err) {
+      logger.error('Failed to persist Yjs update:', err);
+    }
+  });
+
+  socket.on('leave_project', (projectId, user) => {
+    const room = `project_${projectId}`;
+    socket.leave(room);
+    socket.to(room).emit('presence:leave', user.id);
+  });
+  // ------------------------------------
+
   socket.on('disconnect', () => {
     logger.info('User disconnected');
+    // Note: To broadcast presence:leave on disconnect, we'd need to track socket.id -> project mapping.
   });
 });
 

@@ -3,70 +3,112 @@ const eventBus = require('./eventBus.service');
 const logger = require('../utils/logger');
 
 const { getEsClient } = require('../config/elasticsearch');
+const { getSession } = require('../config/neo4j');
+const axios = require('axios');
+
+const ML_SERVICE_URL = process.env.ML_SERVICE_URL || 'http://localhost:8000';
 
 class DiscoveryService {
-  async search(userId, query) {
-    // 1. Fetch user interest profile
-    const userResult = await db.query('SELECT research_interests FROM users WHERE id = $1', [userId]);
-    const interests = userResult.rows[0]?.research_interests?.interests || [];
+  async vectorizeQuery(queryText) {
+    try {
+      const response = await axios.post(`${ML_SERVICE_URL}/embed`, {
+        text: queryText
+      });
+      return response.data.embedding;
+    } catch (err) {
+      logger.error('Query vectorization failed', err);
+      return null;
+    }
+  }
 
-    // 2. Execute BM25 Keyword Search across indices
+  async getSuggestedCollaborators(userId) {
+    const session = getSession();
+    try {
+      const query = `
+        MATCH (me:Researcher {userId: $userId})-[:AUTHORED]->(p1:Paper)<-[:AUTHORED]-(collab:Researcher)-[:AUTHORED]->(p2:Paper)<-[:AUTHORED]-(suggested:Researcher)
+        WHERE me <> suggested
+        AND NOT (me)-[:AUTHORED]->()<-[:AUTHORED]-(suggested)
+        RETURN suggested.userId as userId, 
+               suggested.name as name, 
+               count(DISTINCT collab) as sharedCollabs,
+               collect(DISTINCT collab.name)[0..3] as exampleCollabs
+        ORDER BY sharedCollabs DESC
+        LIMIT 10
+      `;
+      
+      const result = await session.run(query, { userId: parseInt(userId) });
+      
+      return result.records.map(record => ({
+        userId: record.get('userId').toNumber(),
+        name: record.get('name'),
+        sharedCollabs: record.get('sharedCollabs').toNumber(),
+        exampleCollabs: record.get('exampleCollabs')
+      }));
+    } catch (error) {
+      logger.error(`getSuggestedCollaborators Error: ${error.message}`);
+      throw error;
+    } finally {
+      await session.close();
+    }
+  }
+
+  async search(userId, queryText, filters = {}) {
     const esClient = getEsClient();
-    
-    let esResults = [];
+    const queryVector = queryText ? await this.vectorizeQuery(queryText) : null;
+
+    // Build ES Query
+    const searchBody = {
+      size: 50,
+      query: {
+        bool: {
+          must: queryText ? [
+            {
+              multi_match: {
+                query: queryText,
+                fields: ['name^2', 'title^2', 'content', 'tags']
+              }
+            }
+          ] : [{ match_all: {} }],
+          filter: []
+        }
+      }
+    };
+
+    // Apply Filters
+    if (filters.domain) searchBody.query.bool.filter.push({ term: { domain: filters.domain } });
+    if (filters.institution) searchBody.query.bool.filter.push({ term: { institution: filters.institution } });
+    if (filters.skills) searchBody.query.bool.filter.push({ terms: { tags: filters.skills } });
+
+    // Add kNN if vector exists
+    if (queryVector) {
+      searchBody.knn = {
+        field: "embedding",
+        query_vector: queryVector,
+        k: 100,
+        num_candidates: 1000,
+        filter: searchBody.query.bool.filter // Pre-filter kNN too
+      };
+      // Enable RRF for hybrid ranking
+      searchBody.rank = { rrf: {} };
+    }
+
     try {
       const response = await esClient.search({
         index: 'users,papers,projects',
-        body: {
-          query: query ? {
-            multi_match: {
-              query,
-              fields: ['title^2', 'name^2', 'content', 'tags']
-            }
-          } : {
-            match_all: {}
-          },
-          size: 50
-        }
+        body: searchBody
       });
-      
-      // Extract hits and normalize to our standard format
-      esResults = response.hits.hits.map(hit => ({
+
+      return response.hits.hits.map(hit => ({
         id: hit._id,
         _index: hit._index,
         _score: hit._score,
         ...hit._source,
-        tags: hit._source.tags || [],
-        tier: hit._source.tier || 'Standard'
+        match_type: queryVector ? 'hybrid' : 'keyword'
       }));
     } catch (err) {
-      logger.error('Elasticsearch query failed', err);
-      // Fallback or empty if ES is unreachable
-      esResults = [];
+      logger.error('Hybrid search query failed', err);
+      throw err;
     }
-
-    // 3. Personalization Logic with Explainability
-    let results = esResults.map(item => {
-      const matchEntries = item.tags.filter(tag => interests.includes(tag));
-      const matchCount = matchEntries.length;
-      // Add BM25 score to our personalization score
-      const score = (item._score || 0) + (matchCount * 10) + (item.tier === 'Q1' ? 5 : 0);
-      const matchedInterest = matchCount > 0 ? matchEntries[0] : null;
-
-      return { 
-        ...item, 
-        score, 
-        matchedInterest,
-        discovery_reason: matchedInterest 
-          ? `Matches your research interest in "${matchedInterest}"` 
-          : item.tier === 'Q1' 
-            ? 'Highly cited paper in a top-tier journal' 
-            : 'Relevant to your search query'
-      };
-    });
-
-    results.sort((a, b) => b.score - a.score);
-    return results;
   }
 
   async savePaper(userId, paperData) {

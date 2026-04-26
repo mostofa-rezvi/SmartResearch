@@ -1,5 +1,7 @@
 - CMD-001: init project.
 - CMD-002: scan codebase.
+
+#Week 01
 - CMD-003: week 01 milestone.
 - CMD-004: discuss day 01.
 - CMD-005: plan day 01.
@@ -24,4 +26,34 @@
 - CMD-022A: UAT audit week 01.
 - CMD-023: Audit week 01.
 - CMD-024: Complete week 01.
+- CMD-024A: Map codebase week 01.
 
+#Week 02
+- CMD-025: Week 02 milestone.
+- CMD-026A: AI spec day 06.
+- CMD-026: Research day 06.
+- CMD-027: Plan day 06.
+- CMD-028: Execute day 06.
+- CMD-029: Review day 06.
+- CMD-029A: Eval review day 06.
+- CMD-030: Discuss day 07.
+- CMD-031: Plan day 07.
+- CMD-032: Execute day 07.
+- CMD-033: Test day 07.
+- CMD-034: Plan day 08.
+- CMD-035: Execute day 08.
+- CMD-036: Review day 08.
+- CMD-036A: Eval review day 08.
+- CMD-037: Plan day 09.
+- CMD-038: Execute day 09.
+- CMD-039: Validate day 09.
+- CMD-040: Discuss day 10.
+- CMD-041: Plan day 10.
+- CMD-042: Execute day 10.
+- CMD-042A: Review day 10.
+- CMD-043: Verify week 02.
+- CMD-043A: UAT audit week 02.
+- CMD-044: Audit week 02.
+
+#Week 03
+- CMD-046: Week 03 milestone.

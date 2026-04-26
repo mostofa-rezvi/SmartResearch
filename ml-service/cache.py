@@ -3,6 +3,7 @@ import redis
 import numpy as np
 import os
 import logging
+import json
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -49,6 +50,23 @@ class EmbeddingCache:
         binary_data = np.array(vector, dtype=np.float32).tobytes()
         self.redis.set(key, binary_data, ex=60*60*24*7) # 7 day TTL
         logger.info(f"Cached embedding for key: {key}")
+
+    def get_rec(self, user_id: int):
+        if not self.redis:
+            return None
+        key = f"rec:v1:{user_id}"
+        data = self.redis.get(key)
+        if data:
+            return json.loads(data)
+        return None
+
+    def set_rec(self, user_id: int, results: list):
+        if not self.redis:
+            return
+        key = f"rec:v1:{user_id}"
+        # Cache for 1 hour
+        self.redis.set(key, json.dumps(results), ex=3600)
+        logger.info(f"Cached recommendations for user {user_id}")
 
 # Singleton instance
 _cache = EmbeddingCache()

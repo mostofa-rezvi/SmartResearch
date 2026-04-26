@@ -56,6 +56,19 @@ CREATE CONSTRAINT thought_id IF NOT EXISTS FOR (t:Thought) REQUIRE t.postId IS U
  */
 // Example: (r:Researcher)-[:AFFILIATED_WITH {department: 'Computer Science'}]->(i:Institution)
 
+/**
+ * [ :ENDORSES ]
+ * A direct credibility signal between researchers.
+ */
+// Example: (r1:Researcher)-[:ENDORSES {weight: 2.0, timestamp: datetime()}]->(r2:Researcher)
+
+/**
+ * [ :CITES ]
+ * Academic citation network.
+ */
+// Example: (p1:Paper)-[:CITES]->(p2:Paper)
+// Derived: (r1:Researcher)-[:CITES_WORK]->(r2:Researcher)
+
 
 // ----------------------------------------------------------------------------
 // 3. EXAMPLE GRAPH INITIALIZATION (For Local Testing / Traversal Optimization)
