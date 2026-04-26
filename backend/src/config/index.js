@@ -17,6 +17,12 @@ const envVarsSchema = Joi.object()
     ML_SERVICE_URL: Joi.string().required().description('ML Service URL'),
     JWT_ACCESS_SECRET: Joi.string().required().description('JWT access secret'),
     JWT_REFRESH_SECRET: Joi.string().required().description('JWT refresh secret'),
+    S3_ENDPOINT: Joi.string().required().description('S3 endpoint URL'),
+    S3_ACCESS_KEY: Joi.string().required().description('S3 access key'),
+    S3_SECRET_KEY: Joi.string().required().description('S3 secret key'),
+    S3_BUCKET: Joi.string().required().description('S3 bucket name'),
+    S3_REGION: Joi.string().default('us-east-1'),
+    S3_FORCE_PATH_STYLE: Joi.boolean().default(true),
   })
   .unknown();
 
@@ -49,4 +55,13 @@ module.exports = {
     accessSecret: envVars.JWT_ACCESS_SECRET,
     refreshSecret: envVars.JWT_REFRESH_SECRET,
   },
+  s3: {
+    endpoint: envVars.S3_ENDPOINT,
+    accessKey: envVars.S3_ACCESS_KEY,
+    secretKey: envVars.S3_SECRET_KEY,
+    bucket: envVars.S3_BUCKET,
+    region: envVars.S3_REGION,
+    forcePathStyle: envVars.S3_FORCE_PATH_STYLE,
+  },
 };
+

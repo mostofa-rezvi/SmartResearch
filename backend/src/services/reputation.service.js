@@ -1,5 +1,5 @@
 const db = require('../config/db');
-const { emitEvent } = require('../utils/kafkaEmitter');
+const eventBus = require('./eventBus.service');
 
 /**
  * Fat Service representing Domain Logic for Scholar Reputation and Citation Impact.
@@ -23,8 +23,9 @@ class ReputationService {
       [totalImpact, userId]
     );
 
-    // Emit event to Kafka for downstream ML and discovery processing
-    emitEvent('scholar_impact_calculated', `user_${userId}`, {
+    // Emit event to Redis Streams for downstream ML and discovery processing
+    eventBus.emitEvent('event.behaviour', {
+      type: 'scholar_impact_calculated',
       userId,
       standardCitations,
       highImpactCitations,

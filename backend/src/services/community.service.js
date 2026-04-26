@@ -1,5 +1,5 @@
 const db = require('../config/db');
-const { emitEvent } = require('../utils/kafkaEmitter');
+const eventBus = require('./eventBus.service');
 const logger = require('../utils/logger');
 
 class CommunityService {
@@ -24,8 +24,7 @@ class CommunityService {
       io.emit('new_post', newPost);
     }
 
-    // Emit Kafka event
-    emitEvent('community.post.created', `user_${userId}`, { userId, postId: newPost.id, type, timestamp: new Date().toISOString() });
+    eventBus.emitEvent('event.behaviour', { type: 'community.post.created', userId, postId: newPost.id, postType: type, timestamp: new Date().toISOString() });
     
     logger.info({ userId, postId: newPost.id }, 'Community post created');
 
@@ -80,7 +79,7 @@ class CommunityService {
       DO UPDATE SET value = $3
     `, [userId, postId, value]);
 
-    emitEvent('community.post.voted', `user_${userId}`, { userId, postId, value, timestamp: new Date().toISOString() });
+    eventBus.emitEvent('event.behaviour', { type: 'community.post.voted', userId, postId, value, timestamp: new Date().toISOString() });
     
     return { message: 'Vote recorded' };
   }

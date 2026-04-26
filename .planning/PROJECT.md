@@ -8,24 +8,40 @@ ResearchBridge is a Smart Research Collaboration Platform designed to facilitate
 
 Empowering research collaboration through a verifiable trust graph, advanced semantic discovery, and real-time event-driven synchronization across a distributed research ecosystem.
 
+## Current State (v1.0)
+The platform is currently an **Infrastructure-Complete Engine**. It features a multi-database sync bus (Postgres, Redis, Neo4j, ES), production-ready auth, and a Python ML service bridge. The backend is 100% functional for profiles and discovery.
+
+## Shipped in v1.0
+- **Multi-DB Sync**: Resilient Redis Streams pipeline for real-time Postgres-to-Graph-to-Search propagation.
+- **Academic Profiles**: Expanded Joi-validated schemas with completeness scoring and S3-compatible avatar storage.
+- **Neo4j Trust Graph**: Bootstrapped with automated schema constraints and sync workers.
+- **Elasticsearch discovery**: BM25 keyword search wired to dynamic sync workers.
+- **Docker Hardening**: Comprehensive orchestration with deep dependency health probes.
+
+## Next Milestone Goals (Week 2)
+- **Collaboration UI**: Group dashboards, paper libraries, and shared feeds.
+- **Semantic Discovery**: LLM-based abstract summarization and cross-researcher graph pathfinding.
+- **Trust Modeling**: Reputation score calculation using Neo4j centrality metrics.
+
 ## Requirements
 
 ### Validated
 
-- ✓ **Core Structure** — Mono-repo scaffolded with Backend (Express), Frontend (Next.js), and ML-service (FastAPI placeholder).
-- ✓ **Auth System** — Two-Step OTP and JWT-based authentication with onboarding gate.
-- ✓ **Multi-DB Foundations** — Connectivity established for PostgreSQL, Redis, Neo4j, and Elasticsearch.
-- ✓ **Real-time Skeleton** — Socket.io integration for researcher feeds.
-- ✓ **API Standards** — Versioned v1 REST API with CSM (Controller-Service-Model) architecture.
+- ✓ **Core Structure** — Mono-repo scaffolded.
+- ✓ **Auth System** — Two-Step OTP and JWT-based authentication.
+- ✓ **Multi-DB Foundations** — Connectivity for PostgreSQL, Redis, Neo4j, and Elasticsearch.
+- ✓ **Redis Streams Bus** — Replaced mock Kafka emitter with reliable Redis Streams.
+- ✓ **Trust Graph Engine** — Neo4j knowledge graph modeling for researchers.
+- ✓ **Semantic Discovery** — Elasticsearch indexing and BM25 search.
+- ✓ **User Profiles** — Expanded academic profiles with completeness scoring.
+- ✓ **ML Service Integration** — FastAPI service wired via Docker.
+- ✓ **Infrastructure Hardening** — Production-ready healthchecks and CI/CD skeleton.
 
 ### Active
 
-- [ ] **Redis Streams Bus** — Replace mock Kafka emitter with reliable Redis Streams for cross-database synchronization.
-- [ ] **Trust Graph Engine** — Implement Neo4j knowledge graph modeling for citations, authorship, and researcher impact.
-- [ ] **Semantic Discovery** — Full Elasticsearch indexing of paper abstracts and metadata with fuzzy/faceted search.
-- [ ] **User Profiles** — Expanded academic profiles with reputation tracking and institution verification.
-- [ ] **ML Service Integration** — Wire Python FastAPI service into the Docker Compose environment for downstream NLP tasks.
-- [ ] **Infrastructure Hardening** — Production-ready Docker configuration and CI/CD skeleton.
+- [ ] **Collaboration UI** — Build the group collaboration and paper sharing interface.
+- [ ] **Graph Search** — Implement Cypher-based graph search for discovering researchers via network distance.
+- [ ] **LLM Summarization** — Integrate ML service to summarize research paper abstracts.
 
 ### Out of Scope
 

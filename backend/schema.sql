@@ -183,3 +183,72 @@ WHERE comment_id IS NULL;
 CREATE UNIQUE INDEX IF NOT EXISTS idx_votes_user_comment_unique 
 ON votes (user_id, comment_id) 
 WHERE post_id IS NOT NULL; -- A comment vote still links to a post
+
+-- Phase 3: Profile Expansion
+-- Institutions Table
+CREATE TABLE IF NOT EXISTS institutions (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) UNIQUE NOT NULL,
+    location VARCHAR(255),
+    website VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Skills Table
+CREATE TABLE IF NOT EXISTS skills (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) UNIQUE NOT NULL,
+    category VARCHAR(100),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Domains (Research Fields) Table
+CREATE TABLE IF NOT EXISTS domains (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) UNIQUE NOT NULL,
+    description TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Goals Table
+CREATE TABLE IF NOT EXISTS goals (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) UNIQUE NOT NULL,
+    description TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- User-Skills Junction Table
+CREATE TABLE IF NOT EXISTS user_skills (
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    skill_id INTEGER REFERENCES skills(id) ON DELETE CASCADE,
+    proficiency VARCHAR(50), -- e.g., 'beginner', 'intermediate', 'expert'
+    PRIMARY KEY (user_id, skill_id)
+);
+
+-- User-Domains Junction Table
+CREATE TABLE IF NOT EXISTS user_domains (
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    domain_id INTEGER REFERENCES domains(id) ON DELETE CASCADE,
+    is_primary BOOLEAN DEFAULT FALSE,
+    PRIMARY KEY (user_id, domain_id)
+);
+
+-- User-Goals Junction Table
+CREATE TABLE IF NOT EXISTS user_goals (
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    goal_id INTEGER REFERENCES goals(id) ON DELETE CASCADE,
+    priority INTEGER DEFAULT 0,
+    PRIMARY KEY (user_id, goal_id)
+);
+
+-- Update users table with avatar_url and institution_id if not present
+-- Note: Altering existing tables for completeness
+ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar_url TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS bio TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS institution_id INTEGER REFERENCES institutions(id) ON DELETE SET NULL;
+
+-- Initial Seed for common domains/skills (optional but helpful)
+INSERT INTO domains (name) VALUES ('Computer Science'), ('Biology'), ('Physics'), ('Medicine'), ('Social Sciences') ON CONFLICT DO NOTHING;
+INSERT INTO goals (name) VALUES ('Find Co-author'), ('Grant Collaboration'), ('Peer Review'), ('Mentorship') ON CONFLICT DO NOTHING;
+

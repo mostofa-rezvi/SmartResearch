@@ -7,23 +7,11 @@ See: .planning/PROJECT.md (updated 2026-04-25)
 **Core value**: Empowering research collaboration through a verifiable trust graph, advanced semantic discovery, and real-time event-driven synchronization.
 
 ## Current Status
-- **Current Phase**: Phase 3 — Redis Streams Event Bus
-- **Overall Progress**: 50% (2/4 Phases Complete)
+- **Current Phase**: Transitioning to Milestone 2
+- **Overall Progress**: 100% (Week 1 Complete)
 
-## Phase Progress
-- [x] Phase 1: Infrastructure & ML Wiring (Complete)
-- [x] Phase 2: Auth System & Token Mgmt (Complete)
-- [/] Phase 3: Redis Streams Event Bus (Pending)
-- [ ] Phase 4: Knowledge Graph & Search (Pending)
+## Milestone History
+- [✓ **Milestone 1: Infrastructure & Core Backend**](file:///d:/github/SmartResearch/.planning/milestones/v1.0-ROADMAP.md) (Archived)
 
 ## Accumulated Context
-
-### Active Milestone: Week 1 — Infrastructure, Auth & Core Backend
-**Goal**: Establish a production-ready infrastructure foundation and core data services.
-**Target features**:
-- [x] Docker infrastructure hardening
-- [ ] Redis Streams event bus
-- [ ] Neo4j trust graph modeling
-- [ ] Elasticsearch indexing
-- [ ] User profile expansion
-- [x] ML service integration
+(Run `/gsd-new-milestone` to initialize Week 2 context)

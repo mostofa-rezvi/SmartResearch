@@ -24,6 +24,62 @@ const initElasticsearch = () => {
 };
 
 /**
+ * Creates indices with dense_vector mappings if they do not exist.
+ */
+const initIndices = async () => {
+  if (!esClient) return;
+  
+  const indexConfigs = {
+    users: {
+      mappings: {
+        properties: {
+          name: { type: 'text' },
+          email: { type: 'keyword' },
+          content: { type: 'text' }, // Bio
+          embedding: { type: 'dense_vector', dims: 384, index: true, similarity: 'cosine' }
+        }
+      }
+    },
+    papers: {
+      mappings: {
+        properties: {
+          title: { type: 'text' },
+          abstract: { type: 'text' },
+          authors: { type: 'keyword' },
+          tags: { type: 'keyword' },
+          embedding: { type: 'dense_vector', dims: 384, index: true, similarity: 'cosine' }
+        }
+      }
+    },
+    projects: {
+      mappings: {
+        properties: {
+          title: { type: 'text' },
+          description: { type: 'text' },
+          tags: { type: 'keyword' },
+          embedding: { type: 'dense_vector', dims: 384, index: true, similarity: 'cosine' }
+        }
+      }
+    }
+  };
+
+  for (const [indexName, mappingBody] of Object.entries(indexConfigs)) {
+    try {
+      const exists = await esClient.indices.exists({ index: indexName });
+      if (!exists) {
+        await esClient.indices.create({
+          index: indexName,
+          body: mappingBody
+        });
+        logger.info(`Created Elasticsearch index: ${indexName} with specific vector mappings`);
+      }
+    } catch (err) {
+      logger.error(`Failed to create index ${indexName}:`, err);
+    }
+  }
+};
+
+/**
  * Returns the active Elasticsearch client.
  */
 const getEsClient = () => {
@@ -35,5 +91,6 @@ const getEsClient = () => {
 
 module.exports = {
   initElasticsearch,
+  initIndices,
   getEsClient
 };

@@ -10,3 +10,18 @@
 - CMD-010: execute day 02.
 - CMD-011: secure day 02.
 - CMD-012: test day 02.
+- CMD-013: plan day 03.
+- CMD-014: execute day 03.
+- CMD-015: review day 03.
+- CMD-016: Discuss day 04.
+- CMD-017: Plan day 04.
+- CMD-018: Execute day 04.
+- CMD-019: Review day 04.
+- CMD-020: Plan day 05.
+- CMD-021: Execute day 05.
+- CMD-020A: Review day 05.
+- CMD-022: Verify week 01.
+- CMD-022A: UAT audit week 01.
+- CMD-023: Audit week 01.
+- CMD-024: Complete week 01.
+

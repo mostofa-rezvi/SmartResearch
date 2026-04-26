@@ -1,7 +1,7 @@
 const db = require('../config/db');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { emitEvent } = require('../utils/kafkaEmitter');
+const eventBus = require('./eventBus.service');
 const logger = require('../utils/logger');
 
 const { sendEmail } = require('../utils/email');
@@ -31,8 +31,8 @@ class AuthService {
 
     const user = result.rows[0];
 
-    // Rules #17: Emit Kafka events for significant user actions
-    emitEvent('auth.user.registered', `user_${user.id}`, { userId: user.id, email: user.email, timestamp: new Date().toISOString() });
+    // Rules #17: Emit events for significant user actions
+    eventBus.emitEvent('profile.created', { id: user.id, name: user.name, email: user.email, timestamp: new Date().toISOString() });
     
     logger.info({ userId: user.id, otp }, 'New user registered and OTP generated');
 
@@ -136,7 +136,7 @@ class AuthService {
       [JSON.stringify({ interests, preferences }), userId]
     );
 
-    emitEvent('auth.onboarding.completed', `user_${userId}`, { userId, timestamp: new Date().toISOString() });
+    eventBus.emitEvent('event.behaviour', { type: 'onboarding.completed', userId, timestamp: new Date().toISOString() });
     
     return { message: 'Onboarding completed. Welcome to ResearchBridge.' };
   }

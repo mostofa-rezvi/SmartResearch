@@ -1,6 +1,8 @@
 const db = require('../config/db');
-const { emitEvent } = require('../utils/kafkaEmitter');
+const eventBus = require('./eventBus.service');
 const logger = require('../utils/logger');
+
+const { getEsClient } = require('../config/elasticsearch');
 
 class DiscoveryService {
   async search(userId, query) {
@@ -8,25 +10,47 @@ class DiscoveryService {
     const userResult = await db.query('SELECT research_interests FROM users WHERE id = $1', [userId]);
     const interests = userResult.rows[0]?.research_interests?.interests || [];
 
-    // 2. Mock Search Results (Elasticsearch placeholder)
-    let results = [
-      { id: 1, title: 'Deep Learning in Clinical Neuroscience', authors: ['J. Smith', 'A. Doe'], journal: 'Nature Medicine', tier: 'Q1', year: 2024, doi: '10.1038/nm.1234', citations: 142, tags: ['AI', 'Neuroscience'] },
-      { id: 2, title: 'Quantum Cryptography Protocols for Finance', authors: ['L. Zhang'], journal: 'Phy. Rev. B', tier: 'Q1', year: 2023, doi: '10.1103/prb.5678', citations: 89, tags: ['Quantum Computing', 'Cryptography'] },
-      { id: 3, title: 'The Impact of Social Media on Political Theory', authors: ['E. Burke'], journal: 'APSR', tier: 'Q1', year: 2025, doi: '10.1017/apsr.9012', citations: 12, tags: ['Sociology', 'Political Theory'] },
-      { id: 4, title: 'New Algorithms for Edge Computing', authors: ['X. Shen'], journal: 'IEEE Trans', tier: 'Q2', year: 2024, doi: '10.1109/it.3456', citations: 45, tags: ['Algorithms'] },
-      { id: 5, title: 'Epidemiological Trends in Urban Environments', authors: ['S. Gupta'], journal: 'The Lancet', tier: 'Q1', year: 2023, doi: '10.1016/lan.7890', citations: 215, tags: ['Epidemiology'] }
-    ];
-
-    // Filter results based on query (mock search)
-    if (query) {
-      results = results.filter(r => r.title.toLowerCase().includes(query.toLowerCase()) || r.tags.some(t => t.toLowerCase().includes(query.toLowerCase())));
+    // 2. Execute BM25 Keyword Search across indices
+    const esClient = getEsClient();
+    
+    let esResults = [];
+    try {
+      const response = await esClient.search({
+        index: 'users,papers,projects',
+        body: {
+          query: query ? {
+            multi_match: {
+              query,
+              fields: ['title^2', 'name^2', 'content', 'tags']
+            }
+          } : {
+            match_all: {}
+          },
+          size: 50
+        }
+      });
+      
+      // Extract hits and normalize to our standard format
+      esResults = response.hits.hits.map(hit => ({
+        id: hit._id,
+        _index: hit._index,
+        _score: hit._score,
+        ...hit._source,
+        tags: hit._source.tags || [],
+        tier: hit._source.tier || 'Standard'
+      }));
+    } catch (err) {
+      logger.error('Elasticsearch query failed', err);
+      // Fallback or empty if ES is unreachable
+      esResults = [];
     }
 
     // 3. Personalization Logic with Explainability
-    results = results.map(item => {
+    let results = esResults.map(item => {
       const matchEntries = item.tags.filter(tag => interests.includes(tag));
       const matchCount = matchEntries.length;
-      const score = matchCount * 10 + (item.tier === 'Q1' ? 5 : 0);
+      // Add BM25 score to our personalization score
+      const score = (item._score || 0) + (matchCount * 10) + (item.tier === 'Q1' ? 5 : 0);
       const matchedInterest = matchCount > 0 ? matchEntries[0] : null;
 
       return { 
@@ -37,7 +61,7 @@ class DiscoveryService {
           ? `Matches your research interest in "${matchedInterest}"` 
           : item.tier === 'Q1' 
             ? 'Highly cited paper in a top-tier journal' 
-            : 'Trending in your broader field'
+            : 'Relevant to your search query'
       };
     });
 
@@ -53,8 +77,8 @@ class DiscoveryService {
       [userId, title, doi, journal]
     );
 
-    // Rule #17: Emit Kafka events
-    emitEvent('library.paper.saved', `user_${userId}`, { userId, doi, timestamp: new Date().toISOString() });
+    // Rule #17: Emit events
+    eventBus.emitEvent('event.behaviour', { type: 'library.paper.saved', userId, doi, timestamp: new Date().toISOString() });
     
     logger.info({ userId, doi }, 'Paper saved to library');
 

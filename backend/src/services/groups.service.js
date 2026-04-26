@@ -1,5 +1,5 @@
 const db = require('../config/db');
-const { emitEvent } = require('../utils/kafkaEmitter');
+const eventBus = require('./eventBus.service');
 const logger = require('../utils/logger');
 
 class GroupService {
@@ -19,7 +19,7 @@ class GroupService {
       [group.id, userId, 'admin']
     );
 
-    emitEvent('community.group.created', `user_${userId}`, { userId, groupId: group.id, timestamp: new Date().toISOString() });
+    eventBus.emitEvent('event.behaviour', { type: 'community.group.created', userId, groupId: group.id, timestamp: new Date().toISOString() });
     logger.info({ userId, groupId: group.id }, 'New research group created');
 
     return group;
@@ -50,7 +50,7 @@ class GroupService {
       [groupId, userId, 'member']
     );
 
-    emitEvent('community.group.joined', `user_${userId}`, { userId, groupId, timestamp: new Date().toISOString() });
+    eventBus.emitEvent('event.behaviour', { type: 'community.group.joined', userId, groupId, timestamp: new Date().toISOString() });
     logger.info({ userId, groupId }, 'User joined group');
 
     return { message: 'Joined group successfully' };

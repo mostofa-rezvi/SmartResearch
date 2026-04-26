@@ -10,7 +10,7 @@ const { errors } = require('celebrate');
 const logger = require('./utils/logger');
 const db = require('./config/db');
 const { initRedis } = require('./config/redis');
-const { initElasticsearch } = require('./config/elasticsearch');
+const { initElasticsearch, initIndices } = require('./config/elasticsearch');
 const { initNeo4j } = require('./config/neo4j');
 const errorHandler = require('./middleware/errorHandler');
 const { apiLimiter, authLimiter } = require('./middleware/rateLimit');
@@ -68,6 +68,7 @@ app.use('/api/v1/discovery', require('./routes/discovery'));
 app.use('/api/v1/users', require('./routes/users'));
 app.use('/api/v1/moderation', require('./routes/moderation'));
 app.use('/api/v1/reputation', require('./routes/reputation.routes'));
+app.use('/api/v1/profiles', require('./routes/profile.routes'));
 
 // Backward-compatible non-versioned routes (transitional)
 app.use('/api/auth', authLimiter, require('./routes/auth'));
@@ -79,6 +80,8 @@ app.use('/api/discovery', apiLimiter, require('./routes/discovery'));
 app.use('/api/users', apiLimiter, require('./routes/users'));
 app.use('/api/moderation', require('./routes/moderation'));
 app.use('/api/reputation', require('./routes/reputation.routes'));
+app.use('/api/profiles', require('./routes/profile.routes'));
+
 
 // Socket.IO Connection Event
 io.on('connection', (socket) => {
@@ -93,9 +96,54 @@ io.on('connection', (socket) => {
   });
 });
 
+// Helper function for timeout
+const withTimeout = (promise, ms) => {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), ms))
+  ]);
+};
+
 // Health Check
-app.get('/health', (req, res) => {
-  res.json({ success: true, data: { status: 'UP' }, meta: { timestamp: new Date().toISOString() } });
+app.get('/health', async (req, res) => {
+  const health = {
+    status: 'UP',
+    postgres: 'DOWN',
+    redis: 'DOWN',
+    neo4j: 'DOWN',
+    elasticsearch: 'DOWN',
+    timestamp: new Date().toISOString()
+  };
+
+  const timeoutMs = 3000;
+
+  const checks = await Promise.allSettled([
+    withTimeout(db.query('SELECT 1'), timeoutMs),
+    withTimeout((async () => {
+      const redisClient = require('./config/redis').getRedisClient();
+      return redisClient.ping();
+    })(), timeoutMs),
+    withTimeout((async () => {
+      const session = require('./config/neo4j').getSession();
+      await session.run('RETURN 1');
+      return session.close();
+    })(), timeoutMs),
+    withTimeout((async () => {
+      const esClient = require('./config/elasticsearch').getEsClient();
+      return esClient.ping();
+    })(), timeoutMs)
+  ]);
+
+  if (checks[0].status === 'fulfilled') health.postgres = 'UP';
+  if (checks[1].status === 'fulfilled') health.redis = 'UP';
+  if (checks[2].status === 'fulfilled') health.neo4j = 'UP';
+  if (checks[3].status === 'fulfilled') health.elasticsearch = 'UP';
+
+  if (health.postgres === 'DOWN' || health.redis === 'DOWN' || health.neo4j === 'DOWN' || health.elasticsearch === 'DOWN') {
+    health.status = 'DEGRADED';
+  }
+
+  res.json({ success: true, data: health, meta: { timestamp: health.timestamp } });
 });
 
 // Global Error Handler (standards.md §1: centralized error middleware)
@@ -113,7 +161,17 @@ server.listen(PORT, async () => {
     // Secondary Stores Initialization
     initRedis();
     initElasticsearch();
+    await initIndices();
     initNeo4j();
+    
+    // Start Background Workers
+    const graphSyncWorker = require('./workers/graphSync.worker');
+    await graphSyncWorker.init();
+    graphSyncWorker.start().catch(err => logger.error('GraphSync worker error', err));
+    
+    const searchSyncWorker = require('./workers/searchSync.worker');
+    await searchSyncWorker.init();
+    searchSyncWorker.start().catch(err => logger.error('SearchSync worker error', err));
     
     logger.info('Multi-database environment initialized successfully');
   } catch (err) {
