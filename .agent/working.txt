@@ -69,3 +69,18 @@
 - CMD-056: Plan day 13.
 - CMD-057: Execute day 13.
 - CMD-058: UI review day 13.
+- CMD-059A: UI day 14.
+- CMD-059: Plan day 14.
+- CMD-060: Execute day 14.
+- CMD-061: Review day 14.
+- CMD-062: Eval review day 14.
+- CMD-063: Plan day 15.
+- CMD-064: Execute day 15.
+- CMD-065: Security audit.
+- CMD-066: Audit fix.
+- CMD-067: E2E verify.
+- CMD-068: Final audit.
+- CMD-069: Extract learnings.
+- CMD-070: DOCS update.
+- CMD-071: Project summary.
+- CMD-072: PR branch.

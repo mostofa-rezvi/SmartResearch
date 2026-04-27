@@ -12,3 +12,5 @@
 - **Phase 11**: Real-Time Feed & Direct Messaging logic.
 - **Phase 12**: Document Versioning & Archival history.
 - **Phase 13**: Profile Social Integration (Followers/Citations).
+- **Phase 14**: Publication Forum & Recommender (Completed).
+- **Phase 15**: Production Hardening & Deployment (Completed).
