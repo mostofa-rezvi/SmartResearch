@@ -20,8 +20,8 @@ See: .planning/PROJECT.md (updated 2026-04-26)
 
 Phase: Not started (defining requirements)
 Plan: —
-Status: Defining requirements
-Last activity: 2026-04-26 — Milestone v1.2 started
+Status: Milestone v1.2 shipped — PR pending manual creation
+Last activity: 2026-04-27 — Pushed clean delivery branch pr-v1.2-clean-delivery
 
 ## Milestone History
 - [✓ **Milestone 1.0: Infrastructure & Core Backend**](file:///d:/github/SmartResearch/.planning/milestones/v1.0-ROADMAP.md)
