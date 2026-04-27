@@ -1,28 +1,46 @@
-# ResearchBridge
+# SmartResearch
 
-**ResearchBridge** is a unified digital platform built for the global research community (Scholar & Research Community Platform - SRCP). It solves academic isolation by providing a structured, intelligent, and human-centered space for discovery, collaboration, and knowledge-sharing.
+SmartResearch is an AI-powered social and collaboration platform for the academic community. It bridges the gap between research discovery, peer collaboration, and publication success through a secure, reputation-driven ecosystem.
 
 ## 🚀 Key Features
-- **The Door In**: Frictionless registration with enforced credentialed access.
-- **The Gate**: Two-step biometric/OTP login to protect academic work and reputations.
-- **Four Kinds of People**: Robust hierarchy (Super Admin, Admin, Users, and verified Invited experts).
-- **The First Conversation**: Mandatory onboarding that solves the cold-start problem through domain keyword selection.
-- **The Living Room**: A structured academic Q&A community and open discussion space.
-- **The Library**: A deeply categorized journal directory filtered by quality tiers (Q1-Q3) and geography.
-- **The Discovery Engine**: Personalized research search powered by profile-aware ranking.
-- **The Face**: Differentiated academic identities that act as living CVs for students and credible resumes for professors.
 
----
+- **AI Discovery Engine:** SBERT-powered research matching and trust graph visualization.
+- **Collaborative Workspaces:** Real-time document versioning and research team management.
+- **Publication Assistant:** Live DOAJ journal recommendations and comprehensive submission checklists.
+- **Community Forum:** Threaded discussions protected by **TrustRank** reputation gating and automated spam filtering.
+- **Verified Profiles:** Institutional badge display and social citation integration.
 
-## 🏗️ Technical Architecture
-ResearchBridge is built on a high-performance stack designed for scale and security:
-- **Frontend**: Next.js 15 (App Router), Tailwind CSS
-- **Backend**: Node.js 20, Express
-- **Search & ML**: Elasticsearch 8, Python FastAPI (Sentence-BERT)
-- **Data Layers**: PostgreSQL (Core), Neo4j (Graph Relationship Mapping), Redis (Caching)
-- **Infrastructure**: Kafka (Event-driven processing)
+## 🛠️ Technical Stack
 
----
+- **Frontend:** Next.js (App Router), Zustand, Tailwind CSS, Radix UI.
+- **Backend:** Node.js / Express, PostgreSQL (Primary DB), Redis (Streams/Cache).
+- **AI Service:** Python FastAPI, SBERT (Matching), Neo4j (Trust Graph).
+- **Ops:** Kubernetes, HPA, Cloudflare CDN/WAF.
 
-## 📜 The Vision: Curiosity to Contribution
-"ResearchBridge creates a platform where the full lifecycle of research activity has a home. It supports the journey from discovery and community engagement to formal publication and verified expertise."
+## 🏗️ Getting Started
+
+### Prerequisites
+- Node.js v18+
+- Docker & Kubernetes
+- Python 3.9+ (for ML service)
+
+### Installation
+```bash
+git clone https://github.com/mostofa-rezvi/SmartResearch.git
+cd SmartResearch
+npm install
+```
+
+### Development
+```bash
+npm run dev
+```
+
+## 📜 Documentation
+- [Architecture Guide](ARCHITECTURE.md)
+- [API Reference](API.md)
+- [Deployment Guide](DEPLOYMENT.md)
+- [Contributing](CONTRIBUTING.md)
+
+## 🛡️ License
+MIT
