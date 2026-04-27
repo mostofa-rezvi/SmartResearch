@@ -4,7 +4,7 @@ milestone: v1.2
 milestone_name: "Week 3 — Frontend, Publication Assistant & Production"
 status: completed
 last_updated: "2026-04-27T13:04:00.000Z"
-last_activity: "2026-04-27 -- Milestone v1.2 Completed"
+last_activity: "2026-04-27 -- Generated Milestone summaries for v1.0, v1.1, and v1.2"
 progress:
   total_phases: 5
   completed_phases: 5

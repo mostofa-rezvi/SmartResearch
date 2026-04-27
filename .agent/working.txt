@@ -84,3 +84,4 @@
 - CMD-070: DOCS update.
 - CMD-071: Project summary.
 - CMD-072: PR branch.
+- CMD-073: Ship.
