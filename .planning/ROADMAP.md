@@ -14,3 +14,37 @@
 - **Phase 13**: Profile Social Integration (Followers/Citations).
 - **Phase 14**: Publication Forum & Recommender (Completed).
 - **Phase 15**: Production Hardening & Deployment (Completed).
+
+---
+
+## Backlog
+
+### Phase 999.1: Mobile App (BACKLOG)
+**Goal:** Native mobile experience for researcher on-the-go.
+**Requirements:** TBD
+**Plans:** 0 plans
+
+### Phase 999.2: GraphQL API (BACKLOG)
+**Goal:** Provide a flexible GraphQL endpoint for internal and external consumption.
+**Requirements:** TBD
+**Plans:** 0 plans
+
+### Phase 999.3: Advanced Analytics Dashboard (BACKLOG)
+**Goal:** Visual impact analytics and institutional research metrics.
+**Requirements:** TBD
+**Plans:** 0 plans
+
+### Phase 999.4: Multi-language Support (BACKLOG)
+**Goal:** Localization for international research teams.
+**Requirements:** TBD
+**Plans:** 0 plans
+
+### Phase 999.5: API Marketplace (BACKLOG)
+**Goal:** Monetization and developer ecosystem for research data.
+**Requirements:** TBD
+**Plans:** 0 plans
+
+### Phase 999.6: Institutional SSO (BACKLOG)
+**Goal:** SAML/OIDC integration for university-wide logins.
+**Requirements:** TBD
+**Plans:** 0 plans
