@@ -28,7 +28,7 @@ const initRedis = () => {
  */
 const getRedisClient = () => {
   if (!redisClient) {
-    throw new Error('Redis client not initialized');
+    initRedis();
   }
   return redisClient;
 };

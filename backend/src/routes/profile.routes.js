@@ -3,7 +3,7 @@ const { celebrate } = require('celebrate');
 const multer = require('multer');
 const profileController = require('../controllers/profile.controller');
 const profileValidation = require('../validations/profile.validation');
-const { protect } = require('../middleware/auth.middleware');
+const { verifyAuth } = require('../middleware/auth.middleware');
 
 const router = express.Router();
 
@@ -13,7 +13,7 @@ const upload = multer({
   limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
 });
 
-router.use(protect);
+router.use(verifyAuth);
 
 router.get('/me', profileController.getProfile);
 router.get('/:id', profileController.getProfile);

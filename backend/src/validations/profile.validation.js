@@ -1,7 +1,7 @@
-const Joi = require('joi');
+const { Joi, Segments } = require('celebrate');
 
 const updateProfile = {
-  body: Joi.object().keys({
+  [Segments.BODY]: Joi.object().keys({
     name: Joi.string(),
     bio: Joi.string().max(500).allow(''),
     institution_id: Joi.number().integer(),
