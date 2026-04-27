@@ -7,10 +7,24 @@
 
 ---
 
-## Next Milestone: v1.2 — Feed & Social Dynamics (PENDING)
+## [✓] Milestone v1.2 — Feed & Social Dynamics
 - **Goal**: Implement real-time activity feeds, direct messaging, and document versioning.
-- **Phase 11**: Real-Time Feed & Direct Messaging logic.
-- **Phase 12**: Document Versioning & Archival history.
-- **Phase 13**: Profile Social Integration (Followers/Citations).
-- **Phase 14**: Publication Forum & Recommender (Completed).
-- **Phase 15**: Production Hardening & Deployment (Completed).
+- **Status**: Completed (2026-04-27)
+- **Summary**: Delivered Next.js frontend, Publication Assistant, and production-grade K8s infrastructure.
+
+---
+
+## Next Milestone: v2.0 — Scaling & Ecosystem
+- **Goal**: Expand to mobile, provide external APIs, and integrate institutional SSO.
+- **Phase 16**: Mobile App — Native experience for researchers.
+- **Phase 17**: GraphQL API — Flexible external consumption layer.
+- **Phase 18**: Advanced Analytics Dashboard — Institutional research metrics.
+- **Phase 19**: Multi-language Support — International localization.
+- **Phase 20**: API Marketplace — Developer ecosystem and monetization.
+- **Phase 21**: Institutional SSO — University-wide SAML/OIDC integration.
+
+---
+
+## Backlog
+
+(Empty — All items promoted to v2.0)

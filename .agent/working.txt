@@ -88,3 +88,5 @@
 - CMD-074: Session report.
 
 - CMD-075: Backlog.
+- CMD-076: Plant seeds.
+- CMD-077: Review backlog.
