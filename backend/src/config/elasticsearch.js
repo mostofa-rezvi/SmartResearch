@@ -69,7 +69,7 @@ const initIndices = async () => {
       if (!exists) {
         await esClient.indices.create({
           index: indexName,
-          body: mappingBody
+          ...mappingBody
         });
         logger.info(`Created Elasticsearch index: ${indexName} with specific vector mappings`);
       }

@@ -1,5 +1,5 @@
 const rateLimit = require('express-rate-limit');
-const RedisStore = require('rate-limit-redis').default;
+const { RedisStore } = require('rate-limit-redis');
 const { getRedisClient } = require('../config/redis');
 const logger = require('../utils/logger');
 
@@ -35,7 +35,7 @@ const createLimiter = (windowMs, limit, prefix) => {
 const apiLimiter = createLimiter(15 * 60 * 1000, 100, 'rl:global:');
 
 // Auth limiter: 10 requests per 1 hour (for login, register, etc.)
-const authLimiter = createLimiter(60 * 60 * 1000, 10, 'rl:auth:');
+const authLimiter = createLimiter(60 * 60 * 1000, 100, 'rl:auth:');
 
 module.exports = {
   apiLimiter,

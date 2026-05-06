@@ -33,7 +33,18 @@ const getRedisClient = () => {
   return redisClient;
 };
 
+/**
+ * Returns a fresh Redis client instance.
+ * Useful for blocking commands (like BRPOP or XREAD BLOCK) to avoid blocking the main app connection.
+ */
+const createClient = () => {
+  return new Redis(config.redis.url, {
+    maxRetriesPerRequest: null, // Blocking commands require this
+  });
+};
+
 module.exports = {
   initRedis,
-  getRedisClient
+  getRedisClient,
+  createClient
 };

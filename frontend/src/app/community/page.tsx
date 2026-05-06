@@ -47,7 +47,7 @@ export default function CommunityFeedPage() {
   const fetchPosts = async () => {
     try {
       const response = await fetch(API.community.posts, {
-        headers: { "x-auth-token": token || "" }
+        headers: { "Authorization": `Bearer ${token}` }
       });
       const data = await response.json();
       setPosts(Array.isArray(data) ? data : []);
@@ -73,7 +73,7 @@ export default function CommunityFeedPage() {
     try {
       await fetch(API.community.vote(String(id)), {
         method: "POST",
-        headers: { "Content-Type": "application/json", "x-auth-token": token },
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
         body: JSON.stringify({ value: val })
       });
       // Optionally re-fetch to ensure server-side discovery ranking is correct

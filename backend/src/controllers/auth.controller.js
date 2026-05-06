@@ -1,7 +1,7 @@
 const passport = require('passport');
 const crypto = require('crypto');
 const { v4: uuidv4 } = { v4: () => crypto.randomUUID() };
-const { Pool } = require('pg');
+const db = require('../config/db');
 const config = require('../config/index');
 const { hashPassword } = require('../utils/hash');
 const { sendEmail } = require('../utils/email');
@@ -10,9 +10,7 @@ const { getRedisClient } = require('../config/redis');
 const { envelope, errorEnvelope } = require('../utils/responseEnvelope');
 const logger = require('../utils/logger');
 
-const pool = new Pool({
-  connectionString: config.db.url,
-});
+// Using centralized db pool from config
 
 // --- Security Constants ---
 const PASSWORD_MIN_LENGTH = 8;
@@ -47,7 +45,7 @@ class AuthController {
 
     try {
       // Check if user exists
-      const checkResult = await pool.query('SELECT id FROM users WHERE email = $1', [email]);
+      const checkResult = await db.query('SELECT id FROM users WHERE email = $1', [email]);
       if (checkResult.rows.length > 0) {
         return res.status(409).json(errorEnvelope('Email already in use', 409));
       }
@@ -58,7 +56,7 @@ class AuthController {
       // T6 Fix: Set verification token expiry
       const expiresAt = new Date(Date.now() + VERIFICATION_TOKEN_EXPIRY_HOURS * 60 * 60 * 1000);
 
-      const insertResult = await pool.query(
+      const insertResult = await db.query(
         `INSERT INTO users (name, email, password, verification_token, provider) 
          VALUES ($1, $2, $3, $4, 'local') RETURNING id, name, email, is_verified`,
         [name, email, hashedPassword, verificationToken]
@@ -70,14 +68,15 @@ class AuthController {
       const redis = getRedisClient();
       await redis.set(`verify_token:${verificationToken}`, user.id, 'EX', VERIFICATION_TOKEN_EXPIRY_HOURS * 60 * 60);
 
-      // Send verification email
-      const verifyUrl = `${ALLOWED_REDIRECT_ORIGINS[0]}/verify-email?token=${verificationToken}`;
-      await sendEmail({
+      // Send verification email (Async - do not await to prevent blocking the response)
+      const verifyUrl = `${ALLOWED_REDIRECT_ORIGINS[0]}/verify?token=${verificationToken}`;
+      sendEmail({
         to: email,
         subject: 'Verify your ResearchBridge account',
         text: `Please verify your account by clicking this link: ${verifyUrl}`,
         html: `<p>Please verify your account by clicking this link: <a href="${verifyUrl}">Verify Account</a></p>`,
-      });
+      }).catch(err => logger.error({ email, error: err.message }, 'Failed to send verification email in background'));
+
 
       res.status(201).json(envelope(user, { message: 'Registration successful. Please check your email to verify your account.' }));
     } catch (err) {
@@ -195,16 +194,16 @@ class AuthController {
       const storedUserId = await redis.get(`verify_token:${token}`);
       
       if (!storedUserId) {
-        return res.status(400).json(errorEnvelope('Invalid or expired verification token', 400));
+        return res.status(400).json(errorEnvelope('Invalid, expired, or already verified token. If you are already verified, please try logging in.', 400));
       }
 
-      const result = await pool.query(
+      const result = await db.query(
         'UPDATE users SET is_verified = true, verification_token = NULL WHERE verification_token = $1 RETURNING id',
         [token]
       );
 
       if (result.rowCount === 0) {
-        return res.status(400).json(errorEnvelope('Invalid or expired verification token', 400));
+        return res.status(400).json(errorEnvelope('Invalid, expired, or already verified token. If you are already verified, please try logging in.', 400));
       }
 
       // Clean up Redis
@@ -277,13 +276,29 @@ class AuthController {
       });
 
       // Get user info
-      const result = await pool.query('SELECT id, name, email, role FROM users WHERE id = $1', [userId]);
+      const result = await db.query('SELECT id, name, email, role FROM users WHERE id = $1', [userId]);
       const user = result.rows[0];
 
       res.json(envelope({
         accessToken,
         user,
       }, { message: 'OAuth login successful' }));
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async completeOnboarding(req, res, next) {
+    const { interests, preferences } = req.body;
+    const userId = req.user.id;
+
+    try {
+      await db.query(
+        'UPDATE users SET research_interests = $1, onboarding_completed = true, updated_at = NOW() WHERE id = $2',
+        [JSON.stringify({ interests, preferences }), userId]
+      );
+
+      res.json(envelope({ message: 'Onboarding completed successfully' }));
     } catch (err) {
       next(err);
     }

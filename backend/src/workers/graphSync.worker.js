@@ -1,4 +1,4 @@
-const { getRedisClient } = require('../config/redis');
+const { createClient } = require('../config/redis');
 const { getSession } = require('../config/neo4j');
 const logger = require('../utils/logger');
 
@@ -13,7 +13,7 @@ class GraphSyncWorker {
   }
 
   async init() {
-    this.redisClient = getRedisClient();
+    this.redisClient = createClient();
 
     try {
       // Create consumer group, $ means start consuming from new messages only

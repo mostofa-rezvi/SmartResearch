@@ -1,4 +1,4 @@
-const { getRedisClient } = require('../config/redis');
+const { createClient } = require('../config/redis');
 const { getEsClient } = require('../config/elasticsearch');
 const logger = require('../utils/logger');
 
@@ -13,7 +13,7 @@ class SearchSyncWorker {
   }
 
   async init() {
-    this.redisClient = getRedisClient();
+    this.redisClient = createClient();
 
     try {
       // Create consumer group

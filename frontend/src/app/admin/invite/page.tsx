@@ -38,7 +38,7 @@ export default function SuperAdminInvitePage() {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",
-          "x-auth-token": token || ""
+          "Authorization": `Bearer ${token}`
         },
         body: JSON.stringify({ name, email }),
       });

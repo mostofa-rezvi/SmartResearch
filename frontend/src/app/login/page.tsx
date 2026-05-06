@@ -35,9 +35,15 @@ function LoginContent() {
       });
       const result = await response.json();
 
-      if (response.ok && result.data?.otp_required) {
-        setStep(2);
-        setSuccessMessage(result.data.message);
+      if (response.ok) {
+        if (result.data?.otp_required) {
+          setStep(2);
+          setSuccessMessage(result.data.message);
+        } else if (result.data?.accessToken) {
+          auth.login(result.data.accessToken, result.data.user);
+          setSuccessMessage("Authentication successful! Entering research lab...");
+          setTimeout(() => window.location.href = "/dashboard", 1200);
+        }
       } else {
         setError(result.error?.message || result.data?.message || "Invalid credentials");
       }

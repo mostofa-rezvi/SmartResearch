@@ -21,7 +21,16 @@ import { useAuth } from "@/context/AuthContext";
 import Link from "next/link";
 
 export default function DashboardPage() {
-  const { user } = useAuth();
+  const { user, isLoading } = useAuth();
+  
+  if (isLoading) {
+    return <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex items-center justify-center">
+      <div className="animate-pulse flex flex-col items-center">
+        <div className="w-12 h-12 bg-primary/20 rounded-full mb-4"></div>
+        <div className="h-4 w-32 bg-slate-200 dark:bg-slate-700 rounded"></div>
+      </div>
+    </div>;
+  }
 
   const stats = [
     { label: "Community Posts", value: "24", icon: <MessageSquare size={20} />, color: "text-blue-500", bg: "bg-blue-50" },
@@ -159,10 +168,10 @@ export default function DashboardPage() {
              {/* Profile Card */}
              <div className="bg-white dark:bg-slate-800 p-8 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-xl text-center">
                 <div className="w-20 h-20 rounded-full bg-slate-100 dark:bg-slate-900 mx-auto mb-4 border-4 border-white dark:border-slate-700 flex items-center justify-center text-primary text-3xl font-black shadow-inner">
-                  {user?.name.charAt(0)}
+                  {user?.name?.charAt(0) || 'U'}
                 </div>
-                <h3 className="text-xl font-bold text-slate-900 dark:text-white leading-tight">{user?.name}</h3>
-                <p className="text-slate-500 text-sm mb-6 uppercase tracking-widest font-medium mt-1">{user?.role.replace('_', ' ')}</p>
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white leading-tight">{user?.name || 'Researcher'}</h3>
+                <p className="text-slate-500 text-sm mb-6 uppercase tracking-widest font-medium mt-1">{(user?.role && typeof user.role === 'string') ? user.role.replace('_', ' ') : 'Research Member'}</p>
                 <div className="flex justify-center gap-2 mb-6">
                   {user?.onboarding_completed && (
                     <span className="text-[10px] font-bold bg-accent/10 text-accent px-3 py-1 rounded-full border border-accent/20">VERIFIED RESEARCHER</span>

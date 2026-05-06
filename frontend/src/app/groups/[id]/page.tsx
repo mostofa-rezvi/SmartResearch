@@ -40,7 +40,7 @@ export default function GroupDetailPage() {
     try {
        await fetch(API.groups.join(String(id)), {
         method: "POST",
-        headers: { "x-auth-token": token || "" }
+        headers: { "Authorization": `Bearer ${token}` }
       });
       // Refresh or state update
       window.location.reload();

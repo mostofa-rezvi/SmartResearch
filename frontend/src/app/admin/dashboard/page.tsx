@@ -28,7 +28,7 @@ export default function AdminDashboardPage() {
 
   const fetchDashboardData = async () => {
     try {
-      const headers = { "x-auth-token": token || "" };
+      const headers = { "Authorization": `Bearer ${token}` };
       const [statsRes, queueRes, logsRes] = await Promise.all([
         fetch(API.admin.moderationStats, { headers }),
         fetch(API.admin.moderationQueue, { headers }),
@@ -52,7 +52,7 @@ export default function AdminDashboardPage() {
     try {
       await fetch(API.admin.resolveFlag(String(id)), {
         method: "POST",
-        headers: { "Content-Type": "application/json", "x-auth-token": token || "" },
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
         body: JSON.stringify({ action, reason: "Admin Discretion" })
       });
       fetchDashboardData();
@@ -63,7 +63,7 @@ export default function AdminDashboardPage() {
     try {
       await fetch(API.admin.journalStatus(String(id)), {
         method: "POST",
-        headers: { "Content-Type": "application/json", "x-auth-token": token || "" },
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
         body: JSON.stringify({ status })
       });
       fetchDashboardData();

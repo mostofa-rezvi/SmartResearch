@@ -4,6 +4,7 @@ const crypto = require('crypto');
 const passport = require('passport');
 const { getRedisClient } = require('../config/redis');
 const authController = require('../controllers/auth.controller');
+const { verifyAuth } = require('../middleware/auth.middleware');
 
 // --- OAuth State Management (T4 Fix: CSRF protection) ---
 const OAUTH_STATE_TTL = 300; // 5 minutes
@@ -42,6 +43,7 @@ router.post('/logout', authController.logout);
 // @route   GET /api/v1/auth/verify-email
 // @desc    Verify user email
 router.get('/verify-email', authController.verifyEmail);
+router.post('/onboarding/complete', verifyAuth, authController.completeOnboarding);
 
 // @route   POST /api/v1/auth/exchange-code
 // @desc    Exchange OAuth auth code for tokens (T2 security fix)
