@@ -2,14 +2,14 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { 
-  LayoutDashboard, 
-  Search, 
-  Users, 
-  BookOpen, 
-  Sparkles, 
-  TrendingUp, 
-  FileText, 
+import {
+  LayoutDashboard,
+  Search,
+  Users,
+  BookOpen,
+  Sparkles,
+  TrendingUp,
+  FileText,
   Settings,
   Bell,
   MessageSquare,
@@ -22,7 +22,7 @@ import Link from "next/link";
 
 export default function DashboardPage() {
   const { user, isLoading } = useAuth();
-  
+
   if (isLoading) {
     return <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex items-center justify-center">
       <div className="animate-pulse flex flex-col items-center">
@@ -78,7 +78,7 @@ export default function DashboardPage() {
         {/* Stats Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
           {stats.map((stat, idx) => (
-            <motion.div 
+            <motion.div
               key={idx}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -103,8 +103,8 @@ export default function DashboardPage() {
                 <h3 className="text-2xl font-bold mb-2">Smart Discovery</h3>
                 <p className="text-primary-foreground/80 mb-6 max-w-md">Find cutting-edge research papers matched to your profile using our AI engine.</p>
                 <div className="flex gap-2 p-2 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20">
-                  <input 
-                    type="text" 
+                  <input
+                    type="text"
                     placeholder="Search by topic, DOI or author..."
                     className="flex-1 bg-transparent border-none outline-none text-white placeholder:text-white/50 px-4"
                   />
@@ -155,7 +155,7 @@ export default function DashboardPage() {
                     <div className="text-[10px] font-black text-secondary mb-3 uppercase tracking-[0.1em]">{rec.category}</div>
                     <h4 className="font-serif font-black text-slate-900 dark:text-white mb-4 line-clamp-3 leading-snug group-hover:text-secondary transition-colors">{rec.title}</h4>
                     <div className="text-[10px] uppercase font-bold text-slate-400 mt-auto flex items-center gap-2">
-                       <FileText size={12} /> {rec.journal}
+                      <FileText size={12} /> {rec.journal}
                     </div>
                   </div>
                 ))}
@@ -165,39 +165,39 @@ export default function DashboardPage() {
 
           {/* Sidebar Area */}
           <div className="space-y-8">
-             {/* Profile Card */}
-             <div className="bg-white dark:bg-slate-800 p-8 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-xl text-center">
-                <div className="w-20 h-20 rounded-full bg-slate-100 dark:bg-slate-900 mx-auto mb-4 border-4 border-white dark:border-slate-700 flex items-center justify-center text-primary text-3xl font-black shadow-inner">
-                  {user?.name?.charAt(0) || 'U'}
-                </div>
-                <h3 className="text-xl font-bold text-slate-900 dark:text-white leading-tight">{user?.name || 'Researcher'}</h3>
-                <p className="text-slate-500 text-sm mb-6 uppercase tracking-widest font-medium mt-1">{(user?.role && typeof user.role === 'string') ? user.role.replace('_', ' ') : 'Research Member'}</p>
-                <div className="flex justify-center gap-2 mb-6">
-                  {user?.onboarding_completed && (
-                    <span className="text-[10px] font-bold bg-accent/10 text-accent px-3 py-1 rounded-full border border-accent/20">VERIFIED RESEARCHER</span>
-                  )}
-                </div>
-                <button className="w-full py-3 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 font-bold hover:bg-slate-100 transition-all flex items-center justify-center gap-2">
-                  <Settings size={18} /> Edit Profile
-                </button>
-             </div>
+            {/* Profile Card */}
+            <div className="bg-white dark:bg-slate-800 p-8 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-xl text-center">
+              <div className="w-20 h-20 rounded-full bg-slate-100 dark:bg-slate-900 mx-auto mb-4 border-4 border-white dark:border-slate-700 flex items-center justify-center text-primary text-3xl font-black shadow-inner">
+                {user?.name?.charAt(0) || 'U'}
+              </div>
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white leading-tight">{user?.name || 'Researcher'}</h3>
+              <p className="text-slate-500 text-sm mb-6 uppercase tracking-widest font-medium mt-1">{(user?.role && typeof user.role === 'string') ? user.role.replace('_', ' ') : 'Research Member'}</p>
+              <div className="flex justify-center gap-2 mb-6">
+                {user?.onboarding_completed && (
+                  <span className="text-[10px] font-bold bg-accent/10 text-accent px-3 py-1 rounded-full border border-accent/20">VERIFIED RESEARCHER</span>
+                )}
+              </div>
+              <button className="w-full py-3 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 font-bold hover:bg-slate-100 transition-all flex items-center justify-center gap-2">
+                <Settings size={18} /> Edit Profile
+              </button>
+            </div>
 
-             {/* Recent Activity */}
-             <div className="bg-white dark:bg-slate-800 p-8 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-xl">
-                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-6">Recent Activity</h3>
-                <div className="space-y-6">
-                  {recentActivity.map((activity, idx) => (
-                    <div key={idx} className="flex gap-4 items-start">
-                      <div className="w-2 h-2 rounded-full bg-primary mt-2" />
-                      <div>
-                        <p className="text-sm font-bold text-slate-900 dark:text-white leading-tight mb-1">{activity.title}</p>
-                        <p className="text-xs text-slate-500">{activity.time}</p>
-                      </div>
+            {/* Recent Activity */}
+            <div className="bg-white dark:bg-slate-800 p-8 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-xl">
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-6">Recent Activity</h3>
+              <div className="space-y-6">
+                {recentActivity.map((activity, idx) => (
+                  <div key={idx} className="flex gap-4 items-start">
+                    <div className="w-2 h-2 rounded-full bg-primary mt-2" />
+                    <div>
+                      <p className="text-sm font-bold text-slate-900 dark:text-white leading-tight mb-1">{activity.title}</p>
+                      <p className="text-xs text-slate-500">{activity.time}</p>
                     </div>
-                  ))}
-                </div>
-                <button className="w-full mt-8 text-primary text-sm font-bold hover:underline">View History →</button>
-             </div>
+                  </div>
+                ))}
+              </div>
+              <button className="w-full mt-8 text-primary text-sm font-bold hover:underline">View History →</button>
+            </div>
           </div>
         </div>
       </main>
@@ -206,5 +206,5 @@ export default function DashboardPage() {
 }
 
 const ChevronRight = ({ size }: { size: number }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>
 );

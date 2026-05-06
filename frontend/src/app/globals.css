@@ -19,7 +19,7 @@
 }
 
 :root {
-  --background: #F8FAFC;
+  --background: #FDFCFB; /* Premium Off-White */
   --foreground: #0F172A;
   --primary: #0A192F;
   --secondary: #991B1B;
@@ -27,6 +27,7 @@
   --border: #E2E8F0;
   --input: #E2E8F0;
   --ring: #0A192F;
+  --card: #FFFFFF;
   
   --font-serif: var(--font-fraunces), serif;
   --font-sans: var(--font-outfit), var(--font-inter), sans-serif;
@@ -35,10 +36,11 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #020617;
-    --foreground: #F8FAFC;
-    --border: #1E293B;
-    --card: #0F172A;
+    /* Keep it light and airy as requested, even in dark preference */
+    --background: #F7F7F7; 
+    --foreground: #0F172A;
+    --border: #E2E8F0;
+    --card: #FFFFFF;
   }
 }
 

@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 const { getRedisClient } = require('../config/redis');
 const config = require('../config/index');
 
-const ACCESS_TOKEN_EXPIRATION = '15m';
+const ACCESS_TOKEN_EXPIRATION = '24h';
 const REFRESH_TOKEN_EXPIRATION = '7d';
 const REFRESH_TOKEN_TTL_SECONDS = 7 * 24 * 60 * 60; // 7 days in seconds
 

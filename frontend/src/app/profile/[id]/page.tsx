@@ -20,8 +20,8 @@ export default function ProfilePage() {
       try {
         const response = await fetch(API.users.profile(id as string));
         if (response.ok) {
-          const data = await response.json();
-          setProfile(data);
+          const result = await response.json();
+          setProfile(result.data || result);
         } else {
           setProfile(null);
         }
@@ -34,25 +34,25 @@ export default function ProfilePage() {
     fetchProfile();
   }, [id]);
 
-  if (loading) return <div className="min-h-screen bg-slate-50 dark:bg-slate-900 pt-32 text-center text-slate-400">Loading Academic Profile...</div>;
-  if (!profile) return <div className="min-h-screen bg-slate-50 dark:bg-slate-900 pt-32 text-center text-slate-400">Researcher not found.</div>;
+  if (loading) return <div className="min-h-screen bg-slate-50  pt-32 text-center text-slate-400">Loading Academic Profile...</div>;
+  if (!profile) return <div className="min-h-screen bg-slate-50  pt-32 text-center text-slate-400">Researcher not found.</div>;
 
   const isOwnProfile = currentUser?.id?.toString() === id;
   const isInvited = profile.role === 'invited_user';
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 pb-20">
+    <div className="min-h-screen bg-slate-50  pb-20">
       <Navbar />
 
       {/* Hero Header */}
-      <div className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-800 pt-32 pb-12">
+      <div className="bg-white  border-b border-slate-200  pt-32 pb-12">
         <div className="max-w-5xl mx-auto px-6 flex flex-col md:flex-row items-center md:items-start gap-8">
           <div className="w-32 h-32 bg-gradient-to-br from-primary to-secondary rounded-3xl flex items-center justify-center text-white text-5xl font-bold shadow-2xl shrink-0">
-            {profile.name[0]}
+            {profile.name?.[0] || '?'}
           </div>
           <div className="flex-1 text-center md:text-left">
             <div className="flex flex-col md:flex-row md:items-center gap-3 mb-2">
-              <h1 className="text-4xl md:text-5xl font-serif font-black text-primary dark:text-white">
+              <h1 className="text-4xl md:text-5xl font-serif font-black text-primary ">
                 {isInvited && profile.extended_profile?.title ? `${profile.extended_profile.title} ` : ''}{profile.name}
               </h1>
               {isInvited && (
@@ -69,7 +69,7 @@ export default function ProfilePage() {
 
             <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
               {profile.research_interests?.interests?.slice(0, 4).map((tag: string) => (
-                <span key={tag} className="text-xs font-bold text-slate-400 bg-slate-100 dark:bg-slate-900 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800">
+                <span key={tag} className="text-xs font-bold text-slate-400 bg-slate-100  px-3 py-1.5 rounded-lg border border-slate-200 ">
                   #{tag}
                 </span>
               ))}
@@ -77,7 +77,7 @@ export default function ProfilePage() {
           </div>
           
           {isOwnProfile && (
-            <button className="px-6 py-2.5 bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-300 font-bold rounded-xl flex items-center gap-2 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">
+            <button className="px-6 py-2.5 bg-slate-100  text-slate-600  font-bold rounded-xl flex items-center gap-2 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">
               <Settings size={18} /> Edit Profile
             </button>
           )}
@@ -90,12 +90,12 @@ export default function ProfilePage() {
         <div className="space-y-6">
           
           {/* Trust Score & Shared Interests */}
-          <div className="bg-white dark:bg-slate-800 p-8 rounded-[32px] border border-slate-100 dark:border-slate-700 shadow-xl">
+          <div className="bg-white  p-8 rounded-[32px] border border-slate-100  shadow-xl">
             <h3 className="mono-academic text-xs font-black tracking-[0.2em] text-slate-400 mb-6 flex items-center gap-2">
               <ShieldCheck size={18} className="text-emerald-500" /> Trust Score
             </h3>
-            <div className="mb-6 flex flex-col items-center justify-center p-6 bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800">
-              <div className="text-4xl font-black text-slate-900 dark:text-white mb-2">94/100</div>
+            <div className="mb-6 flex flex-col items-center justify-center p-6 bg-slate-50  rounded-2xl border border-slate-100 ">
+              <div className="text-4xl font-black text-slate-900  mb-2">94/100</div>
               <div className="text-sm font-bold text-amber-500 bg-amber-50 dark:bg-amber-500/10 px-3 py-1 rounded-full border border-amber-200 dark:border-amber-500/20">
                 Gold Tier
               </div>
@@ -117,7 +117,7 @@ export default function ProfilePage() {
             )}
           </div>
 
-          <div className={`bg-white dark:bg-slate-800 p-8 rounded-[32px] border ${isInvited ? 'border-accent/30 shadow-accent/5' : 'border-slate-100 dark:border-slate-700'} shadow-2xl`}>
+          <div className={`bg-white  p-8 rounded-[32px] border ${isInvited ? 'border-accent/30 shadow-accent/5' : 'border-slate-100 '} shadow-2xl`}>
             <h3 className="mono-academic text-xs font-black tracking-[0.2em] text-slate-400 mb-8 flex items-center gap-2">
               <Activity size={18} className="text-secondary" /> Academic Stats
             </h3>
@@ -128,23 +128,23 @@ export default function ProfilePage() {
                 { icon: <Bookmark size={16} />, label: "Library", value: profile.activity_stats?.saved_papers_count || 0, color: "text-emerald-500" },
                 { icon: <Users size={16} />, label: "Groups", value: profile.activity_stats?.joined_groups_count || 0, color: "text-purple-500" }
               ].map((stat, i) => (
-                <div key={i} className="flex justify-between items-center bg-slate-50 dark:bg-slate-900/50 p-4 rounded-2xl border border-slate-100 dark:border-slate-700">
+                <div key={i} className="flex justify-between items-center bg-slate-50 /50 p-4 rounded-2xl border border-slate-100 ">
                   <div className="flex items-center gap-3">
                     <div className={`${stat.color} opacity-80`}>{stat.icon}</div>
                     <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">{stat.label}</span>
                   </div>
-                  <span className="text-xl font-black text-slate-900 dark:text-white leading-none">{stat.value}</span>
+                  <span className="text-xl font-black text-slate-900  leading-none">{stat.value}</span>
                 </div>
               ))}
             </div>
           </div>
 
           {isInvited && (
-            <div className="bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-xl space-y-4">
+            <div className="bg-white  p-6 rounded-3xl border border-slate-100  shadow-xl space-y-4">
               <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2">
                 <Mail size={16} /> Contact & Preferences
               </h3>
-              <p className="text-sm text-slate-600 dark:text-slate-300">
+              <p className="text-sm text-slate-600 ">
                 {profile.extended_profile?.contact_preferences || "Contact preferences not strictly defined. Open to academic inquiries."}
               </p>
             </div>
@@ -156,9 +156,9 @@ export default function ProfilePage() {
           
           {/* Invited User Extended Data */}
           {isInvited && profile.extended_profile?.academic_bio && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="bg-white dark:bg-slate-800 p-8 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-xl">
-              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-4">Academic Biography</h3>
-              <p className="text-slate-600 dark:text-slate-300 leading-relaxed font-serif">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="bg-white  p-8 rounded-3xl border border-slate-100  shadow-xl">
+              <h3 className="text-xl font-bold text-slate-900  mb-4">Academic Biography</h3>
+              <p className="text-slate-600  leading-relaxed font-serif">
                 {profile.extended_profile.academic_bio}
               </p>
             </motion.div>
@@ -166,32 +166,32 @@ export default function ProfilePage() {
 
           {isInvited && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-sm">
+              <div className="bg-white  p-6 rounded-3xl border border-slate-100  shadow-sm">
                 <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2">
                   <Award size={16} /> Verified Metrics
                 </h3>
                 <div className="space-y-4">
-                  <div className="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-2">
+                  <div className="flex justify-between items-center border-b border-slate-100  pb-2">
                     <span className="text-sm text-slate-500">Publications</span>
-                    <span className="font-bold text-slate-900 dark:text-white">{profile.extended_profile?.publications_count || 0}</span>
+                    <span className="font-bold text-slate-900 ">{profile.extended_profile?.publications_count || 0}</span>
                   </div>
-                  <div className="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-2">
+                  <div className="flex justify-between items-center border-b border-slate-100  pb-2">
                     <span className="text-sm text-slate-500">h-index</span>
-                    <span className="font-bold text-slate-900 dark:text-white">{profile.extended_profile?.h_index || 'N/A'}</span>
+                    <span className="font-bold text-slate-900 ">{profile.extended_profile?.h_index || 'N/A'}</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-slate-500">Supervised</span>
-                    <span className="font-bold text-slate-900 dark:text-white">{profile.extended_profile?.students_supervised || 0}</span>
+                    <span className="font-bold text-slate-900 ">{profile.extended_profile?.students_supervised || 0}</span>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-sm">
+              <div className="bg-white  p-6 rounded-3xl border border-slate-100  shadow-sm">
                 <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2">
                   <BookOpen size={16} /> Ongoing Projects
                 </h3>
                 {profile.extended_profile?.ongoing_projects ? (
-                  <ul className="list-disc pl-4 text-sm text-slate-600 dark:text-slate-300 space-y-2">
+                  <ul className="list-disc pl-4 text-sm text-slate-600  space-y-2">
                     {(profile.extended_profile.ongoing_projects as string[]).map((proj, i) => <li key={i}>{proj}</li>)}
                   </ul>
                 ) : (
@@ -202,8 +202,8 @@ export default function ProfilePage() {
           )}
 
           {/* Common Timeline */}
-          <div className="bg-white dark:bg-slate-800 p-8 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-xl">
-            <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-3">
+          <div className="bg-white  p-8 rounded-3xl border border-slate-100  shadow-xl">
+            <h3 className="text-xl font-bold text-slate-900  mb-6 flex items-center gap-3">
               <Clock className="text-primary" /> Community Activity
             </h3>
             
@@ -211,14 +211,14 @@ export default function ProfilePage() {
               <div className="space-y-6 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-slate-200 dark:before:via-slate-700 before:to-transparent">
                 {profile.recent_activity.map((activity: any, idx: number) => (
                   <div key={idx} className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
-                    <div className="flex items-center justify-center w-10 h-10 rounded-full border-4 border-white dark:border-slate-800 bg-primary/20 text-primary shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow-sm relative z-10 text-xs">
+                    <div className="flex items-center justify-center w-10 h-10 rounded-full border-4 border-white  bg-primary/20 text-primary shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow-sm relative z-10 text-xs">
                       {activity.type === 'post' ? <MessageSquare size={14} /> : <MessageSquare size={14} strokeWidth={1.5} />}
                     </div>
-                    <div className="bg-slate-50 dark:bg-slate-900 w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 rounded-2xl border border-slate-100 dark:border-slate-700">
+                    <div className="bg-slate-50  w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 rounded-2xl border border-slate-100 ">
                       <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1 block">
                         {new Date(activity.created_at).toLocaleDateString()}
                       </span>
-                      {activity.title && <h4 className="font-bold text-sm text-slate-900 dark:text-white mb-1 line-clamp-1">{activity.title}</h4>}
+                      {activity.title && <h4 className="font-bold text-sm text-slate-900  mb-1 line-clamp-1">{activity.title}</h4>}
                       <p className="text-xs text-slate-500 line-clamp-2">{activity.content}</p>
                     </div>
                   </div>

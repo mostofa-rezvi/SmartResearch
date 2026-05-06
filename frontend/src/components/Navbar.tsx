@@ -15,19 +15,19 @@ export default function Navbar() {
           <div className="relative w-10 h-10 flex items-center justify-center">
             <div className="absolute inset-0 bg-primary rounded-xl rotate-3 group-hover:rotate-6 transition-transform" />
             <div className="absolute inset-0 bg-secondary rounded-xl -rotate-3 group-hover:-rotate-6 transition-transform opacity-80" />
-            <div className="relative z-10 w-8 h-8 bg-white dark:bg-[#0A192F] rounded-lg flex items-center justify-center overflow-hidden">
+            <div className="relative z-10 w-8 h-8 bg-white rounded-lg flex items-center justify-center overflow-hidden">
                <div className="w-4 h-0.5 bg-primary absolute top-3" />
                <div className="w-5 h-4 border-2 border-primary rounded-t-full mt-2" />
             </div>
           </div>
-          <span className="text-2xl font-serif font-black tracking-tight text-primary dark:text-white">
+          <span className="text-2xl font-serif font-black tracking-tight text-primary">
             ResearchBridge
           </span>
         </Link>
 
         {/* Essential Navigation */}
         {user && (
-          <div className="hidden lg:flex items-center gap-8 text-[15px] font-bold text-slate-600 dark:text-slate-400">
+          <div className="hidden lg:flex items-center gap-8 text-[15px] font-bold text-slate-600">
             <Link href="/library" className="hover:text-primary transition-colors">Library</Link>
             <Link href="/discovery" className="hover:text-primary transition-colors">Discovery</Link>
             <Link href="/community" className="hover:text-primary transition-colors">Community</Link>
@@ -42,15 +42,15 @@ export default function Navbar() {
           <Link href="/support" className="hover:text-primary transition-colors">Support</Link>
         </div>
 
-        <div className="w-px h-6 bg-slate-200 dark:bg-slate-800 hidden md:block" />
+        <div className="w-px h-6 bg-slate-200 hidden md:block" />
 
         {user ? (
           <div className="flex items-center gap-6">
             <Link href="/dashboard" className="text-sm font-bold text-primary px-4 py-2 bg-primary/5 rounded-lg hover:bg-primary/10 transition-colors">
               Lab
             </Link>
-            <div className="flex items-center gap-4 border-l border-slate-200 dark:border-slate-800 pl-6">
-              <Link href={`/profile/${user.id}`} className="text-sm font-semibold text-slate-700 dark:text-slate-200 hover:text-primary transition-colors">
+            <div className="flex items-center gap-4 border-l border-slate-200 pl-6">
+              <Link href={`/profile/${user.id}`} className="text-sm font-semibold text-slate-700 hover:text-primary transition-colors">
                 {user.name}
               </Link>
               <button 
@@ -63,7 +63,7 @@ export default function Navbar() {
           </div>
         ) : (
           <div className="flex items-center gap-2">
-            <Link href="/login" className="px-5 py-2.5 text-[15px] font-bold text-slate-700 dark:text-slate-200 hover:text-primary transition-colors">
+            <Link href="/login" className="px-5 py-2.5 text-[15px] font-bold text-slate-700 hover:text-primary transition-colors">
               Login
             </Link>
             <Link 

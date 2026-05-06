@@ -14,9 +14,10 @@ const verifyAuth = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, config.jwt.accessSecret);
-    req.user = decoded; // { id: '...' }
+    req.user = decoded;
     next();
   } catch (err) {
+    console.error(`[Auth] Token verification failed: ${err.message}`, { token: token.substring(0, 10) + '...' });
     if (err.name === 'TokenExpiredError') {
       return res.status(401).json({ error: 'Unauthorized: Token expired' });
     }
