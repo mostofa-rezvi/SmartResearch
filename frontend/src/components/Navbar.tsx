@@ -30,6 +30,7 @@ export default function Navbar() {
           <div className="hidden lg:flex items-center gap-8 text-[15px] font-bold text-slate-600">
             <Link href="/library" className="hover:text-primary transition-colors">Library</Link>
             <Link href="/discovery" className="hover:text-primary transition-colors">Discovery</Link>
+            <Link href="/researchers" className="hover:text-primary transition-colors">Researchers</Link>
             <Link href="/community" className="hover:text-primary transition-colors">Community</Link>
             <Link href="/groups" className="hover:text-primary transition-colors">Groups</Link>
           </div>

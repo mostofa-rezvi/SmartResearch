@@ -37,11 +37,14 @@ async function main() {
     let total = 0;
     for (const cat of CATEGORIES) {
       console.log(`🔍 Fetching: ${cat}`);
-      const results = await fetchJournalsByCategory(cat);
       
-      for (const item of results) {
-        const j = item.bibjson;
-        const name = j.title;
+      // Fetch 2 pages per category to hit 1000+ target (10 categories * 2 pages * 50 = 1000)
+      for (let page = 1; page <= 2; page++) {
+        const results = await fetchJournalsByCategory(cat, page);
+        
+        for (const item of results) {
+          const j = item.bibjson;
+          const name = j.title;
         const issn = j.eissn || j.pissn || (j.identifier && j.identifier[0] ? j.identifier[0].id : null);
         const publisher = j.publisher?.name || "Unknown Publisher";
         const url = j.link?.[0]?.url || "";
@@ -58,7 +61,7 @@ async function main() {
         );
         total++;
       }
-      console.log(`   ✅ Added ${results.length} journals for ${cat}`);
+      console.log(`   ✅ Added up to page 2 for ${cat} (Total so far: ${total})`);
     }
     console.log(`\n🎉 Total journals seeded: ${total}`);
   } catch (err) {
