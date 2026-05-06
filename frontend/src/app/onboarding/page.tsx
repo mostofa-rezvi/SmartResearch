@@ -1,35 +1,94 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, Sparkles, Brain, Cpu, Microscope, Globe, CheckCircle2, ArrowRight } from "lucide-react";
+import { Sparkles, Brain, CheckCircle2, ArrowRight, ArrowLeft, Loader2, Microscope, Users, BookOpen, MessageSquare } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { API } from "@/config/api";
 
-const DOMAINS = [
-  { id: 'cs', name: 'Computer Science', icon: <Cpu />, keywords: ['AI', 'Cryptography', 'Algorithms', 'Quantum Computing', 'Web3'] },
-  { id: 'bio', name: 'Biology & Medicine', icon: <Microscope />, keywords: ['Genetics', 'Neuroscience', 'Biotech', 'Drug Discovery', 'Epidemiology'] },
-  { id: 'ss', name: 'Social Sciences', icon: <Globe />, keywords: ['Sociology', 'Political Theory', 'Psychology', 'Economics', 'Anthropology'] },
-  { id: 'phys', name: 'Physical Sciences', icon: <Brain />, keywords: ['Particle Physics', 'Astrophysics', 'Materials Science', 'Climate Change', 'Nanotechnology'] }
-];
+interface Question {
+  id: number;
+  section: string;
+  question_text: string;
+  input_type: 'single_choice' | 'multi_choice' | 'free_text' | 'scale';
+  options: string[];
+  is_required: boolean;
+  sort_order: number;
+}
+
+const SECTION_ICONS: Record<string, React.ReactNode> = {
+  identity: <Users size={18} />,
+  focus: <Brain size={18} />,
+  collaboration: <Users size={18} />,
+  publication: <BookOpen size={18} />,
+  community: <MessageSquare size={18} />,
+};
+
+const SECTION_LABELS: Record<string, string> = {
+  identity: "Research Identity",
+  focus: "Intellectual Focus",
+  collaboration: "Collaboration Axis",
+  publication: "Publication Targets",
+  community: "Community Pulse",
+};
 
 export default function OnboardingPage() {
-  const [step, setStep] = useState(1);
-  const [selectedKeywords, setSelectedKeywords] = useState<string[]>([]);
-  const [researchType, setResearchType] = useState<'theoretical' | 'applied' | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [answers, setAnswers] = useState<Record<number, any>>({});
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { user, token, completeOnboarding } = useAuth();
   const router = useRouter();
 
-  const toggleKeyword = (kw: string) => {
-    setSelectedKeywords(prev => 
-      prev.includes(kw) ? prev.filter(k => k !== kw) : [...prev, kw]
-    );
+  useEffect(() => {
+    const fetchQuestions = async () => {
+      try {
+        const res = await fetch(API.onboarding.questionsFlat);
+        const json = await res.json();
+        if (json.success) {
+          setQuestions(json.data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch questions", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchQuestions();
+  }, []);
+
+  const currentQuestion = questions[currentQuestionIndex];
+
+  const handleAnswer = (val: any) => {
+    setAnswers(prev => ({ ...prev, [currentQuestion.id]: val }));
+  };
+
+  const toggleMultiChoice = (option: string) => {
+    const current = answers[currentQuestion.id] || [];
+    const updated = current.includes(option)
+      ? current.filter((o: string) => o !== option)
+      : [...current, option];
+    handleAnswer(updated);
+  };
+
+  const nextStep = () => {
+    if (currentQuestionIndex < questions.length - 1) {
+      setCurrentQuestionIndex(prev => prev + 1);
+    } else {
+      handleSubmit();
+    }
+  };
+
+  const prevStep = () => {
+    if (currentQuestionIndex > 0) {
+      setCurrentQuestionIndex(prev => prev - 1);
+    }
   };
 
   const handleSubmit = async () => {
-    setIsLoading(true);
+    setIsSubmitting(true);
     try {
       const response = await fetch(API.auth.onboardingComplete, {
         method: "POST",
@@ -38,149 +97,151 @@ export default function OnboardingPage() {
           "Authorization": `Bearer ${token}`
         },
         body: JSON.stringify({ 
-          interests: selectedKeywords,
-          preferences: { researchType }
+          answers,
+          completedAt: new Date().toISOString()
         }),
       });
 
       if (response.ok) {
         completeOnboarding();
-        router.push("/");
+        router.push("/dashboard");
       }
     } catch (err) {
-        console.error("Onboarding failed", err);
+      console.error("Onboarding failed", err);
     } finally {
-      setIsLoading(false);
+      setIsSubmitting(false);
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex items-center justify-center">
+        <Loader2 className="animate-spin text-primary" size={48} />
+      </div>
+    );
+  }
+
+  if (questions.length === 0) {
+    return <div className="p-20 text-center">No questions found. Please seed the database.</div>;
+  }
+
+  const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
+  const isLastQuestion = currentQuestionIndex === questions.length - 1;
+  const canContinue = !currentQuestion.is_required || (answers[currentQuestion.id] && (Array.isArray(answers[currentQuestion.id]) ? answers[currentQuestion.id].length > 0 : true));
+
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex flex-col items-center justify-center p-6 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]">
-      <div className="max-w-3xl w-full">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex flex-col items-center justify-center p-6 overflow-hidden">
+      {/* Background Decor */}
+      <div className="absolute top-0 left-0 w-full h-1 bg-slate-200 dark:bg-slate-800">
+        <motion.div 
+          initial={{ width: 0 }}
+          animate={{ width: `${progress}%` }}
+          className="h-full bg-primary shadow-[0_0_10px_rgba(var(--primary-rgb),0.5)]"
+        />
+      </div>
+
+      <div className="max-w-2xl w-full relative z-10">
         <div className="flex justify-between items-center mb-12">
           <div className="flex items-center gap-2 text-primary font-serif">
-            <Sparkles className="animate-pulse" size={20} />
-            <span className="font-black text-2xl tracking-tight italic">The First Habit</span>
+            <Sparkles className="text-secondary" size={24} />
+            <span className="font-black text-2xl tracking-tighter uppercase italic">Calibrating Lab</span>
           </div>
-          <div className="flex gap-2">
-            {[1, 2, 3].map(i => (
-              <div key={i} className={`w-12 h-1.5 rounded-full transition-all duration-500 ${step >= i ? 'bg-primary' : 'bg-slate-200 dark:bg-slate-800'}`} />
-            ))}
+          <div className="text-xs font-black text-slate-400 uppercase tracking-widest bg-white dark:bg-slate-800 px-4 py-2 rounded-full border border-slate-100 dark:border-slate-700">
+            Node {currentQuestionIndex + 1} / {questions.length}
           </div>
         </div>
 
         <AnimatePresence mode="wait">
-          {step === 1 && (
-            <motion.div 
-              key="step1"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              className="space-y-8"
-            >
-              <h1 className="text-4xl md:text-6xl font-black text-slate-900 dark:text-white leading-tight font-serif">
-                How do you <br />
-                <span className="text-secondary italic">approach Knowledge?</span>
+          <motion.div 
+            key={currentQuestion.id}
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -50 }}
+            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+            className="space-y-10"
+          >
+            <header className="space-y-4">
+              <div className="flex items-center gap-2 text-secondary font-black text-[10px] uppercase tracking-[0.2em] bg-secondary/5 w-fit px-3 py-1 rounded">
+                {SECTION_ICONS[currentQuestion.section]} {SECTION_LABELS[currentQuestion.section]}
+              </div>
+              <h1 className="text-4xl md:text-5xl font-serif font-black text-slate-900 dark:text-white leading-[1.1] tracking-tight">
+                {currentQuestion.question_text.split('?')[0]}
+                <span className="text-secondary italic">?</span>
               </h1>
-              <p className="text-slate-500 text-lg max-w-xl">Every researcher has a unique intellectual signature. Define your methodology to calibrate our discovery engine.</p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
-                <button 
-                  onClick={() => { setResearchType('theoretical'); setStep(2); }}
-                  className="p-8 rounded-3xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 shadow-xl hover:shadow-primary/10 hover:border-primary transition-all text-left group"
-                >
-                  <div className="w-12 h-12 bg-blue-50 dark:bg-blue-900/30 text-blue-500 rounded-xl mb-6 flex items-center justify-center group-hover:scale-110 transition-transform"><Brain /></div>
-                  <h3 className="text-xl font-bold mb-2">Theoretical</h3>
-                  <p className="text-slate-500 text-sm">Focus on abstract concepts, first principles, and mathematical proofs.</p>
-                </button>
-                <button 
-                  onClick={() => { setResearchType('applied'); setStep(2); }}
-                  className="p-8 rounded-3xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 shadow-xl hover:shadow-primary/10 hover:border-primary transition-all text-left group"
-                >
-                  <div className="w-12 h-12 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-500 rounded-xl mb-6 flex items-center justify-center group-hover:scale-110 transition-transform"><Microscope /></div>
-                  <h3 className="text-xl font-bold mb-2">Applied</h3>
-                  <p className="text-slate-500 text-sm">Focus on practical solutions, engineering, and empirical experimentation.</p>
-                </button>
-              </div>
-            </motion.div>
-          )}
+            </header>
 
-          {step === 2 && (
-            <motion.div 
-              key="step2"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              className="space-y-8"
-            >
-              <h1 className="text-4xl md:text-5xl font-black text-slate-900 dark:text-white font-serif">
-                Map your <span className="text-accent italic">Intellectual Terrain.</span>
-              </h1>
-              <p className="text-slate-500">Select the domains where you intend to pursue breakthroughs.</p>
-              <div className="space-y-8 pt-4">
-                {DOMAINS.map(domain => (
-                  <div key={domain.id} className="space-y-4">
-                    <div className="flex items-center gap-3 text-slate-400 font-bold uppercase tracking-widest text-xs">
-                      {domain.icon} {domain.name}
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      {domain.keywords.map(kw => (
-                        <button
-                          key={kw}
-                          onClick={() => toggleKeyword(kw)}
-                          className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all border ${
-                            selectedKeywords.includes(kw)
-                            ? 'bg-primary text-white border-primary shadow-lg shadow-primary/20'
-                            : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-100 dark:border-slate-700 hover:border-primary/50'
-                          }`}
-                        >
-                          {kw}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <div className="pt-8">
-                <button 
-                  disabled={selectedKeywords.length < 3}
-                  onClick={() => setStep(3)}
-                  className="bg-slate-900 dark:bg-white dark:text-slate-900 text-white px-10 py-4 rounded-2xl font-bold flex items-center gap-3 shadow-2xl disabled:opacity-30 transition-all hover:gap-5"
-                >
-                  Next Step <ArrowRight size={20} />
-                </button>
-                <p className="mt-4 text-xs text-slate-400">Please select at least 3 keywords to continue.</p>
-              </div>
-            </motion.div>
-          )}
-
-          {step === 3 && (
-            <motion.div 
-              key="step3"
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="text-center space-y-8 py-10"
-            >
-              <div className="w-24 h-24 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-500 rounded-full mx-auto flex items-center justify-center">
-                <CheckCircle2 size={48} />
-              </div>
-              <div>
-                <h1 className="text-4xl font-bold text-slate-900 dark:text-white mb-2">We've established the <span className="text-primary">Seed.</span></h1>
-                <p className="text-slate-500 text-lg">Your profile is now calibrated to {selectedKeywords.length} core research vectors.</p>
-              </div>
-              <div className="bg-white dark:bg-slate-800 p-6 rounded-3xl border border-dashed border-slate-200 dark:border-slate-700 max-w-sm mx-auto">
-                <div className="flex flex-wrap gap-1 justify-center opacity-60 grayscale">
-                  {selectedKeywords.map(k => <span key={k} className="text-[10px] uppercase font-bold px-2 py-1 bg-slate-50 rounded italic">{k}</span>)}
+            <div className="space-y-4 pt-4">
+              {currentQuestion.input_type === 'single_choice' && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {currentQuestion.options.map(option => (
+                    <button
+                      key={option}
+                      onClick={() => handleAnswer(option)}
+                      className={`p-6 rounded-3xl text-left font-bold transition-all border ${
+                        answers[currentQuestion.id] === option
+                        ? 'bg-primary text-white border-primary shadow-xl shadow-primary/20 scale-[1.02]'
+                        : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-100 dark:border-slate-700 hover:border-primary/50'
+                      }`}
+                    >
+                      {option}
+                    </button>
+                  ))}
                 </div>
-              </div>
+              )}
+
+              {currentQuestion.input_type === 'multi_choice' && (
+                <div className="flex flex-wrap gap-3">
+                  {currentQuestion.options.map(option => {
+                    const isSelected = (answers[currentQuestion.id] || []).includes(option);
+                    return (
+                      <button
+                        key={option}
+                        onClick={() => toggleMultiChoice(option)}
+                        className={`px-6 py-3 rounded-2xl text-sm font-bold transition-all border ${
+                          isSelected
+                          ? 'bg-secondary text-white border-secondary shadow-lg shadow-secondary/20'
+                          : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-100 dark:border-slate-700 hover:border-secondary/50'
+                        }`}
+                      >
+                        {option}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+
+              {currentQuestion.input_type === 'free_text' && (
+                <textarea
+                  value={answers[currentQuestion.id] || ""}
+                  onChange={(e) => handleAnswer(e.target.value)}
+                  placeholder="Elaborate your thoughts..."
+                  className="w-full bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-3xl p-8 text-lg font-medium outline-none focus:ring-4 focus:ring-primary/10 transition-all min-h-[200px]"
+                />
+              )}
+            </div>
+
+            <footer className="flex items-center justify-between pt-12 border-t border-slate-100 dark:border-slate-700">
               <button 
-                onClick={handleSubmit}
-                disabled={isLoading}
-                className="bg-primary text-white px-12 py-5 rounded-2xl font-bold text-xl shadow-2xl hover:scale-105 active:scale-95 transition-all shadow-primary/25"
+                onClick={prevStep}
+                disabled={currentQuestionIndex === 0}
+                className="flex items-center gap-2 text-slate-400 font-bold hover:text-slate-600 transition-all disabled:opacity-0"
               >
-                {isLoading ? "Calibrating..." : "Enter ResearchBridge"}
+                <ArrowLeft size={18} /> Previous
               </button>
-            </motion.div>
-          )}
+
+              <button 
+                onClick={nextStep}
+                disabled={!canContinue || isSubmitting}
+                className={`px-10 py-4 rounded-2xl font-black flex items-center gap-3 transition-all ${
+                  isLastQuestion 
+                  ? 'bg-emerald-500 text-white shadow-xl shadow-emerald-500/20' 
+                  : 'bg-primary text-white shadow-xl shadow-primary/20'
+                } hover:scale-105 active:scale-95 disabled:opacity-20`}
+              >
+                {isSubmitting ? "Finalizing..." : isLastQuestion ? "Complete Calibration" : "Next Protocol"} <ArrowRight size={20} />
+              </button>
+            </footer>
+          </motion.div>
         </AnimatePresence>
       </div>
     </div>

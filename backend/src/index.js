@@ -70,6 +70,8 @@ app.use('/api/v1/moderation', require('./routes/moderation'));
 app.use('/api/v1/reputation', require('./routes/reputation.routes'));
 app.use('/api/v1/profiles', require('./routes/profile.routes'));
 app.use('/api/v1/recommendations', require('./routes/recommendationRoutes'));
+app.use('/api/v1/researchers', require('./routes/researchers'));
+app.use('/api/v1/onboarding', require('./routes/onboarding'));
 
 // Backward-compatible non-versioned routes (transitional)
 app.use('/api/auth', authLimiter, require('./routes/auth'));
@@ -83,6 +85,8 @@ app.use('/api/moderation', require('./routes/moderation'));
 app.use('/api/reputation', require('./routes/reputation.routes'));
 app.use('/api/profiles', require('./routes/profile.routes'));
 app.use('/api/recommendations', require('./routes/recommendationRoutes'));
+app.use('/api/researchers', require('./routes/researchers'));
+app.use('/api/onboarding', require('./routes/onboarding'));
 
 
 // Socket.IO Connection Event

@@ -1,0 +1,179 @@
+# 7-Day Data Collection Plan for Research Collaboration Platform
+
+Today is **April 27** → Deadline **May 3**. Here's your focused execution plan.
+
+---
+
+## What You Need (Targets)
+
+| Data Type | Target | Priority |
+|---|---|---|
+| Researchers/Professors | 100+ profiles | High |
+| Journals (Q1–Q4) | 1000+ entries | High |
+| Onboarding Questions | 20–30 questions | Medium |
+| Research Communities/Topics | 50+ categories | Medium |
+
+---
+
+## Phase 1: Journals (Days 1–2) — Easiest Win
+
+This is 100% free and publicly available. You don't need to manually collect 1000 journals — **download them in bulk**.
+
+### Free Authoritative Sources
+
+**Scimago Journal Rankings (SJR)** — Best source
+- Go to: `scimagojr.com/journalrank.php`
+- Filter by: Subject area, Q1/Q2/Q3/Q4, Year
+- **Export as CSV** → You get thousands of journals instantly
+- Fields included: Journal name, ISSN, Publisher, H-index, Quartile, Subject area, Country
+
+**Clarivate/Web of Science JCR**
+- `jcr.clarivate.com` (needs institutional access OR use your university login)
+- Gives Impact Factor + Quartile data
+
+**DOAJ (Directory of Open Access Journals)**
+- `doaj.org/csv` → Free bulk download, 20,000+ journals
+- Great for open-access researchers
+
+**Scopus Source List**
+- Google: *"Scopus source list 2024 download"*
+- Elsevier publishes this as an Excel file publicly every year
+
+### Day 1–2 Action
+```
+1. Download Scimago CSV → filter top 1000 by citations
+2. Download DOAJ CSV → merge unique journals
+3. Tag each with: Field, Quartile, ISSN, Publisher, Submission URL
+4. Load into your DB — this is bulk insert, not manual entry
+```
+
+---
+
+## Phase 2: Researchers & Professors (Days 2–4) — Requires Strategy
+
+You **cannot scrape** LinkedIn or Academia.edu. Use these legitimate approaches:
+
+### Source 1: OpenAlex (Best Free API)
+- `openalex.org` — Open scholarly graph with 250M+ works
+- **API endpoint:** `api.openalex.org/authors?filter=cited_by_count:>1000`
+- Returns: Name, Institution, Research topics, Citation count, ORCID, recent publications
+- **Free, no auth needed for basic use**
+- You can pull 100+ researchers per domain in minutes
+
+```javascript
+// Example API call
+fetch("https://api.openalex.org/authors?filter=last_known_institution.country_code:US,cited_by_count:>500&per-page=50&page=1")
+```
+
+### Source 2: ORCID Public Data
+- `pub.orcid.org` — Public researcher profiles
+- Download the **ORCID Public Data File** (torrent, ~30GB) OR use their API
+- API: `pub.orcid.org/v3.0/search/?q=keyword:machine+learning&rows=100`
+- Returns: ORCID iD, name, affiliation, works
+
+### Source 3: Google Scholar Profiles (Manual but Targeted)
+- Search: `site:scholar.google.com "professor" "machine learning" "Stanford"`
+- Collect: Name, University, h-index, Research interests, Email (if public)
+- **Manual — do 20/day across domains**
+
+### Source 4: University Faculty Pages
+Target 10 universities × 10 professors each = 100 profiles
+```
+MIT, Stanford, Harvard, Oxford, Cambridge, ETH Zurich,
+NUS Singapore, IIT Bombay, University of Toronto, TU Berlin
+```
+Each university has a public faculty directory. Collect name, department, research area, profile URL.
+
+### Research Domains to Cover (Ensures Variety)
+- Computer Science / AI / ML
+- Biomedical / Life Sciences
+- Environmental Science / Climate
+- Physics / Materials Science
+- Economics / Social Sciences
+- Engineering (Civil, Mechanical, Electrical)
+- Psychology / Neuroscience
+- Mathematics / Statistics
+
+---
+
+## Phase 3: Onboarding Questions (Day 4–5)
+
+These drive your recommendation engine. Use this pre-built set:
+
+### Section A: Identity (4 questions)
+1. What is your current role? *(Student / PhD Researcher / Professor / Industry Researcher / Independent)*
+2. What is your highest degree? *(Bachelor's / Master's / PhD / Postdoc)*
+3. Which country/institution are you affiliated with?
+4. How many years of research experience do you have? *(0–1 / 2–5 / 5–10 / 10+)*
+
+### Section B: Research Focus (5 questions)
+5. What is your primary research domain? *(multi-select from 30 categories)*
+6. What are your specific research keywords/topics? *(free text, up to 5 tags)*
+7. What stage are your current projects at? *(Ideation / Data Collection / Analysis / Writing / Published)*
+8. What type of research do you primarily do? *(Empirical / Theoretical / Computational / Review / Mixed)*
+9. Are you currently working on a thesis/dissertation? *(Yes – Undergrad / Yes – PhD / No)*
+
+### Section C: Collaboration Goals (5 questions)
+10. What are you looking for? *(Co-author / Supervisor / Mentee / Peer reviewer / Study group / Funding partner)*
+11. What is your preferred collaboration style? *(Remote only / Hybrid / In-person preferred)*
+12. Are you open to international collaboration? *(Yes / Preferred region only / No)*
+13. How much time can you commit per week? *(<5 hrs / 5–10 hrs / 10–20 hrs / Full-time)*
+14. Do you need help with specific skills? *(Statistics / Writing / Coding / Lab work / Literature review)*
+
+### Section D: Publication & Journals (4 questions)
+15. Have you published before? *(Yes – Q1/Q2 / Yes – Q3/Q4 / Conference only / No)*
+16. Which journal quartiles are you targeting? *(Q1 / Q2 / Q3 / Q4 / Any)*
+17. What citation style does your field use? *(APA / IEEE / Vancouver / Chicago / Other)*
+18. Are you interested in open-access publishing? *(Yes / No / Doesn't matter)*
+
+### Section E: Community Participation (3 questions)
+19. What kind of content would you post? *(Questions / Answers / Paper summaries / Job posts / Events)*
+20. What format of help do you prefer giving/receiving? *(Text answers / Video calls / Async feedback / Code review)*
+21. Would you like to be listed as publicly discoverable? *(Full profile / Limited / No)*
+
+---
+
+## Phase 4: Community Seed Data (Day 5–6)
+
+Pre-populate your Stack Overflow-style Q&A with real questions from:
+
+- **ResearchGate** — Browse popular questions publicly
+- **Reddit r/PhD, r/AskAcademia** — Top posts become seed questions
+- **StackExchange Academia** — `academia.stackexchange.com` (all public)
+
+Seed 50–100 questions across categories like:
+*"How do I choose between Q1 and Q2 journals?", "Best statistical tools for survey research?", "How to find a PhD supervisor abroad?"*
+
+---
+
+## Day-by-Day Execution Schedule
+
+| Day | Task | Output |
+|---|---|---|
+| **Apr 27 (Today)** | Download Scimago + DOAJ CSVs, set up DB schema | 500+ journals imported |
+| **Apr 28** | Clean journal data, add quartile tags, finish 1000 target | 1000 journals ready |
+| **Apr 29** | OpenAlex API pull — 50 researchers across 5 domains | 50 researcher profiles |
+| **Apr 30** | ORCID API + manual Google Scholar — 50 more researchers | 100 researcher profiles |
+| **May 1** | Finalize onboarding questions, build recommendation logic | Question set locked |
+| **May 2** | Seed Q&A community content, test recommendations | Platform seeded |
+| **May 3** | Buffer day — fix data gaps, QA, soft launch | **Beta ready ✅** |
+
+---
+
+## Tools to Speed This Up
+
+| Tool | Use |
+|---|---|
+| **Python + pandas** | Clean and merge CSV data |
+| **OpenAlex Python client** | `pip install pyalex` |
+| **Google Sheets** | Quick manual data entry for researchers |
+| **Airtable** | Visual DB for reviewing before importing |
+| **Postman** | Test ORCID/OpenAlex APIs quickly |
+
+---
+
+## Key Advice
+
+**Don't build profiles manually.** Use OpenAlex and ORCID APIs — you can get 100 quality researcher profiles in an afternoon with a simple script. The journal data is even easier since it's bulk CSV download.
+
+For your beta, **quality over quantity matters more** — 100 well-tagged researchers across 8 domains is far more useful than 500 incomplete profiles. Focus on completeness of each record: name, institution, domain, keywords, and a profile link.

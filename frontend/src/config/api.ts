@@ -52,4 +52,15 @@ export const API = {
     resolveFlag:       (id: string) => `${API_BASE}/api/v1/moderation/resolve_flag/${id}`,
     journalStatus:     (id: string) => `${API_BASE}/api/v1/moderation/journals/${id}/status`,
   },
+  // Researchers domain (seeded from OpenAlex)
+  researchers: {
+    list:              `${API_BASE}/api/v1/researchers`,
+    liveSearch:        `${API_BASE}/api/v1/researchers/openalex-sync`,
+    detail:            (id: string) => `${API_BASE}/api/v1/researchers/${id}`,
+  },
+  // Onboarding domain
+  onboarding: {
+    questions:         `${API_BASE}/api/v1/onboarding/questions`,
+    questionsFlat:     `${API_BASE}/api/v1/onboarding/questions/flat`,
+  },
 } as const;
