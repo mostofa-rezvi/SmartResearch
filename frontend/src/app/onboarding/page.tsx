@@ -39,7 +39,7 @@ export default function OnboardingPage() {
   const [answers, setAnswers] = useState<Record<number, any>>({});
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { user, token, completeOnboarding } = useAuth();
+  const { user, token, completeOnboarding, logout } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
@@ -104,7 +104,12 @@ export default function OnboardingPage() {
 
       if (response.ok) {
         completeOnboarding();
-        router.push("/dashboard");
+        window.location.href = "/dashboard";
+      } else if (response.status === 401) {
+        alert("Your session has expired. Please log in again.");
+        logout();
+      } else {
+        alert("Something went wrong. Please try again.");
       }
     } catch (err) {
       console.error("Onboarding failed", err);

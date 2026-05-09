@@ -60,6 +60,7 @@ async function main() {
           [name, issn, cat, null, tier, impact, url, publisher]
         );
         total++;
+        }
       }
       console.log(`   ✅ Added up to page 2 for ${cat} (Total so far: ${total})`);
     }
