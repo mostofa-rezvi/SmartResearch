@@ -13,6 +13,7 @@ export default function CommunityFeedPage() {
   const [posts, setPosts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'question' | 'thought'>('all');
+  const [searchQuery, setSearchQuery] = useState('');
   const [socketConnected, setSocketConnected] = useState(false);
   const { user, token } = useAuth();
 
@@ -62,10 +63,28 @@ export default function CommunityFeedPage() {
   const handleVote = async (id: number, val: number) => {
     if (!token) return;
 
+    const targetPost = posts.find(p => p.id === id);
+    if (!targetPost) return;
+    const newVal = targetPost.user_vote === val ? 0 : val;
+
     // Optimistic UI Update (Frontend Rule #3)
     setPosts(prevPosts => prevPosts.map(p => {
       if (p.id === id) {
-        return { ...p, vote_score: (parseInt(p.vote_score) || 0) + val };
+        let upDiff = 0;
+        let downDiff = 0;
+        
+        if (p.user_vote === 1) upDiff = -1;
+        if (p.user_vote === -1) downDiff = -1;
+
+        if (newVal === 1) upDiff = 1;
+        if (newVal === -1) downDiff = 1;
+
+        return { 
+          ...p, 
+          upvotes: (parseInt(p.upvotes) || 0) + upDiff,
+          downvotes: (parseInt(p.downvotes) || 0) + downDiff,
+          user_vote: newVal === 0 ? null : newVal
+        };
       }
       return p;
     }));
@@ -74,7 +93,7 @@ export default function CommunityFeedPage() {
       await fetch(API.community.vote(String(id)), {
         method: "POST",
         headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
-        body: JSON.stringify({ value: val })
+        body: JSON.stringify({ value: newVal })
       });
       // Optionally re-fetch to ensure server-side discovery ranking is correct
       // but the optimistic update handles the immediate feedback.
@@ -86,8 +105,18 @@ export default function CommunityFeedPage() {
   };
 
   const filteredPosts = React.useMemo(() => {
-    return posts.filter(p => filter === 'all' || p.type === filter);
-  }, [posts, filter]);
+    let result = posts.filter(p => filter === 'all' || p.type === filter);
+    
+    const q = searchQuery.toLowerCase().trim();
+    if (q) {
+      result = result.filter(p => 
+        (p.title && p.title.toLowerCase().includes(q)) || 
+        (p.content && p.content.toLowerCase().includes(q))
+      );
+    }
+    
+    return result;
+  }, [posts, filter, searchQuery]);
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
@@ -132,13 +161,21 @@ export default function CommunityFeedPage() {
             <Search className="text-slate-400 ml-2" size={20} />
             <input 
               type="text" 
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
               placeholder="Search library, methodologies, papers..." 
-              className="w-full bg-transparent border-none outline-none text-sm"
+              className="w-full bg-transparent border-none outline-none text-sm text-slate-800 dark:text-slate-200"
             />
           </div>
 
           {loading ? (
             <div className="py-20 text-center animate-pulse italic text-slate-400">Blending your personalized research feed...</div>
+          ) : filteredPosts.length === 0 ? (
+            <div className="py-20 text-center text-slate-400">
+              <div className="text-4xl mb-3">🔍</div>
+              <p className="font-bold text-slate-700 dark:text-white mb-1">No matches found</p>
+              <p className="text-sm">Try adjusting your search terms.</p>
+            </div>
           ) : (
             <AnimatePresence>
               {filteredPosts.map((post, idx) => (
@@ -203,10 +240,16 @@ export default function CommunityFeedPage() {
 
                   <div className="flex items-center justify-between pt-6 border-t border-slate-50 dark:border-slate-900">
                     <div className="flex items-center gap-6">
-                      <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-900 px-3 py-1.5 rounded-full">
-                        <button onClick={() => handleVote(post.id, 1)} className="hover:text-primary transition-colors"><ThumbsUp size={16} /></button>
-                        <span className="text-sm font-bold min-w-[20px] text-center">{post.vote_score || 0}</span>
-                        <button onClick={() => handleVote(post.id, -1)} className="hover:text-red-500 transition-colors"><ThumbsDown size={16} /></button>
+                      <div className="flex items-center gap-3 bg-slate-50 dark:bg-slate-900 px-3 py-1.5 rounded-full border border-slate-100 dark:border-slate-700">
+                        <button onClick={() => handleVote(post.id, 1)} className={`flex items-center gap-1.5 transition-colors ${post.user_vote === 1 ? "text-emerald-500" : "text-slate-400 hover:text-emerald-500"}`}>
+                          <ThumbsUp size={16} />
+                          <span className="text-xs font-bold">{post.upvotes || 0}</span>
+                        </button>
+                        <div className="w-px h-3 bg-slate-200 dark:bg-slate-600"></div>
+                        <button onClick={() => handleVote(post.id, -1)} className={`flex items-center gap-1.5 transition-colors ${post.user_vote === -1 ? "text-rose-500" : "text-slate-400 hover:text-rose-500"}`}>
+                          <span className="text-xs font-bold">{post.downvotes || 0}</span>
+                          <ThumbsDown size={16} />
+                        </button>
                       </div>
                       <button className="flex items-center gap-2 text-slate-400 hover:text-primary transition-colors">
                         <MessageSquare size={16} /> <span className="text-sm font-medium">{post.comment_count || 0}</span>

@@ -1,10 +1,12 @@
 const jwt = require('jsonwebtoken');
 const config = require('../config/index');
 
+const db = require('../config/db');
+
 /**
  * Middleware to verify JWT access token from Authorization header.
  */
-const verifyAuth = (req, res, next) => {
+const verifyAuth = async (req, res, next) => {
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return res.status(401).json({ error: 'Unauthorized: No token provided' });
@@ -14,7 +16,22 @@ const verifyAuth = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, config.jwt.accessSecret);
-    req.user = decoded;
+    const userId = decoded.id || (decoded.user && decoded.user.id);
+    
+    if (!userId) {
+      return res.status(401).json({ error: 'Unauthorized: Invalid token payload' });
+    }
+
+    const result = await db.query(
+      'SELECT id, name, email, role, onboarding_completed FROM users WHERE id = $1',
+      [userId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(401).json({ error: 'Unauthorized: User not found' });
+    }
+
+    req.user = result.rows[0];
     next();
   } catch (err) {
     console.error(`[Auth] Token verification failed: ${err.message}`, { token: token.substring(0, 10) + '...' });

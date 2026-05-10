@@ -25,12 +25,12 @@ export default function Home() {
   const router = useRouter();
 
   useEffect(() => {
-    if (!isLoading && user && !user.onboarding_completed) {
-      router.push("/onboarding");
+    if (!isLoading && user) {
+      router.push("/dashboard");
     }
   }, [user, isLoading, router]);
 
-  if (isLoading || (user && !user.onboarding_completed)) {
+  if (isLoading || user) {
     return (
       <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">

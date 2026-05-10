@@ -14,12 +14,13 @@ const errorHandler = (err, req, res, _next) => {
     method: req.method,
     url: req.originalUrl,
     error: err.message,
+    details: err.details, // Joi details
     stack: process.env.NODE_ENV === 'development' ? err.stack : undefined,
     body: req.body,
     user: req.user ? req.user.id : 'anonymous'
   }, 'Request Error');
 
-  res.status(statusCode).json(errorEnvelope(message, statusCode));
+  res.status(statusCode).json(errorEnvelope(message, statusCode, err.details));
 };
 
 module.exports = errorHandler;

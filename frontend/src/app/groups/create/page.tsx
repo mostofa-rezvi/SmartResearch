@@ -15,7 +15,7 @@ export default function CreateGroupPage() {
   const [focusArea, setFocusArea] = useState("");
   const [type, setType] = useState<'public' | 'private'>('public');
   const [isLoading, setIsLoading] = useState(false);
-  const { token } = useAuth();
+  const { token, logout } = useAuth();
   const router = useRouter();
 
   const handleCreate = async (e: React.FormEvent) => {
@@ -36,9 +36,15 @@ export default function CreateGroupPage() {
         const result = await response.json();
         const group = result.data || result;
         router.push(`/groups/${group.id}`);
+      } else if (response.status === 401) {
+        // Token is invalid or expired
+        alert("Your session has expired. Please log in again.");
+        logout();
+      } else {
+        console.error("Failed to create group", await response.text());
       }
     } catch (err) {
-      console.error("Failed to create group");
+      console.error("Failed to create group", err);
     } finally {
       setIsLoading(false);
     }

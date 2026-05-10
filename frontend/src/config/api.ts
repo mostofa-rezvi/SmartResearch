@@ -21,7 +21,16 @@ export const API = {
   // Community domain
   community: {
     posts:             `${API_BASE}/api/v1/community/posts`,
+    groupFeed:         (groupId: string) => `${API_BASE}/api/v1/community/groups/${groupId}/posts`,
     vote:              (id: string) => `${API_BASE}/api/v1/community/posts/${id}/vote`,
+    react:             (id: string) => `${API_BASE}/api/v1/community/posts/${id}/react`,
+    comments:          (id: string) => `${API_BASE}/api/v1/community/posts/${id}/comments`,
+    share:             (id: string) => `${API_BASE}/api/v1/community/posts/${id}/share`,
+    // Management
+    updatePost:        (id: string) => `${API_BASE}/api/v1/community/posts/${id}`,
+    deletePost:        (id: string) => `${API_BASE}/api/v1/community/posts/${id}`,
+    updateComment:     (id: string) => `${API_BASE}/api/v1/community/comments/${id}`,
+    deleteComment:     (id: string) => `${API_BASE}/api/v1/community/comments/${id}`,
   },
   // Discovery domain
   discovery: {
@@ -37,7 +46,12 @@ export const API = {
   groups: {
     list:              `${API_BASE}/api/v1/groups`,
     create:            `${API_BASE}/api/v1/groups`,
+    detail:            (id: string) => `${API_BASE}/api/v1/groups/${id}`,
     join:              (id: string) => `${API_BASE}/api/v1/groups/${id}/join`,
+    leave:             (id: string) => `${API_BASE}/api/v1/groups/${id}/leave`,
+    membership:        (id: string) => `${API_BASE}/api/v1/groups/${id}/membership`,
+    members:           (id: string) => `${API_BASE}/api/v1/groups/${id}/members`,
+    updateMemberRole:  (id: string, userId: string) => `${API_BASE}/api/v1/groups/${id}/members/${userId}/role`,
   },
   // Identity domain
   users: {

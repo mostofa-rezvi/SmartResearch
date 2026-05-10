@@ -2,14 +2,46 @@
 
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
-import { Search, Users, BookOpen, Compass, MessageSquare, ChevronRight } from "lucide-react";
-import { motion } from "framer-motion";
+import { Search, Users, BookOpen, Compass, MessageSquare, ChevronRight, X } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useState } from "react";
 
 export default function Navbar() {
   const { user, isAdmin, logout } = useAuth();
+  const [showOnboardingPrompt, setShowOnboardingPrompt] = useState(true);
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 glass-morphism h-20 flex items-center px-6 md:px-12 justify-between">
+    <>
+      <AnimatePresence>
+        {user && !user.onboarding_completed && showOnboardingPrompt && (
+          <motion.div 
+            initial={{ opacity: 0, y: 20, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.9 }}
+            className="fixed bottom-6 right-6 z-[100] bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-primary/20 p-5 max-w-sm"
+          >
+            <button 
+              onClick={() => setShowOnboardingPrompt(false)}
+              className="absolute top-3 right-3 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+            >
+              <X size={16} />
+            </button>
+            <h3 className="font-bold text-slate-900 dark:text-white mb-2 pr-6">Complete Your Profile</h3>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
+              Get personalized research recommendations and connect with peers by completing your onboarding!
+            </p>
+            <Link 
+              href="/onboarding" 
+              onClick={() => setShowOnboardingPrompt(false)}
+              className="block text-center w-full bg-primary text-white py-2 rounded-xl text-sm font-bold hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20"
+            >
+              Finish Onboarding
+            </Link>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <nav className="fixed top-0 left-0 right-0 z-50 glass-morphism h-20 flex items-center px-6 md:px-12 justify-between">
       <div className="flex items-center gap-8">
         <Link href="/" className="flex items-center gap-3 group">
           <div className="relative w-10 h-10 flex items-center justify-center">
@@ -77,5 +109,6 @@ export default function Navbar() {
         )}
       </div>
     </nav>
+    </>
   );
 }

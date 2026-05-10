@@ -12,9 +12,9 @@ const envelope = (data, meta = {}) => ({
   }
 });
 
-const errorEnvelope = (message, statusCode = 500) => ({
+const errorEnvelope = (message, statusCode = 500, details = null) => ({
   success: false,
-  error: { message, statusCode },
+  error: { message, statusCode, details },
   meta: {
     timestamp: new Date().toISOString()
   }

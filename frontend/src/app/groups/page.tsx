@@ -10,6 +10,7 @@ import { API } from "@/config/api";
 
 export default function GroupsListingPage() {
   const [groups, setGroups] = useState<any[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
 
@@ -17,8 +18,9 @@ export default function GroupsListingPage() {
     const fetchGroups = async () => {
       try {
         const response = await fetch(API.groups.list);
-        const data = await response.json();
-        setGroups(Array.isArray(data) ? data : []);
+        const result = await response.json();
+        const groupsData = result.data || result;
+        setGroups(Array.isArray(groupsData) ? groupsData : []);
       } catch (err) {
         console.error("Failed to fetch groups");
         setGroups([]);
@@ -28,6 +30,11 @@ export default function GroupsListingPage() {
     };
     fetchGroups();
   }, []);
+
+  const filteredGroups = groups.filter(group => 
+    group.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    group.focus_area.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
@@ -55,6 +62,8 @@ export default function GroupsListingPage() {
           <input 
             type="text" 
             placeholder="Search by focus area or name..." 
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full bg-transparent border-none outline-none text-sm py-2"
           />
         </div>
@@ -63,7 +72,7 @@ export default function GroupsListingPage() {
           <div className="text-center py-20 italic text-slate-400">Loading communities...</div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {groups.map((group, idx) => (
+            {filteredGroups.map((group, idx) => (
               <motion.div 
                 key={group.id}
                 initial={{ opacity: 0, y: 20 }}

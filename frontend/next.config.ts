@@ -16,6 +16,7 @@ const nextConfig: NextConfig = {
   devIndicators: {
     appIsrStatus: false,
     buildActivity: false,
+    devIndicators: false
   },
 } as any;
 
