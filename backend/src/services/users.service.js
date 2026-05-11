@@ -4,7 +4,7 @@ class UserService {
   async getProfile(userId) {
     // 1. Base User Info
     const userResult = await db.query(
-      'SELECT id, name, email, role, researcher_type, status, institution, research_interests, created_at FROM users WHERE id = $1',
+      'SELECT id, name, email, role, researcher_type, status, institution, research_interests, bio, avatar_url, educational_status, personal_website, linkedin_url, google_scholar_url, researchgate_url, created_at FROM users WHERE id = $1',
       [userId]
     );
 

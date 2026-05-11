@@ -1,4 +1,4 @@
-﻿require('dotenv').config();
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -207,6 +207,10 @@ server.listen(PORT, async () => {
     initElasticsearch();
     await initIndices();
     initNeo4j();
+    
+    // Initialize Storage (MinIO bucket creation)
+    const { initStorage } = require('./services/storage.service');
+    await initStorage();
     
     // Start Background Workers
     const graphSyncWorker = require('./workers/graphSync.worker');

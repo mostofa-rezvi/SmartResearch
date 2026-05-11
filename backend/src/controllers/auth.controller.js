@@ -29,7 +29,7 @@ const isAllowedRedirect = (url) => {
 
 class AuthController {
   async register(req, res, next) {
-    const { name, email, password } = req.body;
+    const { name, email, password, status, institution, personal_website, linkedin_url, google_scholar_url, researchgate_url } = req.body;
 
     if (!name || !email || !password) {
       return res.status(400).json(errorEnvelope('Name, email, and password are required', 400));
@@ -56,10 +56,30 @@ class AuthController {
       // T6 Fix: Set verification token expiry
       const expiresAt = new Date(Date.now() + VERIFICATION_TOKEN_EXPIRY_HOURS * 60 * 60 * 1000);
 
+      // Map status to researcher_type or educational_status
+      let researcher_type = null;
+      let educational_status = null;
+      
+      const researcherTypes = ['new', 'amateur'];
+      if (researcherTypes.includes(status)) {
+        researcher_type = status === 'new' ? 'new_researcher' : 'amateur_researcher';
+      } else {
+        educational_status = status;
+      }
+
       const insertResult = await db.query(
-        `INSERT INTO users (name, email, password, verification_token, provider) 
-         VALUES ($1, $2, $3, $4, 'local') RETURNING id, name, email, is_verified`,
-        [name, email, hashedPassword, verificationToken]
+        `INSERT INTO users (
+          name, email, password, verification_token, provider, 
+          institution, researcher_type, educational_status,
+          personal_website, linkedin_url, google_scholar_url, researchgate_url
+        ) 
+         VALUES ($1, $2, $3, $4, 'local', $5, $6, $7, $8, $9, $10, $11) 
+         RETURNING id, name, email, is_verified`,
+        [
+          name, email, hashedPassword, verificationToken, 
+          institution, researcher_type, educational_status,
+          personal_website, linkedin_url, google_scholar_url, researchgate_url
+        ]
       );
 
       const user = insertResult.rows[0];

@@ -7,6 +7,10 @@ const register = {
     password: Joi.string().required().min(8),
     status: Joi.string().required(),
     institution: Joi.string().required(),
+    personal_website: Joi.string().uri().allow('').optional(),
+    linkedin_url: Joi.string().uri().allow('').optional(),
+    google_scholar_url: Joi.string().uri().allow('').optional(),
+    researchgate_url: Joi.string().uri().allow('').optional(),
   }),
 };
 

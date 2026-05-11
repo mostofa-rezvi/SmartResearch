@@ -15,6 +15,10 @@ type RegisterFormData = {
   password: string;
   status: string;
   institution: string;
+  personal_website?: string;
+  linkedin_url?: string;
+  google_scholar_url?: string;
+  researchgate_url?: string;
 };
 
 export default function RegisterPage() {
@@ -223,6 +227,33 @@ export default function RegisterPage() {
                       />
                     </div>
                     {errors.institution && <p className="text-xs text-red-500 mt-1">{errors.institution.message}</p>}
+                  </div>
+                </div>
+
+                {/* Online Presence */}
+                <div className="space-y-4">
+                  <h3 className="text-[10px] font-black uppercase tracking-widest text-primary ml-1">Online Presence (Optional)</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input
+                      {...register("personal_website")}
+                      className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-white/10 focus:ring-2 focus:ring-primary outline-none transition-all text-sm"
+                      placeholder="Personal Website URL"
+                    />
+                    <input
+                      {...register("linkedin_url")}
+                      className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-white/10 focus:ring-2 focus:ring-primary outline-none transition-all text-sm"
+                      placeholder="LinkedIn URL"
+                    />
+                    <input
+                      {...register("google_scholar_url")}
+                      className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-white/10 focus:ring-2 focus:ring-primary outline-none transition-all text-sm"
+                      placeholder="Google Scholar URL"
+                    />
+                    <input
+                      {...register("researchgate_url")}
+                      className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-white/10 focus:ring-2 focus:ring-primary outline-none transition-all text-sm"
+                      placeholder="ResearchGate URL"
+                    />
                   </div>
                 </div>
 

@@ -9,6 +9,7 @@ const updateProfile = {
     domains: Joi.array().items(Joi.number().integer()),
     goals: Joi.array().items(Joi.number().integer()),
     onboarding_completed: Joi.boolean(),
+    research_interests: Joi.object(),
   }),
 };
 

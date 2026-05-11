@@ -20,6 +20,7 @@ type AuthContextType = {
   isLoading: boolean;
   isAdmin: boolean;
   isSuperAdmin: boolean;
+  updateUser: (updates: Partial<NonNullable<User>>) => void;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -64,11 +65,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const updateUser = (updates: Partial<NonNullable<User>>) => {
+    if (user) {
+      const updatedUser = { ...user, ...updates };
+      setUser(updatedUser);
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+    }
+  };
+
   const isAdmin = user?.role === 'admin' || user?.role === 'super_admin';
   const isSuperAdmin = user?.role === 'super_admin';
 
   return (
-    <AuthContext.Provider value={{ user, token, login, logout, completeOnboarding, isLoading, isAdmin, isSuperAdmin }}>
+    <AuthContext.Provider value={{ user, token, login, logout, completeOnboarding, isLoading, isAdmin, isSuperAdmin, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

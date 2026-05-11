@@ -246,6 +246,11 @@ CREATE TABLE IF NOT EXISTS user_goals (
 -- Note: Altering existing tables for completeness
 ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar_url TEXT;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS bio TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS personal_website TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS linkedin_url TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS google_scholar_url TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS researchgate_url TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS educational_status VARCHAR(100);
 ALTER TABLE users ADD COLUMN IF NOT EXISTS institution_id INTEGER REFERENCES institutions(id) ON DELETE SET NULL;
 
 -- Initial Seed for common domains/skills (optional but helpful)

@@ -6,14 +6,20 @@ import { useAuth } from "@/context/AuthContext";
 import Navbar from "@/components/Navbar";
 import { API } from "@/config/api";
 import { motion } from "framer-motion";
-import { User, Award, ShieldCheck, Mail, MapPin, Building, BookOpen, Clock, Activity, MessageSquare, Lightbulb, Users, Bookmark, Settings } from "lucide-react";
+import { User, Award, ShieldCheck, Mail, MapPin, Building, BookOpen, Clock, Activity, MessageSquare, Lightbulb, Users, Bookmark, Settings, Globe, ExternalLink, Microscope } from "lucide-react";
 import Link from "next/link";
+import EditProfileModal from "@/components/profile/EditProfileModal";
 
 export default function ProfilePage() {
   const { id } = useParams();
   const { user: currentUser } = useAuth();
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+  const handleProfileUpdate = (updatedProfile: any) => {
+    setProfile((prev: any) => ({ ...prev, ...updatedProfile }));
+  };
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -47,8 +53,12 @@ export default function ProfilePage() {
       {/* Hero Header */}
       <div className="bg-white  border-b border-slate-200  pt-32 pb-12">
         <div className="max-w-5xl mx-auto px-6 flex flex-col md:flex-row items-center md:items-start gap-8">
-          <div className="w-32 h-32 bg-gradient-to-br from-primary to-secondary rounded-3xl flex items-center justify-center text-white text-5xl font-bold shadow-2xl shrink-0">
-            {profile.name?.[0] || '?'}
+          <div className="w-32 h-32 bg-gradient-to-br from-primary to-secondary rounded-3xl flex items-center justify-center text-white text-5xl font-bold shadow-2xl shrink-0 overflow-hidden">
+            {profile.avatar_url ? (
+              <img src={profile.avatar_url} alt={profile.name} className="w-full h-full object-cover" />
+            ) : (
+              profile.name?.[0] || '?'
+            )}
           </div>
           <div className="flex-1 text-center md:text-left">
             <div className="flex flex-col md:flex-row md:items-center gap-3 mb-2">
@@ -62,10 +72,18 @@ export default function ProfilePage() {
               )}
             </div>
             
-            <p className="text-slate-500 font-medium flex items-center justify-center md:justify-start gap-2 mb-6">
-              <Building size={16} /> {profile.institution} 
-              {isInvited && profile.extended_profile?.department && ` • ${profile.extended_profile.department}`}
-            </p>
+            {profile.institution && (
+              <p className="text-slate-500 font-medium flex items-center justify-center md:justify-start gap-2 mb-2">
+                <Building size={16} /> {profile.institution} 
+                {isInvited && profile.extended_profile?.department && ` • ${profile.extended_profile.department}`}
+              </p>
+            )}
+            
+            {(profile.educational_status || profile.researcher_type) && (
+              <p className="text-primary text-xs font-black uppercase tracking-widest flex items-center justify-center md:justify-start gap-2 mb-6">
+                <Award size={14} /> {(profile.educational_status || profile.researcher_type).replace('_', ' ')}
+              </p>
+            )}
 
             <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
               {profile.research_interests?.interests?.slice(0, 4).map((tag: string) => (
@@ -77,12 +95,22 @@ export default function ProfilePage() {
           </div>
           
           {isOwnProfile && (
-            <button className="px-6 py-2.5 bg-slate-100  text-slate-600  font-bold rounded-xl flex items-center gap-2 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">
+            <button 
+              onClick={() => setIsEditModalOpen(true)}
+              className="px-6 py-2.5 bg-slate-100  text-slate-600  font-bold rounded-xl flex items-center gap-2 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
+            >
               <Settings size={18} /> Edit Profile
             </button>
           )}
         </div>
       </div>
+
+      <EditProfileModal 
+        isOpen={isEditModalOpen} 
+        onClose={() => setIsEditModalOpen(false)} 
+        profile={profile} 
+        onUpdate={handleProfileUpdate}
+      />
 
       <main className="max-w-5xl mx-auto px-6 pt-12 grid grid-cols-1 lg:grid-cols-3 gap-8">
         
@@ -90,13 +118,13 @@ export default function ProfilePage() {
         <div className="space-y-6">
           
           {/* Trust Score & Shared Interests */}
-          <div className="bg-white  p-8 rounded-[32px] border border-slate-100  shadow-xl">
+          <div className="bg-white p-8 rounded-[32px] border border-slate-100 shadow-xl">
             <h3 className="mono-academic text-xs font-black tracking-[0.2em] text-slate-400 mb-6 flex items-center gap-2">
               <ShieldCheck size={18} className="text-emerald-500" /> Trust Score
             </h3>
-            <div className="mb-6 flex flex-col items-center justify-center p-6 bg-slate-50  rounded-2xl border border-slate-100 ">
-              <div className="text-4xl font-black text-slate-900  mb-2">94/100</div>
-              <div className="text-sm font-bold text-amber-500 bg-amber-50 dark:bg-amber-500/10 px-3 py-1 rounded-full border border-amber-200 dark:border-amber-500/20">
+            <div className="mb-6 flex flex-col items-center justify-center p-6 bg-slate-50 rounded-2xl border border-slate-100">
+              <div className="text-4xl font-black text-slate-900 mb-2">94/100</div>
+              <div className="text-sm font-bold text-amber-500 bg-amber-50 px-3 py-1 rounded-full border border-amber-200">
                 Gold Tier
               </div>
             </div>
@@ -116,6 +144,37 @@ export default function ProfilePage() {
               </>
             )}
           </div>
+
+          {/* Connect Section */}
+          {(profile.personal_website || profile.linkedin_url || profile.google_scholar_url || profile.researchgate_url) && (
+            <div className="bg-white p-8 rounded-[32px] border border-slate-100 shadow-xl">
+              <h3 className="mono-academic text-xs font-black tracking-[0.2em] text-slate-400 mb-6 flex items-center gap-2">
+                <Globe size={18} className="text-primary" /> Connect
+              </h3>
+              <div className="flex flex-col gap-3">
+                {profile.personal_website && (
+                  <a href={profile.personal_website} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-sm font-bold text-slate-600 hover:text-primary transition-colors">
+                    <Globe size={16} /> Personal Website
+                  </a>
+                )}
+                {profile.linkedin_url && (
+                  <a href={profile.linkedin_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-sm font-bold text-slate-600 hover:text-primary transition-colors">
+                    <ExternalLink size={16} /> LinkedIn Profile
+                  </a>
+                )}
+                {profile.google_scholar_url && (
+                  <a href={profile.google_scholar_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-sm font-bold text-slate-600 hover:text-primary transition-colors">
+                    <BookOpen size={16} /> Google Scholar
+                  </a>
+                )}
+                {profile.researchgate_url && (
+                  <a href={profile.researchgate_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-sm font-bold text-slate-600 hover:text-primary transition-colors">
+                    <Microscope size={16} /> ResearchGate
+                  </a>
+                )}
+              </div>
+            </div>
+          )}
 
           <div className={`bg-white  p-8 rounded-[32px] border ${isInvited ? 'border-accent/30 shadow-accent/5' : 'border-slate-100 '} shadow-2xl`}>
             <h3 className="mono-academic text-xs font-black tracking-[0.2em] text-slate-400 mb-8 flex items-center gap-2">
@@ -155,11 +214,12 @@ export default function ProfilePage() {
         <div className="lg:col-span-2 space-y-6">
           
           {/* Invited User Extended Data */}
-          {isInvited && profile.extended_profile?.academic_bio && (
+          {/* Bio section */}
+          {(profile.bio || (isInvited && profile.extended_profile?.academic_bio)) && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="bg-white  p-8 rounded-3xl border border-slate-100  shadow-xl">
-              <h3 className="text-xl font-bold text-slate-900  mb-4">Academic Biography</h3>
+              <h3 className="text-xl font-bold text-slate-900  mb-4">Biography</h3>
               <p className="text-slate-600  leading-relaxed font-serif">
-                {profile.extended_profile.academic_bio}
+                {isInvited && profile.extended_profile?.academic_bio ? profile.extended_profile.academic_bio : profile.bio}
               </p>
             </motion.div>
           )}

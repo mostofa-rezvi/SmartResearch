@@ -1,6 +1,7 @@
-const { S3Client } = require('@aws-sdk/client-s3');
+const { S3Client, CreateBucketCommand, HeadBucketCommand } = require('@aws-sdk/client-s3');
 const { Upload } = require('@aws-sdk/lib-storage');
 const config = require('../config');
+const logger = require('../utils/logger');
 
 const s3Client = new S3Client({
   endpoint: config.s3.endpoint,
@@ -11,6 +12,22 @@ const s3Client = new S3Client({
   },
   forcePathStyle: config.s3.forcePathStyle,
 });
+
+/**
+ * Ensure the bucket exists, create it if not.
+ */
+const initStorage = async () => {
+  try {
+    await s3Client.send(new HeadBucketCommand({ Bucket: config.s3.bucket }));
+  } catch (error) {
+    if (error.name === 'NotFound' || error.$metadata?.httpStatusCode === 404) {
+      await s3Client.send(new CreateBucketCommand({ Bucket: config.s3.bucket }));
+      logger.info(`S3 Bucket "${config.s3.bucket}" created successfully`);
+    } else {
+      logger.error('S3 Storage initialization failed:', error);
+    }
+  }
+};
 
 /**
  * Upload a file to S3/MinIO
@@ -41,5 +58,6 @@ const uploadFile = async (file, folder = 'avatars') => {
 
 module.exports = {
   s3Client,
+  initStorage,
   uploadFile,
 };

@@ -10,7 +10,7 @@ class ProfileController {
       
       // 1. Get base user
       const userResult = await db.query(
-        'SELECT id, name, email, bio, avatar_url, institution_id, created_at FROM users WHERE id = $1',
+        'SELECT id, name, email, bio, avatar_url, institution, institution_id, personal_website, linkedin_url, google_scholar_url, researchgate_url, educational_status, created_at FROM users WHERE id = $1',
         [userId]
       );
 
@@ -25,7 +25,10 @@ class ProfileController {
       // 2. Get Institution
       if (user.institution_id) {
         const instResult = await db.query('SELECT * FROM institutions WHERE id = $1', [user.institution_id]);
-        user.institution = instResult.rows[0];
+        if (instResult.rows.length > 0) {
+          user.institution_data = instResult.rows[0];
+          user.institution = user.institution_data.name; // Use name for simple display
+        }
       }
 
       // 3. Get Skills
@@ -69,7 +72,10 @@ class ProfileController {
     const client = await db.pool.connect();
     try {
       const userId = req.user.id;
-      const { name, bio, institution_id, skills, domains, goals } = req.body;
+      const { 
+        name, bio, institution_id, skills, domains, goals, research_interests,
+        personal_website, linkedin_url, google_scholar_url, researchgate_url, educational_status
+      } = req.body;
 
       await client.query('BEGIN');
 
@@ -89,6 +95,30 @@ class ProfileController {
       if (institution_id !== undefined) {
         updates.push(`institution_id = $${paramCount++}`);
         values.push(institution_id);
+      }
+      if (research_interests !== undefined) {
+        updates.push(`research_interests = $${paramCount++}`);
+        values.push(JSON.stringify(research_interests));
+      }
+      if (personal_website !== undefined) {
+        updates.push(`personal_website = $${paramCount++}`);
+        values.push(personal_website);
+      }
+      if (linkedin_url !== undefined) {
+        updates.push(`linkedin_url = $${paramCount++}`);
+        values.push(linkedin_url);
+      }
+      if (google_scholar_url !== undefined) {
+        updates.push(`google_scholar_url = $${paramCount++}`);
+        values.push(google_scholar_url);
+      }
+      if (researchgate_url !== undefined) {
+        updates.push(`researchgate_url = $${paramCount++}`);
+        values.push(researchgate_url);
+      }
+      if (educational_status !== undefined) {
+        updates.push(`educational_status = $${paramCount++}`);
+        values.push(educational_status);
       }
 
       if (updates.length > 0) {

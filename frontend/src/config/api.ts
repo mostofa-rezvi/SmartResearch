@@ -57,6 +57,10 @@ export const API = {
   users: {
     profile:           (id: string) => `${API_BASE}/api/v1/users/${id}/profile`,
   },
+  profiles: {
+    me:                `${API_BASE}/api/v1/profiles/me`,
+    avatar:            `${API_BASE}/api/v1/profiles/avatar`,
+  },
   // Admin domain
   admin: {
     invite:            `${API_BASE}/api/v1/admin/invite`,
