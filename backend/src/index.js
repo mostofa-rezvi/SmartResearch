@@ -1,4 +1,4 @@
-require('dotenv').config();
+﻿require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -58,7 +58,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// API v1 Routes (standards.md §2: All APIs must be versioned)
+// API v1 Routes (standards.md Â§2: All APIs must be versioned)
 app.use('/api/v1/auth', authLimiter, require('./routes/auth'));
 app.use('/api/v1/admin', require('./routes/admin'));
 app.use('/api/v1/groups', require('./routes/groups'));
@@ -190,7 +190,7 @@ app.get('/health', async (req, res) => {
   res.json({ success: true, data: health, meta: { timestamp: health.timestamp } });
 });
 
-// Global Error Handler (standards.md §1: centralized error middleware)
+// Global Error Handler (standards.md Â§1: centralized error middleware)
 app.use(errors()); // Handle Joi validation errors
 app.use(errorHandler);
 

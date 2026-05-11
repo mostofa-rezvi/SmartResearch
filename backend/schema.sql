@@ -67,7 +67,7 @@ CREATE TABLE IF NOT EXISTS groups (
 CREATE TABLE IF NOT EXISTS group_members (
     group_id INTEGER REFERENCES groups(id) ON DELETE CASCADE,
     user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
-    role VARCHAR(20) DEFAULT 'member' CHECK (role IN ('member', 'admin')),
+    role VARCHAR(20) DEFAULT 'member' CHECK (role IN ('member', 'contributor', 'admin')),
     joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (group_id, user_id)
 );
