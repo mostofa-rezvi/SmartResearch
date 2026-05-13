@@ -1,4 +1,5 @@
 const communityService = require('../services/community.service');
+const storageService = require('../services/storage.service');
 const { envelope } = require('../utils/responseEnvelope');
 
 class CommunityController {
@@ -13,8 +14,10 @@ class CommunityController {
 
   async getGroupFeed(req, res, next) {
     try {
-      const posts = await communityService.getGroupFeed(req.params.groupId, req.user.id);
-      res.json(envelope(posts));
+      const limit = parseInt(req.query.limit) || 20;
+      const offset = parseInt(req.query.offset) || 0;
+      const result = await communityService.getGroupFeed(req.params.groupId, req.user.id, limit, offset);
+      res.json(envelope(result.posts, { totalCount: result.totalCount, limit, offset }));
     } catch (err) {
       next(err);
     }
@@ -22,8 +25,22 @@ class CommunityController {
 
   async getFeed(req, res, next) {
     try {
-      const posts = await communityService.getFeed(req.user.id);
-      res.json(envelope(posts));
+      const limit = parseInt(req.query.limit) || 20;
+      const offset = parseInt(req.query.offset) || 0;
+      const search = req.query.search || '';
+      const type = req.query.type || 'all';
+      
+      const result = await communityService.getFeed(req.user.id, limit, offset, search, type);
+      res.json(envelope(result.posts, { totalCount: result.totalCount, limit, offset }));
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async getPostById(req, res, next) {
+    try {
+      const post = await communityService.getPostById(req.params.id, req.user.id);
+      res.json(envelope(post));
     } catch (err) {
       next(err);
     }
@@ -105,6 +122,21 @@ class CommunityController {
     try {
       const result = await communityService.updateComment(req.user.id, req.params.id, req.body.content);
       res.json(envelope(result));
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async uploadImage(req, res, next) {
+    try {
+      if (!req.file) {
+        const err = new Error('No image provided');
+        err.statusCode = 400;
+        throw err;
+      }
+
+      const imageUrl = await storageService.uploadFile(req.file, 'community');
+      res.json(envelope({ url: imageUrl }));
     } catch (err) {
       next(err);
     }

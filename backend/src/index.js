@@ -27,6 +27,9 @@ const io = new Server(server, {
   }
 });
 
+require('./services/socket.service').init(io);
+
+
 // Middleware
 app.use(helmet({
   contentSecurityPolicy: {

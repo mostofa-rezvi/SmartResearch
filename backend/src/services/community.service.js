@@ -1,6 +1,8 @@
 const db = require('../config/db');
 const eventBus = require('./eventBus.service');
 const logger = require('../utils/logger');
+const reputationService = require('./reputation.service');
+const socketService = require('./socket.service');
 
 const VALID_REACTIONS = ['insightful', 'support', 'curious', 'celebrate', 'love'];
 
@@ -22,12 +24,21 @@ class CommunityService {
     newPost.reactions = {};
 
     eventBus.emitEvent('event.behaviour', { type: 'community.post.created', userId, postId: newPost.id, postType: type, timestamp: new Date().toISOString() });
+    
+    // Broadcast to all users for real-time feed updates
+    socketService.broadcast('new_post', newPost);
+    
     logger.info({ userId, postId: newPost.id }, 'Community post created');
+
 
     return newPost;
   }
 
-  async getGroupFeed(groupId, userId) {
+  async getGroupFeed(groupId, userId, limit = 20, offset = 0) {
+    const countResult = await db.query(`
+      SELECT COUNT(*) FROM community_posts WHERE group_id = $1
+    `, [groupId]);
+
     const result = await db.query(`
       SELECT 
         p.*,
@@ -53,8 +64,8 @@ class CommunityService {
       LEFT JOIN votes uv ON uv.post_id = p.id AND uv.user_id = $2 AND uv.comment_id IS NULL
       WHERE p.group_id = $1
       ORDER BY p.created_at DESC
-      LIMIT 50
-    `, [groupId, userId]);
+      LIMIT $3 OFFSET $4
+    `, [groupId, userId, limit, offset]);
 
     const posts = result.rows;
 
@@ -74,21 +85,55 @@ class CommunityService {
       });
     }
 
-    return posts;
+    return {
+      posts,
+      totalCount: parseInt(countResult.rows[0].count)
+    };
   }
 
-  async getFeed(userId) {
+  async getFeed(userId, limit = 20, offset = 0, search = '', type = 'all') {
     const userResult = await db.query('SELECT research_interests FROM users WHERE id = $1', [userId]);
     const interests = userResult.rows[0]?.research_interests?.interests || [];
+
+    let whereClauseCount = '';
+    let countParams = [];
+    if (search) {
+      whereClauseCount += ` AND (p.title ILIKE $${countParams.length + 1} OR p.content ILIKE $${countParams.length + 1})`;
+      countParams.push(`%${search}%`);
+    }
+    if (type && type !== 'all') {
+      whereClauseCount += ` AND p.type = $${countParams.length + 1}`;
+      countParams.push(type);
+    }
+
+    const countResult = await db.query(`
+      SELECT COUNT(*) FROM community_posts p
+      WHERE 1=1 ${whereClauseCount}
+    `, countParams);
+
+    let whereClauseData = '';
+    let searchVal = `%${search}%`;
+    let dataParams = [userId, limit, offset];
+    if (search) {
+      whereClauseData += ` AND (p.title ILIKE $${dataParams.length + 1} OR p.content ILIKE $${dataParams.length + 1})`;
+      dataParams.push(searchVal);
+    }
+    if (type && type !== 'all') {
+      whereClauseData += ` AND p.type = $${dataParams.length + 1}`;
+      dataParams.push(type);
+    }
 
     const result = await db.query(`
       SELECT 
         p.*, u.name as author_name, u.role as author_role,
+        iup.impact_score as author_reputation,
+        iup.title as author_primary_field,
         COALESCE(v.vote_score, 0) as vote_score,
         COALESCE(c.comment_count, 0) as comment_count,
         uv.value as user_vote
       FROM community_posts p
       JOIN users u ON p.user_id = u.id
+      LEFT JOIN invited_user_profiles iup ON u.id = iup.user_id
       LEFT JOIN (
         SELECT post_id, SUM(value) as vote_score FROM votes WHERE comment_id IS NULL GROUP BY post_id
       ) v ON v.post_id = p.id
@@ -96,9 +141,10 @@ class CommunityService {
         SELECT post_id, COUNT(*) as comment_count FROM comments GROUP BY post_id
       ) c ON c.post_id = p.id
       LEFT JOIN votes uv ON uv.post_id = p.id AND uv.user_id = $1 AND uv.comment_id IS NULL
+      WHERE 1=1 ${whereClauseData}
       ORDER BY p.created_at DESC
-      LIMIT 100
-    `, [userId]);
+      LIMIT $2 OFFSET $3
+    `, dataParams);
 
     let posts = result.rows.map(post => {
       const matchCount = post.tags ? post.tags.filter(tag => interests.includes(tag)).length : 0;
@@ -117,8 +163,57 @@ class CommunityService {
       };
     });
 
-    posts.sort((a, b) => b.discovery_score - a.discovery_score);
-    return posts;
+    return {
+      posts,
+      totalCount: parseInt(countResult.rows[0].count)
+    };
+  }
+
+  async getPostById(postId, userId) {
+    const result = await db.query(`
+      SELECT 
+        p.*, u.name as author_name, u.role as author_role,
+        iup.impact_score as author_reputation,
+        iup.title as author_primary_field,
+        COALESCE(v.vote_score, 0) as vote_score,
+        COALESCE(c.comment_count, 0) as comment_count,
+        uv.value as user_vote
+      FROM community_posts p
+      JOIN users u ON p.user_id = u.id
+      LEFT JOIN invited_user_profiles iup ON u.id = iup.user_id
+      LEFT JOIN (
+        SELECT post_id, SUM(value) as vote_score FROM votes WHERE comment_id IS NULL GROUP BY post_id
+      ) v ON v.post_id = p.id
+      LEFT JOIN (
+        SELECT post_id, COUNT(*) as comment_count FROM comments GROUP BY post_id
+      ) c ON c.post_id = p.id
+      LEFT JOIN votes uv ON uv.post_id = p.id AND uv.user_id = $2 AND uv.comment_id IS NULL
+      WHERE p.id = $1
+    `, [postId, userId]);
+
+    if (result.rows.length === 0) {
+      const err = new Error('Post not found');
+      err.statusCode = 404;
+      throw err;
+    }
+
+    const post = result.rows[0];
+    
+    // Process reactions
+    const reactionResult = await db.query(
+      `SELECT reaction_type, COUNT(*) as count, 
+       MAX(CASE WHEN user_id = $2 THEN 1 ELSE 0 END) as user_reacted
+       FROM post_reactions WHERE post_id = $1 GROUP BY reaction_type`,
+      [postId, userId]
+    );
+    post.reactions = {};
+    post.user_reaction = null;
+    reactionResult.rows.forEach(r => {
+      post.reactions[r.reaction_type] = parseInt(r.count);
+      if (parseInt(r.user_reacted) === 1) post.user_reaction = r.reaction_type;
+    });
+
+    return post;
   }
 
   async vote(userId, postId, value) {
@@ -153,6 +248,17 @@ class CommunityService {
       [postId]
     );
     const stats = counts.rows[0];
+
+    // --- REPUTATION UPDATE LOGIC ---
+    // If it's an upvote (value=1), reward the author. If it's a downvote or removal, handled accordingly.
+    // For simplicity, we award 10 reputation points per net upvote change.
+    const postRes = await db.query('SELECT user_id FROM community_posts WHERE id = $1', [postId]);
+    const authorId = postRes.rows[0]?.user_id;
+    if (authorId && authorId !== userId) {
+      // Award 10 points for an upvote, subtract 10 for a downvote
+      await reputationService.updateCommunityReputation(authorId, value * 10);
+    }
+    // -------------------------------
 
     eventBus.emitEvent('event.behaviour', { type: 'community.post.voted', userId, postId, value, timestamp: new Date().toISOString() });
     return { 

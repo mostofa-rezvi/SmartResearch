@@ -1,9 +1,17 @@
 const express = require('express');
-const router = express.Router();
 const { celebrate } = require('celebrate');
 const communityController = require('../controllers/community.controller');
 const communityValidation = require('../validations/community.validation');
 const { verifyAuth } = require('../middleware/auth.middleware');
+const multer = require('multer');
+
+const router = express.Router();
+
+// Setup multer for memory storage
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit for research images
+});
 
 // @route   POST /api/v1/community/posts
 // @desc    Create a new post
@@ -17,6 +25,12 @@ router.post('/posts',
 router.get('/posts',
   [verifyAuth],
   communityController.getFeed
+);
+// @route   GET /api/v1/community/posts/:id
+// @desc    Get a single post details
+router.get('/posts/:id',
+  [verifyAuth],
+  communityController.getPostById
 );
 
 // @route   GET /api/v1/community/groups/:groupId/posts
@@ -68,5 +82,8 @@ router.delete('/posts/:id', [verifyAuth], communityController.deletePost);
 // Comment Management
 router.patch('/comments/:id', [verifyAuth], communityController.updateComment);
 router.delete('/comments/:id', [verifyAuth], communityController.deleteComment);
+
+// Image Upload
+router.post('/upload', [verifyAuth, upload.single('image')], communityController.uploadImage);
 
 module.exports = router;

@@ -8,18 +8,39 @@ import Navbar from "@/components/Navbar";
 import { useAuth } from "@/context/AuthContext";
 import { API, API_BASE } from "@/config/api";
 import { io } from "socket.io-client";
+import { QuestionCard } from "@/components/community/QuestionCard";
+import { CreatePostModal } from "@/components/community/CreatePostModal";
 
 export default function CommunityFeedPage() {
   const [posts, setPosts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
   const [filter, setFilter] = useState<'all' | 'question' | 'thought'>('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [socketConnected, setSocketConnected] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const limit = 20;
+
   const { user, token } = useAuth();
 
   useEffect(() => {
-    if (token) fetchPosts();
-  }, [token]);
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [filter, debouncedSearch]);
+
+  useEffect(() => {
+    if (token) {
+      fetchPosts(page);
+    }
+  }, [token, filter, debouncedSearch, page]);
 
   useEffect(() => {
     if (!token || !user) return;
@@ -35,9 +56,18 @@ export default function CommunityFeedPage() {
     // Listen for real-time new posts
     socket.on("new_post", (newPost) => {
       setPosts((prevPosts) => {
-        // Simple logic: if it's a new post, inject at the top with a minor boost to make it visible, though real discovery ranking normally happens server-side
         return [{ ...newPost, matchedInterest: null, isLive: true }, ...prevPosts];
       });
+    });
+
+    // Listen for live reputation updates
+    socket.on("reputation_update", (data) => {
+      setToast({
+        show: true,
+        message: `Reputation ${data.delta > 0 ? '+' : ''}${data.delta}!`,
+        type: data.delta > 0 ? 'success' : 'info'
+      });
+      setTimeout(() => setToast({ show: false, message: '', type: 'info' }), 3000);
     });
 
     return () => {
@@ -45,19 +75,42 @@ export default function CommunityFeedPage() {
     };
   }, [token, user]);
 
-  const fetchPosts = async () => {
+  const [toast, setToast] = useState({ show: false, message: '', type: 'info' });
+
+
+  const fetchPosts = async (pageNum: number) => {
     try {
-      const response = await fetch(API.community.posts, {
+      setLoading(true);
+
+      const offset = (pageNum - 1) * limit;
+      const url = `${API.community.posts}?limit=${limit}&offset=${offset}&search=${encodeURIComponent(debouncedSearch)}&type=${filter}`;
+      
+      const response = await fetch(url, {
         headers: { "Authorization": `Bearer ${token}` }
       });
       const data = await response.json();
-      setPosts(Array.isArray(data) ? data : []);
+      const postsArray = data.success ? data.data : (Array.isArray(data) ? data : []);
+      
+      setPosts(postsArray);
+      setTotalCount(data.meta?.totalCount || 0);
     } catch (err) {
       console.error("Failed to fetch feed");
       setPosts([]);
     } finally {
       setLoading(false);
     }
+  };
+
+  const totalPages = Math.ceil(totalCount / limit);
+
+  const handlePostSuccess = (newPost: any) => {
+    setPosts(prev => [{ ...newPost, isLive: true }, ...prev]);
+    setToast({
+      show: true,
+      message: "Research successfully shared!",
+      type: "success"
+    });
+    setTimeout(() => setToast({ show: false, message: '', type: 'info' }), 3000);
   };
 
   const handleVote = async (id: number, val: number) => {
@@ -100,29 +153,31 @@ export default function CommunityFeedPage() {
     } catch (err) {
       console.error("Vote failed");
       // Rollback if needed
-      fetchPosts(); 
+      fetchPosts(page); 
     }
   };
-
-  const filteredPosts = React.useMemo(() => {
-    let result = posts.filter(p => filter === 'all' || p.type === filter);
-    
-    const q = searchQuery.toLowerCase().trim();
-    if (q) {
-      result = result.filter(p => 
-        (p.title && p.title.toLowerCase().includes(q)) || 
-        (p.content && p.content.toLowerCase().includes(q))
-      );
-    }
-    
-    return result;
-  }, [posts, filter, searchQuery]);
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
       <Navbar />
-      
       <main className="pt-24 pb-20 max-w-5xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-4 gap-8">
+        {/* Toast Notification */}
+        <AnimatePresence>
+          {toast.show && (
+            <motion.div
+              initial={{ opacity: 0, y: 50, x: "-50%" }}
+              animate={{ opacity: 1, y: 0, x: "-50%" }}
+              exit={{ opacity: 0, y: 50, x: "-50%" }}
+              className="fixed bottom-10 left-1/2 z-50 bg-slate-900 text-white px-8 py-4 rounded-[2rem] shadow-2xl border border-white/10 flex items-center gap-3 backdrop-blur-xl"
+            >
+              <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center font-bold">
+                 {toast.message.includes('+') ? '↑' : '↓'}
+              </div>
+              <span className="font-bold tracking-tight">{toast.message}</span>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Left Sidebar - Filters */}
         <div className="lg:col-span-1 space-y-4">
           <div className="bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-xl sticky top-24">
@@ -153,7 +208,16 @@ export default function CommunityFeedPage() {
               ))}
             </div>
           </div>
+
+          <button 
+            onClick={() => setIsModalOpen(true)}
+            className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-primary text-white rounded-[2rem] font-bold text-sm shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all group"
+          >
+            <Sparkles size={18} className="group-hover:rotate-12 transition-transform" />
+            Start New Discussion
+          </button>
         </div>
+
 
         {/* Main Feed Content */}
         <div className="lg:col-span-3 space-y-6">
@@ -170,101 +234,71 @@ export default function CommunityFeedPage() {
 
           {loading ? (
             <div className="py-20 text-center animate-pulse italic text-slate-400">Blending your personalized research feed...</div>
-          ) : filteredPosts.length === 0 ? (
+          ) : posts.length === 0 ? (
             <div className="py-20 text-center text-slate-400">
               <div className="text-4xl mb-3">🔍</div>
               <p className="font-bold text-slate-700 dark:text-white mb-1">No matches found</p>
               <p className="text-sm">Try adjusting your search terms.</p>
             </div>
           ) : (
-            <AnimatePresence>
-              {filteredPosts.map((post, idx) => (
-                <motion.div 
-                  key={post.id}
-                  initial={{ opacity: 0, y: 10, scale: post.isLive ? 0.95 : 1 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  transition={{ delay: post.isLive ? 0 : idx * 0.05 }}
-                  className={`bg-white dark:bg-slate-800 rounded-3xl p-8 border border-slate-100 dark:border-slate-700 shadow-xl hover:shadow-primary/5 transition-all group relative overflow-hidden ${post.isLive ? 'ring-2 ring-primary ring-opacity-50' : ''}`}
-                >
-                  {post.isLive && (
-                    <div className="absolute top-0 right-0 bg-primary text-white text-[10px] font-bold px-3 py-1 rounded-bl-xl uppercase tracking-widest">
-                       Live Update
-                    </div>
-                  )}
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-slate-100 dark:bg-slate-900 rounded-full flex items-center justify-center font-bold text-primary">
-                        {post.author_name ? post.author_name[0] : '?'}
-                      </div>
-                      <div>
-                        <Link href={`/profile/${post.user_id}`}>
-                          <h4 className="font-bold text-slate-900 dark:text-white text-sm hover:underline cursor-pointer flex items-center gap-1">
-                            {post.author_name}
-                            {post.author_role === 'invited_user' && <span title="Verified Scholar"><ShieldCheck size={14} className="text-amber-500" /></span>}
-                          </h4>
-                        </Link>
-                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">
-                          {post.author_role === 'invited_user' ? 'Senior Researcher' : 'Researcher'} • {new Date(post.created_at).toLocaleDateString()}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="hidden sm:flex flex-col items-end gap-1">
-                        {post.matchedInterest && (
-                          <span className="flex items-center gap-1 text-[10px] font-bold text-accent bg-accent/5 px-2 py-1 rounded-md border border-accent/10">
-                              <Sparkles size={10} /> {post.matchedInterest.toUpperCase()} MATCH
-                          </span>
-                        )}
-                        {post.discovery_reason && (
-                          <span className="text-[9px] text-slate-400 italic">
-                            {post.discovery_reason}
-                          </span>
-                        )}
-                      </div>
-                      <span className={`text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full ${post.type === 'question' ? 'bg-blue-50 text-blue-600' : 'bg-amber-50 text-amber-600'}`}>
-                        {post.type}
-                      </span>
-                    </div>
-                  </div>
+            <>
+              <AnimatePresence mode="popLayout">
+                {posts.map((post, idx) => (
+                  <QuestionCard 
+                    key={`${post.id}-${idx}`} 
+                    post={post} 
+                    onVote={handleVote} 
+                    idx={idx} 
+                  />
+                ))}
+              </AnimatePresence>
 
-                  {post.title && <h2 className="text-xl font-bold mb-3 text-slate-900 dark:text-white group-hover:text-primary transition-colors">{post.title}</h2>}
-                  <p className="text-slate-600 dark:text-slate-300 leading-relaxed mb-6 font-serif">{post.content}</p>
-
-                  <div className="flex flex-wrap gap-2 mb-6">
-                    {(post.tags || []).map((tag: string) => (
-                      <span key={tag} className="flex items-center gap-1 text-[10px] font-bold text-slate-400 bg-slate-50 dark:bg-slate-900 px-2 py-1 rounded-md uppercase tracking-wider">
-                        <Tag size={10} /> {tag}
-                      </span>
-                    ))}
-                  </div>
-
-                  <div className="flex items-center justify-between pt-6 border-t border-slate-50 dark:border-slate-900">
-                    <div className="flex items-center gap-6">
-                      <div className="flex items-center gap-3 bg-slate-50 dark:bg-slate-900 px-3 py-1.5 rounded-full border border-slate-100 dark:border-slate-700">
-                        <button onClick={() => handleVote(post.id, 1)} className={`flex items-center gap-1.5 transition-colors ${post.user_vote === 1 ? "text-emerald-500" : "text-slate-400 hover:text-emerald-500"}`}>
-                          <ThumbsUp size={16} />
-                          <span className="text-xs font-bold">{post.upvotes || 0}</span>
-                        </button>
-                        <div className="w-px h-3 bg-slate-200 dark:bg-slate-600"></div>
-                        <button onClick={() => handleVote(post.id, -1)} className={`flex items-center gap-1.5 transition-colors ${post.user_vote === -1 ? "text-rose-500" : "text-slate-400 hover:text-rose-500"}`}>
-                          <span className="text-xs font-bold">{post.downvotes || 0}</span>
-                          <ThumbsDown size={16} />
-                        </button>
-                      </div>
-                      <button className="flex items-center gap-2 text-slate-400 hover:text-primary transition-colors">
-                        <MessageSquare size={16} /> <span className="text-sm font-medium">{post.comment_count || 0}</span>
-                      </button>
-                    </div>
-                    <button className="text-slate-400 hover:text-primary transition-colors">
-                      <Share2 size={18} />
+              {totalPages > 1 && (
+                <div className="flex items-center justify-center gap-2 pt-8 pb-12 overflow-x-auto">
+                  <button 
+                    disabled={page === 1}
+                    onClick={() => setPage(p => p - 1)}
+                    className="px-4 py-2 rounded-xl border border-slate-100 dark:border-slate-800 disabled:opacity-50 text-sm font-bold bg-white dark:bg-slate-800 text-slate-500 hover:text-primary transition-colors"
+                  >
+                    Prev
+                  </button>
+                  
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+                    <button
+                      key={pageNum}
+                      onClick={() => setPage(pageNum)}
+                      className={`min-w-[2.5rem] h-10 rounded-xl font-bold text-sm transition-all ${
+                        page === pageNum 
+                        ? 'bg-primary text-white shadow-lg shadow-primary/20 scale-110' 
+                        : 'bg-white dark:bg-slate-800 text-slate-400 hover:text-slate-600 dark:hover:text-white border border-slate-50 dark:border-slate-800 shadow-sm'
+                      }`}
+                    >
+                      {pageNum}
                     </button>
-                  </div>
-                </motion.div>
-              ))}
-            </AnimatePresence>
+                  ))}
+
+                  <button 
+                    disabled={page === totalPages}
+                    onClick={() => setPage(p => p + 1)}
+                    className="px-4 py-2 rounded-xl border border-slate-100 dark:border-slate-800 disabled:opacity-50 text-sm font-bold bg-white dark:bg-slate-800 text-slate-500 hover:text-primary transition-colors"
+                  >
+                    Next
+                  </button>
+                </div>
+              )}
+            </>
           )}
         </div>
       </main>
+
+      <CreatePostModal 
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSuccess={handlePostSuccess}
+        token={token || ""}
+        apiUrl={API.community.posts}
+      />
     </div>
+
   );
 }

@@ -31,6 +31,7 @@ export const API = {
     deletePost:        (id: string) => `${API_BASE}/api/v1/community/posts/${id}`,
     updateComment:     (id: string) => `${API_BASE}/api/v1/community/comments/${id}`,
     deleteComment:     (id: string) => `${API_BASE}/api/v1/community/comments/${id}`,
+    upload:            `${API_BASE}/api/v1/community/upload`,
   },
   // Discovery domain
   discovery: {
