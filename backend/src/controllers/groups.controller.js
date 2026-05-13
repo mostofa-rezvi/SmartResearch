@@ -58,8 +58,23 @@ class GroupController {
 
   async getMembers(req, res, next) {
     try {
-      const members = await groupsService.getMembers(req.params.id);
+      const includePending = req.query.includePending === 'true';
+      const members = await groupsService.getMembers(req.params.id, includePending);
       res.json(envelope(members));
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async handleJoinRequest(req, res, next) {
+    try {
+      const result = await groupsService.handleJoinRequest(
+        req.user.id,
+        req.params.id,
+        req.params.userId,
+        req.body.action
+      );
+      res.json(envelope(result));
     } catch (err) {
       next(err);
     }

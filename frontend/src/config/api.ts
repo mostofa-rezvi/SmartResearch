@@ -53,6 +53,7 @@ export const API = {
     leave:             (id: string) => `${API_BASE}/api/v1/groups/${id}/leave`,
     membership:        (id: string) => `${API_BASE}/api/v1/groups/${id}/membership`,
     members:           (id: string) => `${API_BASE}/api/v1/groups/${id}/members`,
+    handleRequest:     (id: string, userId: string) => `${API_BASE}/api/v1/groups/${id}/members/${userId}/request`,
     updateMemberRole:  (id: string, userId: string) => `${API_BASE}/api/v1/groups/${id}/members/${userId}/role`,
   },
   // Identity domain

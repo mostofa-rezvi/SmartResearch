@@ -51,11 +51,13 @@ router.get('/:id/members',
   groupsController.getMembers
 );
 
-// @route   PATCH /api/v1/groups/:id/members/:userId/role
-// @desc    Update member role (admin only)
-router.patch('/:id/members/:userId/role',
+// @route   POST /api/v1/groups/:id/members/:userId/request
+// @desc    Approve or reject join request (admin only)
+router.post('/:id/members/:userId/request',
   [verifyAuth],
-  groupsController.updateMemberRole
+  groupsController.handleJoinRequest
 );
+
+// @route   PATCH /api/v1/groups/:id/members/:userId/role
 
 module.exports = router;

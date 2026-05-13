@@ -35,6 +35,7 @@ interface GroupMember {
   name: string;
   system_role: string;
   group_role: 'admin' | 'contributor' | 'member';
+  status?: 'pending' | 'approved' | 'rejected';
   institution?: string;
   researcher_type?: string;
   research_interests?: any;
@@ -427,9 +428,10 @@ function PostComposer({ groupId, token, user, onPosted }: { groupId: string; tok
   );
 }
 
-function MemberCard({ member, currentUserId, currentUserRole, onRoleUpdate, token, groupId }: { 
+function MemberCard({ member, currentUserId, currentUserRole, onRoleUpdate, token, groupId, onRequestAction }: { 
   member: GroupMember; currentUserId: number | null; currentUserRole: string | null; 
   onRoleUpdate: (userId: number, newRole: string) => void; token: string; groupId: string;
+  onRequestAction?: (userId: number, action: 'approve' | 'reject') => void;
 }) {
   const [loading, setLoading] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
@@ -476,6 +478,22 @@ function MemberCard({ member, currentUserId, currentUserRole, onRoleUpdate, toke
         <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest truncate">
           {member.researcher_type || "Researcher"} • {member.institution || "Independent"}
         </p>
+        {member.status === 'pending' && (
+          <div className="flex gap-2 mt-2">
+            <button 
+              onClick={() => onRequestAction?.(member.id, 'approve')}
+              className="bg-emerald-500 text-white text-[10px] font-black px-3 py-1 rounded-lg hover:bg-emerald-600 transition-all shadow-sm shadow-emerald-500/20"
+            >
+              APPROVE
+            </button>
+            <button 
+              onClick={() => onRequestAction?.(member.id, 'reject')}
+              className="bg-slate-100 text-slate-500 text-[10px] font-black px-3 py-1 rounded-lg hover:bg-rose-50 hover:text-rose-600 transition-all"
+            >
+              REJECT
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="flex items-center gap-1 shrink-0">
@@ -537,10 +555,11 @@ function MemberCard({ member, currentUserId, currentUserRole, onRoleUpdate, toke
   );
 }
 
-function MemberSection({ title, icon, members, description, currentUserId, currentUserRole, onRoleUpdate, token, groupId }: { 
+function MemberSection({ title, icon, members, description, currentUserId, currentUserRole, onRoleUpdate, token, groupId, onRequestAction }: { 
   title: string; icon: React.ReactNode; members: GroupMember[]; description: string;
   currentUserId: number | null; currentUserRole: string | null; 
   onRoleUpdate: (userId: number, newRole: string) => void; token: string; groupId: string;
+  onRequestAction?: (userId: number, action: 'approve' | 'reject') => void;
 }) {
   if (members.length === 0) return null;
 
@@ -568,6 +587,7 @@ function MemberSection({ title, icon, members, description, currentUserId, curre
             onRoleUpdate={onRoleUpdate}
             token={token}
             groupId={groupId}
+            onRequestAction={onRequestAction}
           />
         ))}
       </div>
@@ -912,11 +932,11 @@ export default function GroupDetailPage() {
   const [joining, setJoining] = useState(false);
   const [leaving, setLeaving] = useState(false);
   const [feedLoading, setFeedLoading] = useState(true);
-  const [membership, setMembership] = useState<{ is_member: boolean; role: string | null } | null>(null);
+  const [membership, setMembership] = useState<{ is_member: boolean; role: string | null; status: string | null } | null>(null);
   const [inviteToast, setInviteToast] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [memberSearchQuery, setMemberSearchQuery] = useState("");
-  const [activeTab, setActiveTab] = useState<"feed" | "members">("feed");
+  const [activeTab, setActiveTab] = useState<"feed" | "members">("members");
   const [members, setMembers] = useState<GroupMember[]>([]);
   const [membersLoading, setMembersLoading] = useState(false);
 
@@ -961,6 +981,15 @@ export default function GroupDetailPage() {
     fetchGroupAndMembership();
   }, [id, token]);
 
+  // Set active tab to feed if member, otherwise stay on members
+  useEffect(() => {
+    if (membership?.status === 'approved') {
+      setActiveTab("feed");
+    } else {
+      setActiveTab("members");
+    }
+  }, [membership?.status]);
+
   useEffect(() => {
     if (!token) return;
     const fetchFeed = async () => {
@@ -983,7 +1012,8 @@ export default function GroupDetailPage() {
       const fetchMembers = async () => {
         setMembersLoading(true);
         try {
-          const res = await fetch(API.groups.members(String(id)));
+          const isAdmin = membership?.role === 'admin';
+          const res = await fetch(`${API.groups.members(String(id))}${isAdmin ? '?includePending=true' : ''}`);
           if (res.ok) {
             const data = await res.json();
             setMembers(data.data || []);
@@ -998,12 +1028,39 @@ export default function GroupDetailPage() {
     if (!user) return router.push("/login");
     setJoining(true);
     try {
-      await fetch(API.groups.join(String(id)), {
+      const res = await fetch(API.groups.join(String(id)), {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` }
       });
-      window.location.reload();
+      const data = await res.json();
+      if (res.ok) {
+        setMembership({ is_member: false, role: 'member', status: 'pending' });
+        alert(data.message || "Join request sent!");
+      }
     } catch { } finally { setJoining(false); }
+  };
+
+  const handleRequestAction = async (userId: number, action: 'approve' | 'reject') => {
+    try {
+      const res = await fetch(API.groups.handleRequest(String(id), String(userId)), {
+        method: "POST",
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}` 
+        },
+        body: JSON.stringify({ action })
+      });
+      if (res.ok) {
+        // Refresh members list
+        const memRes = await fetch(`${API.groups.members(String(id))}?includePending=true`);
+        if (memRes.ok) {
+          const data = await memRes.json();
+          setMembers(data.data || []);
+        }
+      }
+    } catch (err) {
+      console.error("Failed to handle request:", err);
+    }
   };
 
   const handleLeave = async () => {
@@ -1123,11 +1180,20 @@ export default function GroupDetailPage() {
           {/* Tab Switcher */}
           <div className="flex items-center gap-1 bg-white dark:bg-slate-800 p-1.5 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm w-fit">
             <button
-              onClick={() => setActiveTab("feed")}
-              className={`px-6 py-2 rounded-xl text-sm font-bold transition-all relative ${activeTab === "feed" ? "text-primary" : "text-slate-500 hover:text-slate-700"}`}
+              onClick={() => {
+                if (membership?.status === 'approved') {
+                  setActiveTab("feed");
+                } else {
+                  alert("You must be an approved member to view the feed.");
+                }
+              }}
+              className={`px-6 py-2 rounded-xl text-sm font-bold transition-all relative ${activeTab === "feed" ? "text-primary" : "text-slate-500 hover:text-slate-700"} ${membership?.status !== 'approved' ? "opacity-50 cursor-not-allowed" : ""}`}
             >
               {activeTab === "feed" && <motion.div layoutId="activeTab" className="absolute inset-0 bg-primary/10 rounded-xl" />}
-              <span className="relative z-10 flex items-center gap-2"><MessageSquare size={16} /> Feed</span>
+              <span className="relative z-10 flex items-center gap-2">
+                {membership?.status === 'approved' ? <MessageSquare size={16} /> : <Lock size={16} />} 
+                Feed
+              </span>
             </button>
             <button
               onClick={() => setActiveTab("members")}
@@ -1145,7 +1211,8 @@ export default function GroupDetailPage() {
                 type="text" 
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
-                placeholder="Search discussions by title or content..." 
+                placeholder={membership?.status === 'approved' ? "Search discussions..." : "Feed locked"} 
+                disabled={membership?.status !== 'approved'}
                 className="w-full bg-transparent border-none outline-none text-sm text-slate-800 dark:text-slate-200"
               />
             ) : (
@@ -1161,7 +1228,24 @@ export default function GroupDetailPage() {
 
           {activeTab === "feed" ? (
             <>
-              {feedLoading ? (
+              {membership?.status !== 'approved' ? (
+                <div className="text-center py-24 bg-white dark:bg-slate-800 rounded-[3rem] border border-slate-100 dark:border-slate-700 shadow-sm px-8">
+                  <div className="w-20 h-20 bg-slate-50 dark:bg-slate-900 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <Lock size={32} className="text-slate-300" />
+                  </div>
+                  <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Members-Only Content</h2>
+                  <p className="text-sm text-slate-500 max-w-sm mx-auto mb-8">
+                    The research feed is exclusively available to approved community members. Join the group to see and participate in discussions.
+                  </p>
+                  {(!membership || membership.status === null) && (
+                    <button onClick={handleJoin} disabled={joining}
+                      className="bg-primary text-white px-8 py-3 rounded-2xl font-bold shadow-lg shadow-primary/20 hover:scale-105 transition-all"
+                    >
+                      {joining ? "..." : "Request Access Now"}
+                    </button>
+                  )}
+                </div>
+              ) : feedLoading ? (
                 <div className="text-center py-16 text-slate-400">
                   <div className="w-8 h-8 border-3 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-3" />
                   Loading discussions...
@@ -1201,11 +1285,27 @@ export default function GroupDetailPage() {
                 </div>
               ) : (
                 <>
+                  {/* Requests Section for Admins */}
+                  {membership?.role === 'admin' && (
+                    <MemberSection 
+                      title="Pending Requests" 
+                      icon={<Zap className="text-amber-500" size={20} />}
+                      members={filteredMembers.filter(m => m.status === 'pending')}
+                      description="Users waiting for access to the community."
+                      currentUserId={user?.id ? parseInt(user.id) : null}
+                      currentUserRole={membership?.role || null}
+                      onRoleUpdate={(userId, newRole) => setMembers(prev => prev.map(m => m.id === userId ? { ...m, group_role: newRole as any } : m))}
+                      token={token || ""}
+                      groupId={String(id)}
+                      onRequestAction={handleRequestAction}
+                    />
+                  )}
+
                   {/* Admin Section */}
                   <MemberSection 
                     title="Admins" 
                     icon={<ShieldCheck className="text-amber-500" size={20} />}
-                    members={filteredMembers.filter(m => m.group_role === "admin")}
+                    members={filteredMembers.filter(m => m.group_role === "admin" && m.status === 'approved')}
                     description="The visionary leads managing this community."
                     currentUserId={user?.id ? parseInt(user.id) : null}
                     currentUserRole={membership?.role || null}
@@ -1218,7 +1318,7 @@ export default function GroupDetailPage() {
                   <MemberSection 
                     title="Contributors" 
                     icon={<Award className="text-primary" size={20} />}
-                    members={filteredMembers.filter(m => m.group_role === "contributor")}
+                    members={filteredMembers.filter(m => m.group_role === "contributor" && m.status === 'approved')}
                     description="Top-tier researchers and active collaborators."
                     currentUserId={user?.id ? parseInt(user.id) : null}
                     currentUserRole={membership?.role || null}
@@ -1231,7 +1331,7 @@ export default function GroupDetailPage() {
                   <MemberSection 
                     title="Community Members" 
                     icon={<Users className="text-slate-400" size={20} />}
-                    members={filteredMembers.filter(m => m.group_role === "member")}
+                    members={filteredMembers.filter(m => m.group_role === "member" && m.status === 'approved')}
                     description="Our diverse network of research explorers."
                     currentUserId={user?.id ? parseInt(user.id) : null}
                     currentUserRole={membership?.role || null}
