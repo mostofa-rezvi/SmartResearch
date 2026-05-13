@@ -42,6 +42,7 @@ export const API = {
   library: {
     journals:          `${API_BASE}/api/v1/journals`,
     categories:        `${API_BASE}/api/v1/journals/categories`,
+    metadata:          `${API_BASE}/api/v1/journals/metadata`,
   },
   // Groups domain
   groups: {

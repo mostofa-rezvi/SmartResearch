@@ -1,10 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { motion } from "framer-motion";
 import { MessageSquare, ThumbsUp, ThumbsDown, Share2, Tag, Sparkles, HelpCircle, Lightbulb, ShieldCheck } from "lucide-react";
 import Link from "next/link";
-import { ShareModal } from "./ShareModal";
 
 interface QuestionCardProps {
   post: any;
@@ -16,14 +15,6 @@ import { useRouter } from "next/navigation";
 
 export const QuestionCard: React.FC<QuestionCardProps> = ({ post, onVote, idx }) => {
   const router = useRouter();
-  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
-
-  const shareUrl = typeof window !== "undefined" ? `${window.location.origin}/community/${post.id}` : "";
-
-  const handleShare = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setIsShareModalOpen(true);
-  };
 
   const handleCardClick = (e: React.MouseEvent) => {
     // Don't navigate if clicking a button, link, or the author area
@@ -104,20 +95,10 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({ post, onVote, idx })
             <MessageSquare size={16} /> <span className="text-sm font-medium">{post.comment_count || 0}</span>
           </Link>
         </div>
-        <button 
-          onClick={handleShare}
-          className="text-slate-400 hover:text-primary transition-colors"
-        >
+        <button className="text-slate-400 hover:text-primary transition-colors">
           <Share2 size={18} />
         </button>
       </div>
-
-      <ShareModal 
-        isOpen={isShareModalOpen} 
-        onClose={() => setIsShareModalOpen(false)}
-        url={shareUrl}
-        title={post.title}
-      />
     </motion.div>
   );
 };

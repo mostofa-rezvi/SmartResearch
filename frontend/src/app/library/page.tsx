@@ -1,231 +1,592 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Book, Search, Filter, Globe, School, Award, ChevronRight, ExternalLink, Library as LibraryIcon, Bookmark, Info } from "lucide-react";
+import { 
+  Book, Search, Filter, Globe, School, Award, 
+  ChevronRight, ExternalLink, Library as LibraryIcon, 
+  Bookmark, Info, RefreshCw, X, SlidersHorizontal
+} from "lucide-react";
+import { Virtuoso } from "react-virtuoso";
 import Navbar from "@/components/Navbar";
 import { API } from "@/config/api";
 
-export default function JournalDirectoryPage() {
-  const [journals, setJournals] = useState<any[]>([]);
+// --- Types ---
+interface Journal {
+  id: number;
+  name: string;
+  issn: string;
+  category: string;
+  subcategory?: string;
+  quality_tier: string;
+  geography: string;
+  publisher: string;
+  rank?: number;
+  sjr_score?: number;
+  h_index?: number;
+  total_docs?: number;
+  impact_factor?: number;
+  homepage_url?: string;
+  is_open_access: boolean;
+  year: number;
+}
+
+interface Metadata {
+  categories: string[];
+  tiers: string[];
+  years: number[];
+  regions: string[];
+}
+
+export default function LibraryPage() {
+  const [journals, setJournals] = useState<Journal[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [metadata, setMetadata] = useState<Metadata | null>(null);
   
-  // Filters
-  const [selectedTier, setSelectedTier] = useState<string | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [categories, setCategories] = useState<string[]>([]);
+  // Saved Journals State
+  const [savedJournals, setSavedJournals] = useState<Journal[]>([]);
+  const [showSavedPopup, setShowSavedPopup] = useState(false);
 
+  // Search & Filter State
+  const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedQuery, setDebouncedQuery] = useState("");
+  const [filters, setFilters] = useState({
+    tier: "" as string,
+    category: "" as string,
+    year: "" as string,
+    region: "" as string,
+    isOpenAccess: false,
+  });
+
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const virtuosoRef = useRef(null);
+
+  // --- Effects ---
+
+  // Load saved journals from localStorage
   useEffect(() => {
-    fetchCategories();
-    fetchJournals();
-  }, [selectedTier, selectedCategory]);
+    const saved = localStorage.getItem("saved_journals");
+    if (saved) setSavedJournals(JSON.parse(saved));
+  }, []);
 
-  const fetchCategories = async () => {
-    try {
-      const response = await fetch(API.library.categories);
-      const data = await response.json();
-      setCategories(Array.isArray(data) ? data : []);
-    } catch (err) {
-      console.error("Failed to fetch categories");
-      setCategories([]);
-    }
+  // Sync to localStorage
+  useEffect(() => {
+    localStorage.setItem("saved_journals", JSON.stringify(savedJournals));
+  }, [savedJournals]);
+
+  const toggleSave = (journal: Journal) => {
+    setSavedJournals(prev => {
+      const isSaved = prev.some(j => j.id === journal.id);
+      if (isSaved) {
+        return prev.filter(j => j.id !== journal.id);
+      } else {
+        return [...prev, journal];
+      }
+    });
   };
 
-  const fetchJournals = async () => {
+  const exportToCSV = () => {
+    if (savedJournals.length === 0) return;
+    
+    const headers = ["Name", "ISSN", "Category", "Quality Tier", "Year", "Impact (SJR)", "Publisher", "Geography"];
+    const rows = savedJournals.map(j => [
+      `"${j.name}"`,
+      j.issn,
+      `"${j.category}"`,
+      j.quality_tier,
+      j.year,
+      j.sjr_score,
+      `"${j.publisher}"`,
+      j.geography
+    ]);
+
+    const csvContent = [headers.join(","), ...rows.map(r => r.join(","))].join("\n");
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `research_collection_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  // Initial metadata fetch
+  useEffect(() => {
+    const fetchMetadata = async () => {
+      try {
+        const res = await fetch(API.library.metadata);
+        const json = await res.json();
+        if (json.status === 'success') setMetadata(json.data);
+      } catch (err) {
+        console.error("Failed to fetch library metadata");
+      }
+    };
+    fetchMetadata();
+  }, []);
+
+  // Debounce search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedQuery(searchQuery);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  // Reset and fetch when filters change
+  useEffect(() => {
+    setJournals([]);
+    setPage(1);
+    setHasMore(true);
+    loadMore(1, true);
+  }, [debouncedQuery, filters]);
+
+  const loadMore = useCallback(async (pageNum: number, isReset = false) => {
+    if (!hasMore && !isReset) return;
+    
     setLoading(true);
     try {
-      let url = `${API.library.journals}?`;
-      if (selectedTier) url += `tier=${selectedTier}&`;
-      if (selectedCategory) url += `category=${selectedCategory}&`;
+      const params = new URLSearchParams({
+        page: pageNum.toString(),
+        limit: "50",
+        query: debouncedQuery,
+        tier: filters.tier,
+        category: filters.category,
+        year: filters.year,
+        region: filters.region,
+        isOpenAccess: filters.isOpenAccess.toString(),
+      });
+
+      const response = await fetch(`${API.library.journals}?${params.toString()}`);
+      const json = await response.json();
       
-      const response = await fetch(url);
-      const data = await response.json();
-      setJournals(Array.isArray(data) ? data : []);
+      if (json.status === 'success') {
+        const newJournals = json.data.journals;
+        setJournals(prev => isReset ? newJournals : [...prev, ...newJournals]);
+        setTotalCount(json.data.totalCount);
+        setHasMore(json.data.page < json.data.totalPages);
+        setPage(pageNum + 1);
+      }
     } catch (err) {
-      console.error("Failed to fetch journals");
-      setJournals([]);
+      console.error("Failed to fetch journals", err);
     } finally {
       setLoading(false);
     }
+  }, [debouncedQuery, filters, hasMore]);
+
+  const resetFilters = () => {
+    setFilters({
+      tier: "",
+      category: "",
+      year: "",
+      region: "",
+      isOpenAccess: false,
+    });
+    setSearchQuery("");
   };
 
-  return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
-      <Navbar />
-      
-      <main className="pt-24 pb-20 px-6 max-w-7xl mx-auto flex flex-col md:flex-row gap-8">
-        {/* Sidebar Filters */}
-        <div className="w-full md:w-72 shrink-0 space-y-8">
-          <div>
-            <h1 className="text-4xl font-serif font-black text-primary dark:text-white mb-2 flex items-center gap-3">
-              <LibraryIcon size={32} className="text-secondary" /> The Library
-            </h1>
-            <p className="text-slate-500 text-sm italic font-medium leading-relaxed">
-              "Unifying Global Knowledge from Student to Professor."
-            </p>
-          </div>
+  // --- Render Helpers ---
 
-          <div className="space-y-6">
-            <section className="space-y-4">
-              <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 flex items-center gap-2">
-                <Award size={14} className="text-secondary" /> Journal Ranking (SJR)
-              </h4>
-              <div className="flex flex-wrap gap-2">
-                {['Q1', 'Q2', 'Q3', 'Q4'].map(tier => (
-                  <button
-                    key={tier}
-                    onClick={() => setSelectedTier(selectedTier === tier ? null : tier)}
-                    className={`flex-1 min-w-[60px] py-3 rounded-xl text-xs font-black transition-all border ${
-                      selectedTier === tier 
-                      ? 'bg-secondary text-white border-secondary shadow-lg shadow-secondary/20' 
-                      : 'bg-white dark:bg-slate-800 text-slate-600 border-slate-100 dark:border-slate-700 hover:border-secondary/50'
-                    }`}
-                  >
-                    {tier}
-                  </button>
-                ))}
-              </div>
-            </section>
-
-            <section className="space-y-4">
-              <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 flex items-center gap-2">
-                <Globe size={14} className="text-primary" /> Geographic Axis
-              </h4>
-              <select 
-                className="w-full px-4 py-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 text-sm font-medium outline-none focus:ring-2 focus:ring-primary/20 appearance-none cursor-pointer"
-                defaultValue="all"
-              >
-                <option value="all">Global Reach</option>
-                <option value="bd">Bangladesh (Local)</option>
-                <option value="eu">Europe</option>
-                <option value="na">North America</option>
-                <option value="asia">Asia-Pacific</option>
-              </select>
-            </section>
-
-            <section className="space-y-3">
-              <h4 className="text-[10px] font-bold uppercase tracking-widest text-slate-400 flex items-center gap-2">
-                <Book size={14} /> Disciplines
-              </h4>
-              <div className="flex flex-col gap-1 max-h-60 overflow-y-auto custom-scrollbar">
-                {categories.map(cat => (
-                  <button
-                    key={cat}
-                    onClick={() => setSelectedCategory(selectedCategory === cat ? null : cat)}
-                    className={`text-left px-4 py-2 rounded-xl text-sm font-medium transition-all ${
-                      selectedCategory === cat 
-                      ? 'bg-primary/10 text-primary' 
-                      : 'text-slate-600 hover:bg-white dark:hover:bg-slate-800'
-                    }`}
-                  >
-                    {cat}
-                  </button>
-                ))}
-                {categories.length === 0 && <p className="text-xs italic text-slate-400 px-4">Loading categories...</p>}
-              </div>
-            </section>
-          </div>
-        </div>
-
-        {/* Results Area */}
-        <div className="flex-1 space-y-6">
-          <div className="flex items-center gap-4 bg-white dark:bg-slate-800 p-2 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700">
-            <Search className="text-slate-400 ml-3" size={20} />
-            <input 
-              type="text" 
-              placeholder="Quick search by ISSN or Journal Name..." 
-              className="w-full bg-transparent border-none outline-none text-sm py-2"
-            />
-            <div className="h-6 w-px bg-slate-200 mx-2" />
-            <span className="text-xs font-bold text-slate-400 uppercase tracking-widest mr-4">
-              {journals.length} Holdings
+  const JournalCard = ({ journal, index }: { journal: Journal; index: number }) => (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.2, delay: Math.min(index % 10 * 0.03, 0.3) }}
+      className="mb-2 mx-4"
+    >
+      <div className="bg-white dark:bg-slate-800/50 backdrop-blur-xl rounded-2xl p-4 border border-slate-100 dark:border-slate-700/50 shadow-sm hover:shadow-md transition-all group border-l-4 border-l-primary flex flex-col md:flex-row gap-4">
+        <div className="flex-1 min-w-0">
+          <div className="flex flex-wrap items-center gap-2 mb-2">
+            <span className="text-[9px] font-black text-slate-400 tracking-wider bg-slate-100 dark:bg-slate-900 px-2 py-0.5 rounded uppercase">
+              {journal.issn || "NO-ISSN"}
+            </span>
+            {journal.is_open_access && (
+              <span className="text-[9px] font-black text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded uppercase flex items-center gap-1">
+                <Globe size={9} /> OA
+              </span>
+            )}
+            <span className="text-[9px] font-black text-primary/60 bg-primary/5 px-2 py-0.5 rounded uppercase">
+              {journal.year}
             </span>
           </div>
 
-          {loading ? (
-            <div className="text-center py-20 italic text-slate-400 animate-pulse">Consulting the library archives...</div>
-          ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <AnimatePresence mode="popLayout">
-                {journals.map((journal, idx) => (
-                  <motion.div
-                    key={journal.id}
-                    initial={{ opacity: 0, scale: 0.98 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.95 }}
-                    transition={{ delay: idx * 0.03 }}
-                    className="bg-white dark:bg-slate-800 rounded-3xl p-7 border border-slate-100 dark:border-slate-700 shadow-xl hover:shadow-secondary/5 transition-all group border-l-8 border-l-primary flex flex-col"
-                  >
-                    <div className="flex justify-between items-start mb-6">
-                      <span className="mono-academic text-[10px] text-slate-400 font-bold tracking-widest bg-slate-50 dark:bg-slate-900 px-3 py-1 rounded-md">
-                        {journal.issn || 'NO-ISSN-DATA'}
-                      </span>
-                      <div className="flex items-center gap-2">
-                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-black text-xs shadow-sm ring-1 ${
-                          journal.quality_tier === 'Q1' ? 'bg-secondary/10 text-secondary ring-secondary/20' :
-                          journal.quality_tier === 'Q2' ? 'bg-accent/10 text-accent ring-accent/20' :
-                          'bg-slate-100 text-slate-500 ring-slate-200'
-                        }`}>
-                          {journal.quality_tier}
-                        </div>
-                        <button className="p-2 hover:bg-slate-50 dark:hover:bg-slate-900 rounded-lg text-slate-300 hover:text-secondary transition-all">
-                          <Bookmark size={20} />
-                        </button>
-                      </div>
-                    </div>
+          <h3 className="text-base font-serif font-black text-slate-900 dark:text-white mb-1 group-hover:text-primary transition-colors truncate">
+            {journal.name}
+          </h3>
 
-                    <h3 className="text-2xl font-serif font-black mb-2 text-primary dark:text-white leading-tight transition-colors group-hover:text-secondary">{journal.name}</h3>
-                    
-                    <div className="flex flex-wrap gap-2 mb-6">
-                      <span className="text-[10px] font-black text-secondary bg-secondary/5 px-2 py-1 rounded uppercase tracking-wider">
-                        {journal.category}
-                      </span>
-                      {journal.subcategory && (
-                        <span className="text-[10px] font-black text-primary/60 bg-primary/5 px-2 py-1 rounded uppercase tracking-wider">
-                          {journal.subcategory}
-                        </span>
-                      )}
-                    </div>
+          <div className="flex items-center gap-3 text-[10px] font-medium text-slate-500 dark:text-slate-400">
+            <span className="truncate max-w-[150px] font-bold text-primary/70">{journal.category}</span>
+            <span className="w-1 h-1 bg-slate-300 rounded-full" />
+            <span className="truncate max-w-[150px]">{journal.publisher}</span>
+            <span className="hidden sm:inline-flex items-center gap-1">
+              <Globe size={10} className="text-slate-300" />
+              {journal.geography || "Intl"}
+            </span>
+          </div>
+        </div>
 
-                    <div className="grid grid-cols-2 gap-4 py-5 border-y border-slate-50 dark:border-slate-700 my-4">
-                      <div className="space-y-1">
-                        <p className="mono-academic text-[9px] text-slate-400 font-bold">Impact Factor</p>
-                        <p className="text-lg font-black text-slate-900 dark:text-slate-100">{journal.impact_factor || '0.000'}</p>
-                      </div>
-                      <div className="space-y-1 text-right">
-                        <p className="mono-academic text-[9px] text-slate-400 font-bold text-right">Geography</p>
-                        <p className="text-sm font-bold text-slate-600 dark:text-slate-400 truncate">{journal.geography || 'Global Reach'}</p>
-                      </div>
-                    </div>
+        <div className="md:w-40 flex md:flex-row items-center justify-between gap-3 md:border-l border-slate-100 dark:border-slate-700/50 md:pl-4">
+          <div className="flex items-center gap-2">
+             <div className={`w-9 h-9 rounded-xl flex flex-col items-center justify-center font-black shadow-sm ring-1 transition-transform group-hover:scale-105 ${
+                journal.quality_tier === 'Q1' ? 'bg-amber-400/10 text-amber-500 ring-amber-500/20' :
+                journal.quality_tier === 'Q2' ? 'bg-slate-400/10 text-slate-500 ring-slate-500/20' :
+                journal.quality_tier === 'Q3' ? 'bg-orange-400/10 text-orange-500 ring-orange-500/20' :
+                'bg-slate-100 text-slate-400 ring-slate-200'
+              }`}>
+                <span className="text-[8px] opacity-60 leading-none">SJR</span>
+                <span className="text-xs leading-none">{journal.quality_tier}</span>
+              </div>
+              <div className="text-right">
+                <p className="text-sm font-black text-primary leading-none">{Number(journal.sjr_score || 0).toFixed(3)}</p>
+                <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none mt-1">Impact</p>
+              </div>
+          </div>
 
-                    <div className="mt-auto pt-4 flex items-center justify-between">
-                      <div className="flex items-center gap-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                        <School size={14} className="text-slate-300" /> {journal.institutional_group || 'Independent'}
-                      </div>
-                      <a 
-                        href={journal.website_url || '#'} 
-                        target="_blank" 
-                        rel="noreferrer"
-                        className="flex items-center gap-2 px-4 py-2 bg-slate-50 dark:bg-slate-900 text-slate-500 hover:text-primary hover:bg-primary/5 rounded-xl transition-all text-xs font-bold"
+          <div className="flex items-center gap-1">
+            <a 
+              href={journal.homepage_url || `https://www.google.com/search?q=${encodeURIComponent(journal.name + ' journal')}`}
+              target="_blank" 
+              rel="noreferrer"
+              className="p-2 text-slate-400 hover:text-primary hover:bg-primary/5 rounded-lg transition-all"
+            >
+              <ExternalLink size={16} />
+            </a>
+            <button 
+              onClick={() => toggleSave(journal)}
+              className={`p-2 rounded-lg transition-all ${
+                savedJournals.some(j => j.id === journal.id)
+                ? 'bg-secondary text-white shadow-md shadow-secondary/20'
+                : 'text-slate-400 hover:text-secondary hover:bg-secondary/5'
+              }`}
+            >
+              <Bookmark size={16} fill={savedJournals.some(j => j.id === journal.id) ? "currentColor" : "none"} />
+            </button>
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+
+  return (
+    <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0F172A] text-slate-900 dark:text-slate-100">
+      <Navbar />
+      
+      <main className="pt-24 h-screen flex flex-col max-w-[1600px] mx-auto px-4 md:px-8">
+        {/* Header Section */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8 shrink-0">
+          <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
+            <div>
+              <div className="flex items-center gap-3 mb-2">
+                <div className="p-3 bg-primary rounded-2xl text-white shadow-lg shadow-primary/20">
+                  <LibraryIcon size={24} />
+                </div>
+                <h1 className="text-4xl font-serif font-black tracking-tight">The Library</h1>
+              </div>
+              <p className="text-slate-500 font-medium italic">{totalCount.toLocaleString()}+ Peer-Reviewed Holdings Across 25 Years</p>
+            </div>
+
+            <button 
+              onClick={() => setShowSavedPopup(true)}
+              className="group flex items-center gap-3 px-6 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-sm hover:shadow-md hover:border-secondary transition-all"
+            >
+              <div className="p-2 bg-secondary/10 text-secondary rounded-lg group-hover:bg-secondary group-hover:text-white transition-colors">
+                <Bookmark size={18} fill={savedJournals.length > 0 ? "currentColor" : "none"} />
+              </div>
+              <div className="text-left">
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">My Collection</p>
+                <p className="text-sm font-black text-slate-700 dark:text-slate-200">{savedJournals.length} Journals</p>
+              </div>
+            </button>
+          </div>
+
+          <div className="flex items-center gap-3 w-full md:w-auto">
+            <div className="relative flex-1 md:w-96 group">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors" size={18} />
+              <input 
+                type="text" 
+                placeholder="Search journals, ISSN, or publishers..." 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-12 pr-4 py-4 bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 rounded-2xl outline-none focus:ring-4 focus:ring-primary/10 transition-all shadow-sm font-medium"
+              />
+              {searchQuery && (
+                <button 
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 p-1 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full"
+                >
+                  <X size={14} />
+                </button>
+              )}
+            </div>
+            <button className="p-4 bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 rounded-2xl hover:bg-slate-50 transition-all md:hidden">
+              <SlidersHorizontal size={18} />
+            </button>
+          </div>
+        </div>
+
+        <div className="flex flex-1 overflow-hidden gap-8 pb-8">
+          {/* Filters Sidebar */}
+          <aside className="hidden md:flex flex-col w-80 shrink-0 space-y-6 overflow-y-auto pr-4 custom-scrollbar">
+            <div className="bg-white dark:bg-slate-800/50 rounded-3xl p-6 border border-slate-200 dark:border-slate-700/50 shadow-sm">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="font-black text-xs uppercase tracking-widest text-slate-400 flex items-center gap-2">
+                  <Filter size={14} /> Refine Archives
+                </h3>
+                <button onClick={resetFilters} className="text-[10px] font-bold text-primary hover:underline">Reset</button>
+              </div>
+
+              <div className="space-y-6">
+                {/* SJR Tier */}
+                <section>
+                  <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3">Impact Tier (SJR)</label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {['Q1', 'Q2', 'Q3', 'Q4'].map(tier => (
+                      <button
+                        key={tier}
+                        onClick={() => setFilters(f => ({ ...f, tier: f.tier === tier ? "" : tier }))}
+                        className={`py-3 rounded-xl text-xs font-black border transition-all ${
+                          filters.tier === tier 
+                          ? 'bg-primary text-white border-primary shadow-lg shadow-primary/20' 
+                          : 'bg-slate-50 dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-transparent hover:border-primary/30'
+                        }`}
                       >
-                        Source <ExternalLink size={14} />
-                      </a>
-                    </div>
-                  </motion.div>
-                ))}
-              </AnimatePresence>
-            </div>
-          )}
+                        {tier}
+                      </button>
+                    ))}
+                  </div>
+                </section>
 
-          {!loading && journals.length === 0 && (
-            <div className="py-20 text-center space-y-4">
-              <div className="w-16 h-16 bg-slate-100 rounded-full mx-auto flex items-center justify-center text-slate-300"><Info size={32} /></div>
-              <p className="text-slate-500 font-medium">No results found in this section of the library.</p>
-              <button onClick={() => { setSelectedTier(null); setSelectedCategory(null); }} className="text-primary text-sm font-bold underline">Rest Filters</button>
+                {/* Categories */}
+                <section>
+                  <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3">Academic Field</label>
+                  <select 
+                    value={filters.category}
+                    onChange={(e) => setFilters(f => ({ ...f, category: e.target.value }))}
+                    className="w-full p-3 bg-slate-50 dark:bg-slate-900 rounded-xl text-xs font-bold border-none outline-none appearance-none cursor-pointer hover:bg-slate-100 transition-colors"
+                  >
+                    <option value="">All Disciplines</option>
+                    {metadata?.categories.map(cat => (
+                      <option key={cat} value={cat}>{cat}</option>
+                    ))}
+                  </select>
+                </section>
+
+                {/* Year */}
+                <section>
+                  <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3">Dataset Year</label>
+                  <div className="flex flex-wrap gap-2 mb-3">
+                    {[2025, 2024, 2023, 2022].map(yr => (
+                      <button
+                        key={yr}
+                        onClick={() => setFilters(f => ({ ...f, year: f.year === yr.toString() ? "" : yr.toString() }))}
+                        className={`px-3 py-1.5 rounded-lg text-[10px] font-black transition-all ${
+                          filters.year === yr.toString() 
+                          ? 'bg-secondary text-white shadow-md shadow-secondary/20' 
+                          : 'bg-slate-50 dark:bg-slate-900 text-slate-500 hover:text-secondary hover:bg-secondary/5'
+                        }`}
+                      >
+                        {yr}
+                      </button>
+                    ))}
+                  </div>
+                  <select 
+                    value={filters.year}
+                    onChange={(e) => setFilters(f => ({ ...f, year: e.target.value }))}
+                    className="w-full p-3 bg-slate-50 dark:bg-slate-900 rounded-xl text-xs font-bold border-none outline-none appearance-none cursor-pointer hover:bg-slate-100 transition-colors"
+                  >
+                    <option value="">All Years (1999-2025)</option>
+                    {metadata?.years.map(yr => (
+                      <option key={yr} value={yr}>{yr}</option>
+                    ))}
+                  </select>
+                </section>
+
+                 {/* Open Access Toggle */}
+                 <section className="pt-4 border-t border-slate-100 dark:border-slate-700/50">
+                  <label className="flex items-center justify-between cursor-pointer group">
+                    <span className="text-xs font-bold text-slate-600 dark:text-slate-400 group-hover:text-primary transition-colors">Only Open Access</span>
+                    <div className="relative">
+                      <input 
+                        type="checkbox" 
+                        className="sr-only" 
+                        checked={filters.isOpenAccess}
+                        onChange={() => setFilters(f => ({ ...f, isOpenAccess: !f.isOpenAccess }))}
+                      />
+                      <div className={`w-10 h-5 rounded-full transition-colors ${filters.isOpenAccess ? 'bg-primary' : 'bg-slate-200 dark:bg-slate-700'}`}>
+                        <div className={`absolute top-1 left-1 bg-white w-3 h-3 rounded-full transition-transform ${filters.isOpenAccess ? 'translate-x-5' : ''}`} />
+                      </div>
+                    </div>
+                  </label>
+                </section>
+              </div>
             </div>
-          )}
+
+            {/* Quick Stats */}
+            <div className="p-6 bg-primary/5 rounded-3xl border border-primary/10">
+              <h4 className="text-[10px] font-black text-primary uppercase tracking-widest mb-4">Library Health</h4>
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-[10px] font-bold text-slate-500">Live Entries</span>
+                  <span className="text-xs font-black text-slate-700 dark:text-slate-300">{totalCount.toLocaleString()}</span>
+                </div>
+                <div className="w-full bg-slate-200 dark:bg-slate-700 h-1.5 rounded-full overflow-hidden">
+                  <div className="bg-primary h-full w-full animate-pulse" />
+                </div>
+              </div>
+            </div>
+          </aside>
+
+          {/* Results List */}
+          <div className="flex-1 flex flex-col min-w-0">
+            {journals.length === 0 && loading ? (
+               <div className="flex flex-col items-center justify-center h-full text-slate-400 space-y-4">
+                <RefreshCw className="animate-spin text-primary" size={32} />
+                <p className="font-serif italic text-lg">Unrolling the archives...</p>
+              </div>
+            ) : journals.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-full text-center p-8 bg-white dark:bg-slate-800/30 rounded-[3rem] border border-dashed border-slate-200 dark:border-slate-700">
+                <div className="w-20 h-20 bg-slate-50 dark:bg-slate-900 rounded-full flex items-center justify-center text-slate-300 mb-6">
+                  <Search size={40} />
+                </div>
+                <h3 className="text-2xl font-serif font-black mb-2">No matching holdings</h3>
+                <p className="text-slate-500 max-w-md">Our library couldn't find any journals matching your current criteria. Try widening your search or resetting filters.</p>
+                <button onClick={resetFilters} className="mt-6 px-8 py-3 bg-primary text-white font-black rounded-2xl shadow-lg shadow-primary/20 hover:scale-105 transition-transform">Reset Filters</button>
+              </div>
+            ) : (
+              <Virtuoso
+                ref={virtuosoRef}
+                style={{ height: '100%' }}
+                data={journals}
+                endReached={() => loadMore(page)}
+                increaseViewportBy={300}
+                itemContent={(index, journal) => (
+                  <JournalCard key={journal.id} journal={journal} index={index} />
+                )}
+                components={{
+                  Footer: () => loading ? (
+                    <div className="p-8 text-center">
+                      <RefreshCw className="animate-spin inline-block text-primary mr-2" size={16} />
+                      <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Loading more...</span>
+                    </div>
+                  ) : null
+                }}
+              />
+            )}
+          </div>
         </div>
       </main>
+
+      {/* Saved Journals Popup */}
+      <AnimatePresence>
+        {showSavedPopup && (
+          <>
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowSavedPopup(false)}
+              className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[100] flex items-center justify-end p-4 md:p-8"
+            >
+              <motion.div 
+                initial={{ x: 100, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: 100, opacity: 0 }}
+                onClick={(e) => e.stopPropagation()}
+                className="w-full max-w-lg h-full bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-2xl flex flex-col overflow-hidden"
+              >
+                <div className="p-8 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between shrink-0">
+                  <div>
+                    <h2 className="text-3xl font-serif font-black text-slate-900 dark:text-white">My Collection</h2>
+                    <p className="text-sm text-slate-500 font-medium">{savedJournals.length} Saved Journals</p>
+                  </div>
+                  <button 
+                    onClick={() => setShowSavedPopup(false)}
+                    className="p-3 bg-slate-50 dark:bg-slate-800 text-slate-400 hover:text-primary rounded-2xl transition-all"
+                  >
+                    <X size={24} />
+                  </button>
+                </div>
+
+                <div className="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar">
+                  {savedJournals.length === 0 ? (
+                    <div className="h-full flex flex-col items-center justify-center text-center p-8">
+                      <div className="w-20 h-20 bg-slate-50 dark:bg-slate-800 rounded-full flex items-center justify-center text-slate-300 mb-6">
+                        <Bookmark size={40} />
+                      </div>
+                      <h3 className="text-xl font-serif font-black mb-2">No journals saved yet</h3>
+                      <p className="text-slate-500">Click the bookmark icon on any journal to add it to your collection.</p>
+                    </div>
+                  ) : (
+                    savedJournals.map(journal => (
+                      <div key={`saved-${journal.id}`} className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-700/50 group flex items-start gap-4 hover:border-secondary transition-all">
+                        <div className={`w-10 h-10 shrink-0 rounded-xl flex flex-col items-center justify-center font-black shadow-sm ring-1 ${
+                          journal.quality_tier === 'Q1' ? 'bg-amber-400/10 text-amber-500 ring-amber-500/20' :
+                          journal.quality_tier === 'Q2' ? 'bg-slate-400/10 text-slate-500 ring-slate-500/20' :
+                          journal.quality_tier === 'Q3' ? 'bg-orange-400/10 text-orange-500 ring-orange-500/20' :
+                          'bg-slate-100 text-slate-400 ring-slate-200'
+                        }`}>
+                          <span className="text-[10px] leading-none">{journal.quality_tier}</span>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="text-sm font-black text-slate-900 dark:text-white truncate mb-1">{journal.name}</h4>
+                          <div className="flex items-center gap-2 text-[10px] font-bold text-slate-400">
+                            <span>{journal.issn}</span>
+                            <span>•</span>
+                            <span>{journal.year}</span>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                           <a 
+                            href={journal.homepage_url || `https://www.google.com/search?q=${encodeURIComponent(journal.name + ' journal')}`}
+                            target="_blank" rel="noreferrer"
+                            className="p-2 text-slate-400 hover:text-primary transition-colors"
+                          >
+                            <ExternalLink size={16} />
+                          </a>
+                          <button 
+                            onClick={() => toggleSave(journal)}
+                            className="p-2 text-slate-400 hover:text-red-500 transition-colors"
+                          >
+                            <X size={16} />
+                          </button>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+
+                <div className="p-8 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800 shrink-0">
+                   <button 
+                    onClick={exportToCSV}
+                    disabled={savedJournals.length === 0}
+                    className="w-full py-4 bg-primary text-white font-black rounded-2xl shadow-lg shadow-primary/20 hover:scale-[1.02] transition-transform active:scale-[0.98] disabled:opacity-50 disabled:hover:scale-100"
+                   >
+                    Export Collection (CSV)
+                   </button>
+                </div>
+              </motion.div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      <style jsx global>{`
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: #E2E8F0;
+          border-radius: 20px;
+        }
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: #334155;
+        }
+      `}</style>
     </div>
   );
 }
