@@ -185,8 +185,10 @@ router.get('/:id/works', async (req, res) => {
 
     if (!openalexId) return res.json(envelope([]));
 
-    // 2. Fetch works from OpenAlex
-    const url = `https://api.openalex.org/works?filter=author.id:${openalexId}&per-page=10&mailto=research@researchbridge.app`;
+    // 2. Fetch works from OpenAlex with pagination support
+    const { page = 1, per_page = 10 } = req.query;
+    const url = `https://api.openalex.org/works?filter=author.id:${openalexId}&page=${page}&per-page=${per_page}&mailto=research@researchbridge.app`;
+    
     const response = await fetch(url);
     if (!response.ok) throw new Error(`OpenAlex API responded with ${response.status}`);
     const data = await response.json();
@@ -202,7 +204,15 @@ router.get('/:id/works', async (req, res) => {
       landing_page_url: work.primary_location?.landing_page_url || work.doi
     }));
 
-    res.json(envelope(works));
+    res.json({
+      ...envelope(works),
+      meta: {
+        total: data.meta.count,
+        page: parseInt(page),
+        per_page: parseInt(per_page),
+        has_more: data.meta.count > (parseInt(page) * parseInt(per_page))
+      }
+    });
   } catch (err) {
     console.error('Works fetch error:', err.message);
     res.status(500).json(envelope(null, { error: 'Server error' }));

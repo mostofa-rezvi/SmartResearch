@@ -41,11 +41,14 @@ export default function ResearcherProfilePage() {
   const [works, setWorks] = useState<Work[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingWorks, setLoadingWorks] = useState(false);
+  const [worksPage, setWorksPage] = useState(1);
+  const [hasMoreWorks, setHasMoreWorks] = useState(true);
+  const [totalWorks, setTotalWorks] = useState(0);
 
   useEffect(() => {
     if (id) {
       fetchResearcher();
-      fetchWorks();
+      fetchWorks(1, true); // Reset and fetch first page
     }
   }, [id]);
 
@@ -63,18 +66,32 @@ export default function ResearcherProfilePage() {
     }
   };
 
-  const fetchWorks = async () => {
+  const fetchWorks = async (page: number, reset = false) => {
     try {
       setLoadingWorks(true);
-      const res = await fetch(API.researchers.works(String(id)));
+      const res = await fetch(`${API.researchers.works(String(id))}?page=${page}&per_page=10`);
       const data = await res.json();
+      
       if (data.success) {
-        setWorks(data.data);
+        if (reset) {
+          setWorks(data.data);
+        } else {
+          setWorks(prev => [...prev, ...data.data]);
+        }
+        setHasMoreWorks(data.meta.has_more);
+        setTotalWorks(data.meta.total);
+        setWorksPage(page);
       }
     } catch (err) {
       console.error("Failed to fetch works");
     } finally {
       setLoadingWorks(false);
+    }
+  };
+
+  const loadMore = () => {
+    if (!loadingWorks && hasMoreWorks) {
+      fetchWorks(worksPage + 1);
     }
   };
 
@@ -212,17 +229,11 @@ export default function ResearcherProfilePage() {
                   <BookOpen size={16} className="text-primary" /> Key Research Items
                 </h3>
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest bg-slate-50 dark:bg-slate-900 px-3 py-1 rounded-full">
-                  {works.length} items listed
+                  {totalWorks} total items
                 </span>
               </div>
 
-              {loadingWorks ? (
-                <div className="space-y-4">
-                  {[1, 2, 3, 4].map(i => (
-                    <div key={i} className="h-24 bg-slate-50 dark:bg-slate-900/50 animate-pulse rounded-3xl" />
-                  ))}
-                </div>
-              ) : works.length > 0 ? (
+              {works.length > 0 ? (
                 <div className="space-y-4">
                   {works.map((work) => (
                     <motion.a
@@ -255,6 +266,31 @@ export default function ResearcherProfilePage() {
                         <ChevronRight size={20} />
                       </div>
                     </motion.a>
+                  ))}
+
+                  {/* Loading Skeletons for Load More */}
+                  {loadingWorks && (
+                    <div className="space-y-4">
+                      {[1, 2, 3].map(i => (
+                        <div key={`skel-${i}`} className="h-24 bg-slate-50 dark:bg-slate-900/50 animate-pulse rounded-[2rem] border border-transparent" />
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Load More Button */}
+                  {hasMoreWorks && !loadingWorks && (
+                    <button
+                      onClick={loadMore}
+                      className="w-full py-4 mt-4 bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-700 rounded-[2rem] text-sm font-bold text-slate-500 hover:text-primary hover:bg-white dark:hover:bg-slate-800 transition-all flex items-center justify-center gap-2"
+                    >
+                      <Sparkles size={16} className="text-primary" /> Load More Research Items
+                    </button>
+                  )}
+                </div>
+              ) : loadingWorks ? (
+                <div className="space-y-4">
+                  {[1, 2, 3, 4].map(i => (
+                    <div key={i} className="h-24 bg-slate-50 dark:bg-slate-900/50 animate-pulse rounded-[2rem]" />
                   ))}
                 </div>
               ) : (
