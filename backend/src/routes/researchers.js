@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const db = require('../config/db');
 const { envelope } = require('../utils/responseEnvelope');
+const { getRedisClient } = require('../config/redis');
 
 // @route   GET /api/v1/researchers
 // @desc    Get researchers from local DB (seeded from OpenAlex)
@@ -65,16 +66,27 @@ router.get('/openalex-sync', async (req, res) => {
     domain = 'machine learning',
     country_code,
     min_citations = 500,
-    per_page = 25, // Increased default
+    per_page = 25,
     page = 1
   } = req.query;
 
-  const limit = Math.min(parseInt(per_page), 100); // Cap at 100 per OpenAlex standards
+  const limit = Math.min(parseInt(per_page), 100);
+  const cacheKey = `openalex:sync:${domain}:${country_code || 'all'}:${min_citations}:${per_page}:${page}`;
+  const redis = getRedisClient();
 
   try {
+    // 1. Check Cache
+    const cached = await redis.get(cacheKey);
+    if (cached) {
+      console.log(`[Cache Hit] OpenAlex sync: ${cacheKey}`);
+      return res.json(JSON.parse(cached));
+    }
+
+    // 2. Fetch from OpenAlex
     let filter = `cited_by_count:>${min_citations}`;
     if (country_code) filter += `,last_known_institution.country_code:${country_code.toUpperCase()}`;
-
+    
+    // Simple domain keyword search in concepts
     const url = `https://api.openalex.org/authors?filter=${encodeURIComponent(filter)}&per-page=${per_page}&page=${page}&mailto=research@researchbridge.app`;
 
     const response = await fetch(url);
@@ -96,11 +108,16 @@ router.get('/openalex-sync', async (req, res) => {
       orcid_url: author.orcid ? `https://orcid.org/${author.orcid.replace('https://orcid.org/', '')}` : null,
     }));
 
-    res.json(envelope(researchers, null, {
+    const responseBody = envelope(researchers, null, {
       total: data.meta?.count,
       page: parseInt(page),
       per_page: parseInt(per_page)
-    }));
+    });
+
+    // 3. Save to Cache (1 hour)
+    await redis.setex(cacheKey, 3600, JSON.stringify(responseBody));
+
+    res.json(responseBody);
   } catch (err) {
     console.error('OpenAlex proxy error:', err.message);
     res.status(502).json(envelope(null, { error: `OpenAlex API error: ${err.message}` }));

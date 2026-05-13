@@ -118,7 +118,10 @@ export default function ResearchersPage() {
       const pagesToFetch = source === "live" ? 8 : 1; 
       const batchSize = source === "live" ? 50 : 1000;
 
-      const fetchPromises = Array.from({ length: pagesToFetch }).map(async (_, i) => {
+      const results: Researcher[][] = [];
+      
+      // Sequential fetching to avoid overloading the backend/API and prevent timeouts
+      for (let i = 0; i < pagesToFetch; i++) {
         const params = new URLSearchParams({
           page: String(i + 1),
           min_citations: "300",
@@ -136,17 +139,17 @@ export default function ResearchersPage() {
         const url = `${endpoint}?${params}`;
         
         try {
-          const res = await fetch(url, { signal: AbortSignal.timeout(15000) });
-          if (!res.ok) return [];
-          const json = await res.json();
-          return json.data ?? json;
+          // Increase individual timeout to 30s
+          const res = await fetch(url, { signal: AbortSignal.timeout(30000) });
+          if (res.ok) {
+            const json = await res.json();
+            results.push(json.data ?? json);
+          }
         } catch (e) {
           console.error(`Sync batch fail: ${url}`, e);
-          return [];
+          // Continue to next page even if one fails
         }
-      });
-
-      const results = await Promise.all(fetchPromises);
+      }
       const newBatches = results.flat().filter(Boolean);
 
       // --- Merging Strategy ---

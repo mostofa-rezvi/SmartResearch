@@ -37,14 +37,18 @@ async function seedScimagoJR(filename, year) {
   for await (const record of parser) {
     // Dynamically find the "Total Docs" column for that year
     // ScimagoJR usually has "Total Docs. (YYYY)" or similar
-    const totalDocsKey = Object.keys(record).find(k => k.startsWith('Total Docs.'));
+    const totalDocsKey = Object.keys(record).find(k => k.startsWith('Total Docs.') && k.includes(`(${year})`)) || 
+                        Object.keys(record).find(k => k.startsWith('Total Docs.'));
     
+    let qt = record['SJR Best Quartile'] || 'N/A';
+    if (qt === '-') qt = 'N/A';
+
     const journal = {
       name: record['Title'],
       issn: record['Issn']?.split(',')[0]?.trim() || '',
       category: record['Categories']?.split(';')[0]?.trim() || 'Uncategorized',
       subcategory: record['Categories']?.split(';')[1]?.trim() || '',
-      quality_tier: record['SJR Best Quartile'] || 'N/A',
+      quality_tier: qt,
       geography: record['Country'] || '',
       publisher: record['Publisher'] || '',
       rank: parseInt(record['Rank']) || null,
@@ -177,7 +181,7 @@ async function insertBatch(batch) {
     await client.query('COMMIT');
   } catch (e) {
     await client.query('ROLLBACK');
-    // Silently continue if a batch fails, we log it but don't stop the whole process
+    console.error(`Batch insertion failed: ${e.message}`);
   } finally {
     client.release();
   }
