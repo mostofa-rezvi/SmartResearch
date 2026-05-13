@@ -4,7 +4,7 @@
  * Architect rule: Domain integrity, no scattered config.
  */
 
-export const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+export const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:5000';
 
 export const API = {
   // Auth domain
@@ -76,6 +76,7 @@ export const API = {
     list:              `${API_BASE}/api/v1/researchers`,
     liveSearch:        `${API_BASE}/api/v1/researchers/openalex-sync`,
     detail:            (id: string) => `${API_BASE}/api/v1/researchers/${id}`,
+    works:             (id: string) => `${API_BASE}/api/v1/researchers/${id}/works`,
   },
   // Onboarding domain
   onboarding: {

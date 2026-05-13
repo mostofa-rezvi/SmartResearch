@@ -31,8 +31,8 @@ const createLimiter = (windowMs, limit, prefix) => {
   });
 };
 
-// Global limiter: 100 requests per 15 minutes
-const apiLimiter = createLimiter(15 * 60 * 1000, 100, 'rl:global:');
+// Global limiter: 1000 requests per 15 minutes (Increased for batch syncing)
+const apiLimiter = createLimiter(15 * 60 * 1000, 1000, 'rl:global:');
 
 // Auth limiter: 10 requests per 1 hour (for login, register, etc.)
 const authLimiter = createLimiter(60 * 60 * 1000, 100, 'rl:auth:');

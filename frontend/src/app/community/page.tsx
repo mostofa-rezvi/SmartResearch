@@ -10,6 +10,9 @@ import { API, API_BASE } from "@/config/api";
 import { io } from "socket.io-client";
 import { QuestionCard } from "@/components/community/QuestionCard";
 import { CreatePostModal } from "@/components/community/CreatePostModal";
+import { ResearcherCard } from "@/components/community/ResearcherCard";
+import { ResearcherDetailModal } from "@/components/community/ResearcherDetailModal";
+import { Globe, Users } from "lucide-react";
 
 export default function CommunityFeedPage() {
   const [posts, setPosts] = useState<any[]>([]);
@@ -21,6 +24,10 @@ export default function CommunityFeedPage() {
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [socketConnected, setSocketConnected] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [researchers, setResearchers] = useState<any[]>([]);
+  const [loadingResearchers, setLoadingResearchers] = useState(false);
+  const [selectedResearcher, setSelectedResearcher] = useState<any>(null);
+  const [isResearcherModalOpen, setIsResearcherModalOpen] = useState(false);
   const limit = 20;
 
   const { user, token } = useAuth();
@@ -39,6 +46,7 @@ export default function CommunityFeedPage() {
   useEffect(() => {
     if (token) {
       fetchPosts(page);
+      fetchResearchers();
     }
   }, [token, filter, debouncedSearch, page]);
 
@@ -101,6 +109,23 @@ export default function CommunityFeedPage() {
     }
   };
 
+  const fetchResearchers = async () => {
+    try {
+      setLoadingResearchers(true);
+      const response = await fetch(`${API.researchers.list}?limit=5`, {
+        headers: { "Authorization": `Bearer ${token}` }
+      });
+      const data = await response.json();
+      if (data.success) {
+        setResearchers(data.data);
+      }
+    } catch (err) {
+      console.error("Failed to fetch researchers");
+    } finally {
+      setLoadingResearchers(false);
+    }
+  };
+
   const totalPages = Math.ceil(totalCount / limit);
 
   const handlePostSuccess = (newPost: any) => {
@@ -160,7 +185,7 @@ export default function CommunityFeedPage() {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
       <Navbar />
-      <main className="pt-24 pb-20 max-w-5xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-4 gap-8">
+      <main className="pt-24 pb-20 max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Toast Notification */}
         <AnimatePresence>
           {toast.show && (
@@ -179,7 +204,7 @@ export default function CommunityFeedPage() {
         </AnimatePresence>
 
         {/* Left Sidebar - Filters */}
-        <div className="lg:col-span-1 space-y-4">
+        <div className="lg:col-span-3 space-y-4">
           <div className="bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-xl sticky top-24">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-bold text-slate-900 dark:text-white flex items-center gap-2">
@@ -220,7 +245,7 @@ export default function CommunityFeedPage() {
 
 
         {/* Main Feed Content */}
-        <div className="lg:col-span-3 space-y-6">
+        <div className="lg:col-span-6 space-y-6">
           <div className="flex items-center gap-4 mb-2 bg-white dark:bg-slate-800 p-3 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm">
             <Search className="text-slate-400 ml-2" size={20} />
             <input 
@@ -289,6 +314,59 @@ export default function CommunityFeedPage() {
             </>
           )}
         </div>
+
+        {/* Right Sidebar - Researchers */}
+        <div className="lg:col-span-3 space-y-6">
+          <div className="bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-xl sticky top-24">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <Globe size={18} className="text-primary" /> Global Researchers
+              </h3>
+              <div className="p-1.5 bg-slate-50 dark:bg-slate-900 rounded-lg">
+                <Users size={14} className="text-slate-400" />
+              </div>
+            </div>
+
+            {loadingResearchers ? (
+              <div className="space-y-4">
+                {[1, 2, 3].map(i => (
+                  <div key={i} className="h-24 bg-slate-50 dark:bg-slate-900 animate-pulse rounded-2xl" />
+                ))}
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {researchers.map((res, i) => (
+                  <ResearcherCard 
+                    key={res.id} 
+                    researcher={res} 
+                    idx={i} 
+                    onClick={(r) => {
+                      setSelectedResearcher(r);
+                      setIsResearcherModalOpen(true);
+                    }}
+                  />
+                ))}
+                
+                <button className="w-full py-3 text-xs font-bold text-primary hover:bg-primary/5 rounded-xl transition-all uppercase tracking-widest border border-dashed border-primary/20">
+                  Discover More Scholars
+                </button>
+              </div>
+            )}
+          </div>
+          
+          <div className="bg-gradient-to-br from-primary to-blue-600 p-6 rounded-3xl shadow-xl shadow-primary/20 text-white relative overflow-hidden group">
+            <div className="absolute -right-4 -bottom-4 opacity-10 group-hover:scale-110 transition-transform">
+              <Sparkles size={120} />
+            </div>
+            <h4 className="font-bold mb-2 relative z-10">Elite Network</h4>
+            <p className="text-xs text-white/80 leading-relaxed mb-4 relative z-10">
+              Connect with 50,000+ verified scholars from top-tier institutions globally.
+            </p>
+            <button className="px-4 py-2 bg-white/20 backdrop-blur-md rounded-lg text-[10px] font-bold uppercase tracking-widest hover:bg-white/30 transition-all relative z-10">
+              Learn More
+            </button>
+          </div>
+        </div>
       </main>
 
       <CreatePostModal 
@@ -297,6 +375,12 @@ export default function CommunityFeedPage() {
         onSuccess={handlePostSuccess}
         token={token || ""}
         apiUrl={API.community.posts}
+      />
+
+      <ResearcherDetailModal 
+        isOpen={isResearcherModalOpen}
+        onClose={() => setIsResearcherModalOpen(false)}
+        researcher={selectedResearcher}
       />
     </div>
 
