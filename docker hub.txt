@@ -26,3 +26,6 @@ docker tag neo4j:5-community mostofarezvi/neo4j:5-community
 docker push mostofarezvi/neo4j:5-community
 docker pull mostofarezvi/neo4j:5-community
 
+docker tag docker.elastic.co/elasticsearch/elasticsearch:8.8.0 mostofarezvi/elasticsearch:8.8.0
+docker push mostofarezvi/elasticsearch:8.8.0
+docker pull mostofarezvi/elasticsearch:8.8.0
