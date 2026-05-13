@@ -1,0 +1,28 @@
+docker tag research-bridge-backend:latest mostofarezvi/research-bridge-backend:latest
+docker push mostofarezvi/research-bridge-backend:latest
+docker pull mostofarezvi/research-bridge-backend:latest
+
+docker tag research-bridge-frontend:latest mostofarezvi/research-bridge-frontend:latest
+docker push mostofarezvi/research-bridge-frontend:latest
+docker pull mostofarezvi/research-bridge-frontend:latest
+
+docker tag research-bridge-ml:latest mostofarezvi/research-bridge-ml:latest
+docker push mostofarezvi/research-bridge-ml:latest
+docker pull mostofarezvi/research-bridge-ml:latest
+
+docker tag postgres:15-alpine mostofarezvi/postgres:15-alpine
+docker push mostofarezvi/postgres:15-alpine
+docker pull mostofarezvi/postgres:15-alpine
+
+docker tag redis:7-alpine mostofarezvi/redis:7-alpine
+docker push mostofarezvi/redis:7-alpine
+docker pull mostofarezvi/redis:7-alpine
+
+docker tag minio/minio:latest mostofarezvi/minio:latest
+docker push mostofarezvi/minio:latest
+docker pull mostofarezvi/minio:latest
+
+docker tag neo4j:5-community mostofarezvi/neo4j:5-community
+docker push mostofarezvi/neo4j:5-community
+docker pull mostofarezvi/neo4j:5-community
+
