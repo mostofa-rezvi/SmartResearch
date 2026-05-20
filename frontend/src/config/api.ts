@@ -6,83 +6,88 @@
 
 export const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:5000';
 
+// OpenAlex — free scholarly works API (250M+ works, no key required)
+// Set NEXT_PUBLIC_OPENALEX_EMAIL for polite-pool priority (recommended)
+export const OPENALEX_BASE = 'https://api.openalex.org';
+export const OPENALEX_EMAIL = process.env.NEXT_PUBLIC_OPENALEX_EMAIL || 'mostofarezvi1@gmail.com';
+
 export const API = {
   // Auth domain
   auth: {
-    register:          `${API_BASE}/api/v1/auth/register`,
-    login:             `${API_BASE}/api/v1/auth/login`,
-    verifyOtp:         `${API_BASE}/api/v1/auth/verify-otp`,
-    refresh:           `${API_BASE}/api/v1/auth/refresh`,
-    verifyEmail:       `${API_BASE}/api/v1/auth/verify-email`,
-    onboardingComplete:`${API_BASE}/api/v1/auth/onboarding/complete`,
-    acceptInvite:      `${API_BASE}/api/v1/auth/accept-invite`,
-    validateInvite:    (token: string) => `${API_BASE}/api/v1/auth/invitation/${token}`,
+    register: `${API_BASE}/api/v1/auth/register`,
+    login: `${API_BASE}/api/v1/auth/login`,
+    verifyOtp: `${API_BASE}/api/v1/auth/verify-otp`,
+    refresh: `${API_BASE}/api/v1/auth/refresh`,
+    verifyEmail: `${API_BASE}/api/v1/auth/verify-email`,
+    onboardingComplete: `${API_BASE}/api/v1/auth/onboarding/complete`,
+    acceptInvite: `${API_BASE}/api/v1/auth/accept-invite`,
+    validateInvite: (token: string) => `${API_BASE}/api/v1/auth/invitation/${token}`,
   },
   // Community domain
   community: {
-    posts:             `${API_BASE}/api/v1/community/posts`,
-    groupFeed:         (groupId: string) => `${API_BASE}/api/v1/community/groups/${groupId}/posts`,
-    vote:              (id: string) => `${API_BASE}/api/v1/community/posts/${id}/vote`,
-    react:             (id: string) => `${API_BASE}/api/v1/community/posts/${id}/react`,
-    comments:          (id: string) => `${API_BASE}/api/v1/community/posts/${id}/comments`,
-    share:             (id: string) => `${API_BASE}/api/v1/community/posts/${id}/share`,
+    posts: `${API_BASE}/api/v1/community/posts`,
+    groupFeed: (groupId: string) => `${API_BASE}/api/v1/community/groups/${groupId}/posts`,
+    vote: (id: string) => `${API_BASE}/api/v1/community/posts/${id}/vote`,
+    react: (id: string) => `${API_BASE}/api/v1/community/posts/${id}/react`,
+    comments: (id: string) => `${API_BASE}/api/v1/community/posts/${id}/comments`,
+    share: (id: string) => `${API_BASE}/api/v1/community/posts/${id}/share`,
     // Management
-    updatePost:        (id: string) => `${API_BASE}/api/v1/community/posts/${id}`,
-    deletePost:        (id: string) => `${API_BASE}/api/v1/community/posts/${id}`,
-    updateComment:     (id: string) => `${API_BASE}/api/v1/community/comments/${id}`,
-    deleteComment:     (id: string) => `${API_BASE}/api/v1/community/comments/${id}`,
-    upload:            `${API_BASE}/api/v1/community/upload`,
+    updatePost: (id: string) => `${API_BASE}/api/v1/community/posts/${id}`,
+    deletePost: (id: string) => `${API_BASE}/api/v1/community/posts/${id}`,
+    updateComment: (id: string) => `${API_BASE}/api/v1/community/comments/${id}`,
+    deleteComment: (id: string) => `${API_BASE}/api/v1/community/comments/${id}`,
+    upload: `${API_BASE}/api/v1/community/upload`,
   },
   // Discovery domain
   discovery: {
-    search:            `${API_BASE}/api/v1/discovery/search`,
-    save:              `${API_BASE}/api/v1/discovery/save`,
+    search: `${API_BASE}/api/v1/discovery/search`,
+    save: `${API_BASE}/api/v1/discovery/save`,
   },
   // Library domain
   library: {
-    journals:          `${API_BASE}/api/v1/journals`,
-    categories:        `${API_BASE}/api/v1/journals/categories`,
-    metadata:          `${API_BASE}/api/v1/journals/metadata`,
+    journals: `${API_BASE}/api/v1/journals`,
+    categories: `${API_BASE}/api/v1/journals/categories`,
+    metadata: `${API_BASE}/api/v1/journals/metadata`,
   },
   // Groups domain
   groups: {
-    list:              `${API_BASE}/api/v1/groups`,
-    create:            `${API_BASE}/api/v1/groups`,
-    detail:            (id: string) => `${API_BASE}/api/v1/groups/${id}`,
-    join:              (id: string) => `${API_BASE}/api/v1/groups/${id}/join`,
-    leave:             (id: string) => `${API_BASE}/api/v1/groups/${id}/leave`,
-    membership:        (id: string) => `${API_BASE}/api/v1/groups/${id}/membership`,
-    members:           (id: string) => `${API_BASE}/api/v1/groups/${id}/members`,
-    handleRequest:     (id: string, userId: string) => `${API_BASE}/api/v1/groups/${id}/members/${userId}/request`,
-    updateMemberRole:  (id: string, userId: string) => `${API_BASE}/api/v1/groups/${id}/members/${userId}/role`,
+    list: `${API_BASE}/api/v1/groups`,
+    create: `${API_BASE}/api/v1/groups`,
+    detail: (id: string) => `${API_BASE}/api/v1/groups/${id}`,
+    join: (id: string) => `${API_BASE}/api/v1/groups/${id}/join`,
+    leave: (id: string) => `${API_BASE}/api/v1/groups/${id}/leave`,
+    membership: (id: string) => `${API_BASE}/api/v1/groups/${id}/membership`,
+    members: (id: string) => `${API_BASE}/api/v1/groups/${id}/members`,
+    handleRequest: (id: string, userId: string) => `${API_BASE}/api/v1/groups/${id}/members/${userId}/request`,
+    updateMemberRole: (id: string, userId: string) => `${API_BASE}/api/v1/groups/${id}/members/${userId}/role`,
   },
   // Identity domain
   users: {
-    profile:           (id: string) => `${API_BASE}/api/v1/users/${id}/profile`,
+    profile: (id: string) => `${API_BASE}/api/v1/users/${id}/profile`,
   },
   profiles: {
-    me:                `${API_BASE}/api/v1/profiles/me`,
-    avatar:            `${API_BASE}/api/v1/profiles/avatar`,
+    me: `${API_BASE}/api/v1/profiles/me`,
+    avatar: `${API_BASE}/api/v1/profiles/avatar`,
   },
   // Admin domain
   admin: {
-    invite:            `${API_BASE}/api/v1/admin/invite`,
-    moderationQueue:   `${API_BASE}/api/v1/moderation/queue`,
-    moderationStats:   `${API_BASE}/api/v1/moderation/stats`,
-    auditLogs:         `${API_BASE}/api/v1/moderation/audit_logs`,
-    resolveFlag:       (id: string) => `${API_BASE}/api/v1/moderation/resolve_flag/${id}`,
-    journalStatus:     (id: string) => `${API_BASE}/api/v1/moderation/journals/${id}/status`,
+    invite: `${API_BASE}/api/v1/admin/invite`,
+    moderationQueue: `${API_BASE}/api/v1/moderation/queue`,
+    moderationStats: `${API_BASE}/api/v1/moderation/stats`,
+    auditLogs: `${API_BASE}/api/v1/moderation/audit_logs`,
+    resolveFlag: (id: string) => `${API_BASE}/api/v1/moderation/resolve_flag/${id}`,
+    journalStatus: (id: string) => `${API_BASE}/api/v1/moderation/journals/${id}/status`,
   },
   // Researchers domain (seeded from OpenAlex)
   researchers: {
-    list:              `${API_BASE}/api/v1/researchers`,
-    liveSearch:        `${API_BASE}/api/v1/researchers/openalex-sync`,
-    detail:            (id: string) => `${API_BASE}/api/v1/researchers/${id}`,
-    works:             (id: string) => `${API_BASE}/api/v1/researchers/${id}/works`,
+    list: `${API_BASE}/api/v1/researchers`,
+    liveSearch: `${API_BASE}/api/v1/researchers/openalex-sync`,
+    detail: (id: string) => `${API_BASE}/api/v1/researchers/${id}`,
+    works: (id: string) => `${API_BASE}/api/v1/researchers/${id}/works`,
   },
   // Onboarding domain
   onboarding: {
-    questions:         `${API_BASE}/api/v1/onboarding/questions`,
-    questionsFlat:     `${API_BASE}/api/v1/onboarding/questions/flat`,
+    questions: `${API_BASE}/api/v1/onboarding/questions`,
+    questionsFlat: `${API_BASE}/api/v1/onboarding/questions/flat`,
   },
 } as const;

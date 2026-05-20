@@ -5,11 +5,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import { 
   Book, Search, Filter, Globe, School, Award, 
   ChevronRight, ExternalLink, Library as LibraryIcon, 
-  Bookmark, Info, RefreshCw, X, SlidersHorizontal
+  Bookmark, Info, RefreshCw, X, SlidersHorizontal, FileText
 } from "lucide-react";
 import { Virtuoso } from "react-virtuoso";
 import Navbar from "@/components/Navbar";
 import { API } from "@/config/api";
+import JournalPapersModal from "@/components/journal/JournalPapersModal";
+import AllSavedPapersModal from "@/components/journal/AllSavedPapersModal";
 
 // --- Types ---
 interface Journal {
@@ -43,10 +45,15 @@ export default function LibraryPage() {
   const [totalCount, setTotalCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [metadata, setMetadata] = useState<Metadata | null>(null);
+  const [selectedJournal, setSelectedJournal] = useState<Journal | null>(null);
   
   // Saved Journals State
   const [savedJournals, setSavedJournals] = useState<Journal[]>([]);
   const [showSavedPopup, setShowSavedPopup] = useState(false);
+
+  // Saved Papers State
+  const [savedPapersCount, setSavedPapersCount] = useState(0);
+  const [showSavedPapers, setShowSavedPapers] = useState(false);
 
   // Search & Filter State
   const [searchQuery, setSearchQuery] = useState("");
@@ -86,6 +93,29 @@ export default function LibraryPage() {
       }
     });
   };
+
+  const refreshSavedPapersCount = useCallback(() => {
+    if (typeof window === "undefined") return;
+    let count = 0;
+    try {
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith("saved_papers_")) {
+          const list = JSON.parse(localStorage.getItem(key) ?? "[]");
+          if (Array.isArray(list)) {
+            count += list.length;
+          }
+        }
+      }
+    } catch (e) {
+      console.error(e);
+    }
+    setSavedPapersCount(count);
+  }, []);
+
+  useEffect(() => {
+    refreshSavedPapersCount();
+  }, [refreshSavedPapersCount, selectedJournal]);
 
   const exportToCSV = () => {
     if (savedJournals.length === 0) return;
@@ -196,7 +226,10 @@ export default function LibraryPage() {
       transition={{ duration: 0.2, delay: Math.min(index % 10 * 0.03, 0.3) }}
       className="mb-2 mx-4"
     >
-      <div className="bg-white dark:bg-slate-800/50 backdrop-blur-xl rounded-2xl p-4 border border-slate-100 dark:border-slate-700/50 shadow-sm hover:shadow-md transition-all group border-l-4 border-l-primary flex flex-col md:flex-row gap-4">
+      <div 
+        onClick={() => setSelectedJournal(journal)}
+        className="bg-white dark:bg-slate-800/50 backdrop-blur-xl rounded-2xl p-4 border border-slate-100 dark:border-slate-700/50 shadow-sm hover:shadow-md transition-all group border-l-4 border-l-primary flex flex-col md:flex-row gap-4 cursor-pointer"
+      >
         <div className="flex-1 min-w-0">
           <div className="flex flex-wrap items-center gap-2 mb-2">
             <span className="text-[9px] font-black text-slate-400 tracking-wider bg-slate-100 dark:bg-slate-900 px-2 py-0.5 rounded uppercase">
@@ -227,7 +260,7 @@ export default function LibraryPage() {
           </div>
         </div>
 
-        <div className="md:w-40 flex md:flex-row items-center justify-between gap-3 md:border-l border-slate-100 dark:border-slate-700/50 md:pl-4">
+        <div className="md:w-40 flex md:flex-row items-center justify-between gap-3 md:border-l border-slate-100 dark:border-slate-700/50 md:pl-4" onClick={(e) => e.stopPropagation()}>
           <div className="flex items-center gap-2">
              <div className={`w-9 h-9 rounded-xl flex flex-col items-center justify-center font-black shadow-sm ring-1 transition-transform group-hover:scale-105 ${
                 journal.quality_tier === 'Q1' ? 'bg-amber-400/10 text-amber-500 ring-amber-500/20' :
@@ -250,11 +283,15 @@ export default function LibraryPage() {
               target="_blank" 
               rel="noreferrer"
               className="p-2 text-slate-400 hover:text-primary hover:bg-primary/5 rounded-lg transition-all"
+              onClick={(e) => e.stopPropagation()}
             >
               <ExternalLink size={16} />
             </a>
             <button 
-              onClick={() => toggleSave(journal)}
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleSave(journal);
+              }}
               className={`p-2 rounded-lg transition-all ${
                 savedJournals.some(j => j.id === journal.id)
                 ? 'bg-secondary text-white shadow-md shadow-secondary/20'
@@ -297,6 +334,22 @@ export default function LibraryPage() {
               <div className="text-left">
                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">My Collection</p>
                 <p className="text-sm font-black text-slate-700 dark:text-slate-200">{savedJournals.length} Journals</p>
+              </div>
+            </button>
+
+            <button 
+              onClick={() => {
+                refreshSavedPapersCount();
+                setShowSavedPapers(true);
+              }}
+              className="group flex items-center gap-3 px-6 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-sm hover:shadow-md hover:border-primary transition-all"
+            >
+              <div className="p-2 bg-primary/10 text-primary rounded-lg group-hover:bg-primary group-hover:text-white transition-colors">
+                <FileText size={18} fill={savedPapersCount > 0 ? "currentColor" : "none"} />
+              </div>
+              <div className="text-left">
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Saved Papers</p>
+                <p className="text-sm font-black text-slate-700 dark:text-slate-200">{savedPapersCount} Papers</p>
               </div>
             </button>
           </div>
@@ -569,6 +622,18 @@ export default function LibraryPage() {
               </motion.div>
             </motion.div>
           </>
+        )}
+        {selectedJournal && (
+          <JournalPapersModal 
+            journal={selectedJournal} 
+            onClose={() => setSelectedJournal(null)} 
+          />
+        )}
+        {showSavedPapers && (
+          <AllSavedPapersModal 
+            onClose={() => setShowSavedPapers(false)}
+            onRefreshCount={refreshSavedPapersCount}
+          />
         )}
       </AnimatePresence>
 

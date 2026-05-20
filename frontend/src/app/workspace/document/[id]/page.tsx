@@ -41,7 +41,7 @@ export default function DocumentWorkspacePage() {
                 <div 
                   key={i} 
                   className="w-8 h-8 rounded-full border-2 border-white dark:border-slate-900 flex items-center justify-center text-[10px] font-bold text-white shadow-sm ring-2 ring-transparent"
-                  style={{ backgroundColor: u.color, ringColor: `${u.color}40` }}
+                  style={{ backgroundColor: u.color }}
                 >
                   {u.initials}
                 </div>

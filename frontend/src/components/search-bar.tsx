@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { Search, Loader2 } from "lucide-react";
-import { useDebounce } from "@/hooks/use-debounce"; // We'll create this or just inline debounce
+
 
 export function SearchBar() {
   const [query, setQuery] = useState("");
