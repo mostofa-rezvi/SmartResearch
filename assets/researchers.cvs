@@ -1,0 +1,1201 @@
+id,name,role,institution,country,works_count,cited_by_count,h_index
+"https://openalex.org/A5077297577","M. Emoto","Associate Professor","","",1770211,3288,32
+"https://openalex.org/A5028125522","T. Kobayashi","Associate Professor","","",1478138,3573,28
+"https://openalex.org/A5053271482","H. Funaba","Associate Professor","","",1065843,4917,37
+"https://openalex.org/A5043579160","T. Tokuzawa","Associate Professor","","",671591,6661,40
+"https://openalex.org/A5076193546","I. Yamada","Professor / Expert","","",445110,7195,44
+"https://openalex.org/A5086806278","K. Ida","Professor / Expert","","",437539,15977,59
+"https://openalex.org/A5134815396","Mitsutaka ISOBE","Student / Beginner","","",429588,0,0
+"https://openalex.org/A5134800537","Kunihiro OGAWA","Student / Beginner","","",429283,0,0
+"https://openalex.org/A5134754013","Joshua Adkins","Student / Beginner","","",378038,0,0
+"https://openalex.org/A5044512393","Mary L. Berbee","Professor / Expert","","",370739,9536,49
+"https://openalex.org/A5037491546","Julia Pawłowska","Associate Professor","","",370697,5629,29
+"https://openalex.org/A5022654839","Terry Law","Student / Beginner","","",357569,0,0
+"https://openalex.org/A5134806286","Masaki OSAKABE","Student / Beginner","","",322305,0,0
+"https://openalex.org/A5035984477","Tomoki Kondo","Assistant Professor / Researcher","","",312504,854,16
+"https://openalex.org/A5035651875","H. Nuga","Assistant Professor / Researcher","","",296971,653,14
+"https://openalex.org/A5072928702","S. Kamio","Assistant Professor / Researcher","","",262325,1259,18
+"https://openalex.org/A5134767719","Ryosuke SEKI","Student / Beginner","","",246848,0,0
+"https://openalex.org/A5134838409","Kenji TANAKA","Student / Beginner","","",166379,0,0
+"https://openalex.org/A5023208979","Y. Takemura","Assistant Professor / Researcher","","",155352,1046,19
+"https://openalex.org/A5112247009","Hayato Tsuchiya","Postdoc / Early Career","","",142718,99,5
+"https://openalex.org/A5134669567","Hiroe IGAMI","Student / Beginner","","",142594,0,0
+"https://openalex.org/A5134890410","Ichihiro YAMADA","Student / Beginner","","",132967,0,0
+"https://openalex.org/A5134927249","Yasuhiro SUZUKI","Student / Beginner","","",130523,0,0
+"https://openalex.org/A5134799982","Yutaka FUJIWARA","Student / Beginner","","",129961,0,0
+"https://openalex.org/A5134862456","Kunihiro OGAWA","Student / Beginner","","",122512,0,0
+"https://openalex.org/A5134871065","Mitsutaka ISOBE","Student / Beginner","","",122512,0,0
+"https://openalex.org/A5056895519","Markus Göker","Professor / Expert","","",121723,36220,62
+"https://openalex.org/A5089245822","Joshua Adkins","Professor / Expert","","",115545,17116,61
+"https://openalex.org/A5134725876","Kunihiro OGAWA","Student / Beginner","","",112330,0,0
+"https://openalex.org/A5134744216","Mitsutaka ISOBE","Student / Beginner","","",112330,0,0
+"https://openalex.org/A5134906931","Katsumi IDA","Student / Beginner","","",111148,0,0
+"https://openalex.org/A5134720058","Tetsuo SEKI","Student / Beginner","","",110341,0,0
+"https://openalex.org/A5134755782","Chihiro SUZUKI","Student / Beginner","","",108077,0,0
+"https://openalex.org/A5134793704","Katsumi IDA","Student / Beginner","","",108077,0,0
+"https://openalex.org/A5020192096","Sarah Leichty","Postdoc / Early Career","","",102867,61,4
+"https://openalex.org/A5039600762","M. Shoji","Associate Professor","","",100008,806327,38
+"https://openalex.org/A5006106430","T. Nishitani","Associate Professor","","",98026,7993,39
+"https://openalex.org/A5087680499","S. Ohdachi","Associate Professor","","",97683,5555,40
+"https://openalex.org/A5134744010","Kenji SAITO","Student / Beginner","","",97680,0,0
+"https://openalex.org/A5040654425","George M Garrity","Professor / Expert","","",96203,45458,52
+"https://openalex.org/A5053617215","Charles Thomas Parker","Assistant Professor / Researcher","","",95794,1903,12
+"https://openalex.org/A5074663242","Tujin Shi","Associate Professor","","",94857,4889,37
+"https://openalex.org/A5134876862","Chihiro SUZUKI","Student / Beginner","","",93647,0,0
+"https://openalex.org/A5134812731","Masahiro KOBAYASHI","Student / Beginner","","",91500,0,0
+"https://openalex.org/A5012213483","H. Tanaka","Associate Professor","","",84367,1930,24
+"https://openalex.org/A5134779766","Gen MOTOJIMA","Student / Beginner","","",84319,0,0
+"https://openalex.org/A5134913734","Ryo YASUHARA","Student / Beginner","","",81570,0,0
+"https://openalex.org/A5048174800","K. Tanaka","Professor / Expert","","",80941,9031,45
+"https://openalex.org/A5000439024","T. Oishi","Associate Professor","","",80099,1626,21
+"https://openalex.org/A5081004636","S. Matsuoka","Postdoc / Early Career","","",78095,305,10
+"https://openalex.org/A5134890551","Ryosuke SEKI","Student / Beginner","","",77617,0,0
+"https://openalex.org/A5077382678","Karin Rodland","Professor / Expert","","",75873,17787,60
+"https://openalex.org/A5006191066","Scott Baker","Professor / Expert","","",75656,17975,60
+"https://openalex.org/A5134818759","Yasuhiro SUZUKI","Student / Beginner","","",69849,0,0
+"https://openalex.org/A5058811459","Vladislav Petyuk","Professor / Expert","","",69373,16396,56
+"https://openalex.org/A5134706976","Motoshi GOTO","Student / Beginner","","",68591,0,0
+"https://openalex.org/A5077731390","Kristin Burnum-Johnson","Professor / Expert","","",67981,6645,45
+"https://openalex.org/A5134660624","Kenichi NAGAOKA","Student / Beginner","","",67084,0,0
+"https://openalex.org/A5134727532","Suguru MASUZAKI","Student / Beginner","","",67084,0,0
+"https://openalex.org/A5134835055","Ryosuke SEKI","Student / Beginner","","",66124,0,0
+"https://openalex.org/A5134836808","Sarah Leichty","Student / Beginner","","",65503,0,0
+"https://openalex.org/A5043928018","Tao Liu","Professor / Expert","","",65359,16985,61
+"https://openalex.org/A5005196385","Matthew Monroe","Professor / Expert","","",64199,16447,60
+"https://openalex.org/A5134895850","Keisuke FUJII","Student / Beginner","","",59447,0,0
+"https://openalex.org/A5044610102","Marija Veličković","Assistant Professor / Researcher","","",58554,433,11
+"https://openalex.org/A5030422039","S. Masuzaki","Professor / Expert","","",58221,11959,51
+"https://openalex.org/A5052162325","H. Sugama","Associate Professor","","",56760,4895,39
+"https://openalex.org/A5006059092","M. Nunami","Associate Professor","","",56628,1988,24
+"https://openalex.org/A5018236442","Daniel M. Master","Assistant Professor / Researcher","","",56278,730,12
+"https://openalex.org/A5004043577","Juan Moisés de la Serna","Postdoc / Early Career","","",56134,236,7
+"https://openalex.org/A5134862719","Haylie Kimball","Student / Beginner","","",56036,0,0
+"https://openalex.org/A5061414245","Ashley Rubinstein","Postdoc / Early Career","","",55975,124,5
+"https://openalex.org/A5042510341","S. Inagaki","Professor / Expert","","",54017,7368,42
+"https://openalex.org/A5134709268","Katsumi IDA","Student / Beginner","","",53266,0,0
+"https://openalex.org/A5100389959","Yi-Ting Wang","Assistant Professor / Researcher","","",52238,717,11
+"https://openalex.org/A5134891643","Tokihiko TOKUZAWA","Student / Beginner","","",51396,0,0
+"https://openalex.org/A5134950803","Sarah Leichty","Student / Beginner","","",51194,0,0
+"https://openalex.org/A5134782325","Hiroyuki YAMAGUCHI","Student / Beginner","","",51142,0,0
+"https://openalex.org/A5025452099","Dušan Veličković","Associate Professor","","",50833,3290,27
+"https://openalex.org/A5134822377","Chihiro SUZUKI","Student / Beginner","","",49475,0,0
+"https://openalex.org/A5134854802","Katsumi IDA","Student / Beginner","","",49475,0,0
+"https://openalex.org/A5023982706","Richard Smith","Professor / Expert","","",47948,113091,160
+"https://openalex.org/A5134922912","Masahiro KOBAYASHI","Student / Beginner","","",46805,0,0
+"https://openalex.org/A5134892567","Sarah Leichty","Student / Beginner","","",45406,0,0
+"https://openalex.org/A5134907067","Toru TSUJIMURA","Student / Beginner","","",42251,0,0
+"https://openalex.org/A5068925015","M. Nishiura","Assistant Professor / Researcher","","",41061,1336,19
+"https://openalex.org/A5134915667","Haylie Kimball","Student / Beginner","","",40492,0,0
+"https://openalex.org/A5100684042","Rui Zhao","Associate Professor","","",40098,4115,31
+"https://openalex.org/A5020386947","B Noble","Associate Professor","","",40000,5552,39
+"https://openalex.org/A5102230837","Yuki Hayashi","Associate Professor","","",39959,1829,23
+"https://openalex.org/A5034698904","Richard Smith","Associate Professor","","",39377,2128,23
+"https://openalex.org/A5083000259","S. Kubo","Professor / Expert","","",38016,8696,47
+"https://openalex.org/A5025760548","Karl Weitz","Associate Professor","","",37678,5692,35
+"https://openalex.org/A5135017478","Sarah Leichty","Student / Beginner","","",37552,0,0
+"https://openalex.org/A5134891272","Shigeru MORITA","Student / Beginner","","",36435,0,0
+"https://openalex.org/A5134904792","Motoshi GOTO","Student / Beginner","","",36435,0,0
+"https://openalex.org/A5134873597","Yasuhiro SUZUKI","Student / Beginner","","",35606,0,0
+"https://openalex.org/A5134740930","Yuki HAYASHI","Student / Beginner","","",35146,0,0
+"https://openalex.org/A5135160010","Sarah Leichty","Student / Beginner","","",34395,0,0
+"https://openalex.org/A5134980628","Haylie Kimball","Student / Beginner","","",33541,0,0
+"https://openalex.org/A5075235007","Weijun Qian","Professor / Expert","","",31815,23546,78
+"https://openalex.org/A5052125746","Thomas Fillmore","Associate Professor","","",31377,2547,28
+"https://openalex.org/A5033168850","Tom Metz","Student / Beginner","","",31347,4,1
+"https://openalex.org/A5089708083","T. Tsujimura","Assistant Professor / Researcher","","",29692,1359,16
+"https://openalex.org/A5134815957","Thomas Fillmore","Student / Beginner","","",28159,0,0
+"https://openalex.org/A5047579487","S. Sakakibara","Associate Professor","","",27398,5346,38
+"https://openalex.org/A5072950497","Y. Narushima","Associate Professor","","",27359,3586,35
+"https://openalex.org/A5058282825","Masayuki Shibuya","Associate Professor","","",26120,2810,28
+"https://openalex.org/A5071240298","Carrie Nicora","Professor / Expert","","",25023,9142,53
+"https://openalex.org/A5053777031","André EX Brown","Associate Professor","","",24930,4919,33
+"https://openalex.org/A5134752304","Hayato TSUCHIYA","Student / Beginner","","",24660,0,0
+"https://openalex.org/A5050316172","William R Schafer","Professor / Expert","","",24587,15009,68
+"https://openalex.org/A5103150221","Chris Li","Associate Professor","","",24471,3490,30
+"https://openalex.org/A5091068752","Eviatar Yemini","Assistant Professor / Researcher","","",24304,3512,19
+"https://openalex.org/A5045283595","Quee-Lim Ch'ng","Assistant Professor / Researcher","","",24258,1403,13
+"https://openalex.org/A5134766648","Paul Piehowski","Student / Beginner","","",23934,0,0
+"https://openalex.org/A5010778078","R. Yanai","Postdoc / Early Career","","",23792,77,5
+"https://openalex.org/A5135044203","Haylie Kimball","Student / Beginner","","",23490,0,0
+"https://openalex.org/A5061217467","Rex Kerr","Associate Professor","","",23447,12491,27
+"https://openalex.org/A5134847766","Lee Ann McCue","Student / Beginner","","",23368,0,0
+"https://openalex.org/A5134847249","Sara Taylor","Student / Beginner","","",23237,0,0
+"https://openalex.org/A5134838251","Stephen Callister","Student / Beginner","","",22054,0,0
+"https://openalex.org/A5077426974","Michael Currie","Postdoc / Early Career","","",22029,564,9
+"https://openalex.org/A5135241538","Haylie Kimball","Student / Beginner","","",21989,0,0
+"https://openalex.org/A5134866436","Karin Rodland","Student / Beginner","","",21293,0,0
+"https://openalex.org/A5015827324","Jim Hokanson","Assistant Professor / Researcher","","",21274,1285,18
+"https://openalex.org/A5058699536","Sebastian Funk","Professor / Expert","","",20974,36553,75
+"https://openalex.org/A5083613572","Sam Abbott","Professor / Expert","","",20810,26292,54
+"https://openalex.org/A5134986501","Vivian Lin","Student / Beginner","","",20702,0,0
+"https://openalex.org/A5048096509","Katharine Sherratt","Associate Professor","","",20643,2772,22
+"https://openalex.org/A5083455510","Christopher Bennett","Associate Professor","","",20609,3830,21
+"https://openalex.org/A5073198689","Martin H. Weik","Professor / Expert","","",20569,13287,53
+"https://openalex.org/A5010734294","Paul Piehowski","Professor / Expert","","",20003,9204,44
+"https://openalex.org/A5001794847","N. Kenmochi","Assistant Professor / Researcher","","",19956,1208,14
+"https://openalex.org/A5134857088","Erik Hom","Student / Beginner","","",19784,0,0
+"https://openalex.org/A5037253743","Ernesto Nakayasu","Professor / Expert","","",19339,9743,51
+"https://openalex.org/A5052184745","Athena Schepmoes","Associate Professor","","",19140,4265,37
+"https://openalex.org/A5087040185","Dorothea Taylor","Student / Beginner","","",18948,260,2
+"https://openalex.org/A5048899487","Avelino Javer","Assistant Professor / Researcher","","",18502,963,12
+"https://openalex.org/A5025745502","Jennifer Kyle","Associate Professor","","",18465,10172,40
+"https://openalex.org/A5056181147","Robyn Fiori","Assistant Professor / Researcher","","",18056,641,16
+"https://openalex.org/A5134824112","Vladislav Petyuk","Student / Beginner","","",17497,0,0
+"https://openalex.org/A5135071539","Sarah Leichty","Student / Beginner","","",17464,0,0
+"https://openalex.org/A5083508715","Nathalie Munoz Munoz","Assistant Professor / Researcher","","",17333,1091,19
+"https://openalex.org/A5053873608","Yuqian Gao","Associate Professor","","",16643,3443,31
+"https://openalex.org/A5134873915","William Chrisler","Student / Beginner","","",16331,0,0
+"https://openalex.org/A5056703958","Kezhi Li","Associate Professor","","",16221,3628,34
+"https://openalex.org/A5041669268","Charles Dickens","Associate Professor","","",15909,4054,33
+"https://openalex.org/A5134958422","Maria Perez","Student / Beginner","","",15905,0,0
+"https://openalex.org/A5108044601","M Kellis","Associate Professor","","",15764,6246,25
+"https://openalex.org/A5049586677","Yoshinori Mizuno","Assistant Professor / Researcher","","",15136,1824,18
+"https://openalex.org/A5012850594","Reta Birhanu Kitata","Assistant Professor / Researcher","","",14763,1101,14
+"https://openalex.org/A5057622973","Atsushi Togo","Associate Professor","","",14738,26542,35
+"https://openalex.org/A5000134164","Nancy Hess","Professor / Expert","","",14371,6434,47
+"https://openalex.org/A5020443342","Bobbie‐Jo Webb‐Robertson","Professor / Expert","","",14125,9012,49
+"https://openalex.org/A5006092446","Ying Zhu","Professor / Expert","","",13988,9876,49
+"https://openalex.org/A5038267323","Zhangyang Xu","Postdoc / Early Career","","",13818,505,10
+"https://openalex.org/A5020608405","Jason McDermott","Professor / Expert","","",13814,14940,53
+"https://openalex.org/A5041887229","Alexander K. C. Leung","Professor / Expert","","",13568,19514,61
+"https://openalex.org/A5034256236","Heather Olson","Assistant Professor / Researcher","","",13425,573,13
+"https://openalex.org/A5134864907","Athena Schepmoes","Student / Beginner","","",13231,0,0
+"https://openalex.org/A5075814924","Yinyin Ye","Assistant Professor / Researcher","","",13027,1759,19
+"https://openalex.org/A5004588687","Janet Jansson","Professor / Expert","","",12962,69871,99
+"https://openalex.org/A5135024434","Maria Perez","Student / Beginner","","",12959,0,0
+"https://openalex.org/A5087552123","Jason Toyoda","Assistant Professor / Researcher","","",12944,1180,17
+"https://openalex.org/A5075414158","Albert Rivas‐Ubach","Associate Professor","","",12893,5844,26
+"https://openalex.org/A5052051439","Sabeeha Merchant","Professor / Expert","","",12534,25467,87
+"https://openalex.org/A5134775625","Sarah Leichty","Student / Beginner","","",12525,0,0
+"https://openalex.org/A5071741936","Elizabeth Eder","Assistant Professor / Researcher","","",12413,830,14
+"https://openalex.org/A5069926616","Kent Bloodsworth","Assistant Professor / Researcher","","",12379,1491,17
+"https://openalex.org/A5022928420","Samuel Purvine","Professor / Expert","","",12178,11631,60
+"https://openalex.org/A5135178104","Maria Perez","Student / Beginner","","",11971,0,0
+"https://openalex.org/A5052412732","Nikola Tolić","Professor / Expert","","",11867,6797,49
+"https://openalex.org/A5100684044","Rui Zhao","Assistant Professor / Researcher","","",11804,1710,18
+"https://openalex.org/A5031131006","Chaevien Clendinen","Assistant Professor / Researcher","","",11720,677,13
+"https://openalex.org/A5134811038","Carrie Nicora","Student / Beginner","","",11596,0,0
+"https://openalex.org/A5134836235","Rosalie Chu","Student / Beginner","","",11520,0,0
+"https://openalex.org/A5005521075","Josie Eder","Postdoc / Early Career","","",11409,159,8
+"https://openalex.org/A5100756103","Ju Yeon Lee","Associate Professor","","",11389,2281,26
+"https://openalex.org/A5009321272","José Maurício Bonifacino","Postdoc / Early Career","","",11272,406,10
+"https://openalex.org/A5051384039","M. Kumar","Associate Professor","","",11256,2810,22
+"https://openalex.org/A5057898543","Ary Mailhos","Student / Beginner","","",11197,17,2
+"https://openalex.org/A5089138062","Berthold Seitz","Professor / Expert","","",11111,24408,60
+"https://openalex.org/A5064529704","Nicholas Wood","Professor / Expert","","",11011,79075,132
+"https://openalex.org/A5100338122","Tao Liu","Professor / Expert","","",10896,38307,52
+"https://openalex.org/A5060603552","Erin Baker","Professor / Expert","","",10709,11082,59
+"https://openalex.org/A5100684039","Rui Zhao","Professor / Expert","","",10592,8144,44
+"https://openalex.org/A5021760293","Rosalie Chu","Professor / Expert","","",10112,7459,42
+"https://openalex.org/A5066799999","Rashmi Madda","Postdoc / Early Career","","",10062,70,4
+"https://openalex.org/A5065706727","Andreas Janecke","Professor / Expert","","",10030,17658,62
+"https://openalex.org/A5134871281","Chaevien Clendinen","Student / Beginner","","",9668,0,0
+"https://openalex.org/A5134817521","Samuel Purvine","Student / Beginner","","",9556,0,0
+"https://openalex.org/A5051837759","Sarah Fansler","Associate Professor","","",9432,3908,31
+"https://openalex.org/A5134824166","Andrew Lipton","Student / Beginner","","",9276,0,0
+"https://openalex.org/A5034309539","Hugo Ten Cate","Professor / Expert","","",9241,42433,95
+"https://openalex.org/A5025780255","David Hoyt","Professor / Expert","","",9222,7826,43
+"https://openalex.org/A5135077129","Maria Perez","Student / Beginner","","",8835,0,0
+"https://openalex.org/A5067234032","Julia Laskin","Professor / Expert","","",8662,24708,82
+"https://openalex.org/A5134847193","Maria Perez","Student / Beginner","","",8597,0,0
+"https://openalex.org/A5049080051","Shelley McGuire","Associate Professor","","",8565,10774,40
+"https://openalex.org/A5135088200","Haylie Kimball","Student / Beginner","","",8557,0,0
+"https://openalex.org/A5009756481","Aaron Wright","Associate Professor","","",8515,5469,36
+"https://openalex.org/A5084026286","Rebecca Powell","Assistant Professor / Researcher","","",8469,1100,17
+"https://openalex.org/A5065901658","John Henry Newman","Associate Professor","","",8455,5895,34
+"https://openalex.org/A5037518581","James Sanford","Associate Professor","","",8454,2881,21
+"https://openalex.org/A5041150910","Chandra Earl","Postdoc / Early Career","","",8266,603,10
+"https://openalex.org/A5011618630","Arnold L. Rheingold","Professor / Expert","","",8211,85459,114
+"https://openalex.org/A5085384361","Mary Lipton","Professor / Expert","","",8211,13861,64
+"https://openalex.org/A5134927615","Trevor Moser","Student / Beginner","","",8161,0,0
+"https://openalex.org/A5087606404","Setsuko Wakao","Assistant Professor / Researcher","","",8046,2393,14
+"https://openalex.org/A5134798346","Anne Glaesener","Student / Beginner","","",7950,0,0
+"https://openalex.org/A5133619539","Montana Smith","Student / Beginner","","",7855,0,0
+"https://openalex.org/A5050024686","Sandrine Henri","Professor / Expert","","",7831,13822,49
+"https://openalex.org/A5061653381","Lionel Spinelli","Associate Professor","","",7821,2189,24
+"https://openalex.org/A5023871699","Montana Smith","Postdoc / Early Career","","",7816,311,9
+"https://openalex.org/A5031460147","Marc Bajénoff","Professor / Expert","","",7795,9051,43
+"https://openalex.org/A5041100615","Darya Yanushko","Student / Beginner","","",7713,63,3
+"https://openalex.org/A5116034739","Despoina Pervizou","Student / Beginner","","",7710,13,2
+"https://openalex.org/A5101459711","Zhe Xu","Assistant Professor / Researcher","","",7706,1615,19
+"https://openalex.org/A5060691247","Netta Gurari","Postdoc / Early Career","","",7591,359,10
+"https://openalex.org/A5031883943","Pearl Kwantwi-Barima","Postdoc / Early Career","","",7542,135,7
+"https://openalex.org/A5057435771","Mark Bowden","Professor / Expert","","",7450,15454,65
+"https://openalex.org/A5000936089","Sara Calhoun","Assistant Professor / Researcher","","",7435,864,13
+"https://openalex.org/A5134779826","Vy Duong","Student / Beginner","","",7404,0,0
+"https://openalex.org/A5134808604","Krishna Niyogi","Student / Beginner","","",7404,0,0
+"https://openalex.org/A5104365745","Hiroyuki Yamaguchi","Postdoc / Early Career","","",7398,302,8
+"https://openalex.org/A5052244302","Daniela Strenkert","Assistant Professor / Researcher","","",7309,2052,20
+"https://openalex.org/A5100437036","Kai Wang","Professor / Expert","","",7209,214187,172
+"https://openalex.org/A5134992604","Tujin Shi","Student / Beginner","","",7205,0,0
+"https://openalex.org/A5011059806","James Fulcher","Assistant Professor / Researcher","","",7200,918,16
+"https://openalex.org/A5134979307","Tao Liu","Student / Beginner","","",7153,0,0
+"https://openalex.org/A5037443412","Krishna Niyogi","Professor / Expert","","",7061,35817,85
+"https://openalex.org/A5134987333","Elizabeth Eder","Student / Beginner","","",7034,0,0
+"https://openalex.org/A5068615364","Charles Ansong","Professor / Expert","","",6986,5875,42
+"https://openalex.org/A5044740357","Sarah Wigley","Student / Beginner","","",6838,34,2
+"https://openalex.org/A5029090824","Paul B. Geraghty","Assistant Professor / Researcher","","",6797,556,13
+"https://openalex.org/A5134846548","Le Day","Student / Beginner","","",6780,0,0
+"https://openalex.org/A5134857047","Panshak Dakup","Student / Beginner","","",6780,0,0
+"https://openalex.org/A5030682716","Ashley Robinson","Assistant Professor / Researcher","","",6772,799,14
+"https://openalex.org/A5134805937","Zane Taylor","Student / Beginner","","",6736,0,0
+"https://openalex.org/A5074815294","J.-C. Fontaine","Associate Professor","","",6733,2582,27
+"https://openalex.org/A5034878585","Kim Hixson","Associate Professor","","",6714,5134,34
+"https://openalex.org/A5006709826","Brian W. Skelton","Professor / Expert","","",6549,39823,77
+"https://openalex.org/A5036671932","Arianna Valmassoi","Postdoc / Early Career","","",6476,173,7
+"https://openalex.org/A5022509460","Stephen Callister","Associate Professor","","",6452,2845,28
+"https://openalex.org/A5067276579","Jon Jacobs","Professor / Expert","","",6422,7627,46
+"https://openalex.org/A5029503725","Shakhnoza S. Azimova","Associate Professor","","",6415,3419,23
+"https://openalex.org/A5081907229","Viroj Wiwanitkit","Professor / Expert","","",6403,12893,41
+"https://openalex.org/A5076169859","Peter Suber","Associate Professor","","",6389,2521,21
+"https://openalex.org/A5055887076","Allison Thompson","Assistant Professor / Researcher","","",6337,1495,14
+"https://openalex.org/A5135275576","Tujin Shi","Student / Beginner","","",6327,0,0
+"https://openalex.org/A5134907344","Brian O'callahan","Student / Beginner","","",6290,0,0
+"https://openalex.org/A5038344776","Jamie Nuñez","Assistant Professor / Researcher","","",6246,1159,15
+"https://openalex.org/A5101533200","Young‐Mo Kim","Professor / Expert","","",6149,9695,55
+"https://openalex.org/A5011306552","John Bargar","Professor / Expert","","",6107,19137,73
+"https://openalex.org/A5134805840","Haylie Kimball","Student / Beginner","","",6076,0,0
+"https://openalex.org/A5135043093","Tao Liu","Student / Beginner","","",6025,0,0
+"https://openalex.org/A5075220507","Douglas M. Templeton","Professor / Expert","","",6023,13898,51
+"https://openalex.org/A5014936305","Melissa Roth","Assistant Professor / Researcher","","",5996,1633,19
+"https://openalex.org/A5134844479","Kent Bloodsworth","Student / Beginner","","",5965,0,0
+"https://openalex.org/A5100352881","Wei Huang","Professor / Expert","","",5848,257099,219
+"https://openalex.org/A5081142251","Amir Ahkami","Assistant Professor / Researcher","","",5710,2365,20
+"https://openalex.org/A5088036933","Shayan Lameh","Student / Beginner","","",5679,8,2
+"https://openalex.org/A5088064718","Ellen A. A. Nollen","Associate Professor","","",5625,7874,37
+"https://openalex.org/A5022503966","Ryan McClure","Associate Professor","","",5594,5335,28
+"https://openalex.org/A5072164503","Henry S. Rzepa","Professor / Expert","","",5575,14879,59
+"https://openalex.org/A5090435894","Hagop M. Kantarjian","Professor / Expert","","",5530,268850,232
+"https://openalex.org/A5038405190","Gregory Y.H. Lip","Professor / Expert","","",5524,309303,213
+"https://openalex.org/A5100353673","Hao Chen","Professor / Expert","","",5506,112214,141
+"https://openalex.org/A5041573207","Takashi Taniguchi","Professor / Expert","","",5505,215943,203
+"https://openalex.org/A5045096283","Kenji Watanabe","Professor / Expert","","",5499,225827,212
+"https://openalex.org/A5009855140","Hoong‐Kun Fun","Professor / Expert","","",5491,21377,63
+"https://openalex.org/A5133453315","Juan Moises De la Serna","Student / Beginner","","",5472,0,0
+"https://openalex.org/A5075082525","Mohamed Elzek","Postdoc / Early Career","","",5443,390,7
+"https://openalex.org/A5100382146","Xiaolu Li","Associate Professor","","",5428,3104,33
+"https://openalex.org/A5064718190","Rhona Stuart","Associate Professor","","",5426,13827,25
+"https://openalex.org/A5024900493","Shahan Mamoor","Postdoc / Early Career","","",5374,650,9
+"https://openalex.org/A5085367465","Sean Colby","Assistant Professor / Researcher","","",5319,1027,19
+"https://openalex.org/A5049970193","Alexandra M. Z. Slawin","Professor / Expert","","",5314,57395,107
+"https://openalex.org/A5134780834","Maria Perez","Student / Beginner","","",5306,0,0
+"https://openalex.org/A5134827326","John Melchior","Student / Beginner","","",5294,0,0
+"https://openalex.org/A5060264145","Ian Stephens","Associate Professor","","",5284,3037,32
+"https://openalex.org/A5077647946","Qian Zhao","Associate Professor","","",5278,4650,32
+"https://openalex.org/A5029729058","Vanessa Paurus","Postdoc / Early Career","","",5252,531,10
+"https://openalex.org/A5065859286","Hui Li","Professor / Expert","","",5250,39189,95
+"https://openalex.org/A5134991489","Nikola Tolic","Student / Beginner","","",5242,0,0
+"https://openalex.org/A5076482116","Adam Swensen","Assistant Professor / Researcher","","",5235,1234,18
+"https://openalex.org/A5084628833","Jessica Bade","Postdoc / Early Career","","",5226,166,6
+"https://openalex.org/A5135086730","Tao Liu","Student / Beginner","","",5221,0,0
+"https://openalex.org/A5023732378","Sneha Couvillion","Assistant Professor / Researcher","","",5186,1855,17
+"https://openalex.org/A5076572080","Allison Myers‐Pigg","Assistant Professor / Researcher","","",5170,1186,16
+"https://openalex.org/A5017034945","Christine Chang","Postdoc / Early Career","","",5157,198,8
+"https://openalex.org/A5012555968","Jay Dunlap","Professor / Expert","","",5148,25896,84
+"https://openalex.org/A5134841738","Daniel Orton","Student / Beginner","","",5113,0,0
+"https://openalex.org/A5081423552","Rainer W. Bussmann","Professor / Expert","","",5058,40960,84
+"https://openalex.org/A5134763619","Andrew Townsend","Student / Beginner","","",5051,0,0
+"https://openalex.org/A5024045111","Jeremy Bougoure","Associate Professor","","",5050,3232,27
+"https://openalex.org/A5134756015","William Petersen","Student / Beginner","","",5050,0,0
+"https://openalex.org/A5134793024","Beata Meluch","Student / Beginner","","",5050,0,0
+"https://openalex.org/A5134804412","Jason Toyoda","Student / Beginner","","",5050,0,0
+"https://openalex.org/A5134820445","Caroline Simonsen","Student / Beginner","","",5050,0,0
+"https://openalex.org/A5063943424","William Kew","Assistant Professor / Researcher","","",5048,1077,18
+"https://openalex.org/A5090386698","Oona A. Hathaway","Associate Professor","","",5043,3432,23
+"https://openalex.org/A5042486801","Aivett Bilbao Pena","Assistant Professor / Researcher","","",5042,2810,16
+"https://openalex.org/A5015215572","Yang Wang","Associate Professor","","",5036,2643,32
+"https://openalex.org/A5133588295","Juan Moisés De la Serna","Student / Beginner","","",5036,0,0
+"https://openalex.org/A5065787609","M Beer","Professor / Expert","","",5016,18789,56
+"https://openalex.org/A5015112468","Sara Taylor","Assistant Professor / Researcher","","",4978,1868,17
+"https://openalex.org/A5078418006","T. Morisaki","Professor / Expert","","",4969,8012,47
+"https://openalex.org/A5053338624","John Cliff","Associate Professor","","",4944,5717,39
+"https://openalex.org/A5135220932","Tao Liu","Student / Beginner","","",4940,0,0
+"https://openalex.org/A5135055403","Tujin Shi","Student / Beginner","","",4908,0,0
+"https://openalex.org/A5020880379","Pubudu Handakumbura","Assistant Professor / Researcher","","",4905,1801,14
+"https://openalex.org/A5134762631","Izabel Stohel","Student / Beginner","","",4872,0,0
+"https://openalex.org/A5134898227","Maria Perez","Student / Beginner","","",4866,0,0
+"https://openalex.org/A5065406835","Charles Redmon","Student / Beginner","","",4845,0,0
+"https://openalex.org/A5134838592","Kateryna LEN-TAYON","Student / Beginner","","",4824,0,0
+"https://openalex.org/A5134846536","Maïa NESTOR-MARTIN","Student / Beginner","","",4824,0,0
+"https://openalex.org/A5134847864","Gilles LAVERNY","Student / Beginner","","",4824,0,0
+"https://openalex.org/A5134851530","Bernard MALISSEN","Student / Beginner","","",4824,0,0
+"https://openalex.org/A5134869393","Frédéric FIORE","Student / Beginner","","",4824,0,0
+"https://openalex.org/A5134873894","Daniel METZGER","Student / Beginner","","",4824,0,0
+"https://openalex.org/A5091367425","Maria Mukhina","Assistant Professor / Researcher","","",4819,784,12
+"https://openalex.org/A5086547107","Mikayla Borton","Associate Professor","","",4807,4283,26
+"https://openalex.org/A5100381999","Qiang Zhang","Professor / Expert","","",4791,46989,90
+"https://openalex.org/A5088912262","Robert Danczak","Associate Professor","","",4779,1884,21
+"https://openalex.org/A5073834446","James Stegen","Professor / Expert","","",4755,24673,59
+"https://openalex.org/A5035096362","Ryan Sontag","Assistant Professor / Researcher","","",4752,1315,17
+"https://openalex.org/A5039324842","Cord Sunderkötter","Professor / Expert","","",4728,19500,68
+"https://openalex.org/A5134983863","Lye Meng Markillie","Student / Beginner","","",4724,0,0
+"https://openalex.org/A5134942886","Hugh Mitchell","Student / Beginner","","",4723,0,0
+"https://openalex.org/A5008452332","Dieter Häussinger","Professor / Expert","","",4707,73324,107
+"https://openalex.org/A5006536606","Vanessa Garayburu‐Caruso","Assistant Professor / Researcher","","",4667,896,16
+"https://openalex.org/A5034097318","Nicholas Day","Professor / Expert","","",4662,80629,120
+"https://openalex.org/A5136060493","ANDREA Pigorini","Student / Beginner","","",4656,0,0
+"https://openalex.org/A5003953667","G. Kawamura","Assistant Professor / Researcher","","",4643,1159,17
+"https://openalex.org/A5067986935","Shivani Upadhyaya","Postdoc / Early Career","","",4635,133,6
+"https://openalex.org/A5040095743","Taniya Roy Chowdhury","Assistant Professor / Researcher","","",4633,2110,19
+"https://openalex.org/A5134870272","Nikola Tolic","Student / Beginner","","",4633,0,0
+"https://openalex.org/A5007509063","Eric Bottos","Assistant Professor / Researcher","","",4603,4575,19
+"https://openalex.org/A5009910896","Andrew Lipton","Associate Professor","","",4591,3223,33
+"https://openalex.org/A5034609521","Andrew Townsend","Assistant Professor / Researcher","","",4590,1664,18
+"https://openalex.org/A5065082245","W. Clegg","Professor / Expert","","",4584,34190,76
+"https://openalex.org/A5088369746","Feng Yang","Professor / Expert","","",4583,8582,49
+"https://openalex.org/A5071396280","Chi Xiao","Postdoc / Early Career","","",4581,190,7
+"https://openalex.org/A5002516911","Arunima Bhattacharjee","Assistant Professor / Researcher","","",4572,834,12
+"https://openalex.org/A5011650421","C. T. Russell","Professor / Expert","","",4501,115529,151
+"https://openalex.org/A5100405781","Ping Zhang","Professor / Expert","","",4484,80787,118
+"https://openalex.org/A5100364769","Jin Li","Professor / Expert","","",4456,129344,150
+"https://openalex.org/A5051101756","Ryan Renslow","Associate Professor","","",4451,3515,31
+"https://openalex.org/A5088230712","Fred R. Volkmar","Professor / Expert","","",4419,52164,119
+"https://openalex.org/A5134822396","Weijun Qian","Student / Beginner","","",4410,0,0
+"https://openalex.org/A5014947618","Anne Glaesener","Postdoc / Early Career","","",4407,421,5
+"https://openalex.org/A5084169778","Jun Wang","Professor / Expert","","",4405,36802,81
+"https://openalex.org/A5076949434","Nicole Danielle Osier","Assistant Professor / Researcher","","",4403,1494,18
+"https://openalex.org/A5108047889","Yì Wáng","Professor / Expert","","",4392,26509,70
+"https://openalex.org/A5079873685","Xingyuan Chen","Associate Professor","","",4380,7332,39
+"https://openalex.org/A5042664825","Frank Gaillard","Associate Professor","","",4375,7030,25
+"https://openalex.org/A5135049806","Elizabeth Eder","Student / Beginner","","",4375,0,0
+"https://openalex.org/A5040141774","Tamás Varga","Assistant Professor / Researcher","","",4361,1552,15
+"https://openalex.org/A5043452704","Martin Nieger","Professor / Expert","","",4345,24437,64
+"https://openalex.org/A5023705098","Michael Bolte","Professor / Expert","","",4337,18488,62
+"https://openalex.org/A5060255302","Sophia McKever","Postdoc / Early Career","","",4335,183,6
+"https://openalex.org/A5134865143","Tierney Becho","Student / Beginner","","",4322,0,0
+"https://openalex.org/A5005097813","Tim Scheibe","Associate Professor","","",4321,5023,36
+"https://openalex.org/A5000629060","Thomas Schwarz","Professor / Expert","","",4297,76378,124
+"https://openalex.org/A5079956770","Wei Li","Professor / Expert","","",4268,20802,66
+"https://openalex.org/A5068888465","Taylor Cameron","Postdoc / Early Career","","",4258,230,8
+"https://openalex.org/A5101877022","Irina Novikova","Assistant Professor / Researcher","","",4257,1652,17
+"https://openalex.org/A5134866985","Elizabeth Eder","Student / Beginner","","",4251,0,0
+"https://openalex.org/A5135091646","Tujin Shi","Student / Beginner","","",4239,0,0
+"https://openalex.org/A5039395705","Frede Blaabjerg","Professor / Expert","","",4192,195950,192
+"https://openalex.org/A5067109486","Amy Goldman","Assistant Professor / Researcher","","",4190,1204,20
+"https://openalex.org/A5039960939","Aditi Sengupta","Assistant Professor / Researcher","","",4186,2105,19
+"https://openalex.org/A5134981893","Jessica Choi","Student / Beginner","","",4176,0,0
+"https://openalex.org/A5013184354","George Davey Smith","Professor / Expert","","",4156,428039,270
+"https://openalex.org/A5089379373","Ben Zhong Tang","Professor / Expert","","",4140,250409,213
+"https://openalex.org/A5031601763","Lawrence H. Price","Professor / Expert","","",4130,28793,94
+"https://openalex.org/A5008555874","C. Suzuki","Associate Professor","","",4126,5245,37
+"https://openalex.org/A5080762339","Trevor W. Robbins","Professor / Expert","","",4124,195598,242
+"https://openalex.org/A5030773855","Lupita Renteria","Assistant Professor / Researcher","","",4110,578,12
+"https://openalex.org/A5134859685","Lauren Vega","Student / Beginner","","",4107,0,0
+"https://openalex.org/A5081818480","Christoph Valentin","Student / Beginner","","",4086,0,0
+"https://openalex.org/A5083462005","Victor E. A. Gerdes","Professor / Expert","","",4076,11786,50
+"https://openalex.org/A5030174951","Morgan Barnes","Assistant Professor / Researcher","","",4065,564,11
+"https://openalex.org/A5100425554","Li Zhang","Professor / Expert","","",4056,75024,114
+"https://openalex.org/A5134838364","Matthew Gaffrey","Associate Professor","","",4054,2185,27
+"https://openalex.org/A5061623935","Francesco Montorsi","Professor / Expert","","",4052,98927,146
+"https://openalex.org/A5017146197","Alan Roebuck","Postdoc / Early Career","","",4041,648,10
+"https://openalex.org/A5032715322","Florian Seliger","Postdoc / Early Career","","",4033,356,10
+"https://openalex.org/A5074730004","Didier Raoult","Professor / Expert","","",4032,225929,198
+"https://openalex.org/A5043918304","Samantha Grieger","Postdoc / Early Career","","",4026,249,7
+"https://openalex.org/A5021495764","Stephanie Fulton","Postdoc / Early Career","","",4010,188,6
+"https://openalex.org/A5135330487","Sarah Leichty","Student / Beginner","","",4010,0,0
+"https://openalex.org/A5134949043","Sara Valdimarsdottir","Student / Beginner","","",3997,0,0
+"https://openalex.org/A5134977561","Carlos Rodriguez Lopez","Student / Beginner","","",3997,0,0
+"https://openalex.org/A5034017799","Qiang Li","Professor / Expert","","",3991,27298,74
+"https://openalex.org/A5065735206","Nobutaka Hirokawa","Professor / Expert","","",3988,55121,115
+"https://openalex.org/A5072643268","Lawrence David Scahill","Professor / Expert","","",3974,43924,112
+"https://openalex.org/A5050099873","Jing Liu","Professor / Expert","","",3968,26330,69
+"https://openalex.org/A5019555383","Christopher J. McDougle","Professor / Expert","","",3956,33384,96
+"https://openalex.org/A5134937157","Yuqian Gao","Student / Beginner","","",3951,0,0
+"https://openalex.org/A5028655150","Jennifer Loros","Professor / Expert","","",3947,16697,75
+"https://openalex.org/A5050242178","P. Jackson","Professor / Expert","","",3927,219455,188
+"https://openalex.org/A5026083794","Tapomayukh Bhattacharjee","Associate Professor","","",3913,1424,22
+"https://openalex.org/A5079571425","Thomas A. Luger","Professor / Expert","","",3908,43481,108
+"https://openalex.org/A5100376569","Zhong Lin Wang","Professor / Expert","","",3896,472295,321
+"https://openalex.org/A5077719529","Siddhartha S Srinivasa","Professor / Expert","","",3892,19009,64
+"https://openalex.org/A5002078295","Filomena Maggino","Associate Professor","","",3874,3700,28
+"https://openalex.org/A5040662398","Erik De Clercq","Professor / Expert","","",3872,139771,160
+"https://openalex.org/A5134873445","Justin Teeguarden","Student / Beginner","","",3872,0,0
+"https://openalex.org/A5023023644","Jie Zhang","Professor / Expert","","",3857,29004,78
+"https://openalex.org/A5100418548","Chen Chen","Professor / Expert","","",3855,75460,108
+"https://openalex.org/A5063130484","Tim Cook","Professor / Expert","","",3851,28468,80
+"https://openalex.org/A5032020071","Lye Meng Markillie","Associate Professor","","",3848,3832,28
+"https://openalex.org/A5100399276","Han Zhang","Professor / Expert","","",3842,154589,184
+"https://openalex.org/A5134844191","Amar Parvate","Student / Beginner","","",3832,0,0
+"https://openalex.org/A5134873759","Stephanie Thibert","Postdoc / Early Career","","",3831,75,5
+"https://openalex.org/A5100430876","Xi Zhang","Associate Professor","","",3828,6520,37
+"https://openalex.org/A5100444820","Xiaogang Wang","Professor / Expert","","",3828,253257,209
+"https://openalex.org/A5055701440","Lee Ann McCue","Associate Professor","","",3827,5570,39
+"https://openalex.org/A5134861166","Yang Wang","Student / Beginner","","",3819,0,0
+"https://openalex.org/A5066675722","K. Mukai","Assistant Professor / Researcher","","",3806,1143,17
+"https://openalex.org/A5022857079","Eun‐Kyung Kim","Professor / Expert","","",3792,36545,89
+"https://openalex.org/A5019361988","Samantha Miller","Associate Professor","","",3788,3681,32
+"https://openalex.org/A5000044759","Karol Kamiński","Associate Professor","","",3784,6376,35
+"https://openalex.org/A5134802759","Qian Zhao","Student / Beginner","","",3777,0,0
+"https://openalex.org/A5079766290","Henrik Zetterberg","Professor / Expert","","",3775,182948,194
+"https://openalex.org/A5001546885","Danny Orton","Postdoc / Early Career","","",3764,408,8
+"https://openalex.org/A5042307561","H. Vincent Poor","Professor / Expert","","",3760,159603,181
+"https://openalex.org/A5055753264","Anil Shukla","Associate Professor","","",3756,6136,40
+"https://openalex.org/A5031340334","Antonio Gasbarrini","Professor / Expert","","",3754,110945,146
+"https://openalex.org/A5114377956","Bo Liu","Professor / Expert","","",3753,69844,104
+"https://openalex.org/A5134840601","David Hoyt","Student / Beginner","","",3747,0,0
+"https://openalex.org/A5100778674","Bharat Bhushan","Professor / Expert","","",3742,92275,139
+"https://openalex.org/A5134866951","Sarah Williams","Student / Beginner","","",3740,0,0
+"https://openalex.org/A5069763141","Wei Wang","Associate Professor","","",3736,7121,35
+"https://openalex.org/A5078999329","Young Jin Kim","Postdoc / Early Career","","",3733,403,8
+"https://openalex.org/A5080882260","Ray J. Butcher","Professor / Expert","","",3723,24842,63
+"https://openalex.org/A5059190653","Michael Weintraub","Professor / Expert","","",3720,13562,41
+"https://openalex.org/A5134837574","Deseree Reid","Student / Beginner","","",3719,0,0
+"https://openalex.org/A5134845800","Jesse Wilson","Student / Beginner","","",3719,0,0
+"https://openalex.org/A5003326991","Daryl Moorhead","Professor / Expert","","",3715,13340,55
+"https://openalex.org/A5052910292","Ruonan Wu","Associate Professor","","",3700,2249,27
+"https://openalex.org/A5076403607","Claudio Ronco","Professor / Expert","","",3689,112456,129
+"https://openalex.org/A5080102032","Hao Wang","Professor / Expert","","",3686,42923,88
+"https://openalex.org/A5134997020","Yi-Ting Wang","Student / Beginner","","",3672,0,0
+"https://openalex.org/A5091394340","Bradley McDonnell","Postdoc / Early Career","","",3671,471,8
+"https://openalex.org/A5063792624","Patrick W. Serruys","Professor / Expert","","",3669,207060,201
+"https://openalex.org/A5073216705","Dan J. Stein","Professor / Expert","","",3669,296362,196
+"https://openalex.org/A5051644359","John‐John B. Schnog","Associate Professor","","",3666,4277,30
+"https://openalex.org/A5057643177","M. Jain","Assistant Professor / Researcher","","",3649,345,11
+"https://openalex.org/A5134871134","Tujin Shi","Student / Beginner","","",3635,0,0
+"https://openalex.org/A5010571732","Deepak L. Bhatt","Professor / Expert","","",3621,220127,198
+"https://openalex.org/A5100606557","Paul M. Thompson","Professor / Expert","","",3618,192386,202
+"https://openalex.org/A5025313057","Kaj Blennow","Professor / Expert","","",3616,236445,215
+"https://openalex.org/A5100630207","M. Weber","Professor / Expert","","",3615,258417,195
+"https://openalex.org/A5007925027","A. Cerri","Professor / Expert","","",3606,252280,195
+"https://openalex.org/A5100351175","Yan Liu","Professor / Expert","","",3606,71822,119
+"https://openalex.org/A5081088505","Narel Y. Paniagua-Zambrana","Associate Professor","","",3594,12374,28
+"https://openalex.org/A5066197593","V. Shutthanandan","Professor / Expert","","",3592,11827,54
+"https://openalex.org/A5041915207","Stefan Schmollinger","Assistant Professor / Researcher","","",3589,1768,20
+"https://openalex.org/A5049143428","Thierry Roisnel","Professor / Expert","","",3587,25841,70
+"https://openalex.org/A5134910025","Tetsuo SEKI","Student / Beginner","","",3570,0,0
+"https://openalex.org/A5134924700","Kenji SAITO","Student / Beginner","","",3570,0,0
+"https://openalex.org/A5022437227","Jun Zhang","Professor / Expert","","",3567,10375,48
+"https://openalex.org/A5015101485","Jörge E. Cortes","Professor / Expert","","",3565,143891,180
+"https://openalex.org/A5045592962","Sophie Lehmann","Postdoc / Early Career","","",3565,284,9
+"https://openalex.org/A5009404760","Peter Nijkamp","Professor / Expert","","",3564,51192,103
+"https://openalex.org/A5070248281","Vivian Lin","Assistant Professor / Researcher","","",3555,2368,15
+"https://openalex.org/A5006834808","Monica Nordberg","Professor / Expert","","",3548,10513,52
+"https://openalex.org/A5133160945","Palak Babel","Student / Beginner","","",3542,0,0
+"https://openalex.org/A5062391734","Yehia Ibrahim","Professor / Expert","","",3538,5720,45
+"https://openalex.org/A5037176679","A. Meyer","Professor / Expert","","",3528,234639,185
+"https://openalex.org/A5134853329","Isaac Attah","Student / Beginner","","",3521,0,0
+"https://openalex.org/A5026848585","Wei Liu","Associate Professor","","",3496,3315,26
+"https://openalex.org/A5100694840","Min Yang","Professor / Expert","","",3493,71360,122
+"https://openalex.org/A5100338921","Huan Liu","Professor / Expert","","",3479,143629,175
+"https://openalex.org/A5019521209","Laura Meredith","Associate Professor","","",3477,2899,27
+"https://openalex.org/A5021056331","Alan Robock","Professor / Expert","","",3472,38396,107
+"https://openalex.org/A5005221518","Gordon B. Mills","Professor / Expert","","",3469,265569,232
+"https://openalex.org/A5016869041","Jennifer Hurley","Associate Professor","","",3469,2460,25
+"https://openalex.org/A5043042218","Dietmar Schomburg","Professor / Expert","","",3452,23589,68
+"https://openalex.org/A5100355692","Yang Liu","Professor / Expert","","",3446,62598,107
+"https://openalex.org/A5082213051","Bin Li","Associate Professor","","",3444,6003,37
+"https://openalex.org/A5100669549","Huiguang He","Professor / Expert","","",3431,5878,41
+"https://openalex.org/A5082656873","Paul K. Chu","Professor / Expert","","",3422,126448,148
+"https://openalex.org/A5054138931","M. Jain","Associate Professor","","",3410,4534,39
+"https://openalex.org/A5040090704","Min Li","Professor / Expert","","",3405,18074,64
+"https://openalex.org/A5040692774","Κ. Peters","Professor / Expert","","",3400,159709,168
+"https://openalex.org/A5034751002","Constantin G. Daniliuc","Professor / Expert","","",3374,30021,86
+"https://openalex.org/A5035836720","Christian A. Koch","Professor / Expert","","",3373,11618,48
+"https://openalex.org/A5134860828","Galya Orr","Student / Beginner","","",3352,0,0
+"https://openalex.org/A5084197662","Michael Trauner","Professor / Expert","","",3328,67895,130
+"https://openalex.org/A5086899353","Holly Andrews","Postdoc / Early Career","","",3326,448,10
+"https://openalex.org/A5135106239","Yuqian Gao","Student / Beginner","","",3324,0,0
+"https://openalex.org/A5041945807","Harriet de Wit","Professor / Expert","","",3316,41479,99
+"https://openalex.org/A5011216396","Rinaldo Bellomo","Professor / Expert","","",3313,176796,182
+"https://openalex.org/A5108167595","X. Wu","Professor / Expert","","",3313,160564,169
+"https://openalex.org/A5015893189","J.-P.E. Grolier","Professor / Expert","","",3311,7111,49
+"https://openalex.org/A5078263922","Tao Wang","Professor / Expert","","",3305,11452,51
+"https://openalex.org/A5029768249","Yong Li","Professor / Expert","","",3302,32564,82
+"https://openalex.org/A5134930830","Weijun Qian","Student / Beginner","","",3301,0,0
+"https://openalex.org/A5063856451","Michael Schwenk","Professor / Expert","","",3300,10825,48
+"https://openalex.org/A5044215108","Peng Zhang","Professor / Expert","","",3294,20521,66
+"https://openalex.org/A5032470776","Jamie Allen","Assistant Professor / Researcher","","",3283,1477,19
+"https://openalex.org/A5052819678","L. Li","Professor / Expert","","",3274,207220,183
+"https://openalex.org/A5081906967","Christopher Anderton","Associate Professor","","",3269,7182,35
+"https://openalex.org/A5100748869","Li Zhu","Professor / Expert","","",3266,52845,106
+"https://openalex.org/A5002336595","Rudolf Holze","Professor / Expert","","",3262,19207,68
+"https://openalex.org/A5014634951","Simon J. Coles","Professor / Expert","","",3259,20553,61
+"https://openalex.org/A5088601700","Madison Blumer","Postdoc / Early Career","","",3259,197,7
+"https://openalex.org/A5134827207","Kristin Burnum-Johnson","Student / Beginner","","",3258,0,0
+"https://openalex.org/A5085982027","Yasemin Yesiltepe","Postdoc / Early Career","","",3254,98,4
+"https://openalex.org/A5071088289","Felicity Nielson","Student / Beginner","","",3252,166,3
+"https://openalex.org/A5024028933","Nicholas Geraci","Assistant Professor / Researcher","","",3248,1374,16
+"https://openalex.org/A5018012012","Gang Li","Professor / Expert","","",3242,13427,44
+"https://openalex.org/A5134846754","Nicole Powell","Student / Beginner","","",3233,0,0
+"https://openalex.org/A5077206620","Hermann Brenner","Professor / Expert","","",3225,327585,204
+"https://openalex.org/A5031299889","Leena Bruckner‐Tuderman","Professor / Expert","","",3223,22901,76
+"https://openalex.org/A5087145651","Ji-Young Kim","Assistant Professor / Researcher","","",3222,1080,12
+"https://openalex.org/A5134929590","Tong Zhang","Student / Beginner","","",3222,0,0
+"https://openalex.org/A5051594294","Paul Dijkstra","Professor / Expert","","",3220,11926,55
+"https://openalex.org/A5019014578","Min Joung Kim","Associate Professor","","",3219,2193,22
+"https://openalex.org/A5037809865","Katherine Holmes","Postdoc / Early Career","","",3215,1512,10
+"https://openalex.org/A5100338073","Tao Liu","Professor / Expert","","",3213,7770,49
+"https://openalex.org/A5100336796","Jing Li","Professor / Expert","","",3212,116289,143
+"https://openalex.org/A5034122195","Swarup China","Associate Professor","","",3210,5245,39
+"https://openalex.org/A5100444537","M. Kumar","Professor / Expert","","",3208,8868,47
+"https://openalex.org/A5133679006","Tanya Winkler","Student / Beginner","","",3206,0,0
+"https://openalex.org/A5100345153","Qing Liu","Professor / Expert","","",3202,62841,106
+"https://openalex.org/A5063063620","Daniel Miller Runfola","Assistant Professor / Researcher","","",3201,1986,19
+"https://openalex.org/A5108631335","Ji","Associate Professor","","",3190,6072,32
+"https://openalex.org/A5089197450","Daniël Hoyer","Professor / Expert","","",3185,36382,91
+"https://openalex.org/A5111964102","Jun Wang","Professor / Expert","","",3183,297386,222
+"https://openalex.org/A5109831824","LI -","Associate Professor","","",3180,8641,35
+"https://openalex.org/A5024120181","M Snyder","Professor / Expert","","",3179,197791,209
+"https://openalex.org/A5009004639","Sunnyjoy Dupuis","Postdoc / Early Career","","",3176,83,4
+"https://openalex.org/A5090852510","Christie P. Thomas","Associate Professor","","",3176,7112,40
+"https://openalex.org/A5003730884","Nina Horn","Associate Professor","","",3174,4448,38
+"https://openalex.org/A5068853530","Juan Pablo","Professor / Expert","","",3173,47918,115
+"https://openalex.org/A5069490814","Youngki You","Postdoc / Early Career","","",3173,151,6
+"https://openalex.org/A5026048739","Giovanni Scambia","Professor / Expert","","",3172,90963,118
+"https://openalex.org/A5072753091","Xuelin Ma","Assistant Professor / Researcher","","",3167,535,12
+"https://openalex.org/A5029387280","Mowei Zhou","Associate Professor","","",3166,2727,26
+"https://openalex.org/A5019602067","Michael Mills","Professor / Expert","","",3161,17136,60
+"https://openalex.org/A5041318032","Anja Schmidt","Professor / Expert","","",3160,7834,47
+"https://openalex.org/A5006906048","Stefan R. Bornstein","Professor / Expert","","",3159,75008,111
+"https://openalex.org/A5058246960","A. Gupta","Postdoc / Early Career","","",3148,271,10
+"https://openalex.org/A5000046286","Winfried März","Professor / Expert","","",3144,149013,128
+"https://openalex.org/A5100616675","Sang Yup Lee","Professor / Expert","","",3138,79413,138
+"https://openalex.org/A5065569192","Toshio Fukuda","Professor / Expert","","",3137,32084,73
+"https://openalex.org/A5100774776","Cyrus Cooper","Professor / Expert","","",3137,333438,236
+"https://openalex.org/A5100638254","S. L. Wu","Professor / Expert","","",3133,177258,170
+"https://openalex.org/A5067751216","Bhim Singh","Professor / Expert","","",3120,59188,96
+"https://openalex.org/A5134855834","Tao Liu","Student / Beginner","","",3120,0,0
+"https://openalex.org/A5108065580","M. Williams","Professor / Expert","","",3118,126098,154
+"https://openalex.org/A5084750854","Alexander J. Blake","Professor / Expert","","",3111,46058,101
+"https://openalex.org/A5047504462","Yong Wang","Associate Professor","","",3108,4122,34
+"https://openalex.org/A5032730516","Antonio Frontera","Professor / Expert","","",3107,36413,84
+"https://openalex.org/A5101831137","Markus Böhm","Professor / Expert","","",3105,12052,53
+"https://openalex.org/A5087017849","María Trujillo","Assistant Professor / Researcher","","",3101,953,13
+"https://openalex.org/A5135067478","Yuqian Gao","Student / Beginner","","",3100,0,0
+"https://openalex.org/A5004625476","Brian Zambri","Assistant Professor / Researcher","","",3098,661,11
+"https://openalex.org/A5012117525","C.H. Arrowsmith","Professor / Expert","","",3094,43161,113
+"https://openalex.org/A5053011724","Jeroen J. Bax","Professor / Expert","","",3093,243079,189
+"https://openalex.org/A5106225322","S. Malik","Professor / Expert","","",3091,157810,163
+"https://openalex.org/A5061649047","Klaus A. Miczek","Professor / Expert","","",3089,23347,84
+"https://openalex.org/A5089379689","Lei Jiang","Professor / Expert","","",3087,207275,212
+"https://openalex.org/A5016697650","Harold Achicanoy","Assistant Professor / Researcher","","",3080,2408,20
+"https://openalex.org/A5002310217","James H. Tsai","Professor / Expert","","",3076,7204,43
+"https://openalex.org/A5135027979","Kent Bloodsworth","Student / Beginner","","",3073,0,0
+"https://openalex.org/A5134873555","Peter Weber","Student / Beginner","","",3072,0,0
+"https://openalex.org/A5032464400","Kenneth C. Anderson","Professor / Expert","","",3070,168440,199
+"https://openalex.org/A5015601396","Galya Orr","Associate Professor","","",3069,5283,38
+"https://openalex.org/A5009883620","Ethan Kroll Gordon","Postdoc / Early Career","","",3065,250,9
+"https://openalex.org/A5101862469","Daisy Herrera","Postdoc / Early Career","","",3063,51,4
+"https://openalex.org/A5067596742","Steven Duplij","Assistant Professor / Researcher","","",3062,1274,13
+"https://openalex.org/A5015978856","Jeremy Zucker","Associate Professor","","",3056,21231,31
+"https://openalex.org/A5100418954","Zhang Li","Professor / Expert","","",3054,15344,56
+"https://openalex.org/A5003799782","Witold Pedrycz","Professor / Expert","","",3047,91662,130
+"https://openalex.org/A5027408085","Stephen Solovitz","Assistant Professor / Researcher","","",3044,683,14
+"https://openalex.org/A5011264157","Christos Pantelis","Professor / Expert","","",3039,93359,137
+"https://openalex.org/A5014424002","Erin Rooney","Postdoc / Early Career","","",3034,318,7
+"https://openalex.org/A5040645120","E. Gorini","Professor / Expert","","",3033,217988,194
+"https://openalex.org/A5012860439","Craig A. Erickson","Professor / Expert","","",3026,11073,53
+"https://openalex.org/A5055801618","Deisy Chaves","Postdoc / Early Career","","",3026,458,8
+"https://openalex.org/A5020674754","Jean‐Thomas Martelli","Postdoc / Early Career","","",3025,90,7
+"https://openalex.org/A5074164414","Li Li","Professor / Expert","","",3021,12323,47
+"https://openalex.org/A5034359289","E. Rossi","Professor / Expert","","",3020,211707,195
+"https://openalex.org/A5100727879","Ajay Singh","Professor / Expert","","",3017,65744,101
+"https://openalex.org/A5072421868","I. Cibulka","Associate Professor","","",3016,2736,25
+"https://openalex.org/A5134864174","Aaron Wright","Student / Beginner","","",3013,0,0
+"https://openalex.org/A5059481564","Min-Soo Kim","Postdoc / Early Career","","",3011,273,7
+"https://openalex.org/A5135249179","Elizabeth Eder","Student / Beginner","","",3006,0,0
+"https://openalex.org/A5100404947","Jie Yang","Professor / Expert","","",3004,22769,76
+"https://openalex.org/A5100412926","Lin Li","Professor / Expert","","",3003,72820,115
+"https://openalex.org/A5134832959","Kylee Tate","Student / Beginner","","",2997,0,0
+"https://openalex.org/A5134998414","Tong Zhang","Student / Beginner","","",2990,0,0
+"https://openalex.org/A5033573338","Meletios Α. Dimopoulos","Professor / Expert","","",2988,128560,159
+"https://openalex.org/A5103961339","Ming Ming","Associate Professor","","",2988,3949,24
+"https://openalex.org/A5134874900","Peter Nico","Student / Beginner","","",2988,0,0
+"https://openalex.org/A5070928171","Gregg C. Fonarow","Professor / Expert","","",2986,198190,198
+"https://openalex.org/A5134836195","Eric Slessarev","Student / Beginner","","",2986,0,0
+"https://openalex.org/A5134837943","Steve Blazewicz","Student / Beginner","","",2986,0,0
+"https://openalex.org/A5134840149","Odeta Qafoku","Student / Beginner","","",2986,0,0
+"https://openalex.org/A5134842152","Noah Sokol","Student / Beginner","","",2986,0,0
+"https://openalex.org/A5006847496","J Stamatoyannopoulos","Professor / Expert","","",2973,98349,107
+"https://openalex.org/A5010647553","William Chrisler","Associate Professor","","",2973,6021,37
+"https://openalex.org/A5002712420","Hyung Jun Kim","Professor / Expert","","",2971,11474,50
+"https://openalex.org/A5084580994","Paul Knochel","Professor / Expert","","",2971,58064,109
+"https://openalex.org/A5075525738","Carlo La Vecchia","Professor / Expert","","",2970,245931,187
+"https://openalex.org/A5134860490","Jennifer Pett-Ridge","Student / Beginner","","",2969,0,0
+"https://openalex.org/A5134873948","Gareth Trubl","Student / Beginner","","",2968,0,0
+"https://openalex.org/A5072258594","Tien Yin Wong","Professor / Expert","","",2965,231393,207
+"https://openalex.org/A5076487187","Nigel Collar","Associate Professor","","",2963,10314,34
+"https://openalex.org/A5015200251","Andrew L. Wong","Associate Professor","","",2961,4043,28
+"https://openalex.org/A5052354459","Jeong Soo Kim","Associate Professor","","",2947,5806,40
+"https://openalex.org/A5100740683","W. T. Ford","Professor / Expert","","",2946,148225,157
+"https://openalex.org/A5115589533","Sheng Wang","Assistant Professor / Researcher","","",2943,1319,19
+"https://openalex.org/A5000471665","Markku Kulmala","Professor / Expert","","",2942,142291,179
+"https://openalex.org/A5059286326","Katherine EO Todd-Brown","Associate Professor","","",2938,43007,28
+"https://openalex.org/A5040861534","M. Morii","Professor / Expert","","",2937,155150,165
+"https://openalex.org/A5070204165","Silke Hofmann","Associate Professor","","",2930,4997,32
+"https://openalex.org/A5024176508","Kenneth W. McCravy","Assistant Professor / Researcher","","",2928,1460,19
+"https://openalex.org/A5061026876","Guillermo Garcia‐Manero","Professor / Expert","","",2928,89874,149
+"https://openalex.org/A5083881252","James Moran","Associate Professor","","",2927,2057,24
+"https://openalex.org/A5002610484","Stylianos Chatzimanolis","Assistant Professor / Researcher","","",2921,1585,20
+"https://openalex.org/A5038373228","Edward L. Giovannucci","Professor / Expert","","",2895,215783,217
+"https://openalex.org/A5087568651","Abdullah M. Asiri","Professor / Expert","","",2893,137204,168
+"https://openalex.org/A5012703845","Florentín Smarandache","Professor / Expert","","",2891,23486,64
+"https://openalex.org/A5074211409","Michael G. B. Drew","Professor / Expert","","",2891,35261,72
+"https://openalex.org/A5135145602","Sabeeha Merchant","Student / Beginner","","",2890,0,0
+"https://openalex.org/A5109064832","CF Tsai","Student / Beginner","","",2887,13,2
+"https://openalex.org/A5075230689","R. Kowalewski","Professor / Expert","","",2886,175082,165
+"https://openalex.org/A5023609736","Jing Li","Postdoc / Early Career","","",2885,108,5
+"https://openalex.org/A5100378803","Tong Zhang","Professor / Expert","","",2881,17726,60
+"https://openalex.org/A5100400217","Jun Zhang","Professor / Expert","","",2880,54307,111
+"https://openalex.org/A5100666747","A. Bodek","Professor / Expert","","",2879,142526,159
+"https://openalex.org/A5079401169","Shahrokh F. Shariat","Professor / Expert","","",2878,99958,147
+"https://openalex.org/A5107658271","H. F. Heath","Professor / Expert","","",2876,178822,171
+"https://openalex.org/A5023264421","J. W. Head","Professor / Expert","","",2875,74325,133
+"https://openalex.org/A5100355773","Yang Liu","Professor / Expert","","",2875,50406,90
+"https://openalex.org/A5012526019","N. Berger","Professor / Expert","","",2872,137762,156
+"https://openalex.org/A5063667378","Zhu Han","Professor / Expert","","",2872,91286,136
+"https://openalex.org/A5079665496","Matthew J. Budoff","Professor / Expert","","",2870,110376,161
+"https://openalex.org/A5083193286","Mohamed‐Slim Alouini","Professor / Expert","","",2868,92531,119
+"https://openalex.org/A5106426616","F. Šforza","Professor / Expert","","",2868,172559,177
+"https://openalex.org/A5081822197","Theodore E. Simos","Professor / Expert","","",2867,11345,45
+"https://openalex.org/A5085381025","S. J. Pearton","Professor / Expert","","",2867,82534,115
+"https://openalex.org/A5100378741","H. J. Yang","Professor / Expert","","",2866,43706,88
+"https://openalex.org/A5100698315","M. Costa","Professor / Expert","","",2858,201931,181
+"https://openalex.org/A5134969252","James Fulcher","Student / Beginner","","",2858,0,0
+"https://openalex.org/A5032913787","A. Clark","Professor / Expert","","",2852,170458,176
+"https://openalex.org/A5115602439","Haibo Liu","Professor / Expert","","",2852,84456,128
+"https://openalex.org/A5063226007","Richard Corley","Associate Professor","","",2850,4435,35
+"https://openalex.org/A5053939876","George Lauder","Professor / Expert","","",2839,30465,100
+"https://openalex.org/A5100457678","Zhe Chen","Professor / Expert","","",2837,55560,101
+"https://openalex.org/A5029413844","Robin Murray","Professor / Expert","","",2834,162084,196
+"https://openalex.org/A5019356592","J. B. Singh","Professor / Expert","","",2833,139929,154
+"https://openalex.org/A5134873661","Mark Bowden","Student / Beginner","","",2832,0,0
+"https://openalex.org/A5028085268","Ignacio I. Wistuba","Professor / Expert","","",2831,105245,154
+"https://openalex.org/A5100667614","V. Gupta","Associate Professor","","",2829,2366,25
+"https://openalex.org/A5035758112","Mercouri G. Kanatzidis","Professor / Expert","","",2826,190487,199
+"https://openalex.org/A5032900701","Masatoshi Kudo","Professor / Expert","","",2823,126638,145
+"https://openalex.org/A5079424258","Leyla Işık","Assistant Professor / Researcher","","",2822,2200,17
+"https://openalex.org/A5070624497","Mana M. Parast","Professor / Expert","","",2820,7474,44
+"https://openalex.org/A5005358303","R. Gupta","Assistant Professor / Researcher","","",2818,1054,13
+"https://openalex.org/A5003010065","Massimo Filippi","Professor / Expert","","",2817,125672,154
+"https://openalex.org/A5003379719","Jean‐Louis Vincent","Professor / Expert","","",2817,257763,198
+"https://openalex.org/A5017177249","Michael Weller","Professor / Expert","","",2815,166290,176
+"https://openalex.org/A5134986009","Chia-Feng Tsai","Student / Beginner","","",2810,0,0
+"https://openalex.org/A5021278551","Sharon Walsh","Professor / Expert","","",2801,14639,57
+"https://openalex.org/A5031550729","Alberto Briganti","Professor / Expert","","",2801,44427,97
+"https://openalex.org/A5088028306","Harlan M. Krumholz","Professor / Expert","","",2800,212746,216
+"https://openalex.org/A5041612225","Ernest E. Moore","Professor / Expert","","",2799,93948,153
+"https://openalex.org/A5060806470","Josef Finsterer","Professor / Expert","","",2798,18655,62
+"https://openalex.org/A5014142259","Αpostolos Trichas","Postdoc / Early Career","","",2797,312,9
+"https://openalex.org/A5046863413","Thomas Shimizu","Associate Professor","","",2795,6917,27
+"https://openalex.org/A5059307323","Yuri Corilo","Associate Professor","","",2795,2348,29
+"https://openalex.org/A5091266202","Dusit Niyato","Professor / Expert","","",2794,88761,135
+"https://openalex.org/A5100365785","Sanjeev Sharma","Professor / Expert","","",2791,33203,76
+"https://openalex.org/A5135096077","Yi-Ting Wang","Student / Beginner","","",2790,0,0
+"https://openalex.org/A5135281741","Yi-Ting Wang","Student / Beginner","","",2790,0,0
+"https://openalex.org/A5017574831","Jing Zhang","Assistant Professor / Researcher","","",2789,776,14
+"https://openalex.org/A5077736575","Song Feng","Professor / Expert","","",2786,9399,49
+"https://openalex.org/A5025419127","Irena Kushner","Student / Beginner","","",2785,34,1
+"https://openalex.org/A5037750455","Lee A. Denson","Professor / Expert","","",2781,25026,72
+"https://openalex.org/A5068882254","Jun Li","Postdoc / Early Career","","",2778,325,7
+"https://openalex.org/A5066919651","David Lester","Professor / Expert","","",2773,39685,76
+"https://openalex.org/A5089297467","Reinhard Dummer","Professor / Expert","","",2770,128912,154
+"https://openalex.org/A5060998599","Whitney Cranshaw","Assistant Professor / Researcher","","",2769,1823,19
+"https://openalex.org/A5040143921","Jansen Zuanon","Professor / Expert","","",2763,11756,51
+"https://openalex.org/A5080515342","Bo Wang","Professor / Expert","","",2758,7982,41
+"https://openalex.org/A5064146582","Christoforos Pavlou","Postdoc / Early Career","","",2756,143,4
+"https://openalex.org/A5035013697","Claudiu T. Supuran","Professor / Expert","","",2754,130914,153
+"https://openalex.org/A5043957313","Hyeon Jeong Kim","Postdoc / Early Career","","",2747,962,10
+"https://openalex.org/A5073522064","Giuseppe Lippi","Professor / Expert","","",2747,90436,124
+"https://openalex.org/A5046629853","Gregg W. Stone","Professor / Expert","","",2746,167174,195
+"https://openalex.org/A5100335103","Young Ho Kim","Professor / Expert","","",2746,49222,89
+"https://openalex.org/A5004083823","Christer Jansson","Professor / Expert","","",2743,9226,51
+"https://openalex.org/A5017618655","M. J. White","Professor / Expert","","",2743,175045,176
+"https://openalex.org/A5027320968","Martin McKee","Professor / Expert","","",2743,259674,173
+"https://openalex.org/A5043559433","B. Stugu","Professor / Expert","","",2743,142290,158
+"https://openalex.org/A5100382429","Wang Li","Professor / Expert","","",2742,14918,56
+"https://openalex.org/A5100768678","T. Adye","Professor / Expert","","",2741,145189,162
+"https://openalex.org/A5068730007","Tasawar Hayat","Professor / Expert","","",2740,133515,148
+"https://openalex.org/A5133786137","Beata Meluch","Student / Beginner","","",2737,0,0
+"https://openalex.org/A5135097662","Tong Zhang","Student / Beginner","","",2736,0,0
+"https://openalex.org/A5135247596","Chia-Feng Tsai","Student / Beginner","","",2736,0,0
+"https://openalex.org/A5064378373","Frederik Barkhof","Professor / Expert","","",2734,158510,180
+"https://openalex.org/A5085369757","Joel T. Mague","Professor / Expert","","",2726,13420,52
+"https://openalex.org/A5021241280","Jonathan Pevsner","Professor / Expert","","",2724,14926,59
+"https://openalex.org/A5030258071","Peter J. Barnes","Professor / Expert","","",2720,222857,217
+"https://openalex.org/A5115739212","Sw. Banerjee","Professor / Expert","","",2720,190766,164
+"https://openalex.org/A5100345666","Yu Liu","Professor / Expert","","",2718,69003,115
+"https://openalex.org/A5041704528","G. N. Taylor","Professor / Expert","","",2714,166196,177
+"https://openalex.org/A5085434984","Jens J. Holst","Professor / Expert","","",2714,160392,193
+"https://openalex.org/A5056808142","Jung Ho Kim","Assistant Professor / Researcher","","",2712,803,14
+"https://openalex.org/A5083991449","Walter C. Willett","Professor / Expert","","",2712,404258,314
+"https://openalex.org/A5134872036","Charles Ansong","Student / Beginner","","",2712,0,0
+"https://openalex.org/A5134969156","Ryan McClure","Student / Beginner","","",2710,0,0
+"https://openalex.org/A5070378593","Philippe Ciais","Professor / Expert","","",2708,227419,222
+"https://openalex.org/A5035224025","Yoshiyuki Kawazoe","Professor / Expert","","",2705,48207,95
+"https://openalex.org/A5015190461","Josep Tabernero","Professor / Expert","","",2704,127950,147
+"https://openalex.org/A5086927005","Bruce A. Smith","Associate Professor","","",2699,4898,37
+"https://openalex.org/A5080494895","Ravi Kukkadapu","Professor / Expert","","",2695,10507,59
+"https://openalex.org/A5106499574","K. Satô","Professor / Expert","","",2690,140116,157
+"https://openalex.org/A5049411008","JoAnn E. Manson","Professor / Expert","","",2686,258833,257
+"https://openalex.org/A5012756209","Konstantin А. Lyssenko","Professor / Expert","","",2685,15649,52
+"https://openalex.org/A5133898754","Juan Moisés de la Serna de la Serna","Student / Beginner","","",2685,0,0
+"https://openalex.org/A5014196937","Edward R. T. Tiekink","Professor / Expert","","",2684,24506,67
+"https://openalex.org/A5028169517","A. Zhemchugov","Professor / Expert","","",2681,120314,147
+"https://openalex.org/A5006752603","P. Chang","Professor / Expert","","",2678,161318,169
+"https://openalex.org/A5100456227","Yan Zhang","Professor / Expert","","",2676,37680,87
+"https://openalex.org/A5077506130","Edward Miguel","Professor / Expert","","",2668,35868,71
+"https://openalex.org/A5036357902","Philip S. Yu","Professor / Expert","","",2667,136813,168
+"https://openalex.org/A5052263288","O. Brandt","Professor / Expert","","",2664,198108,183
+"https://openalex.org/A5090341915","J.L. Wardell","Associate Professor","","",2662,6393,35
+"https://openalex.org/A5030280190","Frank R. Fronczek","Professor / Expert","","",2660,24969,67
+"https://openalex.org/A5032114486","MacDonald J. Christie","Professor / Expert","","",2660,22689,78
+"https://openalex.org/A5042807344","B. S. Acharya","Professor / Expert","","",2653,158578,155
+"https://openalex.org/A5063753198","Elin Lundstad","Postdoc / Early Career","","",2653,387,6
+"https://openalex.org/A5007740742","Christoph Hiemke","Professor / Expert","","",2650,19779,63
+"https://openalex.org/A5134944519","Matthew McGraw","Student / Beginner","","",2649,0,0
+"https://openalex.org/A5059778310","Ian P. Stolerman","Professor / Expert","","",2645,13232,60
+"https://openalex.org/A5016139987","Roxana Mehran","Professor / Expert","","",2644,155978,172
+"https://openalex.org/A5000439325","Tae Hyong Kim","Professor / Expert","","",2643,8321,43
+"https://openalex.org/A5005228083","Christodoulos Stefanadis","Professor / Expert","","",2640,70241,116
+"https://openalex.org/A5012652688","Nicholas G. Martin","Professor / Expert","","",2638,228700,219
+"https://openalex.org/A5042511375","Bryan Killinger","Postdoc / Early Career","","",2637,143,6
+"https://openalex.org/A5100743975","Y. Yang","Professor / Expert","","",2636,125360,162
+"https://openalex.org/A5089272383","Gérémy Clair","Associate Professor","","",2635,3970,32
+"https://openalex.org/A5048196698","Luigi Ferrucci","Professor / Expert","","",2634,278862,239
+"https://openalex.org/A5065516180","María Victoria Valtierra","Student / Beginner","","",2634,9,2
+"https://openalex.org/A5100640276","Anil K. Sood","Professor / Expert","","",2634,167066,167
+"https://openalex.org/A5063560980","J. Mueller","Professor / Expert","","",2633,169185,176
+"https://openalex.org/A5101847617","C. Chen","Professor / Expert","","",2633,154451,166
+"https://openalex.org/A5042178740","K. N. Houk","Professor / Expert","","",2632,119943,158
+"https://openalex.org/A5047547279","J. Conway","Professor / Expert","","",2627,135394,153
+"https://openalex.org/A5067499997","Marc N. Potenza","Professor / Expert","","",2626,69865,132
+"https://openalex.org/A5044298471","Kari Rissanen","Professor / Expert","","",2625,35258,81
+"https://openalex.org/A5028679667","Hisashi Yamamoto","Professor / Expert","","",2622,37862,104
+"https://openalex.org/A5052545953","Б. А. Трофимов","Professor / Expert","","",2622,15396,46
+"https://openalex.org/A5020631676","Scott A. Lindsay","Assistant Professor / Researcher","","",2621,1162,14
+"https://openalex.org/A5100381911","Qiang Zhang","Professor / Expert","","",2620,176669,209
+"https://openalex.org/A5134824153","Janet Jansson","Student / Beginner","","",2619,0,0
+"https://openalex.org/A5056536713","Samuel Johnson","Assistant Professor / Researcher","","",2616,2069,19
+"https://openalex.org/A5076426660","Funda Meric‐Bernstam","Professor / Expert","","",2616,107060,147
+"https://openalex.org/A5047007168","R. W. Moore","Professor / Expert","","",2615,141904,158
+"https://openalex.org/A5056865783","Matthew McGraw","Assistant Professor / Researcher","","",2613,992,15
+"https://openalex.org/A5072603502","M. Iwasaki","Professor / Expert","","",2612,113735,147
+"https://openalex.org/A5027213857","John J.V. McMurray","Professor / Expert","","",2611,354342,232
+"https://openalex.org/A5090970652","Jin‐Young Kim","Assistant Professor / Researcher","","",2609,1390,17
+"https://openalex.org/A5100410352","Hong Liu","Professor / Expert","","",2609,86469,134
+"https://openalex.org/A5008881437","Wei Zhang","Professor / Expert","","",2605,40736,85
+"https://openalex.org/A5044555614","Mark Lautens","Professor / Expert","","",2605,38951,100
+"https://openalex.org/A5085403239","Qiang Wang","Professor / Expert","","",2601,16934,68
+"https://openalex.org/A5100408669","Hua Zhang","Professor / Expert","","",2600,191464,205
+"https://openalex.org/A5084956562","Masakazu Iwai","Associate Professor","","",2598,3707,26
+"https://openalex.org/A5038029240","Holger Braunschweig","Professor / Expert","","",2597,39300,92
+"https://openalex.org/A5058470461","B Bernstein","Professor / Expert","","",2597,135426,118
+"https://openalex.org/A5100371271","Sheng Wang","Assistant Professor / Researcher","","",2596,1266,18
+"https://openalex.org/A5091070572","Wilbert S. Aronow","Professor / Expert","","",2593,55172,83
+"https://openalex.org/A5087348557","Antônio R. Panizzi","Associate Professor","","",2591,6188,38
+"https://openalex.org/A5064121884","Arthur Brant","Assistant Professor / Researcher","","",2590,810,13
+"https://openalex.org/A5033023115","Brian Druker","Professor / Expert","","",2588,95984,135
+"https://openalex.org/A5049634384","Amy G. Vandergast","Associate Professor","","",2588,1605,22
+"https://openalex.org/A5059645286","Robert West","Professor / Expert","","",2587,99681,132
+"https://openalex.org/A5100404176","Qing Li","Professor / Expert","","",2583,38971,80
+"https://openalex.org/A5045624486","Harald Pfeiffer","Professor / Expert","","",2580,83673,100
+"https://openalex.org/A5112434001","Dieter Metze","Professor / Expert","","",2580,14452,58
+"https://openalex.org/A5034592694","Thomas Metz","Professor / Expert","","",2577,21555,80
+"https://openalex.org/A5017158901","Adrian Furnham","Professor / Expert","","",2574,93560,145
+"https://openalex.org/A5015501263","Stephen M. Stahl","Professor / Expert","","",2570,29864,88
+"https://openalex.org/A5017808266","Jinde Cao","Professor / Expert","","",2567,100428,145
+"https://openalex.org/A5050630882","Licheng Jiao","Professor / Expert","","",2566,57059,102
+"https://openalex.org/A5100718800","A. V. Gritsan","Professor / Expert","","",2563,169443,158
+"https://openalex.org/A5081249912","Myoung Soo Kim","Professor / Expert","","",2559,10787,49
+"https://openalex.org/A5017505906","Jos Prickaerts","Professor / Expert","","",2557,15939,69
+"https://openalex.org/A5024159880","Nicola Maffulli","Professor / Expert","","",2556,93931,140
+"https://openalex.org/A5100425671","Li Zhang","Professor / Expert","","",2555,82273,121
+"https://openalex.org/A5015524075","Tilman Spohn","Professor / Expert","","",2551,20996,69
+"https://openalex.org/A5028780342","Shi Xue Dou","Professor / Expert","","",2549,136974,188
+"https://openalex.org/A5112239741","Norihiro Ueshima","Assistant Professor / Researcher","","",2546,396,11
+"https://openalex.org/A5026132307","A. J. Beddall","Professor / Expert","","",2540,197332,189
+"https://openalex.org/A5038163975","Elizabeth Bush","Assistant Professor / Researcher","","",2539,460,11
+"https://openalex.org/A5109833501","Zhao Zhao","Associate Professor","","",2538,3715,26
+"https://openalex.org/A5072097825","Kläus Müllen","Professor / Expert","","",2532,179045,186
+"https://openalex.org/A5076394173","Amy Schmid","Associate Professor","","",2532,2213,27
+"https://openalex.org/A5023958825","Kazuaki Chayama","Professor / Expert","","",2531,83747,129
+"https://openalex.org/A5040799512","Eileen Shiuan","Postdoc / Early Career","","",2530,718,10
+"https://openalex.org/A5017266796","J. Albert","Professor / Expert","","",2529,138607,157
+"https://openalex.org/A5029242864","Colleen Hui","Postdoc / Early Career","","",2525,156,8
+"https://openalex.org/A5079500427","M. Paulini","Professor / Expert","","",2524,135099,153
+"https://openalex.org/A5109160404","Michaël Grätzel","Professor / Expert","","",2522,452356,304
+"https://openalex.org/A5114377868","L. Lista","Professor / Expert","","",2520,135318,152
+"https://openalex.org/A5133907031","Juan Moisés de la Serna Tuya","Student / Beginner","","",2519,0,0
+"https://openalex.org/A5018798138","Eric Tytell","Associate Professor","","",2518,3281,27
+"https://openalex.org/A5069451255","Pratha Sah","Associate Professor","","",2518,4343,30
+"https://openalex.org/A5031484004","V. Sharma","Professor / Expert","","",2514,172777,164
+"https://openalex.org/A5030343009","Antonio Colombo","Professor / Expert","","",2513,114672,155
+"https://openalex.org/A5100633632","Yue Wang","Professor / Expert","","",2510,15049,55
+"https://openalex.org/A5063718436","Jae‐Hoon Kim","Associate Professor","","",2508,6308,37
+"https://openalex.org/A5100401143","Wei Zheng","Professor / Expert","","",2505,112038,148
+"https://openalex.org/A5027189790","Atsuhiro Osuka","Professor / Expert","","",2504,49394,105
+"https://openalex.org/A5100368058","Na Li","Professor / Expert","","",2504,75329,124
+"https://openalex.org/A5108039384","S. A. Çetin","Professor / Expert","","",2504,121855,149
+"https://openalex.org/A5021090793","Lars Arendt‐Nielsen","Professor / Expert","","",2498,75294,134
+"https://openalex.org/A5100629817","M. Martı́nez","Professor / Expert","","",2496,145424,163
+"https://openalex.org/A5060127274","G. Della Ricca","Professor / Expert","","",2493,133080,152
+"https://openalex.org/A5046310439","Carla Simone Pavanelli","Associate Professor","","",2492,4234,25
+"https://openalex.org/A5046345178","Marc Ladanyi","Professor / Expert","","",2492,210316,205
+"https://openalex.org/A5037436415","C. Dallapiccola","Professor / Expert","","",2491,143134,158
+"https://openalex.org/A5083199032","Vladimir N. Uversky","Professor / Expert","","",2490,107720,155
+"https://openalex.org/A5100326547","Sung Woo Kim","Professor / Expert","","",2487,33227,91
+"https://openalex.org/A5000308170","Angela Dispenzieri","Professor / Expert","","",2485,99559,145
+"https://openalex.org/A5107251665","R. J. Barlow","Professor / Expert","","",2485,89328,134
+"https://openalex.org/A5042137089","K. Lim","Student / Beginner","","",2482,12,2
+"https://openalex.org/A5110501107","Liang Liang","Associate Professor","","",2481,2975,22
+"https://openalex.org/A5014413794","C. P. Hays","Professor / Expert","","",2479,143584,158
+"https://openalex.org/A5068744113","C. Guedes Soares","Professor / Expert","","",2479,60281,105
+"https://openalex.org/A5107211189","Alex Alex","Assistant Professor / Researcher","","",2479,1100,11
+"https://openalex.org/A5038667320","Andrzej Katrusiak","Professor / Expert","","",2476,10745,44
+"https://openalex.org/A5100391883","Wei Wang","Professor / Expert","","",2476,75715,112
+"https://openalex.org/A5108166785","K. Bloom","Professor / Expert","","",2475,127416,149
+"https://openalex.org/A5021022035","John A. Kellum","Professor / Expert","","",2472,112608,154
+"https://openalex.org/A5101454429","Akihisa Inoue","Professor / Expert","","",2469,93322,126
+"https://openalex.org/A5029106022","G. Mitselmakher","Professor / Expert","","",2468,215479,177
+"https://openalex.org/A5056109933","D. Blöch","Professor / Expert","","",2468,186441,162
+"https://openalex.org/A5031215077","J. M. Izen","Professor / Expert","","",2464,149954,165
+"https://openalex.org/A5053911734","R. Shane Tubbs","Professor / Expert","","",2464,41922,83
+"https://openalex.org/A5060091206","Heiko Traupe","Professor / Expert","","",2464,12880,56
+"https://openalex.org/A5100414285","Ying Liu","Professor / Expert","","",2464,93427,118
+"https://openalex.org/A5107173477","S. W. Lee","Professor / Expert","","",2464,126214,151
+"https://openalex.org/A5135565223","Valentina Stanley","Student / Beginner","","",2464,0,0
+"https://openalex.org/A5135586812","Kathleen M Fisch","Student / Beginner","","",2464,0,0
+"https://openalex.org/A5135594759","Louise C Laurent","Student / Beginner","","",2464,0,0
+"https://openalex.org/A5072119772","Ying Ying","Associate Professor","","",2463,3903,25
+"https://openalex.org/A5090227372","M. Franklin","Professor / Expert","","",2461,140019,160
+"https://openalex.org/A5005099850","Clifford R. Jack","Professor / Expert","","",2456,210940,203
+"https://openalex.org/A5074738902","Yehuda Shoenfeld","Professor / Expert","","",2455,99303,145
+"https://openalex.org/A5087003938","D. Gareth Evans","Professor / Expert","","",2455,135168,183
+"https://openalex.org/A5134871345","Scott Lea","Student / Beginner","","",2454,5,1
+"https://openalex.org/A5044578338","A. V. Filippenko","Professor / Expert","","",2451,144799,158
+"https://openalex.org/A5100773343","Xuemin Shen","Professor / Expert","","",2451,99409,149
+"https://openalex.org/A5074750801","Kara Mannor","Postdoc / Early Career","","",2450,128,4
+"https://openalex.org/A5013365638","Ji Hoon Kim","Professor / Expert","","",2449,16297,50
+"https://openalex.org/A5080921373","David J. Hunter","Professor / Expert","","",2446,210585,205
+"https://openalex.org/A5007949292","P. K. Behera","Professor / Expert","","",2445,104583,137
+"https://openalex.org/A5108537547","Scott Baker","Professor / Expert","","",2445,7363,44
+"https://openalex.org/A5052504518","Toni K. Choueiri","Professor / Expert","","",2443,127632,150
+"https://openalex.org/A5100374993","Jianjun Liu","Professor / Expert","","",2442,107562,131
+"https://openalex.org/A5005208943","Ping Wang","Professor / Expert","","",2441,5927,42
+"https://openalex.org/A5000750846","Farhad Ravandi","Professor / Expert","","",2440,68971,127
+"https://openalex.org/A5014770642","A.M. Edwards","Professor / Expert","","",2440,21601,79
+"https://openalex.org/A5061275811","Владик Крейнович","Professor / Expert","","",2440,12081,45
+"https://openalex.org/A5040188499","S. Giagu","Professor / Expert","","",2437,139927,155
+"https://openalex.org/A5106511527","A. Warburton","Professor / Expert","","",2437,136157,156
+"https://openalex.org/A5072378199","Johann S. de Bono","Professor / Expert","","",2436,135359,161
+"https://openalex.org/A5036364090","Per Svenningsson","Professor / Expert","","",2434,30633,91
+"https://openalex.org/A5041938298","anon anon","Postdoc / Early Career","","",2433,943,10
+"https://openalex.org/A5049847263","Vanessa Bailey","Associate Professor","","",2433,8005,37
+"https://openalex.org/A5048380048","John V. Heymach","Professor / Expert","","",2431,68224,130
+"https://openalex.org/A5067403270","Alan J. Lough","Professor / Expert","","",2429,31347,87
+"https://openalex.org/A5026175078","William Ewart Gladstone","Associate Professor","","",2423,4325,34
+"https://openalex.org/A5050296510","S. M. Gibson","Professor / Expert","","",2423,176478,175
+"https://openalex.org/A5089471293","Ji Yeon Kim","Professor / Expert","","",2423,7551,46
+"https://openalex.org/A5002194740","Jennifer Pett‐Ridge","Professor / Expert","","",2422,17806,72
+"https://openalex.org/A5100355322","Xiaogang Li","Professor / Expert","","",2422,56738,115
+"https://openalex.org/A5107247482","S. Choi","Professor / Expert","","",2421,127630,149
+"https://openalex.org/A5049875695","M. Erdmann","Professor / Expert","","",2420,131303,155
+"https://openalex.org/A5059980683","Ivana Cı́sařová","Professor / Expert","","",2419,16181,52
+"https://openalex.org/A5081714379","Warren K. Bickel","Professor / Expert","","",2417,43300,101
+"https://openalex.org/A5008372095","Mark D. Griffiths","Professor / Expert","","",2416,128532,171
+"https://openalex.org/A5106497162","H. P. Beck","Professor / Expert","","",2416,157511,176
+"https://openalex.org/A5067884516","Mark Scheel","Professor / Expert","","",2413,15921,72
+"https://openalex.org/A5106974091","J. Ocariz","Professor / Expert","","",2410,136317,159
+"https://openalex.org/A5004952410","Kelsey Lucas","Assistant Professor / Researcher","","",2409,671,11
+"https://openalex.org/A5076330040","G. Watts","Professor / Expert","","",2407,180689,179
+"https://openalex.org/A5076827562","F. Filthaut","Professor / Expert","","",2407,140469,153
+"https://openalex.org/A5047965868","Paul R. Raithby","Professor / Expert","","",2404,24497,63
+"https://openalex.org/A5030756029","Dumitru Bǎleanu","Professor / Expert","","",2402,86802,124
+"https://openalex.org/A5090672942","Andrei Sourakov","Assistant Professor / Researcher","","",2402,1347,15
+"https://openalex.org/A5070036826","Glen B. Deacon","Professor / Expert","","",2400,26851,62
+"https://openalex.org/A5075323817","B. Yabsley","Professor / Expert","","",2399,129233,158
+"https://openalex.org/A5045838478","Viqar Uddin Ahmad","Associate Professor","","",2398,6525,40
+"https://openalex.org/A5037328125","Thomas Klockgether","Professor / Expert","","",2397,43074,104
+"https://openalex.org/A5049892384","Ian J. Deary","Professor / Expert","","",2397,173079,200
+"https://openalex.org/A5006851261","William J. McKenna","Professor / Expert","","",2395,108877,163
+"https://openalex.org/A5026206882","Gideon Koren","Professor / Expert","","",2392,95374,143
+"https://openalex.org/A5027928063","Kim Wolff","Associate Professor","","",2392,4434,33
+"https://openalex.org/A5049585448","Arndt Hartmann","Professor / Expert","","",2391,44635,98
+"https://openalex.org/A5100683988","R. W. L. Jones","Professor / Expert","","",2389,178155,168
+"https://openalex.org/A5106315352","M. Pierini","Professor / Expert","","",2388,123664,150
+"https://openalex.org/A5107464338","N. Zhou","Professor / Expert","","",2387,146777,159
+"https://openalex.org/A5016202220","C. Tully","Professor / Expert","","",2386,120662,145
+"https://openalex.org/A5019474609","Séverine Vermeire","Professor / Expert","","",2386,111609,164
+"https://openalex.org/A5050356892","Charles B. Nemeroff","Professor / Expert","","",2382,111862,167
+"https://openalex.org/A5011047964","Tao Li","Assistant Professor / Researcher","","",2379,1393,18
+"https://openalex.org/A5018976124","Tae-Young Kim","Associate Professor","","",2378,2938,27
+"https://openalex.org/A5034365278","Dirk Schadendorf","Professor / Expert","","",2378,223998,183
+"https://openalex.org/A5063941923","P. Thuéry","Professor / Expert","","",2378,16136,62
+"https://openalex.org/A5088679899","Tony Chiang","Assistant Professor / Researcher","","",2378,712,11
+"https://openalex.org/A5031201037","Graham A. Colditz","Professor / Expert","","",2375,231184,247
+"https://openalex.org/A5050614301","Todd K. Shackelford","Professor / Expert","","",2375,33261,94
+"https://openalex.org/A5022768838","I. Gorelov","Professor / Expert","","",2373,135198,159
+"https://openalex.org/A5100434028","Lei Zhang","Professor / Expert","","",2373,39363,88
+"https://openalex.org/A5100775902","Laurent Maron","Professor / Expert","","",2372,25301,79
+"https://openalex.org/A5008936786","Johannes Bagnoli","Assistant Professor / Researcher","","",2371,1263,13
+"https://openalex.org/A5019133187","Graham G. Giles","Professor / Expert","","",2371,123077,165
+"https://openalex.org/A5081312498","Young Song","Professor / Expert","","",2371,8374,42
+"https://openalex.org/A5100429324","Sung‐Hoon Kim","Professor / Expert","","",2371,49287,95
+"https://openalex.org/A5100460917","Hui Wang","Professor / Expert","","",2370,26166,73
+"https://openalex.org/A5025870220","Philip Scheltens","Professor / Expert","","",2369,188722,178
+"https://openalex.org/A5035306881","Anjali Seth","Assistant Professor / Researcher","","",2368,883,18
+"https://openalex.org/A5063630764","John C. Morris","Professor / Expert","","",2367,234966,213
+"https://openalex.org/A5100386630","Shuo Li","Professor / Expert","","",2367,51656,85
+"https://openalex.org/A5074788196","Fang Liu","Associate Professor","","",2365,5414,39
+"https://openalex.org/A5051555808","Martine Cador","Professor / Expert","","",2363,8805,50
+"https://openalex.org/A5090578339","Hiroshi Nakamura","Professor / Expert","","",2363,24565,72
+"https://openalex.org/A5068296211","G. Gomez Ceballos","Professor / Expert","","",2362,123246,149
+"https://openalex.org/A5100601229","S. Tosi","Professor / Expert","","",2362,121614,150
+"https://openalex.org/A5053074659","Loı̈c Le Marchand","Professor / Expert","","",2361,98651,141
+"https://openalex.org/A5101862104","Hui Xiong","Professor / Expert","","",2360,45759,89
+"https://openalex.org/A5002177924","B. Blumenfeld","Professor / Expert","","",2359,124543,149
+"https://openalex.org/A5024766312","Peter H. Adler","Professor / Expert","","",2359,8428,42
+"https://openalex.org/A5025944326","Mat­thias Zeller","Professor / Expert","","",2359,18553,61
+"https://openalex.org/A5106382331","M. Gallinaro","Professor / Expert","","",2358,134660,152
+"https://openalex.org/A5033717261","O. Schneider","Professor / Expert","","",2355,136889,144
+"https://openalex.org/A5035627473","William A. Goddard","Professor / Expert","","",2353,177827,184
+"https://openalex.org/A5108337108","Y. Wu","Professor / Expert","","",2353,112245,146
+"https://openalex.org/A5081499203","Rui L. Reis","Professor / Expert","","",2351,102860,147
+"https://openalex.org/A5034165453","Seeram Ramakrishna","Professor / Expert","","",2349,180001,197
+"https://openalex.org/A5036163332","Amirhossein Sahebkar","Professor / Expert","","",2348,240601,176
+"https://openalex.org/A5057871048","David L. Kaplan","Professor / Expert","","",2348,166381,196
+"https://openalex.org/A5013507311","Craig Hacking","Postdoc / Early Career","","",2344,420,9
+"https://openalex.org/A5032850756","Vince D. Calhoun","Professor / Expert","","",2342,108415,150
+"https://openalex.org/A5037658956","L. Fabbri","Professor / Expert","","",2342,160473,174
+"https://openalex.org/A5042202815","Jean‐Yves Blay","Professor / Expert","","",2342,94707,157
+"https://openalex.org/A5072449178","V. Bhatnagar","Professor / Expert","","",2341,130635,149
+"https://openalex.org/A5106313080","A. Rossi","Professor / Expert","","",2341,148881,162
+"https://openalex.org/A5013003026","Frank Lammert","Professor / Expert","","",2340,31335,91
+"https://openalex.org/A5002279235","Ron Waksman","Professor / Expert","","",2339,55265,109
+"https://openalex.org/A5048675362","Pasi A. Jänne","Professor / Expert","","",2339,126649,163
+"https://openalex.org/A5034597750","Ricardo Amils","Professor / Expert","","",2338,19874,60
+"https://openalex.org/A5051538410","Gunnar Alexander Schmitz","Assistant Professor / Researcher","","",2338,2262,18
+"https://openalex.org/A5002275174","Jaakko Kaprio","Professor / Expert","","",2336,193041,184
+"https://openalex.org/A5044633009","C. M. Hawkes","Professor / Expert","","",2335,130815,151
+"https://openalex.org/A5079752137","Dorret I. Boomsma","Professor / Expert","","",2335,185954,203
+"https://openalex.org/A5107061555","A. Ivanov","Professor / Expert","","",2332,141890,159
+"https://openalex.org/A5071296637","Pavlo Bohutskyi","Assistant Professor / Researcher","","",2330,1870,18
+"https://openalex.org/A5133644099","William Kew","Student / Beginner","","",2330,0,0
+"https://openalex.org/A5069151214","Peter R. Galle","Professor / Expert","","",2329,107619,128
+"https://openalex.org/A5075012306","Ulrich S. Schubert","Professor / Expert","","",2327,101017,138
+"https://openalex.org/A5018210688","Patrick De Clercq","Professor / Expert","","",2326,10719,54
+"https://openalex.org/A5031846245","P. Elmer","Professor / Expert","","",2325,112807,145
+"https://openalex.org/A5056577532","N. Louise Glass","Professor / Expert","","",2325,20037,72
+"https://openalex.org/A5043408422","Luca Benini","Professor / Expert","","",2324,57728,107
+"https://openalex.org/A5046737002","M. Bóna","Professor / Expert","","",2323,128889,157
+"https://openalex.org/A5068632927","T. J. Kim","Professor / Expert","","",2323,133355,149
+"https://openalex.org/A5073761054","Giovanni Martinelli","Professor / Expert","","",2323,60149,112
+"https://openalex.org/A5101436495","S. Li","Professor / Expert","","",2321,160501,176
+"https://openalex.org/A5100765571","Arun Kumar","Professor / Expert","","",2320,145794,157
+"https://openalex.org/A5049385583","Elias Jabbour","Professor / Expert","","",2319,56185,115
+"https://openalex.org/A5134920942","Elizabeth Eder","Student / Beginner","","",2318,0,0
+"https://openalex.org/A5047563454","Silvio Danese","Professor / Expert","","",2317,87734,140
+"https://openalex.org/A5053481267","Razelle Kurzrock","Professor / Expert","","",2315,87995,145
+"https://openalex.org/A5080220991","K. H. Nicolaides","Professor / Expert","","",2314,135770,176
+"https://openalex.org/A5081316842","Herbert W. Roesky","Professor / Expert","","",2313,47006,91
+"https://openalex.org/A5106324797","G. Hamel de Monchenault","Professor / Expert","","",2313,130830,151
+"https://openalex.org/A5023684409","Anthony Linden","Professor / Expert","","",2312,14982,57
+"https://openalex.org/A5000311800","Kirsten Hofmockel","Professor / Expert","","",2309,15689,50
+"https://openalex.org/A5075296559","Guido Kroemer","Professor / Expert","","",2308,373371,284
+"https://openalex.org/A5056193352","A. Dominguez","Professor / Expert","","",2307,123001,147
+"https://openalex.org/A5086816309","J. Reedijk","Professor / Expert","","",2303,61878,98
+"https://openalex.org/A5087421071","Gary King","Professor / Expert","","",2303,66631,93
+"https://openalex.org/A5080500381","Fereidoun Azizi","Professor / Expert","","",2300,78418,108
+"https://openalex.org/A5041020801","Dierk Raabe","Professor / Expert","","",2297,119139,180
+"https://openalex.org/A5004420462","Yoshihiko Maehara","Professor / Expert","","",2296,55567,106
+"https://openalex.org/A5054928610","‬Peter C. Junk","Professor / Expert","","",2291,14780,59
+"https://openalex.org/A5033040903","Henrik Toft Sørensen","Professor / Expert","","",2290,111299,145
+"https://openalex.org/A5067511554","Roberto Romero","Professor / Expert","","",2290,149629,182
+"https://openalex.org/A5090587420","Song Feng","Assistant Professor / Researcher","","",2290,1181,14
+"https://openalex.org/A5106552509","C. Sciacca","Professor / Expert","","",2287,100244,129
+"https://openalex.org/A5086797953","Henry Knipe","Postdoc / Early Career","","",2286,509,9
+"https://openalex.org/A5030335492","Yan Zhang","Professor / Expert","","",2285,12564,55
+"https://openalex.org/A5108337100","A. Mehta","Professor / Expert","","",2284,118000,144
+"https://openalex.org/A5034713503","Bartek Rajwa","Associate Professor","","",2283,6146,31
+"https://openalex.org/A5009533777","Dennis W. Dickson","Professor / Expert","","",2279,231881,219
+"https://openalex.org/A5102770958","John E. Bowers","Professor / Expert","","",2279,65640,126
+"https://openalex.org/A5107678348","P. Kyberd","Professor / Expert","","",2277,120893,148
+"https://openalex.org/A5028284770","Yuichiro� Doki","Professor / Expert","","",2276,51716,102
+"https://openalex.org/A5035919267","Victor C. M. Leung","Professor / Expert","","",2274,66968,116
+"https://openalex.org/A5048865240","John D. Minna","Professor / Expert","","",2274,114381,174
+"https://openalex.org/A5089798153","Keith J. Mbata","Postdoc / Early Career","","",2274,271,7
+"https://openalex.org/A5114376833","G. Gómez","Professor / Expert","","",2272,128789,148
+"https://openalex.org/A5050885958","Z. Doležal","Professor / Expert","","",2269,123805,150
+"https://openalex.org/A5055290893","A. Stahl","Professor / Expert","","",2269,167326,149
+"https://openalex.org/A5111385619","Yang Hao","Professor / Expert","","",2268,17962,63
+"https://openalex.org/A5057285218","Robert H. Anderson","Professor / Expert","","",2267,51436,109
+"https://openalex.org/A5100421454","Yi Li","Professor / Expert","","",2267,42237,96
+"https://openalex.org/A5044522566","M. Bruze","Professor / Expert","","",2265,23561,69
+"https://openalex.org/A5013491544","David J. Smith","Professor / Expert","","",2264,36848,87
+"https://openalex.org/A5066364056","K. E. Varvell","Professor / Expert","","",2262,129259,156
+"https://openalex.org/A5042792908","John Gould","Assistant Professor / Researcher","","",2261,1355,19
+"https://openalex.org/A5100454174","Jie Liu","Professor / Expert","","",2261,96263,151
+"https://openalex.org/A5106580283","J. Nash","Professor / Expert","","",2261,128029,153
+"https://openalex.org/A5004980433","D. R. Claes","Professor / Expert","","",2260,124836,146
+"https://openalex.org/A5049546780","E. L. Barberio","Professor / Expert","","",2260,145297,157
+"https://openalex.org/A5052631324","Jean‐Christophe Rochet","Professor / Expert","","",2259,14533,45
+"https://openalex.org/A5057781163","Issei Komuro","Professor / Expert","","",2258,67419,125
+"https://openalex.org/A5007309669","Konrad Sandhoff","Professor / Expert","","",2257,35971,103
+"https://openalex.org/A5100415738","Jae Wook Lee","Professor / Expert","","",2257,43873,93
+"https://openalex.org/A5047427644","Alexander Villinger","Professor / Expert","","",2256,9469,41
+"https://openalex.org/A5101833024","Hui Wang","Associate Professor","","",2256,3741,32
+"https://openalex.org/A5020215901","Ole A. Andreassen","Professor / Expert","","",2255,152135,157
+"https://openalex.org/A5007230772","Michael Currie","Postdoc / Early Career","","",2254,946,8
+"https://openalex.org/A5020989412","Jesús F. San Miguel","Professor / Expert","","",2253,127624,159
+"https://openalex.org/A5054306814","Marc D. Binder","Professor / Expert","","",2253,23157,64
+"https://openalex.org/A5109829072","Marí­a Teresa","Assistant Professor / Researcher","","",2252,1640,15
+"https://openalex.org/A5056177451","Yang Liu","Associate Professor","","",2251,2767,24
+"https://openalex.org/A5040446749","Roberto Esser dos Reis","Associate Professor","","",2250,8524,35
+"https://openalex.org/A5108053209","A. Ruiz-Jimeno","Professor / Expert","","",2250,126363,146
+"https://openalex.org/A5045504446","Stefan Zeuzem","Professor / Expert","","",2249,90722,130
+"https://openalex.org/A5100460802","Hui Wang","Professor / Expert","","",2249,73189,113
+"https://openalex.org/A5072068792","Kyung‐Ho Kim","Professor / Expert","","",2246,6311,42
+"https://openalex.org/A5045818888","D. G. Charlton","Professor / Expert","","",2242,124816,149
+"https://openalex.org/A5041573362","Manfred Scheer","Professor / Expert","","",2240,16462,63
+"https://openalex.org/A5090795384","Ben W. Mol","Professor / Expert","","",2240,80959,131
+"https://openalex.org/A5100665512","Jianmin Chen","Professor / Expert","","",2240,86050,119
+"https://openalex.org/A5009391886","Michael Boyle","Professor / Expert","","",2239,14384,47
+"https://openalex.org/A5053733868","Paul Newhouse","Professor / Expert","","",2239,13593,63
+"https://openalex.org/A5043623012","William Breitbart","Professor / Expert","","",2238,31422,86
+"https://openalex.org/A5101683824","Alexander K. C. Leung","Assistant Professor / Researcher","","",2237,1416,16
+"https://openalex.org/A5042231804","A. Korytov","Professor / Expert","","",2235,121960,150
+"https://openalex.org/A5053378123","R. Wallny","Professor / Expert","","",2235,124812,149
+"https://openalex.org/A5014075642","David A. Bennett","Professor / Expert","","",2234,183384,197
+"https://openalex.org/A5025724032","L. Masetti","Professor / Expert","","",2234,168860,177
+"https://openalex.org/A5053079398","Sabu Thomas","Professor / Expert","","",2233,87508,134
+"https://openalex.org/A5005182277","Matthias Beller","Professor / Expert","","",2232,128994,175
+"https://openalex.org/A5060617034","Jian Wang","Assistant Professor / Researcher","","",2232,1018,16
+"https://openalex.org/A5040977229","Chi‐Ming Che","Professor / Expert","","",2231,85022,140
+"https://openalex.org/A5064072134","G. Alverson","Professor / Expert","","",2231,114266,143
+"https://openalex.org/A5019779057","İbrahim Dinçer","Professor / Expert","","",2230,107863,153
+"https://openalex.org/A5101648494","Marcelo Salles Rocha","Postdoc / Early Career","","",2229,347,9
+"https://openalex.org/A5106263427","S. Grinstein","Professor / Expert","","",2229,126305,151
+"https://openalex.org/A5047552541","J.-F. Grivaz","Professor / Expert","","",2228,138750,151
+"https://openalex.org/A5061631272","Ronald Klein","Professor / Expert","","",2225,212885,229
+"https://openalex.org/A5051542986","Josie Hansen","Assistant Professor / Researcher","","",2224,1302,16
+"https://openalex.org/A5058193339","Peter Weber","Professor / Expert","","",2224,20437,67
+"https://openalex.org/A5083040858","G. Landsberg","Professor / Expert","","",2221,125922,148
+"https://openalex.org/A5040201243","Samuel Payne","Professor / Expert","","",2220,15510,53
+"https://openalex.org/A5080162226","Hua Zhang","Associate Professor","","",2220,6896,34
+"https://openalex.org/A5106324687","B. Kilminster","Professor / Expert","","",2220,114922,144
+"https://openalex.org/A5061926369","Eduard Vieta","Professor / Expert","","",2219,103817,154
+"https://openalex.org/A5062459935","K. F. Chen","Professor / Expert","","",2219,135861,158
+"https://openalex.org/A5055785355","Ara Darzi","Professor / Expert","","",2217,98252,153
+"https://openalex.org/A5100320398","Bo Zhang","Professor / Expert","","",2217,19565,57
+"https://openalex.org/A5064280165","Geoffrey Lovelace","Professor / Expert","","",2215,64522,68
+"https://openalex.org/A5077849176","P. Wittich","Professor / Expert","","",2215,125950,149
+"https://openalex.org/A5081571915","Armando J. L. Pombeiro","Professor / Expert","","",2215,37059,86
+"https://openalex.org/A5055429882","P. D. Thompson","Professor / Expert","","",2213,151297,170
+"https://openalex.org/A5017534724","H. Castilla-Valdez","Professor / Expert","","",2212,118168,143
+"https://openalex.org/A5100329996","Xi Chen","Professor / Expert","","",2212,58355,113
+"https://openalex.org/A5100632072","Yi‐Long Wu","Professor / Expert","","",2212,112574,135
+"https://openalex.org/A5066374036","Walter Leal Filho","Professor / Expert","","",2211,37014,94
+"https://openalex.org/A5070743713","И.Л. Еременко","Associate Professor","","",2211,8966,37
+"https://openalex.org/A5082059107","Marc Humbert","Professor / Expert","","",2211,160897,178
+"https://openalex.org/A5091653870","Stephen J. Chanock","Professor / Expert","","",2211,127363,170
+"https://openalex.org/A5100318325","Wěi Li","Professor / Expert","","",2211,73324,108
+"https://openalex.org/A5034209487","H. R. Qi","Professor / Expert","","",2210,32412,78
+"https://openalex.org/A5100346092","Huijun Li","Professor / Expert","","",2208,36992,88
+"https://openalex.org/A5072693225","L. N. Pfeiffer","Professor / Expert","","",2207,58573,122
+"https://openalex.org/A5077298972","H. F-W. Sadrozinski","Professor / Expert","","",2207,149776,173
+"https://openalex.org/A5077801380","Iván Izquierdo","Professor / Expert","","",2207,32423,89
+"https://openalex.org/A5031717153","Gordon Guyatt","Professor / Expert","","",2206,306902,258
+"https://openalex.org/A5034179596","Toyoaki Murohara","Professor / Expert","","",2206,62019,105
+"https://openalex.org/A5100419770","Yong Zhang","Professor / Expert","","",2206,72474,125
+"https://openalex.org/A5109248108","Zhong‐Min Su","Professor / Expert","","",2206,61123,110
+"https://openalex.org/A5106923474","Larry Kidder","Associate Professor","","",2205,9615,34
+"https://openalex.org/A5108167662","H. Evans","Professor / Expert","","",2205,134258,150
+"https://openalex.org/A5053563726","Ursula Schmidt‐Erfurth","Professor / Expert","","",2204,42430,90
+"https://openalex.org/A5084577264","V. Gavrilov","Professor / Expert","","",2204,125313,146
+"https://openalex.org/A5056890979","M. Klein","Professor / Expert","","",2202,141920,162
+"https://openalex.org/A5107390047","F. Canelli","Professor / Expert","","",2202,116003,143
+"https://openalex.org/A5017160240","John G.F. Cleland","Professor / Expert","","",2201,197434,175
+"https://openalex.org/A5026574827","Shaji Kumar","Professor / Expert","","",2201,94674,136
+"https://openalex.org/A5061102588","E. Thomson","Professor / Expert","","",2201,124180,150
+"https://openalex.org/A5014328916","M. Shapiro","Professor / Expert","","",2200,134174,157
+"https://openalex.org/A5043059300","G. Lafferty","Professor / Expert","","",2200,84491,127
+"https://openalex.org/A5084723908","Francis Martin","Professor / Expert","","",2200,60438,116
+"https://openalex.org/A5100388089","Yi Zhang","Professor / Expert","","",2200,97991,104
+"https://openalex.org/A5080142922","S. Majewski","Professor / Expert","","",2199,119540,149
+"https://openalex.org/A5102719307","Richard White","Associate Professor","","",2199,3146,26
+"https://openalex.org/A5100715629","L. Scodellaro","Professor / Expert","","",2198,127203,149
+"https://openalex.org/A5048654077","Béla Szilágyi","Professor / Expert","","",2197,15389,53
+"https://openalex.org/A5056468812","R. J. Wilson","Professor / Expert","","",2197,105617,154
+"https://openalex.org/A5057574653","Gene‐Hsiang Lee","Professor / Expert","","",2197,27623,71
+"https://openalex.org/A5011544267","Cameron Casey","Associate Professor","","",2196,3401,23
+"https://openalex.org/A5100382667","Xiaodong Wang","Professor / Expert","","",2196,40398,99
+"https://openalex.org/A5100422786","Qian Wang","Professor / Expert","","",2196,58219,102
+"https://openalex.org/A5051078160","David R. Jacobs","Professor / Expert","","",2194,149425,179
+"https://openalex.org/A5135118114","Weijun Qian","Student / Beginner","","",2194,0,0
+"https://openalex.org/A5047124260","Sujin Kim","Postdoc / Early Career","","",2193,409,8
+"https://openalex.org/A5067964738","Jeong Hee Kim","Assistant Professor / Researcher","","",2193,1295,15
+"https://openalex.org/A5024633466","Guanrong Chen","Professor / Expert","","",2192,113789,154
+"https://openalex.org/A5022262922","Hai Jin","Professor / Expert","","",2190,33179,79
+"https://openalex.org/A5066436685","Yavin Shaham","Professor / Expert","","",2190,37338,109
+"https://openalex.org/A5087959120","Andrew J. P. White","Professor / Expert","","",2190,47837,98
+"https://openalex.org/A5108010872","R. D’Alessandro","Professor / Expert","","",2190,112969,141
+"https://openalex.org/A5079278711","Hyun‐Seob Song","Associate Professor","","",2188,2588,31
+"https://openalex.org/A5020866795","Darryl C. Zeldin","Professor / Expert","","",2187,33892,98
+"https://openalex.org/A5024923217","Saharon Shelah","Professor / Expert","","",2187,23478,64
+"https://openalex.org/A5031569307","Lúcia Helena Rapp Py‐Daniel","Assistant Professor / Researcher","","",2186,965,16
+"https://openalex.org/A5068835941","Andrew T. Chan","Professor / Expert","","",2186,80456,136
+"https://openalex.org/A5118899500","J. Kroll","Professor / Expert","","",2184,137045,155
+"https://openalex.org/A5057257626","Seung Hwan Lee","Professor / Expert","","",2182,16508,64
+"https://openalex.org/A5071446330","George A. Olah","Professor / Expert","","",2181,64876,107
+"https://openalex.org/A5012785903","Zachary Lewis","Postdoc / Early Career","","",2180,1122,8
+"https://openalex.org/A5106482967","L. Sawyer","Professor / Expert","","",2180,129160,149
+"https://openalex.org/A5074727212","Valentı́n Fuster","Professor / Expert","","",2179,252251,220
+"https://openalex.org/A5011316965","Tzu-Wen Cross","Associate Professor","","",2178,1590,23
+"https://openalex.org/A5027189046","Владимир И. Минкин","Professor / Expert","","",2177,13584,45
+"https://openalex.org/A5101987748","J. M. Butterworth","Professor / Expert","","",2175,145378,164
+"https://openalex.org/A5011359523","Evamarie Hey‐Hawkins","Professor / Expert","","",2173,13009,43
+"https://openalex.org/A5100430015","Q. Li","Professor / Expert","","",2172,96460,135
+"https://openalex.org/A5035988449","D. Belsito","Professor / Expert","","",2171,18362,66
+"https://openalex.org/A5083833040","A. Safonov","Professor / Expert","","",2170,112839,144
+"https://openalex.org/A5100727282","Daniel S. Berman","Professor / Expert","","",2170,113908,161
+"https://openalex.org/A5100741889","D. Del Re","Professor / Expert","","",2170,125718,150
+"https://openalex.org/A5076304854","P. Krokovny","Professor / Expert","","",2167,75848,131
+"https://openalex.org/A5078882374","Michael Berk","Professor / Expert","","",2167,106224,154
+"https://openalex.org/A5001188770","Hiroshi Okamoto","Professor / Expert","","",2166,41754,94
+"https://openalex.org/A5107498166","C. Leroy","Professor / Expert","","",2163,126533,153
+"https://openalex.org/A5007568357","Georgy K. Fukin","Professor / Expert","","",2161,11924,49
+"https://openalex.org/A5022553846","Joseph H. Friedman","Professor / Expert","","",2160,22335,79
+"https://openalex.org/A5135052613","Jennifer Kyle","Student / Beginner","","",2160,0,0
+"https://openalex.org/A5033633287","Henry F. Schaefer","Professor / Expert","","",2159,90910,128
+"https://openalex.org/A5043652685","Y. Tokura","Professor / Expert","","",2159,18144,59
+"https://openalex.org/A5100600335","G. Hall","Professor / Expert","","",2159,109732,143
+"https://openalex.org/A5002280928","Maggie Bowman","Postdoc / Early Career","","",2158,303,8
+"https://openalex.org/A5014873928","Victor N. Khrustalev","Professor / Expert","","",2158,11361,44
+"https://openalex.org/A5075670673","Y. G.","Professor / Expert","","",2158,80096,132
+"https://openalex.org/A5075991130","K. K. Gan","Professor / Expert","","",2158,118785,147
+"https://openalex.org/A5063987582","T. Adams","Professor / Expert","","",2157,119087,149
+"https://openalex.org/A5135054219","Nikola Tolic","Student / Beginner","","",2157,0,0
+"https://openalex.org/A5133415705","Juan Moisés De la Serna","Student / Beginner","","",2156,0,0
+"https://openalex.org/A5106323625","K. Lannon","Professor / Expert","","",2155,116084,145
+"https://openalex.org/A5085382896","S. Burdin","Professor / Expert","","",2154,131064,151
+"https://openalex.org/A5030800645","T. Ferguson","Professor / Expert","","",2153,114988,143
+"https://openalex.org/A5052424875","J. Nielsen","Professor / Expert","","",2153,133685,156
+"https://openalex.org/A5016511599","Werner Seeger","Professor / Expert","","",2152,75973,129
+"https://openalex.org/A5108166859","E. Shabalina","Professor / Expert","","",2152,127492,149
+"https://openalex.org/A5043109251","J. S. H. Lee","Professor / Expert","","",2151,142932,155
+"https://openalex.org/A5012173547","Ning Li","Professor / Expert","","",2150,11308,55
+"https://openalex.org/A5018419311","Salim Yusuf","Professor / Expert","","",2150,292810,264
+"https://openalex.org/A5048654641","Alberto Mantovani","Professor / Expert","","",2150,220236,203
+"https://openalex.org/A5061664830","K. De","Professor / Expert","","",2150,134079,152
+"https://openalex.org/A5067647817","Masaki Mori","Professor / Expert","","",2149,61501,112
+"https://openalex.org/A5085489146","C. N. R. Rao","Professor / Expert","","",2149,98543,150
+"https://openalex.org/A5007042386","Christos C. Zouboulis","Professor / Expert","","",2148,45153,108
+"https://openalex.org/A5078498803","Naveed Sattar","Professor / Expert","","",2148,208528,206
+"https://openalex.org/A5102849626","S. M. Farrington","Professor / Expert","","",2148,125241,153
+"https://openalex.org/A5135251810","Jennifer Kyle","Student / Beginner","","",2148,0,0
+"https://openalex.org/A5038487413","P. P. Allport","Professor / Expert","","",2147,126752,150
+"https://openalex.org/A5066778729","Cheng Shi","Postdoc / Early Career","","",2147,187,4
+"https://openalex.org/A5027033208","Peter Paul De Deyn","Professor / Expert","","",2146,47632,102
+"https://openalex.org/A5022712318","Franco Locatelli","Professor / Expert","","",2145,72013,126
+"https://openalex.org/A5088055007","G. A. Alves","Professor / Expert","","",2145,125280,145
+"https://openalex.org/A5036508375","M. Lokajı́ček","Professor / Expert","","",2144,133139,153
+"https://openalex.org/A5062225093","J. Jia","Professor / Expert","","",2144,135215,163
+"https://openalex.org/A5078048335","R. Lipton","Professor / Expert","","",2143,124573,147
+"https://openalex.org/A5088765788","H. Fox","Professor / Expert","","",2142,132050,152
+"https://openalex.org/A5000937401","Dinggang Shen","Professor / Expert","","",2140,84922,143
+"https://openalex.org/A5005594888","R. Klanner","Professor / Expert","","",2140,116919,145
+"https://openalex.org/A5024593161","A. Sánchez-Hernández","Professor / Expert","","",2139,124812,145
+"https://openalex.org/A5106762330","W. Taylor","Professor / Expert","","",2139,128108,152
+"https://openalex.org/A5071143789","J. Qian","Professor / Expert","","",2137,128827,149
+"https://openalex.org/A5135048657","Chia-Feng Tsai","Student / Beginner","","",2137,0,0
