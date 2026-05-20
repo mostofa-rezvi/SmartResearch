@@ -11,7 +11,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Config
-DB_URL = os.getenv("DATABASE_URL", "postgresql://postgres:postgres@localhost:5432/researchbridge")
+DB_URL = os.getenv("DATABASE_URL", "postgresql://postgres:postgres@localhost:5434/researchbridge")
 NEO4J_URI = os.getenv("NEO4J_URI", "bolt://localhost:7687")
 NEO4J_AUTH = os.getenv("NEO4J_AUTH", "neo4j/password").split("/")
 

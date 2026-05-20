@@ -42,6 +42,7 @@ export const API = {
   discovery: {
     search: `${API_BASE}/api/v1/discovery/search`,
     save: `${API_BASE}/api/v1/discovery/save`,
+    recommendations: `${API_BASE}/api/v1/discovery/recommendations`,
   },
   // Library domain
   library: {
@@ -89,5 +90,7 @@ export const API = {
   onboarding: {
     questions: `${API_BASE}/api/v1/onboarding/questions`,
     questionsFlat: `${API_BASE}/api/v1/onboarding/questions/flat`,
+    userInterests: `${API_BASE}/api/v1/onboarding/user-interests`,
+    userAnswers: `${API_BASE}/api/v1/onboarding/user-answers`,
   },
 } as const;

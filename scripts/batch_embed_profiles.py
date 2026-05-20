@@ -11,7 +11,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Config
-DB_URL = os.getenv("DATABASE_URL", "postgresql://postgres:postgres@localhost:5432/researchbridge")
+DB_URL = os.getenv("DATABASE_URL", "postgresql://postgres:postgres@localhost:5434/researchbridge")
 ML_SERVICE_URL = os.getenv("ML_SERVICE_URL", "http://localhost:8000/embed")
 ES_URL = os.getenv("ELASTICSEARCH_URL", "http://localhost:9200")
 
@@ -29,7 +29,7 @@ def batch_embed():
     es = Elasticsearch(ES_URL)
 
     # 3. Fetch profiles
-    cur.execute("SELECT id, bio, interests FROM profiles")
+    cur.execute("SELECT id, name, role, institution, research_interests FROM researcher_profiles")
     profiles = cur.fetchall()
     logger.info(f"Found {len(profiles)} profiles to process")
 
@@ -38,10 +38,18 @@ def batch_embed():
     for i in range(0, len(profiles), batch_size):
         batch = profiles[i:i + batch_size]
         
-        # Construct text for embedding (bio + interests)
+        # Construct text for embedding
         texts = []
         for p in batch:
-            text = f"{p.get('bio', '')} {p.get('interests', '')}".strip()
+            interests = p.get('research_interests') or []
+            if isinstance(interests, str):
+                try:
+                    import json
+                    interests = json.loads(interests)
+                except:
+                    pass
+            interests_str = ", ".join(interests) if isinstance(interests, list) else str(interests)
+            text = f"Researcher {p.get('name', '')}, Role: {p.get('role', '')}, Institution: {p.get('institution', '')}. Interests: {interests_str}"
             texts.append(text or "empty profile")
 
         # 5. Get embeddings from ML service

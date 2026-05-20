@@ -95,12 +95,20 @@ export default function ProfilePage() {
           </div>
           
           {isOwnProfile && (
-            <button 
-              onClick={() => setIsEditModalOpen(true)}
-              className="px-6 py-2.5 bg-slate-100  text-slate-600  font-bold rounded-xl flex items-center gap-2 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
-            >
-              <Settings size={18} /> Edit Profile
-            </button>
+            <div className="flex flex-col gap-2 shrink-0">
+              <button 
+                onClick={() => setIsEditModalOpen(true)}
+                className="px-6 py-2.5 bg-slate-100 text-slate-600 font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors w-full"
+              >
+                <Settings size={18} /> Edit Profile
+              </button>
+              <Link 
+                href="/profile/edit-interests"
+                className="px-6 py-2.5 bg-primary/10 text-primary font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-primary/20 transition-all border border-primary/20 text-xs w-full text-center"
+              >
+                <Microscope size={16} /> Edit Interests
+              </Link>
+            </div>
           )}
         </div>
       </div>

@@ -52,6 +52,98 @@ class DiscoveryService {
     }
   }
 
+  async getRecommendationsFromOnboarding(userId) {
+    try {
+      // 1. Fetch user onboarding answers
+      const answersResult = await db.query(
+        `SELECT q.question_text, a.answer_data 
+         FROM onboarding_answers a
+         JOIN onboarding_questions q ON a.question_id = q.id
+         WHERE a.user_id = $1 AND q.section IN ('focus', 'identity', 'publication')`,
+        [userId]
+      );
+      
+      let userInterests = [];
+      answersResult.rows.forEach(r => {
+        let ans = [];
+        try { ans = JSON.parse(r.answer_data); } catch (e) { ans = [r.answer_data]; }
+        if (Array.isArray(ans)) {
+          userInterests = userInterests.concat(ans);
+        } else if (typeof ans === 'string') {
+          userInterests.push(ans);
+        }
+      });
+      
+      const profile_text = userInterests.join(', ');
+
+      // 2. Call ML Service
+      let mlResults = [];
+      try {
+        const mlResponse = await axios.post(`${ML_SERVICE_URL}/recommendations/${userId}`, {
+          profile_text: profile_text
+        });
+        if (mlResponse.data && mlResponse.data.recommendations) {
+          mlResults = mlResponse.data.recommendations; // format: [[id, score], ...]
+        }
+      } catch (mlErr) {
+        logger.error('Failed to call ML service for recommendations', mlErr.message);
+      }
+
+      // 3. Fallback: If ML service is down or returned empty, fetch popular researchers directly
+      if (!mlResults || mlResults.length === 0) {
+        logger.info('Using popular researchers fallback in Node layer.');
+        const popular = await db.query(
+          `SELECT id, cited_by_count FROM researcher_profiles ORDER BY cited_by_count DESC NULLS LAST LIMIT 10`
+        );
+        mlResults = popular.rows.map(r => [r.id, Math.min(0.99, (r.cited_by_count || 0) / 1000000.0)]);
+      }
+
+      if (!mlResults.length) return [];
+
+      // 3. Fetch researcher profiles for the recommended IDs
+      const recommendedIds = mlResults.map(r => r[0]); // Extracted IDs
+      
+      const researchers = await db.query(
+        `SELECT id, name, role, institution, country, works_count, cited_by_count, h_index, research_interests 
+         FROM researcher_profiles 
+         WHERE id = ANY($1::varchar[])`,
+        [recommendedIds]
+      );
+
+      // 4. Map scores to researchers and sort
+      const mappedResearchers = researchers.rows.map(researcher => {
+        // Find the matching ML result to get the score
+        const match = mlResults.find(r => r[0] === researcher.id);
+        const score = match ? match[1] : 0;
+        
+        // Normalize score 0-100 for frontend display (RRF scores are typically small floats like 0.01)
+        // Here we just map it creatively for UI, or use the raw score. We'll give a base 70 + (score * 1000)
+        let similarityScore = Math.min(99, Math.round(70 + (score * 500)));
+
+        return {
+          id: researcher.id,
+          name: researcher.name,
+          institution: researcher.institution,
+          role: researcher.role,
+          country: researcher.country,
+          works_count: researcher.works_count,
+          cited_by_count: researcher.cited_by_count,
+          h_index: researcher.h_index,
+          research_interests: researcher.research_interests,
+          similarityScore,
+        };
+      });
+
+      // Sort by similarity score descending
+      mappedResearchers.sort((a, b) => b.similarityScore - a.similarityScore);
+
+      return mappedResearchers;
+    } catch (err) {
+      logger.error('Error fetching ML recommendations from onboarding', err);
+      throw err;
+    }
+  }
+
   async search(userId, queryText, filters = {}) {
     const esClient = getEsClient();
     const queryVector = queryText ? await this.vectorizeQuery(queryText) : null;

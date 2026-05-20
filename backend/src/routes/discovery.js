@@ -26,4 +26,11 @@ router.get('/suggested-collaborators',
   discoveryController.getSuggestedCollaborators
 );
 
+// @route   GET /api/v1/discovery/recommendations
+// @desc    Find researcher recommendations based on onboarding
+router.get('/recommendations',
+  auth,
+  discoveryController.getRecommendations
+);
+
 module.exports = router;

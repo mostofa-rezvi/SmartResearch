@@ -309,17 +309,44 @@ class AuthController {
   }
 
   async completeOnboarding(req, res, next) {
-    const { interests, preferences } = req.body;
+    const { answers, completedAt } = req.body;
     const userId = req.user.id;
 
     try {
+      await db.query('BEGIN');
+      
+      // Save all answers
+      for (const [questionId, answerData] of Object.entries(answers || {})) {
+        await db.query(
+          `INSERT INTO onboarding_answers (user_id, question_id, answer_data)
+           VALUES ($1, $2, $3)
+           ON CONFLICT (user_id, question_id) DO UPDATE SET answer_data = $3, created_at = NOW()`,
+          [userId, questionId, JSON.stringify(answerData)]
+        );
+      }
+
+      // Update user status
       await db.query(
-        'UPDATE users SET research_interests = $1, onboarding_completed = true, updated_at = NOW() WHERE id = $2',
-        [JSON.stringify({ interests, preferences }), userId]
+        'UPDATE users SET onboarding_completed = true, updated_at = NOW() WHERE id = $1',
+        [userId]
       );
+      
+      await db.query('COMMIT');
+
+      // Clear recommendation cache in Redis to trigger dynamic update
+      try {
+        const redis = getRedisClient();
+        if (redis) {
+          await redis.del(`rec:v1:${userId}`);
+          logger.info(`Cleared recommendation cache in Redis for user ${userId}`);
+        }
+      } catch (redisErr) {
+        logger.error(`Failed to clear recommendation cache: ${redisErr.message}`);
+      }
 
       res.json(envelope({ message: 'Onboarding completed successfully' }));
     } catch (err) {
+      await db.query('ROLLBACK');
       next(err);
     }
   }

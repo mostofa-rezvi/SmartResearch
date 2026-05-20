@@ -2,15 +2,20 @@ import React from "react";
 import { UserPlus, Building, BookOpen } from "lucide-react";
 
 interface CollaboratorCardProps {
+  id?: string;
   name: string;
   institution: string;
   similarityScore: number;
   publications: number;
+  onClick?: () => void;
 }
 
-export function CollaboratorCard({ name, institution, similarityScore, publications }: CollaboratorCardProps) {
+export function CollaboratorCard({ id, name, institution, similarityScore, publications, onClick }: CollaboratorCardProps) {
   return (
-    <div className="bg-white dark:bg-slate-800 rounded-3xl p-6 border border-slate-100 dark:border-slate-700 shadow-sm hover:shadow-xl transition-all group">
+    <div 
+      onClick={onClick}
+      className="bg-white dark:bg-slate-800 rounded-3xl p-6 border border-slate-100 dark:border-slate-700 shadow-sm hover:shadow-xl hover:scale-[1.01] transition-all group cursor-pointer"
+    >
       <div className="flex justify-between items-start mb-6">
         <div className="flex items-center gap-4">
           <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-bold text-xl shadow-md">
@@ -32,7 +37,13 @@ export function CollaboratorCard({ name, institution, similarityScore, publicati
         </div>
       </div>
 
-      <button className="w-full py-3 bg-slate-50 dark:bg-slate-900 hover:bg-primary hover:text-white text-slate-700 dark:text-slate-300 rounded-xl font-bold transition-all flex items-center justify-center gap-2 group/btn">
+      <button 
+        onClick={(e) => {
+          e.stopPropagation();
+          // connect logic if any
+        }}
+        className="w-full py-3 bg-slate-50 dark:bg-slate-900 hover:bg-primary hover:text-white text-slate-700 dark:text-slate-300 rounded-xl font-bold transition-all flex items-center justify-center gap-2 group/btn"
+      >
         <UserPlus size={18} className="group-hover/btn:scale-110 transition-transform" />
         Connect
       </button>

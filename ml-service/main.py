@@ -13,6 +13,12 @@ import logging
 builder = MatrixBuilder()
 cf_engine = CFEngine(builder)
 
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+app = FastAPI(title="ResearchBridge ML Service")
+
 @app.on_event("startup")
 async def startup_event():
     logger.info("Initializing recommendation matrix...")
@@ -20,8 +26,11 @@ async def startup_event():
     builder.build_matrix(data)
     cf_engine.compute_user_similarity()
 
+class RecRequest(BaseModel):
+    profile_text: Optional[str] = None
+
 @app.post("/recommendations/{user_id}")
-async def get_recommendations(user_id: int):
+async def get_recommendations(user_id: int, req: Optional[RecRequest] = None):
     try:
         cache = get_cache()
         # 1. Check Cache
@@ -33,12 +42,57 @@ async def get_recommendations(user_id: int):
         cf_results = cf_engine.get_recommendations(user_id)
         
         # 3. Get CBF Results (Semantic Search based on profile)
-        # Mocking CBF for now as we need profile text fetching logic
-        cbf_results = [] # TODO: Query ES for kNN matches
+        cbf_results = []
+        if req and req.profile_text:
+            model = get_model()
+            vector = cache.get(req.profile_text)
+            if not vector:
+                vector = await asyncio.to_thread(model.encode, req.profile_text)
+                cache.set(req.profile_text, vector)
+                
+            from elasticsearch import Elasticsearch
+            import os
+            es = Elasticsearch(os.getenv("ELASTICSEARCH_URL", "http://localhost:9200"))
+            
+            query = {
+                "knn": {
+                    "field": "embedding",
+                    "query_vector": vector.tolist() if hasattr(vector, 'tolist') else vector,
+                    "k": 20,
+                    "num_candidates": 100
+                }
+            }
+            try:
+                res = es.search(index="profiles", body=query)
+                for hit in res['hits']['hits']:
+                    cbf_results.append((hit['_id'], hit['_score']))
+            except Exception as es_err:
+                logger.error(f"ES search error: {es_err}")
         
         # 4. Merge using RRF
         hybrid_results = rrf_merge(cbf_results, cf_results)
         final_results = hybrid_results[:20]
+
+        # 4.5 Fallback if no matches found (Cold Start)
+        if not final_results:
+            logger.info("No ML recommendations found, applying popular researchers fallback.")
+            try:
+                import psycopg2
+                import os
+                conn = psycopg2.connect(os.getenv("DATABASE_URL", "postgresql://postgres:postgres@localhost:5434/researchbridge"))
+                cur = conn.cursor()
+                # If we have a profile text, we could do basic ILIKE matching, otherwise just top cited
+                cur.execute(
+                    "SELECT id, cited_by_count FROM researcher_profiles ORDER BY cited_by_count DESC NULLS LAST LIMIT 10"
+                )
+                rows = cur.fetchall()
+                for row in rows:
+                    # Append id and a dummy score based on citations
+                    final_results.append((row[0], min(0.99, (row[1] or 0) / 1000000.0)))
+                cur.close()
+                conn.close()
+            except Exception as db_fallback_err:
+                logger.error(f"DB fallback error: {db_fallback_err}")
         
         # 5. Set Cache
         cache.set_rec(user_id, final_results)
@@ -48,11 +102,7 @@ async def get_recommendations(user_id: int):
         logger.error(f"Recommendation error: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
-app = FastAPI(title="ResearchBridge ML Service")
 
 class EmbedRequest(BaseModel):
     text: Union[str, List[str]]

@@ -258,3 +258,36 @@ ALTER TABLE users ADD COLUMN IF NOT EXISTS institution_id INTEGER REFERENCES ins
 INSERT INTO domains (name) VALUES ('Computer Science'), ('Biology'), ('Physics'), ('Medicine'), ('Social Sciences') ON CONFLICT DO NOTHING;
 INSERT INTO goals (name) VALUES ('Find Co-author'), ('Grant Collaboration'), ('Peer Review'), ('Mentorship') ON CONFLICT DO NOTHING;
 
+-- Onboarding System
+CREATE TABLE IF NOT EXISTS onboarding_questions (
+    id SERIAL PRIMARY KEY,
+    section VARCHAR(100) NOT NULL,
+    question_text TEXT NOT NULL,
+    input_type VARCHAR(50) NOT NULL CHECK (input_type IN ('single_choice', 'multi_choice', 'free_text', 'scale')),
+    options JSONB DEFAULT '[]',
+    is_required BOOLEAN DEFAULT TRUE,
+    sort_order INTEGER NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS onboarding_answers (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    question_id INTEGER REFERENCES onboarding_questions(id) ON DELETE CASCADE,
+    answer_data JSONB NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(user_id, question_id)
+);
+
+-- Researcher Profiles for Discovery ML
+CREATE TABLE IF NOT EXISTS researcher_profiles (
+    id VARCHAR(255) PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    role VARCHAR(255),
+    institution VARCHAR(500),
+    country VARCHAR(10),
+    works_count INTEGER DEFAULT 0,
+    cited_by_count INTEGER DEFAULT 0,
+    h_index INTEGER DEFAULT 0,
+    research_interests JSONB DEFAULT '[]',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

@@ -3,7 +3,7 @@ import os
 
 ES_URL = os.getenv("ELASTICSEARCH_URL", "http://localhost:9200")
 
-indices = ["users", "papers", "projects"]
+indices = ["users", "papers", "projects", "profiles"]
 
 def setup_indices():
     for index in indices:

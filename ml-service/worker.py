@@ -46,7 +46,7 @@ async def process_message(msg_id, data):
             es.index(index="profiles", id=profile_id, document={
                 "id": profile_id,
                 "embedding": vector,
-                "updated_at": time.time()
+                "updated_at": int(time.time() * 1000)
             })
             logger.info(f"Generated and stored embedding for profile {profile_id} in ES")
         except Exception as e:

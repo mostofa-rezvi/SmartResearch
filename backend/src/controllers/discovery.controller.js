@@ -30,6 +30,15 @@ class DiscoveryController {
       next(err);
     }
   }
+
+  async getRecommendations(req, res, next) {
+    try {
+      const results = await discoveryService.getRecommendationsFromOnboarding(req.user.id);
+      res.json(envelope(results));
+    } catch (err) {
+      next(err);
+    }
+  }
 }
 
 module.exports = new DiscoveryController();
