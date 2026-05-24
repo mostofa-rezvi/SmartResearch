@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
   LayoutDashboard,
@@ -17,13 +17,67 @@ import {
   Plus
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth, useApi } from "@/context/AuthContext";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { API } from "@/config/api";
+
+interface DashboardData {
+  stats: {
+    posts: number;
+    groups: number;
+    impactScore: number;
+    papersRead: number;
+  };
+  recentActivity: Array<{
+    type: string;
+    title: string;
+    time: string;
+  }>;
+  recommendations: Array<{
+    id: number;
+    title: string;
+    author: string;
+    category: string;
+  }>;
+}
 
 export default function DashboardPage() {
-  const { user, isLoading } = useAuth();
+  const { user, token } = useAuth();
+  const { fetchWithAuth } = useApi();
+  const router = useRouter();
+  const [data, setData] = useState<DashboardData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
 
-  if (isLoading) {
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
+    }
+  };
+
+  useEffect(() => {
+    const fetchDashboard = async () => {
+      try {
+        const res = await fetchWithAuth(API.dashboard.overview);
+        const json = await res.json();
+        if (json.success) {
+          setData(json.data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch dashboard data:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (token) {
+      fetchDashboard();
+    }
+  }, [token]);
+
+  if (isLoading || !data) {
     return <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex items-center justify-center">
       <div className="animate-pulse flex flex-col items-center">
         <div className="w-12 h-12 bg-primary/20 rounded-full mb-4"></div>
@@ -33,23 +87,14 @@ export default function DashboardPage() {
   }
 
   const stats = [
-    { label: "Community Posts", value: "24", icon: <MessageSquare size={20} />, color: "text-blue-500", bg: "bg-blue-50" },
-    { label: "Papers Read", value: "12", icon: <BookOpen size={20} />, iconColor: "text-purple-500", bg: "bg-purple-50" },
-    { label: "Connections", value: "85", icon: <Users size={20} />, iconColor: "text-emerald-500", bg: "bg-emerald-50" },
-    { label: "Impact Score", value: "480", icon: <TrendingUp size={20} />, iconColor: "text-accent", bg: "bg-accent/10" },
+    { label: "Community Posts", value: data.stats.posts.toString(), icon: <MessageSquare size={20} />, color: "text-blue-500", bg: "bg-blue-50" },
+    { label: "Groups Joined", value: data.stats.groups.toString(), icon: <Users size={20} />, iconColor: "text-emerald-500", bg: "bg-emerald-50" },
+    { label: "Papers Read", value: data.stats.papersRead.toString(), icon: <BookOpen size={20} />, iconColor: "text-purple-500", bg: "bg-purple-50" },
+    { label: "Impact Score", value: data.stats.impactScore.toString(), icon: <TrendingUp size={20} />, iconColor: "text-accent", bg: "bg-accent/10" },
   ];
 
-  const recentActivity = [
-    { type: "search", title: "New match for 'Neural Networks'", time: "2 hours ago" },
-    { type: "post", title: "Discussion started in Quantum Biology", time: "5 hours ago" },
-    { type: "save", title: "You saved 'Ethics of AI in Medicine'", time: "Yesterday" },
-  ];
-
-  const recommendations = [
-    { title: "Advanced Calculus for Research", journal: "Nature Math", category: "Mathematics" },
-    { title: "The Neural Link: Fact vs Fiction", journal: "Tech Quarterly", category: "Neuroscience" },
-    { title: "Sustainable Energy in 2027", journal: "Green Research", category: "Engineering" },
-  ];
+  const recentActivity = data.recentActivity || [];
+  const recommendations = data.recommendations || [];
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
@@ -102,16 +147,18 @@ export default function DashboardPage() {
               <div className="relative z-10">
                 <h3 className="text-2xl font-bold mb-2">Smart Discovery</h3>
                 <p className="text-primary-foreground/80 mb-6 max-w-md">Find cutting-edge research papers matched to your profile using our AI engine.</p>
-                <div className="flex gap-2 p-2 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20">
+                <form onSubmit={handleSearch} className="flex gap-2 p-2 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20">
                   <input
                     type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search by topic, DOI or author..."
                     className="flex-1 bg-transparent border-none outline-none text-white placeholder:text-white/50 px-4"
                   />
-                  <button className="bg-white text-primary p-3 rounded-xl hover:scale-95 transition-transform">
+                  <button type="submit" className="bg-white text-primary p-3 rounded-xl hover:scale-95 transition-transform">
                     <Search size={20} />
                   </button>
-                </div>
+                </form>
               </div>
               <Sparkles className="absolute -bottom-4 -right-4 text-white/10 w-48 h-48 -rotate-12" />
             </div>
@@ -120,44 +167,66 @@ export default function DashboardPage() {
             <div>
               <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-6 font-display">Core Research Pillars</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <Link href="/community" className="p-6 rounded-3xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 shadow-xl hover:border-primary transition-all group">
-                  <div className="w-10 h-10 bg-blue-50 dark:bg-blue-900/30 text-blue-500 rounded-xl mb-4 flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all"><MessageSquare size={20} /></div>
-                  <h4 className="font-bold text-slate-900 dark:text-white mb-1">Community</h4>
-                  <p className="text-xs text-slate-500">Engage in global discussions.</p>
-                </Link>
-                <Link href="/groups" className="p-6 rounded-3xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 shadow-xl hover:border-emerald-500 transition-all group">
-                  <div className="w-10 h-10 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-500 rounded-xl mb-4 flex items-center justify-center group-hover:bg-emerald-500 group-hover:text-white transition-all"><Users size={20} /></div>
-                  <h4 className="font-bold text-slate-900 dark:text-white mb-1">Groups</h4>
-                  <p className="text-xs text-slate-500">Collaborate in smaller circles.</p>
-                </Link>
-                <Link href="/library" className="p-6 rounded-3xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 shadow-xl hover:border-amber-500 transition-all group">
+                
+                {/* The Library */}
+                <div className="p-6 rounded-3xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 shadow-xl hover:border-amber-500 transition-all group">
                   <div className="w-10 h-10 bg-amber-50 dark:bg-amber-900/30 text-amber-500 rounded-xl mb-4 flex items-center justify-center group-hover:bg-amber-500 group-hover:text-white transition-all"><BookOpen size={20} /></div>
-                  <h4 className="font-bold text-slate-900 dark:text-white mb-1">Library</h4>
-                  <p className="text-xs text-slate-500">Access curated research papers.</p>
-                </Link>
+                  <h4 className="font-bold text-slate-900 dark:text-white mb-4">The Library</h4>
+                  <div className="flex flex-col gap-2">
+                    <Link href="/library?tier=Q1" className="text-sm font-medium text-slate-600 hover:text-amber-500 dark:text-slate-400 p-2 rounded-lg hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-all flex items-center justify-between">Q1 Publications <ArrowRight size={14}/></Link>
+                    <Link href="/library?tier=Q2" className="text-sm font-medium text-slate-600 hover:text-amber-500 dark:text-slate-400 p-2 rounded-lg hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-all flex items-center justify-between">Q2 Publications <ArrowRight size={14}/></Link>
+                    <Link href="/library" className="text-sm font-medium text-slate-600 hover:text-amber-500 dark:text-slate-400 p-2 rounded-lg hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-all flex items-center justify-between">Journal Directory <ArrowRight size={14}/></Link>
+                    <Link href="/onboarding" className="text-sm font-medium text-slate-600 hover:text-amber-500 dark:text-slate-400 p-2 rounded-lg hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-all flex items-center justify-between">Calibration Hub <ArrowRight size={14}/></Link>
+                  </div>
+                </div>
+
+                {/* The Living Room */}
+                <div className="p-6 rounded-3xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 shadow-xl hover:border-blue-500 transition-all group">
+                  <div className="w-10 h-10 bg-blue-50 dark:bg-blue-900/30 text-blue-500 rounded-xl mb-4 flex items-center justify-center group-hover:bg-blue-500 group-hover:text-white transition-all"><MessageSquare size={20} /></div>
+                  <h4 className="font-bold text-slate-900 dark:text-white mb-4">The Living Room</h4>
+                  <div className="flex flex-col gap-2">
+                    <Link href="/community" className="text-sm font-medium text-slate-600 hover:text-blue-500 dark:text-slate-400 p-2 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all flex items-center justify-between">Methodology Feed <ArrowRight size={14}/></Link>
+                    <Link href="/groups" className="text-sm font-medium text-slate-600 hover:text-blue-500 dark:text-slate-400 p-2 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all flex items-center justify-between">Private Lab Groups <ArrowRight size={14}/></Link>
+                    <Link href="/community?filter=thought" className="text-sm font-medium text-slate-600 hover:text-blue-500 dark:text-slate-400 p-2 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all flex items-center justify-between">Knowledge Streams <ArrowRight size={14}/></Link>
+                    <Link href="/community?filter=question" className="text-sm font-medium text-slate-600 hover:text-blue-500 dark:text-slate-400 p-2 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all flex items-center justify-between">Q&A Exchange <ArrowRight size={14}/></Link>
+                  </div>
+                </div>
+
+                {/* The Discovery Engine */}
+                <div className="p-6 rounded-3xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 shadow-xl hover:border-emerald-500 transition-all group">
+                  <div className="w-10 h-10 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-500 rounded-xl mb-4 flex items-center justify-center group-hover:bg-emerald-500 group-hover:text-white transition-all"><Search size={20} /></div>
+                  <h4 className="font-bold text-slate-900 dark:text-white mb-4">The Discovery Engine</h4>
+                  <div className="flex flex-col gap-2">
+                    <Link href="/discovery" className="text-sm font-medium text-slate-600 hover:text-emerald-500 dark:text-slate-400 p-2 rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-all flex items-center justify-between">Semantic Search <ArrowRight size={14}/></Link>
+                    <Link href="/search" className="text-sm font-medium text-slate-600 hover:text-emerald-500 dark:text-slate-400 p-2 rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-all flex items-center justify-between">DOI Lookup <ArrowRight size={14}/></Link>
+                    <Link href="/dashboard" className="text-sm font-medium text-slate-600 hover:text-emerald-500 dark:text-slate-400 p-2 rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-all flex items-center justify-between">My Research Lab <ArrowRight size={14}/></Link>
+                    <Link href="/support" className="text-sm font-medium text-slate-600 hover:text-emerald-500 dark:text-slate-400 p-2 rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-all flex items-center justify-between">Support Desk <ArrowRight size={14}/></Link>
+                  </div>
+                </div>
+
               </div>
             </div>
 
             {/* Recommendations */}
             <div>
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-2xl font-serif font-black text-primary dark:text-white">Tailored Suggestions</h3>
-                <Link href="/discovery" className="text-secondary text-sm font-black flex items-center gap-1 hover:underline uppercase tracking-wider">
-                  Deep Discovery <ChevronRight size={16} />
+                <h3 className="text-2xl font-serif font-black text-primary dark:text-white">Featured Blogs</h3>
+                <Link href="/blog" className="text-secondary text-sm font-black flex items-center gap-1 hover:underline uppercase tracking-wider">
+                  View All <ChevronRight size={16} />
                 </Link>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {recommendations.map((rec, idx) => (
-                  <div key={idx} className="bg-white dark:bg-slate-800 p-6 rounded-[32px] border border-slate-100 dark:border-slate-700 hover:shadow-2xl transition-all group relative overflow-hidden">
+                  <Link key={idx} href={`/blog/${rec.id}`} className="bg-white dark:bg-slate-800 p-6 rounded-[32px] border border-slate-100 dark:border-slate-700 hover:shadow-2xl transition-all group relative overflow-hidden block">
                     <div className="absolute top-0 right-0 p-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <div className="bg-secondary text-white text-[8px] font-black px-2 py-1 rounded" title="Because you tagged 'Machine Learning' in Onboarding">? WHY THIS</div>
+                      <div className="bg-secondary text-white text-[8px] font-black px-2 py-1 rounded" title="Suggested Blog">READ BLOG</div>
                     </div>
                     <div className="text-[10px] font-black text-secondary mb-3 uppercase tracking-[0.1em]">{rec.category}</div>
                     <h4 className="font-serif font-black text-slate-900 dark:text-white mb-4 line-clamp-3 leading-snug group-hover:text-secondary transition-colors">{rec.title}</h4>
                     <div className="text-[10px] uppercase font-bold text-slate-400 mt-auto flex items-center gap-2">
-                      <FileText size={12} /> {rec.journal}
+                      <FileText size={12} /> {rec.author}
                     </div>
-                  </div>
+                  </Link>
                 ))}
               </div>
             </div>
@@ -177,8 +246,8 @@ export default function DashboardPage() {
                   <span className="text-[10px] font-bold bg-accent/10 text-accent px-3 py-1 rounded-full border border-accent/20">VERIFIED RESEARCHER</span>
                 )}
               </div>
-              <button className="w-full py-3 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 font-bold hover:bg-slate-100 transition-all flex items-center justify-center gap-2">
-                <Settings size={18} /> Edit Profile
+              <button onClick={() => router.push(`/profile/${user?.id}`)} className="w-full py-3 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 font-bold hover:bg-slate-100 transition-all flex items-center justify-center gap-2">
+                <Settings size={18} /> Go to Profile
               </button>
             </div>
 
@@ -191,12 +260,12 @@ export default function DashboardPage() {
                     <div className="w-2 h-2 rounded-full bg-primary mt-2" />
                     <div>
                       <p className="text-sm font-bold text-slate-900 dark:text-white leading-tight mb-1">{activity.title}</p>
-                      <p className="text-xs text-slate-500">{activity.time}</p>
+                      <p className="text-xs text-slate-500">{new Date(activity.time).toLocaleDateString()}</p>
                     </div>
                   </div>
                 ))}
               </div>
-              <button className="w-full mt-8 text-primary text-sm font-bold hover:underline">View History →</button>
+              <button onClick={() => router.push(`/profile/${user?.id}`)} className="w-full mt-8 text-primary text-sm font-bold hover:underline">View History →</button>
             </div>
           </div>
         </div>

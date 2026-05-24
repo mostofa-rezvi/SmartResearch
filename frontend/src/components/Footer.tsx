@@ -49,7 +49,7 @@ export default function Footer() {
               <li><Link href="/discovery" className="hover:text-secondary transition-colors">Semantic Search</Link></li>
               <li><Link href="/search" className="hover:text-secondary transition-colors">DOI Lookup</Link></li>
               <li><Link href="/dashboard" className="hover:text-secondary transition-colors">My Research Lab</Link></li>
-              <li><Link href="/contact" className="hover:text-secondary transition-colors">Support Desk</Link></li>
+              <li><Link href="/support" className="hover:text-secondary transition-colors">Support Desk</Link></li>
             </ul>
           </div>
         </div>

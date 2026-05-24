@@ -139,6 +139,20 @@ CREATE TABLE IF NOT EXISTS saved_papers (
     saved_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Blogs System
+CREATE TABLE IF NOT EXISTS blogs (
+    id SERIAL PRIMARY KEY,
+    title VARCHAR(500) NOT NULL,
+    excerpt TEXT,
+    content TEXT NOT NULL,
+    author_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    category VARCHAR(100),
+    image_url TEXT,
+    status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected')),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Author Follows
 CREATE TABLE IF NOT EXISTS author_follows (
     user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,

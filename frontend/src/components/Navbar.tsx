@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { Search, Users, BookOpen, Compass, MessageSquare, ChevronRight, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { usePathname } from "next/navigation";
 
 export default function Navbar() {
@@ -13,6 +13,18 @@ export default function Navbar() {
   const pathname = usePathname();
 
   const isEditingProfile = pathname === "/onboarding" || pathname === "/profile/edit-interests";
+  const [showResources, setShowResources] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowResources(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   return (
     <>
@@ -74,16 +86,35 @@ export default function Navbar() {
       </div>
 
       <div className="flex items-center gap-6">
-        <div className="hidden md:flex items-center gap-6 text-[15px] font-medium text-slate-500">
-          <Link href="/about" className="hover:text-primary transition-colors">About</Link>
-          <Link href="/support" className="hover:text-primary transition-colors">Support</Link>
+        <div className="hidden md:flex items-center gap-6 text-[15px] font-medium text-slate-500 relative" ref={dropdownRef}>
+          <button 
+            onClick={() => setShowResources(!showResources)}
+            className="flex items-center gap-1 hover:text-primary transition-colors focus:outline-none"
+          >
+            Resources <ChevronRight size={14} className={`transform transition-transform ${showResources ? 'rotate-90' : ''}`} />
+          </button>
+          
+          <AnimatePresence>
+            {showResources && (
+              <motion.div 
+                initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                className="absolute top-10 left-1/2 -translate-x-1/2 w-48 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-700 py-2 flex flex-col z-50 overflow-hidden"
+              >
+                <Link href="/about" onClick={() => setShowResources(false)} className="px-5 py-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 hover:text-primary transition-colors">About</Link>
+                <Link href="/blog" onClick={() => setShowResources(false)} className="px-5 py-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 hover:text-primary transition-colors">Blog</Link>
+                <Link href="/support" onClick={() => setShowResources(false)} className="px-5 py-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 hover:text-primary transition-colors">Support</Link>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
         <div className="w-px h-6 bg-slate-200 hidden md:block" />
 
         {user ? (
           <div className="flex items-center gap-6">
-            <Link href="/dashboard" className="text-sm font-bold text-primary px-4 py-2 bg-primary/5 rounded-lg hover:bg-primary/10 transition-colors">
+            <Link href="/search" className="text-sm font-bold text-primary px-4 py-2 bg-primary/5 rounded-lg hover:bg-primary/10 transition-colors">
               Lab
             </Link>
             <div className="flex items-center gap-4 border-l border-slate-200 pl-6">

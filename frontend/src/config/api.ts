@@ -41,8 +41,17 @@ export const API = {
   // Discovery domain
   discovery: {
     search: `${API_BASE}/api/v1/discovery/search`,
+    searchDoi: (doi: string) => `${API_BASE}/api/v1/search/doi?doi=${encodeURIComponent(doi)}`,
     save: `${API_BASE}/api/v1/discovery/save`,
     recommendations: `${API_BASE}/api/v1/discovery/recommendations`,
+  },
+  // Blogs domain
+  blogs: {
+    list: `${API_BASE}/api/v1/blogs`,
+    getById: (id: string | number) => `${API_BASE}/api/v1/blogs/${id}`,
+    create: `${API_BASE}/api/v1/blogs`,
+    adminList: `${API_BASE}/api/v1/blogs/admin`,
+    updateStatus: (id: string | number) => `${API_BASE}/api/v1/blogs/${id}/status`,
   },
   // Library domain
   library: {
@@ -92,5 +101,9 @@ export const API = {
     questionsFlat: `${API_BASE}/api/v1/onboarding/questions/flat`,
     userInterests: `${API_BASE}/api/v1/onboarding/user-interests`,
     userAnswers: `${API_BASE}/api/v1/onboarding/user-answers`,
+  },
+  // Dashboard domain
+  dashboard: {
+    overview: `${API_BASE}/api/v1/dashboard/overview`,
   },
 } as const;
