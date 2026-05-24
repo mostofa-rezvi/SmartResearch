@@ -93,7 +93,7 @@ class DiscoveryService {
       if (!mlResults || mlResults.length === 0) {
         logger.info('Using popular researchers fallback in Node layer.');
         const popular = await db.query(
-          `SELECT id, cited_by_count FROM researcher_profiles ORDER BY cited_by_count DESC NULLS LAST LIMIT 10`
+          `SELECT id, cited_by_count FROM researcher_profiles ORDER BY cited_by_count DESC NULLS LAST`
         );
         mlResults = popular.rows.map(r => [r.id, Math.min(0.99, (r.cited_by_count || 0) / 1000000.0)]);
       }

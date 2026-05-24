@@ -85,6 +85,13 @@ export function RecommendationFeed({ filters }: RecommendationFeedProps) {
     fetchPapers(rec.id);
   };
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 30;
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filters]);
+
   const filteredRecommendations = recommendations.filter(rec => {
     // 1. Filter by Domain
     if (filters?.domains && filters.domains.length > 0) {
@@ -116,7 +123,13 @@ export function RecommendationFeed({ filters }: RecommendationFeedProps) {
     }
 
     return true;
-  });
+  }).sort((a, b) => (b.similarityScore || 0) - (a.similarityScore || 0));
+
+  const totalPages = Math.ceil(filteredRecommendations.length / ITEMS_PER_PAGE);
+  const paginatedRecommendations = filteredRecommendations.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
 
   if (isLoading) {
     return (
@@ -135,15 +148,76 @@ export function RecommendationFeed({ filters }: RecommendationFeedProps) {
       </div>
       
       {filteredRecommendations.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {filteredRecommendations.map((rec, i) => (
-            <CollaboratorCard 
-              key={i} 
-              {...rec} 
-              onClick={() => handleCardClick(rec)}
-            />
-          ))}
-        </div>
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {paginatedRecommendations.map((rec, i) => (
+              <CollaboratorCard 
+                key={i} 
+                {...rec} 
+                onClick={() => handleCardClick(rec)}
+              />
+            ))}
+          </div>
+          
+          {totalPages > 1 && (
+            <div className="flex justify-center items-center gap-4 mt-10">
+              <button
+                onClick={() => {
+                  setCurrentPage(prev => Math.max(prev - 1, 1));
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                disabled={currentPage === 1}
+                className="px-5 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-sm font-bold text-slate-700 dark:text-slate-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors shadow-sm"
+              >
+                Previous
+              </button>
+              <div className="flex items-center gap-3 bg-slate-100 dark:bg-slate-800 p-1.5 rounded-xl">
+                <div className="text-sm font-bold text-slate-500 dark:text-slate-400 px-3 py-1">
+                  Page {currentPage} of {totalPages}
+                </div>
+                <div className="w-px h-6 bg-slate-200 dark:bg-slate-700"></div>
+                <form 
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    const formData = new FormData(e.currentTarget as HTMLFormElement);
+                    const pageVal = Number(formData.get('pageJump'));
+                    if (pageVal >= 1 && pageVal <= totalPages) {
+                      setCurrentPage(pageVal);
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }
+                    (e.currentTarget as HTMLFormElement).reset();
+                  }}
+                  className="flex items-center gap-1.5"
+                >
+                  <input 
+                    type="number" 
+                    name="pageJump"
+                    min={1} 
+                    max={totalPages}
+                    placeholder="Go..."
+                    className="w-16 px-2 py-1 text-sm text-center bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:border-primary transition-colors text-slate-700 dark:text-slate-300 placeholder:text-slate-400 font-medium"
+                  />
+                  <button 
+                    type="submit"
+                    className="px-3 py-1 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 rounded-lg text-sm font-bold transition-colors shadow-sm"
+                  >
+                    Go
+                  </button>
+                </form>
+              </div>
+              <button
+                onClick={() => {
+                  setCurrentPage(prev => Math.min(prev + 1, totalPages));
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                disabled={currentPage === totalPages}
+                className="px-5 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-sm font-bold text-slate-700 dark:text-slate-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors shadow-sm"
+              >
+                Next
+              </button>
+            </div>
+          )}
+        </>
       ) : (
         <div className="p-10 text-center bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700">
           <p className="text-slate-500">No matching collaborators found for the selected filters.</p>
