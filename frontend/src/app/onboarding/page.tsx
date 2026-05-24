@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, Brain, CheckCircle2, ArrowRight, ArrowLeft, Loader2, Microscope, Users, BookOpen, MessageSquare } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth, useApi } from "@/context/AuthContext";
 import { API } from "@/config/api";
 
 interface Question {
@@ -40,12 +40,13 @@ export default function OnboardingPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { user, token, completeOnboarding, logout } = useAuth();
+  const { fetchWithAuth } = useApi();
   const router = useRouter();
 
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
-        const res = await fetch(API.onboarding.questionsFlat);
+        const res = await fetchWithAuth(API.onboarding.questionsFlat);
         const json = await res.json();
         if (json.success) {
           setQuestions(json.data);
@@ -90,11 +91,10 @@ export default function OnboardingPage() {
   const handleSubmit = async () => {
     setIsSubmitting(true);
     try {
-      const response = await fetch(API.auth.onboardingComplete, {
+      const response = await fetchWithAuth(API.auth.onboardingComplete, {
         method: "POST",
         headers: { 
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
+          "Content-Type": "application/json"
         },
         body: JSON.stringify({ 
           answers,

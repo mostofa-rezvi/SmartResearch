@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { CollaboratorCard } from "./collaborator-card";
 import { API } from "@/config/api";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth, useApi } from "@/context/AuthContext";
 import { 
   Loader2, X, Building, BookOpen, GraduationCap, Award, Globe, FileText, ExternalLink 
 } from "lucide-react";
@@ -25,6 +25,7 @@ export function RecommendationFeed({ filters }: RecommendationFeedProps) {
   const [recommendations, setRecommendations] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { token } = useAuth();
+  const { fetchWithAuth } = useApi();
 
   // Modal & Detail States
   const [selectedResearcher, setSelectedResearcher] = useState<any | null>(null);
@@ -35,9 +36,7 @@ export function RecommendationFeed({ filters }: RecommendationFeedProps) {
   useEffect(() => {
     const fetchRecommendations = async () => {
       try {
-        const res = await fetch(API.discovery.recommendations, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        const res = await fetchWithAuth(API.discovery.recommendations);
         const json = await res.json();
         if (json.success && json.data) {
           const formatted = json.data.map((r: any) => ({
@@ -68,9 +67,7 @@ export function RecommendationFeed({ filters }: RecommendationFeedProps) {
     setPapers([]);
     try {
       const cleanId = id.replace("https://openalex.org/", "");
-      const res = await fetch(API.researchers.works(cleanId), {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await fetchWithAuth(API.researchers.works(cleanId));
       const json = await res.json();
       if (json.success && json.data) {
         setPapers(json.data);

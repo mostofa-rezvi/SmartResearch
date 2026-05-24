@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth, useApi } from "@/context/AuthContext";
 import { API } from "@/config/api";
 import Navbar from "@/components/Navbar";
 import { motion, AnimatePresence } from "framer-motion";
@@ -41,7 +41,8 @@ const SECTIONS = ['identity', 'focus', 'collaboration', 'publication', 'communit
 
 export default function EditInterestsPage() {
   const router = useRouter();
-  const { user, token } = useAuth();
+  const { user, token, completeOnboarding } = useAuth();
+  const { fetchWithAuth } = useApi();
   const [questions, setQuestions] = useState<Question[]>([]);
   const [answers, setAnswers] = useState<Record<number, any>>({});
   const [loading, setLoading] = useState(true);
@@ -59,9 +60,7 @@ export default function EditInterestsPage() {
         const qJson = await qRes.json();
         
         // Fetch existing answers
-        const aRes = await fetch(API.onboarding.userAnswers, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        const aRes = await fetchWithAuth(API.onboarding.userAnswers);
         const aJson = await aRes.json();
 
         if (qJson.success && aJson.success) {
@@ -100,11 +99,10 @@ export default function EditInterestsPage() {
     setSuccessMsg("");
 
     try {
-      const response = await fetch(API.auth.onboardingComplete, {
+      const response = await fetchWithAuth(API.auth.onboardingComplete, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
+          "Content-Type": "application/json"
         },
         body: JSON.stringify({
           answers,
@@ -113,6 +111,7 @@ export default function EditInterestsPage() {
       });
 
       if (response.ok) {
+        completeOnboarding();
         setSuccessMsg("Interests updated successfully! Recommendations have been updated.");
         // Redirect to discovery page to see updated recommendations after a short delay
         setTimeout(() => {

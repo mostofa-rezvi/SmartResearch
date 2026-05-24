@@ -6,7 +6,7 @@ import { SearchBar } from "@/components/search-bar";
 import { FilterSidebar } from "@/components/filter-sidebar";
 import { RecommendationFeed } from "@/components/recommendation-feed";
 import { API } from "@/config/api";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth, useApi } from "@/context/AuthContext";
 
 const matchUserInterestsToSidebarDomains = (interests: any[]): string[] => {
   if (!Array.isArray(interests)) return [];
@@ -47,6 +47,7 @@ const matchUserInterestsToSidebarDomains = (interests: any[]): string[] => {
 
 export default function DiscoveryPage() {
   const { token } = useAuth();
+  const { fetchWithAuth } = useApi();
   const [selectedDomains, setSelectedDomains] = React.useState<string[]>([]);
   const [userMatchedDomains, setUserMatchedDomains] = React.useState<string[]>([]);
   const [selectedTier, setSelectedTier] = React.useState<string | null>(null);
@@ -55,9 +56,7 @@ export default function DiscoveryPage() {
   React.useEffect(() => {
     const fetchUserInterests = async () => {
       try {
-        const res = await fetch(API.onboarding.userInterests, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        const res = await fetchWithAuth(API.onboarding.userInterests);
         const json = await res.json();
         if (json.success && json.data && json.data.interests) {
           const matchedDomains = matchUserInterestsToSidebarDomains(json.data.interests);

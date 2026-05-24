@@ -5,15 +5,19 @@ import { useAuth } from "@/context/AuthContext";
 import { Search, Users, BookOpen, Compass, MessageSquare, ChevronRight, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 
 export default function Navbar() {
   const { user, isAdmin, logout } = useAuth();
   const [showOnboardingPrompt, setShowOnboardingPrompt] = useState(true);
+  const pathname = usePathname();
+
+  const isEditingProfile = pathname === "/onboarding" || pathname === "/profile/edit-interests";
 
   return (
     <>
       <AnimatePresence>
-        {user && !user.onboarding_completed && showOnboardingPrompt && (
+        {user && !user.onboarding_completed && showOnboardingPrompt && !isEditingProfile && (
           <motion.div 
             initial={{ opacity: 0, y: 20, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}

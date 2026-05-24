@@ -21,6 +21,7 @@ type AuthContextType = {
   isAdmin: boolean;
   isSuperAdmin: boolean;
   updateUser: (updates: Partial<NonNullable<User>>) => void;
+  updateToken: (newToken: string) => void;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -73,11 +74,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const updateToken = (newToken: string) => {
+    setToken(newToken);
+    localStorage.setItem("token", newToken);
+  };
+
   const isAdmin = user?.role === 'admin' || user?.role === 'super_admin';
   const isSuperAdmin = user?.role === 'super_admin';
 
   return (
-    <AuthContext.Provider value={{ user, token, login, logout, completeOnboarding, isLoading, isAdmin, isSuperAdmin, updateUser }}>
+    <AuthContext.Provider value={{ user, token, login, logout, completeOnboarding, isLoading, isAdmin, isSuperAdmin, updateUser, updateToken }}>
       {children}
     </AuthContext.Provider>
   );
@@ -90,3 +96,51 @@ export const useAuth = () => {
   }
   return context;
 };
+
+export function useApi() {
+  const { token, updateToken, logout } = useAuth();
+
+  const fetchWithAuth = async (input: RequestInfo | URL, init?: RequestInit) => {
+    let currentToken = token;
+    if (!currentToken && typeof window !== "undefined") {
+      currentToken = localStorage.getItem("token");
+    }
+
+    const headers = new Headers(init?.headers);
+    if (currentToken && !headers.has("Authorization")) {
+      headers.set("Authorization", `Bearer ${currentToken}`);
+    }
+
+    const requestInit = { ...init, headers };
+    let response = await fetch(input, requestInit);
+
+    if (response.status === 401) {
+      try {
+        const refreshResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:5000'}/api/v1/auth/refresh`, {
+          method: 'POST',
+          credentials: 'include',
+        });
+
+        if (refreshResponse.ok) {
+          const json = await refreshResponse.json();
+          if (json.success && json.data?.accessToken) {
+            const newToken = json.data.accessToken;
+            updateToken(newToken);
+            headers.set("Authorization", `Bearer ${newToken}`);
+            response = await fetch(input, { ...init, headers });
+          } else {
+            logout();
+          }
+        } else {
+          logout();
+        }
+      } catch (err) {
+        logout();
+      }
+    }
+
+    return response;
+  };
+
+  return { fetchWithAuth };
+}
