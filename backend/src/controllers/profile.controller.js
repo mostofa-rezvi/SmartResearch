@@ -10,7 +10,7 @@ class ProfileController {
       
       // 1. Get base user
       const userResult = await db.query(
-        'SELECT id, name, email, bio, avatar_url, institution, institution_id, personal_website, linkedin_url, google_scholar_url, researchgate_url, educational_status, created_at FROM users WHERE id = $1',
+        'SELECT id, name, email, bio, avatar_url, institution, institution_id, personal_website, linkedin_url, google_scholar_url, researchgate_url, educational_status, created_at, onboarding_completed, researcher_type FROM users WHERE id = $1',
         [userId]
       );
 
@@ -156,7 +156,7 @@ class ProfileController {
       req.params.id = userId;
       // Note: this is a bit hacky for returning the response directly, better to extract the logic
       // but it serves the immediate requirement.
-      const updatedUserResult = await db.query('SELECT id, name, email, bio, avatar_url, institution_id FROM users WHERE id = $1', [userId]);
+      const updatedUserResult = await db.query('SELECT id, name, email, bio, avatar_url, institution_id, onboarding_completed, researcher_type FROM users WHERE id = $1', [userId]);
       const user = updatedUserResult.rows[0];
       
       // Let's just return a success message for brevity, or full profile

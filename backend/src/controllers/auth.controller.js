@@ -135,6 +135,8 @@ class AuthController {
             name: user.name,
             email: user.email,
             role: user.role,
+            onboarding_completed: user.onboarding_completed,
+            researcher_type: user.researcher_type,
           }
         }, { message: 'Login successful' }));
       } catch (e) {
@@ -296,7 +298,7 @@ class AuthController {
       });
 
       // Get user info
-      const result = await db.query('SELECT id, name, email, role FROM users WHERE id = $1', [userId]);
+      const result = await db.query('SELECT id, name, email, role, onboarding_completed, researcher_type FROM users WHERE id = $1', [userId]);
       const user = result.rows[0];
 
       res.json(envelope({
