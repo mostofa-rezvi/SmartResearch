@@ -3,6 +3,11 @@ docker push mostofarezvi/research-bridge-backend:latest
 docker pull mostofarezvi/research-bridge-backend:latest
 
 docker tag research-bridge-frontend:latest mostofarezvi/research-bridge-frontend:latest
+docker tag research-bridge-backend:latest mostofarezvi/research-bridge-backend:latest
+docker push mostofarezvi/research-bridge-backend:latest
+docker pull mostofarezvi/research-bridge-backend:latest
+
+docker tag research-bridge-frontend:latest mostofarezvi/research-bridge-frontend:latest
 docker push mostofarezvi/research-bridge-frontend:latest
 docker pull mostofarezvi/research-bridge-frontend:latest
 
@@ -29,3 +34,32 @@ docker pull mostofarezvi/neo4j:5-community
 docker tag docker.elastic.co/elasticsearch/elasticsearch:8.8.0 mostofarezvi/elasticsearch:8.8.0
 docker push mostofarezvi/elasticsearch:8.8.0
 docker pull mostofarezvi/elasticsearch:8.8.0
+
+
+
+# 0. Create the shared network first:
+docker network create research-bridge-net
+
+1. PostgreSQL:
+docker run -d --name rb-postgres --network research-bridge-net -p 5434:5432 -v pgdata:/var/lib/postgresql/data -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=researchbridge mostofarezvi/postgres:15-alpine
+
+2. Redis:
+docker run -d --name rb-redis --network research-bridge-net -p 6379:6379 -v redisdata:/data mostofarezvi/redis:7-alpine
+
+3. Elasticsearch:
+docker run -d --name rb-elasticsearch --network research-bridge-net -p 9200:9200 -p 9300:9300 -v esdata:/usr/share/elasticsearch/data -e discovery.type=single-node -e xpack.security.enabled=false -e ES_JAVA_OPTS="-Xms512m -Xmx512m" mostofarezvi/elasticsearch:8.8.0
+
+4. Neo4j:
+docker run -d --name rb-neo4j --network research-bridge-net -p 7474:7474 -p 7687:7687 -v neo4jdata:/data -e NEO4J_AUTH=neo4j/password -e NEO4J_PLUGINS='["apoc", "graph-data-science"]' mostofarezvi/neo4j:5-community
+
+5. MinIO:
+docker run -d --name rb-minio --network research-bridge-net -p 9000:9000 -p 9001:9001 -v miniodata:/data -e MINIO_ROOT_USER=minioadmin -e MINIO_ROOT_PASSWORD=minioadmin mostofarezvi/minio:latest server /data --console-address ":9001"
+
+6. Backend:
+docker run -d --name rb-backend --network research-bridge-net -p 5000:5000 -e NODE_ENV=development -e PORT=5000 -e DB_HOST=rb-postgres -e DB_PORT=5432 -e DB_USER=postgres -e DB_PASSWORD=postgres -e DB_NAME=researchbridge -e DATABASE_URL=postgresql://postgres:postgres@rb-postgres:5432/researchbridge -e NEO4J_URI=bolt://rb-neo4j:7687 -e NEO4J_USER=neo4j -e NEO4J_PASSWORD=password -e NEO4J_AUTH=neo4j/password -e ELASTICSEARCH_NODE=http://rb-elasticsearch:9200 -e REDIS_URL=redis://rb-redis:6379 -e S3_ENDPOINT=http://rb-minio:9000 -e S3_ACCESS_KEY=minioadmin -e S3_SECRET_KEY=minioadmin -e S3_BUCKET=researchbridge -e S3_REGION=us-east-1 -e S3_FORCE_PATH_STYLE=true -e ML_SERVICE_URL=http://rb-ml:8000 -e SMTP_HOST=smtp.gmail.com -e SMTP_PORT=465 -e SMTP_SECURE=true -e SMTP_USER=rblannk@gmail.com -e SMTP_PASS="ibfz qfwi wnlf garg" -e EMAIL_FROM_NAME=ResearchBridge -e EMAIL_FROM_ADDRESS=rblannk@gmail.com mostofarezvi/research-bridge-backend:latest
+
+7. Frontend:
+docker run -d --name rb-frontend --network research-bridge-net -p 3000:3000 -e NODE_ENV=development -e PORT=3000 -e NEXT_PUBLIC_API_URL=http://localhost:5000 mostofarezvi/research-bridge-frontend:latest
+
+8. ML Service:
+docker run -d --name rb-ml --network research-bridge-net -p 8000:8000 -e PORT=8000 -e DB_HOST=rb-postgres -e DB_PORT=5432 -e DB_USER=postgres -e DB_PASSWORD=postgres -e DB_NAME=researchbridge -e REDIS_URL=redis://rb-redis:6379 mostofarezvi/research-bridge-ml:latest
