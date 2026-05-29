@@ -1,0 +1,17 @@
+cd backend
+npm run db:setup
+node scripts/seed-onboarding.js
+node scripts/seed-researchers.js
+node scripts/seed-journals.js
+node scripts/seed-community.js
+node scripts/seed-blogs.js
+
+cd frontend
+npm install
+npm run dev
+
+cd ml-service
+python -m venv venv
+.\venv\scripts\Activate.ps1
+pip install -r requirements.txt
+python main.py

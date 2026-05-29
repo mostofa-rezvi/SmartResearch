@@ -26,9 +26,37 @@ async def process_message(msg_id, data):
         model = get_model()
         cache = get_cache()
         
-        # Extract profile data
-        profile_id = data.get(b'id', b'').decode()
-        text = data.get(b'text', b'').decode()
+        # Extract profile data supporting both flat and JSON-stringified payloads
+        if b'payload' in data:
+            try:
+                payload = json.loads(data[b'payload'].decode('utf-8'))
+                profile_id = str(payload.get('id', ''))
+                name = payload.get('name', 'Unknown')
+                role = payload.get('role', '')
+                institution = payload.get('institution', '') or payload.get('institution_name', '')
+                interests = payload.get('interests', []) or payload.get('research_interests', [])
+                if isinstance(interests, str):
+                    try:
+                        interests = json.loads(interests)
+                    except Exception:
+                        interests = [interests]
+                elif not isinstance(interests, list):
+                    interests = [interests] if interests else []
+                
+                text = f"Researcher {name}"
+                if role:
+                    text += f", Role: {role}"
+                if institution:
+                    text += f", Institution: {institution}"
+                if interests:
+                    text += f". Interests: {', '.join(str(i) for i in interests)}"
+            except Exception as json_err:
+                logger.error(f"JSON payload parse failed, falling back: {json_err}")
+                profile_id = data.get(b'id', b'').decode('utf-8', errors='ignore')
+                text = data.get(b'text', b'').decode('utf-8', errors='ignore')
+        else:
+            profile_id = data.get(b'id', b'').decode('utf-8', errors='ignore')
+            text = data.get(b'text', b'').decode('utf-8', errors='ignore')
         
         if not text:
             logger.warning(f"Empty text for profile {profile_id}, skipping.")

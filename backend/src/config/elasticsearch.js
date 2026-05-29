@@ -36,7 +36,7 @@ const initIndices = async () => {
           name: { type: 'text' },
           email: { type: 'keyword' },
           content: { type: 'text' }, // Bio
-          embedding: { type: 'dense_vector', dims: 384, index: true, similarity: 'cosine' }
+          embedding: { type: 'dense_vector', dims: 768, index: true, similarity: 'cosine' }
         }
       }
     },
@@ -47,7 +47,7 @@ const initIndices = async () => {
           abstract: { type: 'text' },
           authors: { type: 'keyword' },
           tags: { type: 'keyword' },
-          embedding: { type: 'dense_vector', dims: 384, index: true, similarity: 'cosine' }
+          embedding: { type: 'dense_vector', dims: 768, index: true, similarity: 'cosine' }
         }
       }
     },
@@ -57,7 +57,7 @@ const initIndices = async () => {
           title: { type: 'text' },
           description: { type: 'text' },
           tags: { type: 'keyword' },
-          embedding: { type: 'dense_vector', dims: 384, index: true, similarity: 'cosine' }
+          embedding: { type: 'dense_vector', dims: 768, index: true, similarity: 'cosine' }
         }
       }
     }

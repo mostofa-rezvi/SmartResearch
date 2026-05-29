@@ -44,22 +44,23 @@ async function main() {
         
         for (const item of results) {
           const j = item.bibjson;
-          const name = j.title;
-        const issn = j.eissn || j.pissn || (j.identifier && j.identifier[0] ? j.identifier[0].id : null);
-        const publisher = j.publisher?.name || "Unknown Publisher";
-        const url = j.link?.[0]?.url || "";
-        
-        // Mock impact factor and tier as DOAJ doesn't provide SJR directly
-        const impact = (Math.random() * 5 + 0.5).toFixed(2);
-        const tier = impact > 3 ? 'Q1' : (impact > 1.5 ? 'Q2' : 'Q3');
+          const name = j.title ? j.title.substring(0, 500) : "Unknown Journal";
+          const issn = j.eissn || j.pissn || (j.identifier && j.identifier[0] ? j.identifier[0].id : null);
+          const rawPublisher = j.publisher?.name || "Unknown Publisher";
+          const publisher = rawPublisher.substring(0, 100);
+          const url = j.link?.[0]?.url || "";
+          
+          // Mock impact factor and tier as DOAJ doesn't provide SJR directly
+          const impact = (Math.random() * 5 + 0.5).toFixed(2);
+          const tier = impact > 3 ? 'Q1' : (impact > 1.5 ? 'Q2' : 'Q3');
 
-        await client.query(
-          `INSERT INTO journals (name, issn, category, subcategory, quality_tier, impact_factor, website_url, institutional_group, status)
-           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'approved')
-           ON CONFLICT DO NOTHING`,
-          [name, issn, cat, null, tier, impact, url, publisher]
-        );
-        total++;
+          await client.query(
+            `INSERT INTO journals (name, issn, category, subcategory, quality_tier, impact_factor, website_url, institutional_group, status)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'approved')
+             ON CONFLICT DO NOTHING`,
+            [name, issn, cat, null, tier, impact, url, publisher]
+          );
+          total++;
         }
       }
       console.log(`   ✅ Added up to page 2 for ${cat} (Total so far: ${total})`);

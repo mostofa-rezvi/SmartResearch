@@ -4,8 +4,9 @@ sentence-transformers
 redis
 numpy
 pydantic
-elasticsearch
+elasticsearch<9.0.0
 requests
 psycopg2-binary
 pytest
 httpx
+neo4j

@@ -92,7 +92,7 @@ function formatIssnForOpenAlex(issn?: string): string | null {
     }
     return part;
   }).filter(Boolean);
-  
+
   return formattedParts.length > 0 ? formattedParts.join('|') : null;
 }
 
@@ -250,11 +250,10 @@ function PaperCard({
           )}
           <button
             onClick={() => onToggleSave(paper)}
-            className={`p-2 rounded-lg transition-all ${
-              isSaved
+            className={`p-2 rounded-lg transition-all ${isSaved
                 ? "bg-secondary text-white shadow-md shadow-secondary/20"
                 : "text-slate-400 hover:text-secondary hover:bg-secondary/5"
-            }`}
+              }`}
             title={isSaved ? "Remove from saved" : "Save paper"}
           >
             <Bookmark size={14} fill={isSaved ? "currentColor" : "none"} />
@@ -635,11 +634,10 @@ export default function JournalPapersModal({ journal, onClose }: Props) {
                       <button
                         key={yr}
                         onClick={() => setYearFilter(f => f === yr ? "" : yr)}
-                        className={`px-2.5 py-1 rounded-lg text-[10px] font-black transition-all ${
-                          yearFilter === yr
+                        className={`px-2.5 py-1 rounded-lg text-[10px] font-black transition-all ${yearFilter === yr
                             ? "bg-primary text-white shadow-md shadow-primary/20"
                             : "bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-primary hover:bg-primary/5"
-                        }`}
+                          }`}
                       >
                         {yr}
                       </button>
@@ -702,7 +700,7 @@ export default function JournalPapersModal({ journal, onClose }: Props) {
                 {/* Initial loading skeleton */}
                 {loading && papers.length === 0 && (
                   <div className="flex flex-col items-center justify-center py-16 text-center">
-                    <p className="text-sm font-semibold text-slate-400">Searching OpenAlex archives...</p>
+                    <p className="text-sm font-semibold text-slate-400">Searching Archives...</p>
                   </div>
                 )}
 

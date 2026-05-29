@@ -9,6 +9,8 @@ from recommender.cf_engine import CFEngine
 from recommender.scorer import rrf_merge
 import logging
 
+from contextlib import asynccontextmanager
+
 # Initialize Recommender Components
 builder = MatrixBuilder()
 cf_engine = CFEngine(builder)
@@ -17,14 +19,17 @@ cf_engine = CFEngine(builder)
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-app = FastAPI(title="ResearchBridge ML Service")
-
-@app.on_event("startup")
-async def startup_event():
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup: Initialize recommendation matrix
     logger.info("Initializing recommendation matrix...")
     data = builder.fetch_interactions()
     builder.build_matrix(data)
     cf_engine.compute_user_similarity()
+    yield
+    # Shutdown logic can go here if needed
+
+app = FastAPI(title="ResearchBridge ML Service", lifespan=lifespan)
 
 class RecRequest(BaseModel):
     profile_text: Optional[str] = None
@@ -125,15 +130,15 @@ async def embed(request: EmbedRequest):
         if isinstance(request.text, str):
             cached = cache.get(request.text)
             if cached:
-                return {"vectors": cached, "cached": True}
+                return {"vectors": cached, "embedding": cached, "cached": True}
             
             vector = await asyncio.to_thread(model.encode, request.text)
             cache.set(request.text, vector)
-            return {"vectors": vector, "cached": False}
+            return {"vectors": vector, "embedding": vector, "cached": False}
         
         # Handle list case (batch caching is more complex, simple pass-through for now)
         vectors = await asyncio.to_thread(model.encode, request.text)
-        return {"vectors": vectors}
+        return {"vectors": vectors, "embedding": vectors}
     except Exception as e:
         logger.error(f"Embedding error: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))

@@ -44,13 +44,13 @@ async function seedScimagoJR(filename, year) {
     if (qt === '-') qt = 'N/A';
 
     const journal = {
-      name: record['Title'],
+      name: record['Title'] ? record['Title'].substring(0, 500) : '',
       issn: record['Issn']?.split(',')[0]?.trim() || '',
       category: record['Categories']?.split(';')[0]?.trim() || 'Uncategorized',
       subcategory: record['Categories']?.split(';')[1]?.trim() || '',
       quality_tier: qt,
       geography: record['Country'] || '',
-      publisher: record['Publisher'] || '',
+      publisher: record['Publisher'] ? record['Publisher'].substring(0, 500) : '',
       rank: parseInt(record['Rank']) || null,
       sjr_score: parseFloat(record['SJR']?.replace(',', '.')) || null,
       h_index: parseInt(record['H index']) || null,
@@ -111,13 +111,13 @@ async function seedDOAJ(filename) {
 
   for await (const record of parser) {
     const journal = {
-      name: record['Journal title'],
+      name: record['Journal title'] ? record['Journal title'].substring(0, 500) : '',
       issn: record['Journal EISSN (online version)'] || record['Journal ISSN (print version)'] || '',
       issn_print: record['Journal ISSN (print version)'] || '',
       issn_online: record['Journal EISSN (online version)'] || '',
       category: record['Subjects']?.split('|')[0]?.trim() || 'Uncategorized',
       quality_tier: 'N/A',
-      publisher: record['Publisher'] || '',
+      publisher: record['Publisher'] ? record['Publisher'].substring(0, 500) : '',
       country: record['Country of publisher'] || '',
       homepage_url: record['Journal URL'] || '',
       doaj_url: record['URL in DOAJ'] || '',
