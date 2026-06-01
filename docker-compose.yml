@@ -121,7 +121,7 @@ services:
     networks:
       - research-bridge-net
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:7474 > /dev/null || exit 1"]
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:7474 || exit 1"]
       interval: 20s
       timeout: 10s
       retries: 5

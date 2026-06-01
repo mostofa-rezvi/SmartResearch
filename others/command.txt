@@ -5,6 +5,7 @@ node scripts/seed-researchers.js
 node scripts/seed-journals.js
 node scripts/seed-community.js
 node scripts/seed-blogs.js
+npm run dev
 
 cd frontend
 npm install
