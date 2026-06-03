@@ -10,6 +10,9 @@ import numpy as np
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# Suppress Neo4j notifications/warnings (e.g., non-existent properties/relationships on empty database)
+logging.getLogger("neo4j.notifications").setLevel(logging.ERROR)
+
 # Config
 DB_URL = os.getenv("DATABASE_URL", "postgresql://postgres:postgres@localhost:5434/researchbridge")
 NEO4J_URI = os.getenv("NEO4J_URI", "bolt://localhost:7687")

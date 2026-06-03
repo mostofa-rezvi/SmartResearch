@@ -6,6 +6,9 @@ from neo4j import GraphDatabase
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# Suppress Neo4j notifications/warnings (e.g., non-existent properties/relationships on empty database)
+logging.getLogger("neo4j.notifications").setLevel(logging.ERROR)
+
 NEO4J_URI = os.getenv("NEO4J_URI", "bolt://localhost:7687")
 NEO4J_AUTH = os.getenv("NEO4J_AUTH", "neo4j/password").split("/")
 
