@@ -8,6 +8,13 @@ ResearchBridge is a Smart Research Collaboration Platform designed to facilitate
 
 Empowering research collaboration through a verifiable trust graph, advanced semantic discovery, and real-time event-driven synchronization across a distributed research ecosystem.
 
+## Shipped: v1.2 — Week 3 — Frontend, Publication Assistant & Production (2026-04-27)
+
+**Accomplishments:**
+- **Frontend & Auth UI**: Next.js dashboard with OTP register, JWT auth, and virtualized Library lists.
+- **Publication Assistant**: Fully integrated DOAJ journal recommendation and PDF upload workflow.
+- **Production Hardening**: Production-ready Kubernetes (HPA, ingress), Prometheus/Grafana, and E2E Playwright tests.
+
 ## Shipped: v1.1 — Intelligence & Collaboration (2026-04-26)
 
 **Accomplishments:**
@@ -16,16 +23,17 @@ Empowering research collaboration through a verifiable trust graph, advanced sem
 - **Real-Time Collaboration**: Socket.IO project rooms with Yjs CRDT document sync.
 - **Trust Analytics**: PageRank and Co-authorship discovery in Neo4j GDS.
 
-## Current Milestone: v1.2 — Week 3 — Frontend, Publication Assistant & Production
+## Current Milestone: v1.3 — Gap Closure Milestone: Yjs Editor, Kanban API, Templates
 
-**Goal:** Build the Next.js frontend with Authentication, User Profiles, and the Publication Assistant, preparing for production.
+**Goal:** Close all critical, medium, and low-priority gaps to deliver a polished demo-ready research platform.
 
 **Target features:**
-- **Next.js Frontend Scaffold**: Modern React framework setup with a premium design system.
-- **Auth & Session Management**: Login, Registration, and JWT-based session persistence.
-- **Academic Profiles**: User-facing profile system with research stats and completeness scoring.
-- **Publication Assistant**: AI-powered utility for assisting researchers with paper submissions.
-- **Production Readiness**: Final performance audits, Dockerization, and deployment prep.
+- **WS/Yjs Connection**: Integrate real-time WebSocket Yjs document editing in frontend editor.
+- **Kanban API Integration**: Connect frontend kanban board to existing ProjectService backend endpoints.
+- **Templates Storage**: Seed LaTeX/Word templates to resolve template download 404 errors.
+- **Mentorship Module**: Establish DB table, Express controller/routes, booking UI, and Neo4j pairing graph sync.
+- **Paper Reading History**: Introduce user bookmark/download logs, exposing routes to dynamic dashboard metrics.
+- **Hardening**: Add JWT authentication to Socket.IO and calibrate FastAPI SBERT threshold.
 
 ## Requirements
 
@@ -42,14 +50,20 @@ Empowering research collaboration through a verifiable trust graph, advanced sem
 - ✓ **Infrastructure Hardening** — Production-ready healthchecks and CI/CD skeleton.
 - ✓ **Hybrid Search (RRF)** — BM25 + kNN merging in ES 8.
 - ✓ **Collaborative Workspace** — Yjs CRDT sync with Postgres binary storage.
+- ✓ **Frontend Scaffold** — Next.js frontend UI setup with design tokens.
+- ✓ **Authentication UI** — Login/Register screens with session management.
+- ✓ **Academic Profiles** — Profile management and stats visualization.
+- ✓ **Publication Assistant** — AI assistant for researcher support.
+- ✓ **Production Infrastructure** — Docker, CI/CD, and K8s configuration.
 
 ### Active
 
-- [ ] **Frontend Scaffold** — Initialize Next.js app with design tokens.
-- [ ] **Authentication UI** — Build Login/Register/Social Auth screens.
-- [ ] **Academic Profiles** — Implement profile management and stats visualization.
-- [ ] **Publication Assistant** — Develop the AI assistant for researcher support.
-- [ ] **Production Infrastructure** — Configure Docker, CI/CD, and monitoring.
+- [ ] **WS/Yjs Editor Connection** — Connect @hocuspocus/provider or y-websocket to Express WS gateway.
+- [ ] **Kanban Integration** — Connect kanban-board.tsx to ProjectService REST API.
+- [ ] **Templates Seeding** — Save valid templates in public folder.
+- [ ] **Mentorship CRUD & UI** — Implement mentorship DB table, Express REST API, booking UI, and Neo4j graph sync.
+- [ ] **Reading History Logs** — Implement reading history database tables, GET/POST routes, and dashboard counts.
+- [ ] **Security & ML Hardening** — JWT auth on Socket.IO and SBERT threshold calibration.
 
 ### Out of Scope
 
@@ -63,7 +77,7 @@ ResearchBridge is built as a high-performance mono-repo. The architecture emphas
 ## Constraints
 
 - **Tech Stack**: Node/Express, Next.js, Python FastAPI, PostgreSQL, Redis 7, Neo4j 5, Elasticsearch 8.
-- **Timeline**: 3-week target for production-ready MVP.
+- **Timeline**: Dedicated focus on closing outstanding gaps.
 
 ## Key Decisions
 
@@ -75,4 +89,4 @@ ResearchBridge is built as a high-performance mono-repo. The architecture emphas
 | Yjs CRDT | Handles complex concurrent document editing without locks. | ✓ Validated |
 
 ---
-*Last updated: 2026-04-26 after starting Milestone v1.2*
+*Last updated: 2026-06-04 after starting Milestone v1.3*
