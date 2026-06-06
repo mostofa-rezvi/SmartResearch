@@ -37,7 +37,7 @@
 - [ ] **Step 14** `[Flash]`   `/gsd-new-milestone` — "Medium Priority: Mentorship Module + Paper History"
 
 ### B.1 — Mentorship Module
-- [ ] **Step 15** `[Flash]`   `/gsd-discuss-phase --auto` — Simple mentorships table + request/accept flow
+- [x] **Step 15** `[Flash]`   `/gsd-discuss-phase --auto` — Simple mentorships table + request/accept flow
 - [ ] **Step 16** `[Pro LOW]` `/gsd-plan-phase` — DB migration, Express routes, React UI components
 - [ ] **Step 17** `[Pro LOW]` `/gsd-execute-phase` — Full Mentorship: DB + API + Neo4j edge + UI
 - [ ] **Step 18** `[Pro LOW]` `/gsd-code-review`
