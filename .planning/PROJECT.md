@@ -8,6 +8,12 @@ ResearchBridge is a Smart Research Collaboration Platform designed to facilitate
 
 Empowering research collaboration through a verifiable trust graph, advanced semantic discovery, and real-time event-driven synchronization across a distributed research ecosystem.
 
+### Shipped: v1.4 — Medium Priority: Mentorship Module & Paper History (2026-06-06)
+
+**Accomplishments:**
+- **Mentorship Module**: PostgreSQL tables, Express request/accept controllers, and pairing UI components implemented, with acceptances synced to Neo4j.
+- **Paper Reading History**: PostgreSQL log schema, GET/POST endpoints, and dashboard stats count integration.
+
 ## Shipped: v1.3 — Gap Closure Phase A: Yjs, Kanban & Templates (2026-06-06)
 
 **Accomplishments:**
@@ -30,13 +36,13 @@ Empowering research collaboration through a verifiable trust graph, advanced sem
 - **Real-Time Collaboration**: Socket.IO project rooms with Yjs CRDT document sync.
 - **Trust Analytics**: PageRank and Co-authorship discovery in Neo4j GDS.
 
-## Current Milestone: v1.4 — Medium Priority: Mentorship Module & Paper History
+## Current Milestone: v1.5 — Low Priority: Hardening & Security
 
-**Goal:** Implement the mentorship matching and pairing module and track paper reading history.
+**Goal:** Implement WebSocket JWT handshake authentication and calibrate SBERT recommendation threshold.
 
 **Target features:**
-- **Mentorship Module**: Establish DB table, Express controller/routes, booking UI, and Neo4j pairing graph sync.
-- **Paper Reading History**: Introduce user bookmark/download logs, exposing routes to dynamic dashboard metrics.
+- **WebSocket Security**: Secure Socket.IO connections via JWT authentication.
+- **ML Calibration**: Empirically evaluate and calibrate the SBERT similarity score threshold.
 
 ## Requirements
 
@@ -58,14 +64,14 @@ Empowering research collaboration through a verifiable trust graph, advanced sem
 - ✓ **Academic Profiles** — Profile management and stats visualization.
 - ✓ **Publication Assistant** — AI assistant for researcher support.
 - ✓ **Production Infrastructure** — Docker, CI/CD, and K8s configuration.
+- ✓ **WS/Yjs Connection** — Real-time collaborative document editing (Yjs WS sync) — v1.3.
+- ✓ **Kanban Integration** — Kanban board wired to ProjectService REST API — v1.3.
+- ✓ **Templates Seeding** — LaTeX and Word templates seeded in public directory — v1.3.
+- ✓ **Mentorship Module** — Mentorships table, Express API, booking UI, and Neo4j sync — v1.4.
+- ✓ **Reading History** — Reading history database tables, GET/POST routes, and dashboard counts — v1.4.
 
 ### Active
 
-- [x] **WS/Yjs Editor Connection** — Connect @hocuspocus/provider or y-websocket to Express WS gateway.
-- [x] **Kanban Integration** — Connect kanban-board.tsx to ProjectService REST API.
-- [x] **Templates Seeding** — Save valid templates in public folder.
-- [ ] **Mentorship CRUD & UI** — Implement mentorship DB table, Express REST API, booking UI, and Neo4j graph sync.
-- [ ] **Reading History Logs** — Implement reading history database tables, GET/POST routes, and dashboard counts.
 - [ ] **Security & ML Hardening** — JWT auth on Socket.IO and SBERT threshold calibration.
 
 ### Out of Scope
@@ -92,4 +98,4 @@ ResearchBridge is built as a high-performance mono-repo. The architecture emphas
 | Yjs CRDT | Handles complex concurrent document editing without locks. | ✓ Validated |
 
 ---
-*Last updated: 2026-06-04 after starting Milestone v1.3*
+*Last updated: 2026-06-06 after completing Milestone v1.4*

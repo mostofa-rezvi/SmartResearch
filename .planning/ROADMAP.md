@@ -34,14 +34,19 @@
 
 ---
 
-## Current Milestone: v1.4 — Medium Priority: Mentorship Module & Paper History
-- **Goal**: Implement the mentorship matching and pairing module and track paper reading history.
-- **Phase 19**: Mentorship Module — DB tables, controllers, pairing UI, and Neo4j sync.
-- **Phase 20**: Reading History Tracking — Store user interaction/bookmarks log.
+<details>
+<summary>Milestone v1.4 — Medium Priority: Mentorship Module & Paper History</summary>
+
+## [✓] Milestone v1.4 — Medium Priority: Mentorship Module & Paper History
+- **Status**: Archived (2026-06-06)
+- **Archive**: [.planning/milestones/v1.4-ROADMAP.md](file:///.planning/milestones/v1.4-ROADMAP.md)
+- **Summary**: Delivered mentorship matching database tables and Express REST routes (accept/reject), student-mentor pairing UI components, Neo4j graph edge sync, and PostgreSQL-backed paper reading history tracking wired to the dashboard view.
+
+</details>
 
 ---
 
-## Next Milestone: v1.5 — Low Priority: Hardening & Security
+## Current Milestone: v1.5 — Low Priority: Hardening & Security
 - **Goal**: WebSocket JWT auth handshake and SBERT threshold calibration.
 - **Phase 21**: Security & ML Hardening — WebSocket JWT handshake and SBERT threshold calibration.
 
