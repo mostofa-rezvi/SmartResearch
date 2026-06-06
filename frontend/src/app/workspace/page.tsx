@@ -5,8 +5,22 @@ import Navbar from "@/components/Navbar";
 import { KanbanBoard } from "@/components/kanban-board";
 import { TimelineView } from "@/components/timeline-view";
 import { NotificationsPanel } from "@/components/notifications-panel";
+import useSWR from "swr";
+import { useApi } from "@/context/AuthContext";
+import { API } from "@/config/api";
 
 export default function WorkspaceDashboard() {
+  const { fetchWithAuth } = useApi();
+  const { data: project } = useSWR(API.projects.getProject("1"), async (url) => {
+    const res = await fetchWithAuth(url);
+    if (!res.ok) return null;
+    const json = await res.json();
+    return json.data;
+  });
+
+  const projectName = project?.name || "Quantum ML Integrations";
+  const projectDesc = project?.description || "Collaborative workspace and task tracking";
+
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#020617] flex flex-col">
       <Navbar />
@@ -24,14 +38,14 @@ export default function WorkspaceDashboard() {
               Active Project
             </span>
           </div>
-          <h1 className="text-4xl font-serif font-black text-slate-900 dark:text-white mb-2">Quantum ML Integrations</h1>
-          <p className="text-slate-500 font-medium">Collaborative workspace and task tracking</p>
+          <h1 className="text-4xl font-serif font-black text-slate-900 dark:text-white mb-2">{projectName}</h1>
+          <p className="text-slate-500 font-medium">{projectDesc}</p>
         </header>
 
         <TimelineView />
         
         <div className="flex-1">
-          <KanbanBoard />
+          <KanbanBoard projectId="1" />
         </div>
       </main>
     </div>

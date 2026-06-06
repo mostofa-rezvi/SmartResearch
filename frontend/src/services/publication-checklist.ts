@@ -2,8 +2,9 @@ export class ChecklistService {
   static getTemplates() {
     return [
       { id: 'ieee-conf', name: 'IEEE Conference Template', url: '/templates/ieee.docx' },
-      { id: 'nature-article', name: 'Nature Article Template', url: '/templates/nature.tex' },
-      { id: 'generic-manuscript', name: 'Generic Manuscript', url: '/templates/generic.docx' },
+      { id: 'apa-style', name: 'APA Style Template', url: '/templates/apa.docx' },
+      { id: 'nature-article', name: 'Nature Article Template', url: '/templates/nature.docx' },
+      { id: 'acm-style', name: 'ACM Style Template', url: '/templates/acm.docx' },
     ];
   }
 

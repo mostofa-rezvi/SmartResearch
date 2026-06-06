@@ -1,7 +1,7 @@
-const ProjectService = require('../../../src/services/ProjectService');
-const db = require('../../../src/config/db');
+const ProjectService = require('../../src/services/ProjectService');
+const db = require('../../src/config/db');
 
-jest.mock('../../../src/config/db', () => ({
+jest.mock('../../src/config/db', () => ({
   pool: {
     connect: jest.fn()
   },

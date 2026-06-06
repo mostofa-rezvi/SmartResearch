@@ -78,6 +78,8 @@ app.use('/api/v1/onboarding', require('./routes/onboarding'));
 app.use('/api/v1/search', require('./routes/search'));
 app.use('/api/v1/dashboard', require('./routes/dashboard'));
 app.use('/api/v1/blogs', require('./routes/blogs'));
+app.use('/api/v1/projects', require('./routes/projects'));
+
 
 // Backward-compatible non-versioned routes (transitional)
 app.use('/api/auth', authLimiter, require('./routes/auth'));
@@ -95,6 +97,8 @@ app.use('/api/researchers', require('./routes/researchers'));
 app.use('/api/onboarding', require('./routes/onboarding'));
 app.use('/api/search', require('./routes/search'));
 app.use('/api/dashboard', require('./routes/dashboard'));
+app.use('/api/projects', require('./routes/projects'));
+
 
 
 // Socket.IO Connection Event

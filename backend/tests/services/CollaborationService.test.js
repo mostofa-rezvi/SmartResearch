@@ -1,8 +1,8 @@
-const CollaborationService = require('../../../src/services/CollaborationService');
-const db = require('../../../src/config/db');
+const CollaborationService = require('../../src/services/CollaborationService');
+const db = require('../../src/config/db');
 const Y = require('yjs');
 
-jest.mock('../../../src/config/db', () => ({
+jest.mock('../../src/config/db', () => ({
   pool: {
     connect: jest.fn()
   },

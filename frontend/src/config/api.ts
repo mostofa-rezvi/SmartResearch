@@ -106,4 +106,11 @@ export const API = {
   dashboard: {
     overview: `${API_BASE}/api/v1/dashboard/overview`,
   },
+  // Projects & Kanban domain
+  projects: {
+    listMilestones: (projectId: string) => `${API_BASE}/api/v1/projects/${projectId}/milestones`,
+    createMilestone: (projectId: string) => `${API_BASE}/api/v1/projects/${projectId}/milestones`,
+    updateMilestoneStatus: (milestoneId: string) => `${API_BASE}/api/v1/projects/milestones/${milestoneId}/status`,
+    getProject: (projectId: string) => `${API_BASE}/api/v1/projects/${projectId}`,
+  },
 } as const;

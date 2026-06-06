@@ -16,14 +16,14 @@
 - [x] **Step 5** `[Pro LOW]`  `/gsd-code-review` — Race conditions, memory leaks, reconnection edge cases
 
 ### A.2 — Kanban Board API Integration
-- [ ] **Step 6** `[Flash]`    `/gsd-discuss-phase --auto` — Kanban wiring to ProjectService endpoints
-- [ ] **Step 7** `[Pro LOW]`  `/gsd-plan-phase` — SWR hooks, optimistic updates, loading skeletons
-- [ ] **Step 8** `[Pro LOW]`  `/gsd-execute-phase` — Wire kanban-board.tsx to live API
-- [ ] **Step 9** `[Pro LOW]`  `/gsd-ui-review` — 6-pillar visual audit
+- [x] **Step 6** `[Flash]`    `/gsd-discuss-phase --auto` — Kanban wiring to ProjectService endpoints
+- [x] **Step 7** `[Pro LOW]`  `/gsd-plan-phase` — SWR hooks, optimistic updates, loading skeletons
+- [x] **Step 8** `[Pro LOW]`  `/gsd-execute-phase` — Wire kanban-board.tsx to live API
+- [x] **Step 9** `[Pro LOW]`  `/gsd-ui-review` — 6-pillar visual audit
 
 ### A.3 — Template Files
-- [ ] **Step 10** `[Flash]`   `/gsd-fast` — Create `frontend/public/templates/` + seed ieee/apa/nature/acm files
-
+- [x] **Step 10** `[Flash]`   `/gsd-fast` — Create `frontend/public/templates/` + seed ieee/apa/nature/acm files
+ 
 ### A.4 — High Priority Verification
 - [ ] **Step 11** `[Pro LOW]` `/gsd-verify-work` — UAT: Yjs sync, live Kanban, template download
 - [ ] **Step 12** `[Flash]`   `/gsd-audit-uat`
@@ -89,8 +89,8 @@
 
 | Phase | Done | Total | % |
 |-------|------|-------|---|
-| A — High Priority | 0 | 13 | 0% |
+| A — High Priority | 9 | 13 | 69% |
 | B — Medium Priority | 0 | 9 | 0% |
 | C — Low Priority | 0 | 11 | 0% |
 | D — Ship | 0 | 5 | 0% |
-| **TOTAL** | **0** | **38** | **0%** |
+| **TOTAL** | **9** | **38** | **24%** |

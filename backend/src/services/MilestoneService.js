@@ -17,6 +17,14 @@ class MilestoneService {
     return res.rows[0];
   }
 
+  async listMilestones(projectId) {
+    const res = await db.query(
+      'SELECT * FROM milestones WHERE project_id = $1 ORDER BY id ASC',
+      [projectId]
+    );
+    return res.rows;
+  }
+
   async updateStatus(milestoneId, userId, newStatus) {
     // 1. Get current status and project context
     const milestoneRes = await db.query(

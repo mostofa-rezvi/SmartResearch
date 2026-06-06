@@ -1,7 +1,7 @@
-const MilestoneService = require('../../../src/services/MilestoneService');
-const db = require('../../../src/config/db');
+const MilestoneService = require('../../src/services/MilestoneService');
+const db = require('../../src/config/db');
 
-jest.mock('../../../src/config/db', () => ({
+jest.mock('../../src/config/db', () => ({
   query: jest.fn()
 }));
 
