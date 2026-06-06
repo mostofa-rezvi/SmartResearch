@@ -2,8 +2,6 @@
 
 import React, { useEffect, useState } from 'react';
 import { useApi, useAuth } from '@/context/AuthContext';
-import { Button } from '../ui/button';
-import { useToast } from '@/hooks/use-toast';
 import { Loader2, CheckCircle2, XCircle } from 'lucide-react';
 import Image from 'next/image';
 
@@ -23,10 +21,10 @@ interface Mentorship {
 export function MentorshipInbox() {
   const { fetchWithAuth } = useApi();
   const { user } = useAuth();
-  const { toast } = useToast();
   const [requests, setRequests] = useState<Mentorship[]>([]);
   const [loading, setLoading] = useState(true);
   const [processingId, setProcessingId] = useState<number | null>(null);
+  const [notification, setNotification] = useState<{message: string, type: 'success' | 'error'} | null>(null);
 
   useEffect(() => {
     const fetchRequests = async () => {
@@ -65,16 +63,9 @@ export function MentorshipInbox() {
       }
 
       setRequests(prev => prev.map(req => req.id === id ? { ...req, status } : req));
-      toast({
-        title: "Success",
-        description: `Mentorship request ${status}.`
-      });
+      setNotification({ message: `Mentorship request ${status}.`, type: 'success' });
     } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive"
-      });
+      setNotification({ message: error.message, type: 'error' });
     } finally {
       setProcessingId(null);
     }
@@ -91,6 +82,11 @@ export function MentorshipInbox() {
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold">Mentorships</h2>
+      {notification && (
+        <div className={`p-4 rounded-md ${notification.type === 'error' ? 'bg-red-50 text-red-700' : 'bg-green-50 text-green-700'}`}>
+          {notification.message}
+        </div>
+      )}
       <div className="grid gap-4">
         {requests.map(request => {
           const isIncoming = user?.id.toString() === request.mentor_id.toString();
@@ -122,22 +118,21 @@ export function MentorshipInbox() {
 
               {isIncoming && request.status === 'pending' && (
                 <div className="flex gap-2">
-                  <Button 
-                    variant="outline" 
-                    className="text-red-600 border-red-200 hover:bg-red-50"
+                  <button 
+                    className="inline-flex items-center justify-center px-3 py-2 text-red-600 border border-red-200 rounded-md hover:bg-red-50 disabled:opacity-50"
                     onClick={() => handleRespond(request.id, 'rejected')}
                     disabled={processingId === request.id}
                   >
                     <XCircle className="w-4 h-4 mr-2" /> Reject
-                  </Button>
-                  <Button 
-                    className="bg-green-600 hover:bg-green-700 text-white"
+                  </button>
+                  <button 
+                    className="inline-flex items-center justify-center px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md disabled:opacity-50"
                     onClick={() => handleRespond(request.id, 'accepted')}
                     disabled={processingId === request.id}
                   >
                     {processingId === request.id ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <CheckCircle2 className="w-4 h-4 mr-2" />}
                     Accept
-                  </Button>
+                  </button>
                 </div>
               )}
             </div>
