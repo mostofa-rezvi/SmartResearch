@@ -83,16 +83,16 @@ router.patch('/:id/respond', auth, async (req, res) => {
       try {
         await session.run(
           `
-          MATCH (mentor:User {id: $mentorId})
-          MATCH (mentee:User {id: $menteeId})
+          MATCH (mentor:Researcher {userId: $mentorId})
+          MATCH (mentee:Researcher {userId: $menteeId})
           MERGE (mentor)-[:MENTORS]->(mentee)
           `,
           {
-            mentorId: mentor_id.toString(),
-            menteeId: mentorship.mentee_id.toString()
+            mentorId: parseInt(mentor_id, 10),
+            menteeId: parseInt(mentorship.mentee_id, 10)
           }
         );
-        logger.info(`Neo4j: Created MENTORS edge from User ${mentor_id} to User ${mentorship.mentee_id}`);
+        logger.info(`Neo4j: Created MENTORS edge from Researcher ${mentor_id} to Researcher ${mentorship.mentee_id}`);
       } catch (graphError) {
         logger.error(`Error syncing MENTORS edge to Neo4j: ${graphError.message}`);
         // We still return success for the DB update

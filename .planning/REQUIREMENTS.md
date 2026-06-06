@@ -22,15 +22,15 @@
 ## Active (Milestone v1.4)
 
 ### 4. Mentorship Module (MENTOR)
-- [ ] **MENTOR-01**: Create `mentorships` schema and table in PostgreSQL database.
-- [ ] **MENTOR-02**: Write Express routing and controller endpoints for slot booking (`POST /mentorship/request`, `PATCH /mentorship/:id/respond`).
-- [ ] **MENTOR-03**: Implement UI for requesting mentorship and managing active mentorship requests.
-- [ ] **MENTOR-04**: Sync mentorship connection as `MENTORS` edge in Neo4j graph db.
+- [x] **MENTOR-01**: Create `mentorships` schema and table in PostgreSQL database.
+- [x] **MENTOR-02**: Write Express routing and controller endpoints for slot booking (`POST /mentorship/request`, `PATCH /mentorship/:id/respond`).
+- [x] **MENTOR-03**: Implement UI for requesting mentorship and managing active mentorship requests.
+- [x] **MENTOR-04**: Sync mentorship connection as `MENTORS` edge in Neo4j graph db.
 
 ### 5. Paper Tracking & History (HIST)
-- [ ] **HIST-01**: Create `reading_history` log schema in PostgreSQL.
-- [ ] **HIST-02**: Expose user history routes (`GET /users/me/history`).
-- [ ] **HIST-03**: Log reading events on paper view/bookmarks, and wire dashboard stats dynamically.
+- [x] **HIST-01**: Create `reading_history` log schema in PostgreSQL.
+- [x] **HIST-02**: Expose user history routes (`GET /users/me/history`).
+- [x] **HIST-03**: Log reading events on paper view/bookmarks, and wire dashboard stats dynamically.
 
 ---
 
