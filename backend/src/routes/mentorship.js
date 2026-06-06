@@ -54,7 +54,6 @@ router.get('/my', auth, async (req, res) => {
 
 // PATCH /:id/respond
 router.patch('/:id/respond', auth, async (req, res) => {
-  const session = getSession();
   try {
     const { id } = req.params;
     const { status } = req.body; // 'accepted' or 'rejected'
@@ -80,6 +79,7 @@ router.patch('/:id/respond', auth, async (req, res) => {
 
     // Trigger graph sync if accepted
     if (status === 'accepted') {
+      const session = getSession();
       try {
         await session.run(
           `
