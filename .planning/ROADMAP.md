@@ -22,15 +22,27 @@
 
 </details>
 
+<details>
+<summary>Milestone v1.3 — Gap Closure Phase A: Yjs, Kanban & Templates</summary>
+
+## [✓] Milestone v1.3 — Gap Closure Phase A: Yjs, Kanban & Templates
+- **Status**: Archived (2026-06-06)
+- **Archive**: [.planning/milestones/v1.3-ROADMAP.md](file:///.planning/milestones/v1.3-ROADMAP.md)
+- **Summary**: Delivered real-time collaborative document editing (Yjs), dynamic Kanban board integration with backend optimistic status update FSM enforcement, and public templates folder.
+
+</details>
+
 ---
 
-## Current Milestone: v1.3 — Gap Closure Milestone: Yjs Editor, Kanban API, Templates
-- **Goal**: Close outstanding gaps across editor, Kanban board, templates, mentorship, and history log.
-- **Phase 16**: Yjs Editor WS Connection — Hook up editor React frontend to Socket.IO/Yjs backend.
-- **Phase 17**: Kanban API Integration — Fetch and persist kanban actions to ProjectService.
-- **Phase 18**: Template Files Seeding — Save templates in frontend/public folder.
+## Current Milestone: v1.4 — Medium Priority: Mentorship Module & Paper History
+- **Goal**: Implement the mentorship matching and pairing module and track paper reading history.
 - **Phase 19**: Mentorship Module — DB tables, controllers, pairing UI, and Neo4j sync.
 - **Phase 20**: Reading History Tracking — Store user interaction/bookmarks log.
+
+---
+
+## Next Milestone: v1.5 — Low Priority: Hardening & Security
+- **Goal**: WebSocket JWT auth handshake and SBERT threshold calibration.
 - **Phase 21**: Security & ML Hardening — WebSocket JWT handshake and SBERT threshold calibration.
 
 ---

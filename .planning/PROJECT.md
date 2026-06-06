@@ -8,6 +8,13 @@ ResearchBridge is a Smart Research Collaboration Platform designed to facilitate
 
 Empowering research collaboration through a verifiable trust graph, advanced semantic discovery, and real-time event-driven synchronization across a distributed research ecosystem.
 
+## Shipped: v1.3 — Gap Closure Phase A: Yjs, Kanban & Templates (2026-06-06)
+
+**Accomplishments:**
+- **WS/Yjs Connection**: Real-time collaborative document editor with SocketIOProvider sync.
+- **Kanban API Integration**: Next.js kanban board wired to backend endpoints, featuring skeleton loading and optimistic updates with FSM status transition constraints.
+- **Templates Seeding**: IEEE, APA, Nature, and ACM templates seeded in public directory, resolving 404 errors.
+
 ## Shipped: v1.2 — Week 3 — Frontend, Publication Assistant & Production (2026-04-27)
 
 **Accomplishments:**
@@ -23,17 +30,13 @@ Empowering research collaboration through a verifiable trust graph, advanced sem
 - **Real-Time Collaboration**: Socket.IO project rooms with Yjs CRDT document sync.
 - **Trust Analytics**: PageRank and Co-authorship discovery in Neo4j GDS.
 
-## Current Milestone: v1.3 — Gap Closure Milestone: Yjs Editor, Kanban API, Templates
+## Current Milestone: v1.4 — Medium Priority: Mentorship Module & Paper History
 
-**Goal:** Close all critical, medium, and low-priority gaps to deliver a polished demo-ready research platform.
+**Goal:** Implement the mentorship matching and pairing module and track paper reading history.
 
 **Target features:**
-- **WS/Yjs Connection**: Integrate real-time WebSocket Yjs document editing in frontend editor.
-- **Kanban API Integration**: Connect frontend kanban board to existing ProjectService backend endpoints.
-- **Templates Storage**: Seed LaTeX/Word templates to resolve template download 404 errors.
 - **Mentorship Module**: Establish DB table, Express controller/routes, booking UI, and Neo4j pairing graph sync.
 - **Paper Reading History**: Introduce user bookmark/download logs, exposing routes to dynamic dashboard metrics.
-- **Hardening**: Add JWT authentication to Socket.IO and calibrate FastAPI SBERT threshold.
 
 ## Requirements
 

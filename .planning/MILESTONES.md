@@ -4,4 +4,6 @@
 |-----------|-------|--------|---------|
 | v0.1 | Foundation & Scan | ✓ Shipped | 2026-04-25 |
 | v1.0 | Week 1 — Infrastructure, Auth & Core Backend | ✓ Shipped | 2026-04-26 |
-| v1.1 | Week 2 — AI Matching Engine, Search & Collaboration Core | 🏗️ Active | — |
+| v1.1 | Milestone v1.1: AI Matching & Collaboration | ✓ Shipped | 2026-04-26 |
+| v1.2 | Milestone v1.2 — Feed & Social Dynamics | ✓ Shipped | 2026-04-27 |
+| v1.3 | Milestone v1.3 — Gap Closure Milestone: Yjs Editor, Kanban API, Templates | ✓ Shipped | 2026-06-06 |
