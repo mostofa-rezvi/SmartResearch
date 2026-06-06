@@ -8,7 +8,9 @@ import {
   Filter, ArrowUpDown, BookMarked, FileText, Users,
   Calendar, TrendingUp, Unlock, Lock, Tag, Trash2
 } from "lucide-react";
-import { OPENALEX_BASE, OPENALEX_EMAIL } from "@/config/api";
+import { OPENALEX_BASE, OPENALEX_EMAIL, API } from "@/config/api";
+import { useApi, useAuth } from "@/context/AuthContext";
+
 
 // ---------- Types ----------
 
@@ -144,10 +146,12 @@ function PaperCard({
   paper,
   isSaved,
   onToggleSave,
+  onTrackView,
 }: {
   paper: Paper;
   isSaved: boolean;
   onToggleSave: (p: Paper) => void;
+  onTrackView: (p: Paper) => void;
 }) {
   const [expanded, setExpanded] = useState(false);
   const abstract = decodeAbstract(paper.abstract_inverted_index);
@@ -194,7 +198,7 @@ function PaperCard({
           {/* Title */}
           <h4 className="text-sm font-bold text-slate-900 dark:text-white leading-snug mb-1.5 group-hover:text-primary transition-colors line-clamp-2">
             {url ? (
-              <a href={url} target="_blank" rel="noreferrer" className="hover:underline underline-offset-2">
+              <a href={url} target="_blank" rel="noreferrer" className="hover:underline underline-offset-2" onClick={() => onTrackView(paper)}>
                 {paper.title || "Untitled"}
               </a>
             ) : (
@@ -244,6 +248,7 @@ function PaperCard({
               rel="noreferrer"
               className="p-2 text-slate-400 hover:text-primary hover:bg-primary/5 rounded-lg transition-all"
               title="Open paper"
+              onClick={() => onTrackView(paper)}
             >
               <ExternalLink size={14} />
             </a>
@@ -271,11 +276,15 @@ function SavedPapersPanel({
   journalName,
   onRemove,
   onClose,
+  onTrackView,
+  onTrackDownload,
 }: {
   papers: Paper[];
   journalName: string;
   onRemove: (id: string) => void;
   onClose: () => void;
+  onTrackView: (p: Paper) => void;
+  onTrackDownload: (p: Paper) => void;
 }) {
   return (
     <div className="flex flex-col h-full">
@@ -311,7 +320,13 @@ function SavedPapersPanel({
             <div key={p.id} className="flex items-start gap-3 p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-700/50 group hover:border-secondary/30 transition-all">
               <div className="flex-1 min-w-0">
                 <p className="text-xs font-bold text-slate-800 dark:text-white line-clamp-2 mb-1">
-                  {p.title || "Untitled"}
+                  {getPaperUrl(p) ? (
+                    <a href={getPaperUrl(p)} target="_blank" rel="noreferrer" className="hover:underline" onClick={() => onTrackView(p)}>
+                      {p.title || "Untitled"}
+                    </a>
+                  ) : (
+                    p.title || "Untitled"
+                  )}
                 </p>
                 <div className="flex items-center gap-2 text-[10px] text-slate-400 font-semibold">
                   <span>{p.publication_year}</span>
@@ -321,7 +336,7 @@ function SavedPapersPanel({
               </div>
               <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                 {getPaperUrl(p) && (
-                  <a href={getPaperUrl(p)} target="_blank" rel="noreferrer" className="p-1.5 text-slate-400 hover:text-primary transition-colors">
+                  <a href={getPaperUrl(p)} target="_blank" rel="noreferrer" className="p-1.5 text-slate-400 hover:text-primary transition-colors" onClick={() => onTrackView(p)}>
                     <ExternalLink size={12} />
                   </a>
                 )}
@@ -337,7 +352,10 @@ function SavedPapersPanel({
       {/* Footer */}
       <div className="p-5 border-t border-slate-100 dark:border-slate-800 shrink-0 space-y-3">
         <button
-          onClick={() => exportPapersToCSV(papers, journalName)}
+          onClick={() => {
+            exportPapersToCSV(papers, journalName);
+            papers.forEach(p => onTrackDownload(p));
+          }}
           disabled={papers.length === 0}
           className="w-full flex items-center justify-center gap-2 py-3.5 bg-gradient-to-r from-primary to-secondary text-white text-sm font-black rounded-2xl shadow-lg shadow-primary/20 hover:scale-[1.02] transition-transform active:scale-[0.98] disabled:opacity-50 disabled:hover:scale-100"
         >
@@ -385,6 +403,27 @@ export default function JournalPapersModal({ journal, onClose }: Props) {
     catch { return []; }
   });
   const [showSaved, setShowSaved] = useState(false);
+
+  const { fetchWithAuth } = useApi();
+  const { token } = useAuth();
+
+  const trackPaperEvent = useCallback(async (paper: Paper, action: 'view' | 'bookmark' | 'download') => {
+    if (!token) return;
+    try {
+      await fetchWithAuth(API.users.history, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          paper_id: paper.id,
+          paper_title: paper.title || "Untitled",
+          paper_doi: paper.doi || "",
+          action
+        })
+      });
+    } catch (err) {
+      console.error("Failed to track paper action:", err);
+    }
+  }, [token, fetchWithAuth]);
 
   const listRef = useRef<HTMLDivElement>(null);
   const abortRef = useRef<AbortController | null>(null);
@@ -539,6 +578,8 @@ export default function JournalPapersModal({ journal, onClose }: Props) {
                 journalName={journal.name}
                 onRemove={removeSavedPaper}
                 onClose={() => setShowSaved(false)}
+                onTrackView={(p) => trackPaperEvent(p, 'view')}
+                onTrackDownload={(p) => trackPaperEvent(p, 'download')}
               />
             </motion.div>
           ) : (
@@ -722,6 +763,7 @@ export default function JournalPapersModal({ journal, onClose }: Props) {
                     paper={paper}
                     isSaved={savedPapers.some(p => p.id === paper.id)}
                     onToggleSave={toggleSavePaper}
+                    onTrackView={(p) => trackPaperEvent(p, 'view')}
                   />
                 ))}
 

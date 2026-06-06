@@ -74,6 +74,7 @@ export const API = {
   // Identity domain
   users: {
     profile: (id: string) => `${API_BASE}/api/v1/users/${id}/profile`,
+    history: `${API_BASE}/api/v1/users/me/history`,
   },
   profiles: {
     me: `${API_BASE}/api/v1/profiles/me`,

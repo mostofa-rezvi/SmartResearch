@@ -3,6 +3,9 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { X, Bookmark, ExternalLink, Trash2, Download, FileText, Calendar, Quote } from "lucide-react";
+import { API } from "@/config/api";
+import { useApi, useAuth } from "@/context/AuthContext";
+
 
 interface Author {
   author: { display_name: string };
@@ -69,6 +72,27 @@ function getPaperUrl(paper: Paper): string {
 }
 
 export default function AllSavedPapersModal({ onClose, onRefreshCount }: Props) {
+  const { fetchWithAuth } = useApi();
+  const { token } = useAuth();
+
+  const trackPaperEvent = React.useCallback(async (paper: Paper, action: 'view' | 'bookmark' | 'download') => {
+    if (!token) return;
+    try {
+      await fetchWithAuth(API.users.history, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          paper_id: paper.id,
+          paper_title: paper.title || "Untitled",
+          paper_doi: paper.doi || "",
+          action
+        })
+      });
+    } catch (err) {
+      console.error("Failed to track paper action:", err);
+    }
+  }, [token, fetchWithAuth]);
+
   // Load papers from localStorage
   const loadPapers = (): SavedPaperItem[] => {
     if (typeof window === "undefined") return [];
@@ -232,7 +256,7 @@ export default function AllSavedPapersModal({ onClose, onRefreshCount }: Props) 
                   {/* Title */}
                   <h4 className="text-sm font-bold text-slate-900 dark:text-white leading-snug mb-1.5 group-hover:text-primary transition-colors">
                     {getPaperUrl(p) ? (
-                      <a href={getPaperUrl(p)} target="_blank" rel="noreferrer" className="hover:underline">
+                      <a href={getPaperUrl(p)} target="_blank" rel="noreferrer" className="hover:underline" onClick={() => trackPaperEvent(p, 'view')}>
                         {p.title || "Untitled"}
                       </a>
                     ) : (
@@ -274,6 +298,7 @@ export default function AllSavedPapersModal({ onClose, onRefreshCount }: Props) 
                       rel="noreferrer" 
                       className="p-2 text-slate-400 hover:text-primary hover:bg-primary/5 rounded-lg transition-all"
                       title="Open Paper"
+                      onClick={() => trackPaperEvent(p, 'view')}
                     >
                       <ExternalLink size={14} />
                     </a>
@@ -301,7 +326,10 @@ export default function AllSavedPapersModal({ onClose, onRefreshCount }: Props) 
               Clear All
             </button>
             <button
-              onClick={handleExport}
+              onClick={() => {
+                handleExport();
+                savedItems.forEach(({ paper }) => trackPaperEvent(paper, 'download'));
+              }}
               className="flex-1 flex items-center justify-center gap-2 py-3.5 bg-gradient-to-r from-primary to-secondary text-white text-xs font-black rounded-xl shadow-lg shadow-primary/20 hover:scale-[1.01] active:scale-[0.99] transition-all"
             >
               <Download size={14} />

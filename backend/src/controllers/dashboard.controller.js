@@ -4,9 +4,10 @@ exports.getOverview = async (req, res) => {
   try {
     const userId = req.user.id;
 
-    // 1. Get Stats (Community posts by user, Groups joined)
+    // 1. Get Stats (Community posts by user, Groups joined, Papers read)
     const postsResult = await db.query('SELECT COUNT(*) as count FROM community_posts WHERE user_id = $1', [userId]);
     const groupsResult = await db.query('SELECT COUNT(*) as count FROM group_members WHERE user_id = $1', [userId]);
+    const papersResult = await db.query('SELECT COUNT(DISTINCT paper_id) as count FROM reading_history WHERE user_id = $1', [userId]);
     const userResult = await db.query(`
       SELECT u.research_interests, iup.impact_score 
       FROM users u 
@@ -16,8 +17,10 @@ exports.getOverview = async (req, res) => {
 
     const postCount = parseInt(postsResult.rows[0].count) || 0;
     const groupCount = parseInt(groupsResult.rows[0].count) || 0;
+    const papersReadCount = parseInt(papersResult.rows[0].count) || 0;
     const impactScore = userResult.rows[0].impact_score || 0;
     const interests = userResult.rows[0].research_interests || [];
+
 
     // 2. Recent Activity (Latest 5 posts/comments)
     const recentActivityQuery = `
@@ -78,7 +81,7 @@ exports.getOverview = async (req, res) => {
           posts: postCount,
           groups: groupCount,
           impactScore: impactScore,
-          papersRead: 0 // Placeholder until paper tracking is implemented
+          papersRead: papersReadCount
         },
         recentActivity: activities,
         recommendations: recommendations

@@ -53,6 +53,23 @@ class UserService {
 
     return userProfile;
   }
+
+  async getReadingHistory(userId) {
+    const result = await db.query(
+      'SELECT id, paper_id, paper_title, paper_doi, action, read_at FROM reading_history WHERE user_id = $1 ORDER BY read_at DESC',
+      [userId]
+    );
+    return result.rows;
+  }
+
+  async recordReadingHistory(userId, { paper_id, paper_title, paper_doi, action }) {
+    const result = await db.query(
+      'INSERT INTO reading_history (user_id, paper_id, paper_title, paper_doi, action) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+      [userId, paper_id, paper_title, paper_doi, action]
+    );
+    return result.rows[0];
+  }
 }
 
 module.exports = new UserService();
+

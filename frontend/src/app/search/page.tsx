@@ -6,6 +6,8 @@ import Footer from "@/components/Footer";
 import { Search as SearchIcon, FileText, User, ChevronRight, Hash, Send, AlertTriangle, ExternalLink, Calendar, Users, FileType, CheckCircle2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { API } from "@/config/api";
+import { useAuth, useApi } from "@/context/AuthContext";
+
 
 interface PaperMetadata {
   id: string;
@@ -28,6 +30,27 @@ export default function PublicSearchPage() {
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<PaperMetadata | null>(null);
 
+  const { token } = useAuth();
+  const { fetchWithAuth } = useApi();
+
+  const trackPaperEvent = async (paper: PaperMetadata, action: 'view' | 'bookmark' | 'download') => {
+    if (!token) return;
+    try {
+      await fetchWithAuth(API.users.history, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          paper_id: paper.id,
+          paper_title: paper.title || "Untitled",
+          paper_doi: paper.doi || "",
+          action
+        })
+      });
+    } catch (err) {
+      console.error("Failed to track paper action:", err);
+    }
+  };
+
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!query) return;
@@ -44,6 +67,7 @@ export default function PublicSearchPage() {
 
       if (json.success && json.data) {
         setResult(json.data);
+        trackPaperEvent(json.data, 'view');
       } else {
         setError(json.message || "Failed to resolve identifier.");
       }
@@ -199,6 +223,7 @@ export default function PublicSearchPage() {
                           target="_blank" 
                           rel="noreferrer"
                           className="w-full py-4 bg-emerald-500 hover:bg-emerald-600 text-white font-black rounded-2xl flex items-center justify-center gap-2 shadow-xl shadow-emerald-500/20 transition-all"
+                          onClick={() => trackPaperEvent(result, 'view')}
                          >
                            Read Open Access PDF <ExternalLink size={18} />
                          </a>

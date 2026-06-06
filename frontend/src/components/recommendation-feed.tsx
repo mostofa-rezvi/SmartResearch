@@ -33,6 +33,24 @@ export function RecommendationFeed({ filters }: RecommendationFeedProps) {
   const [papers, setPapers] = useState<any[]>([]);
   const [isLoadingPapers, setIsLoadingPapers] = useState(false);
 
+  const trackPaperEvent = async (paper: any, action: 'view' | 'bookmark' | 'download') => {
+    if (!token) return;
+    try {
+      await fetchWithAuth(API.users.history, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          paper_id: paper.id,
+          paper_title: paper.title || "Untitled",
+          paper_doi: paper.doi || "",
+          action
+        })
+      });
+    } catch (err) {
+      console.error("Failed to track paper action:", err);
+    }
+  };
+
   useEffect(() => {
     const fetchRecommendations = async () => {
       try {
@@ -339,7 +357,13 @@ export function RecommendationFeed({ filters }: RecommendationFeedProps) {
                       >
                         <div className="flex justify-between items-start gap-4 mb-2">
                           <h4 className="font-bold text-slate-900 dark:text-white group-hover/paper:text-primary transition-colors text-sm md:text-base leading-snug">
-                            {paper.title}
+                            {paper.landing_page_url ? (
+                              <a href={paper.landing_page_url} target="_blank" rel="noopener noreferrer" className="hover:underline" onClick={() => trackPaperEvent(paper, 'view')}>
+                                {paper.title}
+                              </a>
+                            ) : (
+                              paper.title
+                            )}
                           </h4>
                           {paper.landing_page_url && (
                             <a 
@@ -347,6 +371,7 @@ export function RecommendationFeed({ filters }: RecommendationFeedProps) {
                               target="_blank" 
                               rel="noopener noreferrer" 
                               className="p-1.5 bg-slate-50 hover:bg-primary/10 dark:bg-slate-800 text-slate-400 hover:text-primary rounded-lg transition-all shrink-0"
+                              onClick={() => trackPaperEvent(paper, 'view')}
                             >
                               <ExternalLink size={14} />
                             </a>
