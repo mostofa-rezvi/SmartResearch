@@ -10,10 +10,10 @@
 - [ ] **Step 1** `[Flash]` `/gsd-new-milestone` — "Gap Closure Milestone: Yjs Editor, Kanban API, Templates"
 
 ### A.1 — Yjs/WebSocket Collaborative Editor
-- [ ] **Step 2** `[Pro HIGH]` `/gsd-discuss-phase` — Yjs provider selection + awareness/cursor design
-- [ ] **Step 3** `[Pro HIGH]` `/gsd-plan-phase` — Exact React hook, provider setup, reconnection logic
-- [ ] **Step 4** `[Pro LOW]`  `/gsd-execute-phase` — Wire `collaborative-editor.tsx` with real Yjs sync
-- [ ] **Step 5** `[Pro LOW]`  `/gsd-code-review` — Race conditions, memory leaks, reconnection edge cases
+- [x] **Step 2** `[Pro HIGH]` `/gsd-discuss-phase` — Yjs provider selection + awareness/cursor design
+- [x] **Step 3** `[Pro HIGH]` `/gsd-plan-phase` — Exact React hook, provider setup, reconnection logic
+- [x] **Step 4** `[Pro LOW]`  `/gsd-execute-phase` — Wire `collaborative-editor.tsx` with real Yjs sync
+- [x] **Step 5** `[Pro LOW]`  `/gsd-code-review` — Race conditions, memory leaks, reconnection edge cases
 
 ### A.2 — Kanban Board API Integration
 - [ ] **Step 6** `[Flash]`    `/gsd-discuss-phase --auto` — Kanban wiring to ProjectService endpoints
