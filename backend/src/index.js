@@ -14,6 +14,7 @@ const { initElasticsearch, initIndices } = require('./config/elasticsearch');
 const { initNeo4j } = require('./config/neo4j');
 const errorHandler = require('./middleware/errorHandler');
 const { apiLimiter, authLimiter } = require('./middleware/rateLimit');
+const { socketAuthMiddleware } = require('./middleware/auth');
 
 const app = express();
 const server = http.createServer(app);
@@ -103,32 +104,56 @@ app.use('/api/mentorship', require('./routes/mentorship'));
 
 
 
+// Apply Socket.IO Auth Middleware
+io.use(socketAuthMiddleware);
+
 // Socket.IO Connection Event
 io.on('connection', (socket) => {
-  logger.info('A user connected via WebSocket');
+  logger.info(`A user connected via WebSocket: ${socket.user?.id}`);
   
   socket.on('join_feed', (userId) => {
+    if (userId !== socket.user?.id) return;
     socket.join(`user_${userId}`);
   });
 
   // --- Collaboration Workspace Logic ---
-  socket.on('join_project', (projectId, user) => {
-    const room = `project_${projectId}`;
-    socket.join(room);
-    
-    // Broadcast presence
-    socket.to(room).emit('presence:join', user);
-    logger.info(`User ${user.id} joined project room ${room}`);
+  socket.on('join_project', async (projectId, user) => {
+    try {
+      // Verify project membership
+      const authCheck = await db.query(
+        'SELECT role FROM project_members WHERE project_id = $1 AND user_id = $2',
+        [projectId, socket.user.id]
+      );
+      
+      if (authCheck.rowCount === 0) {
+        socket.emit('error', { message: 'Unauthorized to join project' });
+        return;
+      }
 
-    // Load initial document state
-    const collaborationService = require('./services/CollaborationService');
-    collaborationService.getDocumentState(projectId).then(state => {
-      socket.emit('sync:init', state);
-    }).catch(err => logger.error('Failed to load document state:', err));
+      const room = `project_${projectId}`;
+      socket.join(room);
+      
+      // Broadcast presence securely
+      socket.to(room).emit('presence:join', socket.user);
+      logger.info(`User ${socket.user.id} joined project room ${room}`);
+
+      // Load initial document state
+      const collaborationService = require('./services/CollaborationService');
+      collaborationService.getDocumentState(projectId).then(state => {
+        socket.emit('sync:init', state);
+      }).catch(err => logger.error('Failed to load document state:', err));
+    } catch (err) {
+      logger.error('Error joining project room', err);
+      socket.emit('error', { message: 'Server error joining project' });
+    }
   });
 
   socket.on('sync:update', async (projectId, updateBinary) => {
     const room = `project_${projectId}`;
+    if (!socket.rooms.has(room)) {
+      return; // Must join room first to sync
+    }
+
     // Broadcast to others immediately for low latency
     socket.to(room).emit('sync:update', updateBinary);
 
@@ -144,13 +169,12 @@ io.on('connection', (socket) => {
   socket.on('leave_project', (projectId, user) => {
     const room = `project_${projectId}`;
     socket.leave(room);
-    socket.to(room).emit('presence:leave', user.id);
+    socket.to(room).emit('presence:leave', socket.user.id);
   });
   // ------------------------------------
 
   socket.on('disconnect', () => {
-    logger.info('User disconnected');
-    // Note: To broadcast presence:leave on disconnect, we'd need to track socket.id -> project mapping.
+    logger.info(`User disconnected: ${socket.user?.id}`);
   });
 });
 

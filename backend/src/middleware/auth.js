@@ -67,4 +67,39 @@ const requireOnboarding = (req, res, next) => {
   next();
 };
 
-module.exports = { auth, requireRole, requireOnboarding };
+const socketAuthMiddleware = async (socket, next) => {
+  try {
+    let token = socket.handshake.auth?.token;
+    if (!token && socket.handshake.headers['x-auth-token']) {
+      token = socket.handshake.headers['x-auth-token'];
+    }
+    
+    if (!token) {
+      return next(new Error('Authentication error: No token provided'));
+    }
+
+    const decoded = jwt.verify(token, config.jwt.accessSecret);
+    const userId = decoded.id || (decoded.user && decoded.user.id);
+    
+    if (!userId) {
+      return next(new Error('Authentication error: Token is not valid'));
+    }
+
+    const result = await db.query(
+      'SELECT id, name, email, role FROM users WHERE id = $1',
+      [userId]
+    );
+
+    if (result.rows.length === 0) {
+      return next(new Error('Authentication error: User not found'));
+    }
+
+    socket.user = result.rows[0];
+    next();
+  } catch (err) {
+    logger.error('Socket JWT Verification failed: ' + err.message);
+    next(new Error('Authentication error'));
+  }
+};
+
+module.exports = { auth, requireRole, requireOnboarding, socketAuthMiddleware };

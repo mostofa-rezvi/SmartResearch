@@ -23,11 +23,14 @@ export const YjsProvider = ({ documentId, children }: { documentId: string, chil
   const [provider, setProvider] = useState<SocketIOProvider | null>(null);
 
   useEffect(() => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+
     // 1. Initialize Socket.IO with Reconnection Logic
     const socket = io(process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:4000', {
       reconnectionDelayMax: 10000,
       reconnectionAttempts: Infinity,
       transports: ['websocket'],
+      auth: { token }
     });
 
     // 2. Initialize y-socket.io Provider
@@ -36,7 +39,7 @@ export const YjsProvider = ({ documentId, children }: { documentId: string, chil
       socketUrl,
       `doc-room-${documentId}`,
       doc,
-      { autoConnect: true }
+      { autoConnect: true, auth: { token } } as any
     );
 
     setProvider(yjsProvider);

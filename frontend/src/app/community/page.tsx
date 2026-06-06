@@ -54,8 +54,10 @@ export default function CommunityFeedPage() {
     if (!token || !user) return;
 
     // Connect to Socket.IO backend
-    const socket = io(API_BASE);
-    
+    const socket = io(API_BASE, {
+      auth: { token }
+    });
+
     socket.on("connect", () => {
       setSocketConnected(true);
       socket.emit("join_feed", user.id);
