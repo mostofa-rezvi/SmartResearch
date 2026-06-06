@@ -1,16 +1,26 @@
 # Roadmap: SmartResearch
 
+<details>
+<summary>Milestone v1.1: AI Matching & Collaboration</summary>
+
 ## [✓] Milestone v1.1: AI Matching & Collaboration
 - **Status**: Archived (2026-04-26)
 - **Archive**: [.planning/milestones/v1.1-ROADMAP.md](file:///.planning/milestones/v1.1-ROADMAP.md)
 - **Summary**: Delivered SBERT discovery engine, Neo4j trust graph, and real-time collaborative workspaces.
 
+</details>
+
 ---
+
+<details>
+<summary>Milestone v1.2 — Feed & Social Dynamics</summary>
 
 ## [✓] Milestone v1.2 — Feed & Social Dynamics
 - **Status**: Archived (2026-04-27)
 - **Archive**: [.planning/milestones/v1.2-ROADMAP.md](file:///.planning/milestones/v1.2-ROADMAP.md)
 - **Summary**: Delivered Next.js frontend, Publication Assistant, and production-grade K8s infrastructure.
+
+</details>
 
 ---
 

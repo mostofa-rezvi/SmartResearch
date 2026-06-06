@@ -25,9 +25,9 @@
 - [x] **Step 10** `[Flash]`   `/gsd-fast` — Create `frontend/public/templates/` + seed ieee/apa/nature/acm files
  
 ### A.4 — High Priority Verification
-- [ ] **Step 11** `[Pro LOW]` `/gsd-verify-work` — UAT: Yjs sync, live Kanban, template download
-- [ ] **Step 12** `[Flash]`   `/gsd-audit-uat`
-- [ ] **Step 13** `[Flash]`   `/gsd-audit-milestone`
+- [x] **Step 11** `[Pro LOW]` `/gsd-verify-work` — UAT: Yjs sync, live Kanban, template download
+- [x] **Step 12** `[Flash]`   `/gsd-audit-uat`
+- [x] **Step 13** `[Flash]`   `/gsd-audit-milestone`
 
 ---
 
@@ -89,8 +89,8 @@
 
 | Phase | Done | Total | % |
 |-------|------|-------|---|
-| A — High Priority | 9 | 13 | 69% |
+| A — High Priority | 12 | 13 | 92% |
 | B — Medium Priority | 0 | 9 | 0% |
 | C — Low Priority | 0 | 11 | 0% |
 | D — Ship | 0 | 5 | 0% |
-| **TOTAL** | **9** | **38** | **24%** |
+| **TOTAL** | **12** | **38** | **32%** |

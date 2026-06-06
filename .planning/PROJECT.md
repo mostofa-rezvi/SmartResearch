@@ -58,9 +58,9 @@ Empowering research collaboration through a verifiable trust graph, advanced sem
 
 ### Active
 
-- [ ] **WS/Yjs Editor Connection** — Connect @hocuspocus/provider or y-websocket to Express WS gateway.
-- [ ] **Kanban Integration** — Connect kanban-board.tsx to ProjectService REST API.
-- [ ] **Templates Seeding** — Save valid templates in public folder.
+- [x] **WS/Yjs Editor Connection** — Connect @hocuspocus/provider or y-websocket to Express WS gateway.
+- [x] **Kanban Integration** — Connect kanban-board.tsx to ProjectService REST API.
+- [x] **Templates Seeding** — Save valid templates in public folder.
 - [ ] **Mentorship CRUD & UI** — Implement mentorship DB table, Express REST API, booking UI, and Neo4j graph sync.
 - [ ] **Reading History Logs** — Implement reading history database tables, GET/POST routes, and dashboard counts.
 - [ ] **Security & ML Hardening** — JWT auth on Socket.IO and SBERT threshold calibration.
