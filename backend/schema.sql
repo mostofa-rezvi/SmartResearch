@@ -305,3 +305,13 @@ CREATE TABLE IF NOT EXISTS researcher_profiles (
     research_interests JSONB DEFAULT '[]',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Mentorships Table
+CREATE TABLE IF NOT EXISTS mentorships (
+    id SERIAL PRIMARY KEY,
+    mentor_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    mentee_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'accepted', 'rejected')),
+    message TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

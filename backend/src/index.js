@@ -79,6 +79,7 @@ app.use('/api/v1/search', require('./routes/search'));
 app.use('/api/v1/dashboard', require('./routes/dashboard'));
 app.use('/api/v1/blogs', require('./routes/blogs'));
 app.use('/api/v1/projects', require('./routes/projects'));
+app.use('/api/v1/mentorship', require('./routes/mentorship'));
 
 
 // Backward-compatible non-versioned routes (transitional)
@@ -98,6 +99,7 @@ app.use('/api/onboarding', require('./routes/onboarding'));
 app.use('/api/search', require('./routes/search'));
 app.use('/api/dashboard', require('./routes/dashboard'));
 app.use('/api/projects', require('./routes/projects'));
+app.use('/api/mentorship', require('./routes/mentorship'));
 
 
 
