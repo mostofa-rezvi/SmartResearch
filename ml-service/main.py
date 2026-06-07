@@ -9,6 +9,8 @@ from recommender.cf_engine import CFEngine
 from recommender.scorer import rrf_merge
 import logging
 
+import os
+import psycopg2
 from contextlib import asynccontextmanager
 
 # Initialize Recommender Components
@@ -56,7 +58,6 @@ async def get_recommendations(user_id: int, req: Optional[RecRequest] = None):
                 cache.set(req.profile_text, vector)
                 
             from elasticsearch import Elasticsearch
-            import os
             es = Elasticsearch(os.getenv("ELASTICSEARCH_URL", "http://localhost:9200"))
             
             query = {
@@ -87,8 +88,6 @@ async def get_recommendations(user_id: int, req: Optional[RecRequest] = None):
         if len(final_results) < 5:
             logger.info(f"Only {len(final_results)} ML recommendations passed threshold, applying popular researchers fallback.")
             try:
-                import psycopg2
-                import os
                 conn = psycopg2.connect(os.getenv("DATABASE_URL", "postgresql://postgres:postgres@localhost:5434/researchbridge"))
                 cur = conn.cursor()
                 cur.execute(

@@ -10,6 +10,8 @@ import random
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from ml_model import get_model
 
+random.seed(42)
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
