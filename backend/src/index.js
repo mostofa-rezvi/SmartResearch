@@ -15,6 +15,7 @@ const { initNeo4j } = require('./config/neo4j');
 const errorHandler = require('./middleware/errorHandler');
 const { apiLimiter, authLimiter } = require('./middleware/rateLimit');
 const { socketAuthMiddleware } = require('./middleware/auth');
+const notificationService = require('./services/notification.service');
 
 const app = express();
 const server = http.createServer(app);
@@ -29,6 +30,7 @@ const io = new Server(server, {
 });
 
 require('./services/socket.service').init(io);
+notificationService.init(io); // Inject io so notification.service can emit live events
 
 
 // Middleware
@@ -81,6 +83,11 @@ app.use('/api/v1/dashboard', require('./routes/dashboard'));
 app.use('/api/v1/blogs', require('./routes/blogs'));
 app.use('/api/v1/projects', require('./routes/projects'));
 app.use('/api/v1/mentorship', require('./routes/mentorship'));
+app.use('/api/v1/connections', require('./routes/connections'));
+app.use('/api/v1/notifications', require('./routes/notifications'));
+app.use('/api/v1/publications', require('./routes/publications'));
+app.use('/api/v1/analytics', require('./routes/analytics'));
+app.use('/api/v1/library', require('./routes/library.routes'));
 
 
 // Backward-compatible non-versioned routes (transitional)
@@ -101,6 +108,11 @@ app.use('/api/search', require('./routes/search'));
 app.use('/api/dashboard', require('./routes/dashboard'));
 app.use('/api/projects', require('./routes/projects'));
 app.use('/api/mentorship', require('./routes/mentorship'));
+app.use('/api/connections', require('./routes/connections'));
+app.use('/api/notifications', require('./routes/notifications'));
+app.use('/api/publications', require('./routes/publications'));
+app.use('/api/analytics', require('./routes/analytics'));
+app.use('/api/library', require('./routes/library.routes'));
 
 
 
@@ -258,6 +270,10 @@ server.listen(PORT, async () => {
     const searchSyncWorker = require('./workers/searchSync.worker');
     await searchSyncWorker.init();
     searchSyncWorker.start().catch(err => logger.error('SearchSync worker error', err));
+
+    const notificationWorker = require('./workers/notification.worker');
+    await notificationWorker.init();
+    notificationWorker.start().catch(err => logger.error('Notification worker error', err));
     
     logger.info('Multi-database environment initialized successfully');
   } catch (err) {

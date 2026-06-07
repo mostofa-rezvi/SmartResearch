@@ -17,7 +17,8 @@ jest.mock('../middleware/auth', () => ({
 }));
 jest.mock('../utils/logger', () => ({
   info: jest.fn(),
-  error: jest.fn()
+  error: jest.fn(),
+  warn: jest.fn()
 }));
 
 const db = require('../config/db');
@@ -35,9 +36,13 @@ describe('Mentorship Controller', () => {
 
   describe('POST /request', () => {
     it('should create a new mentorship request', async () => {
-      db.query.mockResolvedValueOnce({
-        rows: [{ id: 10, mentor_id: 2, mentee_id: 1, message: 'Hi', status: 'pending' }]
-      });
+      db.query
+        .mockResolvedValueOnce({
+          rows: [{ id: 10, mentor_id: 2, mentee_id: 1, message: 'Hi', status: 'pending' }]
+        })
+        .mockResolvedValue({
+          rows: [{ name: 'Test User', email: 'test@example.com' }]
+        });
 
       const response = await request(app)
         .post('/api/v1/mentorship/request')
@@ -47,7 +52,7 @@ describe('Mentorship Controller', () => {
       expect(response.status).toBe(201);
       expect(response.body.success).toBe(true);
       expect(response.body.data.id).toBe(10);
-      expect(db.query).toHaveBeenCalledTimes(1);
+      expect(db.query).toHaveBeenCalled();
     });
 
     it('should return 400 if mentor_id is missing', async () => {
@@ -94,9 +99,13 @@ describe('Mentorship Controller', () => {
 
   describe('PATCH /:id/respond', () => {
     it('should accept a request and trigger Neo4j sync', async () => {
-      db.query.mockResolvedValueOnce({
-        rows: [{ id: 1, mentor_id: 1, mentee_id: 2, status: 'accepted' }]
-      });
+      db.query
+        .mockResolvedValueOnce({
+          rows: [{ id: 1, mentor_id: 1, mentee_id: 2, status: 'accepted' }]
+        })
+        .mockResolvedValue({
+          rows: [{ name: 'Test User', email: 'test@example.com' }]
+        });
 
       const mockSessionRun = jest.fn().mockResolvedValue({});
       const mockSessionClose = jest.fn().mockResolvedValue({});
@@ -110,16 +119,20 @@ describe('Mentorship Controller', () => {
       expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);
       expect(response.body.data.status).toBe('accepted');
-      expect(db.query).toHaveBeenCalledTimes(1);
+      expect(db.query).toHaveBeenCalled();
       expect(getSession).toHaveBeenCalledTimes(1);
       expect(mockSessionRun).toHaveBeenCalledTimes(1);
       expect(mockSessionClose).toHaveBeenCalledTimes(1);
     });
 
     it('should reject a request without triggering Neo4j sync', async () => {
-      db.query.mockResolvedValueOnce({
-        rows: [{ id: 1, mentor_id: 1, mentee_id: 2, status: 'rejected' }]
-      });
+      db.query
+        .mockResolvedValueOnce({
+          rows: [{ id: 1, mentor_id: 1, mentee_id: 2, status: 'rejected' }]
+        })
+        .mockResolvedValue({
+          rows: [{ name: 'Test User', email: 'test@example.com' }]
+        });
 
       const response = await request(app)
         .patch('/api/v1/mentorship/1/respond')

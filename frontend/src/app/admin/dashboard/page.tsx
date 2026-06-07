@@ -2,21 +2,25 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ShieldAlert, CheckCircle, XCircle, Globe, Activity, Eye, Trash2, ShieldCheck, MailPlus, TerminalSquare } from "lucide-react";
+import { ShieldAlert, CheckCircle, XCircle, Globe, Activity, Eye, Trash2, ShieldCheck, MailPlus, TerminalSquare, BarChart3, Users, Link2, GraduationCap, FolderOpen, TrendingUp } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { useAuth } from "@/context/AuthContext";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { API } from "@/config/api";
+import { useApi } from "@/context/AuthContext";
 
 export default function AdminDashboardPage() {
   const { user, token, isSuperAdmin, isAdmin } = useAuth();
+  const { fetchWithAuth } = useApi();
   const router = useRouter();
 
+  const [activeTab, setActiveTab] = useState<'moderation' | 'analytics'>('moderation');
   const [stats, setStats] = useState<any>({ totalUsers: 0, pendingFlags: 0, activeHubs: [] });
   const [queue, setQueue] = useState({ flags: [], journals: [] });
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [analyticsData, setAnalyticsData] = useState<any>(null);
 
   useEffect(() => {
     if (!isAdmin && !isSuperAdmin) {
@@ -24,6 +28,7 @@ export default function AdminDashboardPage() {
       return;
     }
     fetchDashboardData();
+    fetchAnalytics();
   }, [isAdmin, isSuperAdmin]);
 
   const fetchDashboardData = async () => {
@@ -44,6 +49,23 @@ export default function AdminDashboardPage() {
       console.error("Dashboard fetch error", err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchAnalytics = async () => {
+    try {
+      const [overviewRes, collabRes] = await Promise.all([
+        fetchWithAuth(API.analytics.overview),
+        fetchWithAuth(API.analytics.collaboration),
+      ]);
+      const overview = await overviewRes.json();
+      const collab = await collabRes.json();
+      setAnalyticsData({
+        overview: overview.data || {},
+        collaboration: collab.data || {},
+      });
+    } catch (err) {
+      console.error("Analytics fetch error", err);
     }
   };
 
@@ -84,39 +106,58 @@ export default function AdminDashboardPage() {
             </h1>
             <p className="text-slate-500 mt-1">High-Security Administrative & Moderation Control Panel</p>
           </div>
-          {isSuperAdmin && (
-            <Link href="/admin/invite" className="bg-amber-500/10 text-amber-500 border border-amber-500/20 px-6 py-3 rounded-xl font-bold flex items-center gap-2 hover:bg-amber-500/20 transition-all">
-              <MailPlus size={18} /> Enter Invitation Portal
-            </Link>
-          )}
-        </header>
-
-        {/* Global Hubs & Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
-          <div className="bg-slate-900 border border-slate-800 p-6 rounded-2xl">
-            <Activity className="text-blue-500 mb-2" />
-            <p className="text-3xl font-bold text-white">{stats.totalUsers}</p>
-            <p className="text-xs font-bold uppercase tracking-widest text-slate-500">Active Researchers</p>
-          </div>
-          <div className="bg-slate-900 border border-slate-800 p-6 rounded-2xl">
-            <ShieldAlert className="text-red-500 mb-2" />
-            <p className="text-3xl font-bold text-white">{stats.pendingFlags}</p>
-            <p className="text-xs font-bold uppercase tracking-widest text-slate-500">Pending Flags</p>
-          </div>
-          <div className="md:col-span-2 bg-slate-900 border border-slate-800 p-6 rounded-2xl relative overflow-hidden">
-            <Globe className="absolute -right-4 -bottom-4 text-slate-800" size={120} />
-            <h3 className="text-sm font-bold uppercase tracking-widest text-slate-400 mb-4 relative z-10">Global Activity Hubs</h3>
-            <div className="flex gap-6 relative z-10">
-              {stats.activeHubs?.map((hub: any, i: number) => (
-                <div key={i}>
-                  <p className="text-xl font-bold text-white">{hub.count}</p>
-                  <p className="text-xs text-slate-500 truncate max-w-[100px]">{hub.geography || 'Global'}</p>
-                </div>
-              ))}
-              {(!stats.activeHubs?.length) && <p className="text-xs italic">Awaiting Hub Data...</p>}
+          <div className="flex items-center gap-3">
+            {/* Tab switcher */}
+            <div className="flex bg-slate-800 rounded-xl p-1">
+              <button
+                onClick={() => setActiveTab('moderation')}
+                className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
+                  activeTab === 'moderation' ? 'bg-slate-700 text-white' : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                <ShieldCheck size={14} className="inline mr-1.5" />Moderation
+              </button>
+              <button
+                onClick={() => setActiveTab('analytics')}
+                className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
+                  activeTab === 'analytics' ? 'bg-slate-700 text-white' : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                <BarChart3 size={14} className="inline mr-1.5" />Analytics
+              </button>
             </div>
+            {isSuperAdmin && (
+              <Link href="/admin/invite" className="bg-amber-500/10 text-amber-500 border border-amber-500/20 px-6 py-3 rounded-xl font-bold flex items-center gap-2 hover:bg-amber-500/20 transition-all">
+                <MailPlus size={18} /> Enter Invitation Portal
+              </Link>
+            )}
           </div>
-        </div>
+        </header>
+        {activeTab === 'moderation' && (
+          <>
+            {/* Stats Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+              <div className="bg-slate-900 border border-slate-800 p-6 rounded-2xl animate-fade-in">
+                <div className="text-3xl font-black text-white">{stats.totalUsers || 0}</div>
+                <div className="text-xs uppercase tracking-wider text-slate-500 font-bold mt-1">Total Platform Users</div>
+              </div>
+              <div className="bg-slate-900 border border-slate-800 p-6 rounded-2xl animate-fade-in">
+                <div className="text-3xl font-black text-red-500">{stats.pendingFlags || 0}</div>
+                <div className="text-xs uppercase tracking-wider text-slate-500 font-bold mt-1">Pending Flags</div>
+              </div>
+              <div className="bg-slate-900 border border-slate-800 p-6 rounded-2xl animate-fade-in">
+                <div className="text-sm font-bold text-white mb-3">Active Hubs</div>
+                <div className="space-y-1">
+                  {stats.activeHubs?.map((h: any) => (
+                    <div key={h.geography} className="text-xs flex justify-between">
+                      <span>{h.geography}</span>
+                      <span className="font-bold text-slate-400">{h.count} users</span>
+                    </div>
+                  ))}
+                  {(!stats.activeHubs?.length) && <p className="text-xs italic animate-pulse">Awaiting Hub Data...</p>}
+                </div>
+              </div>
+            </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           
@@ -190,8 +231,110 @@ export default function AdminDashboardPage() {
               </div>
             </div>
           </div>
-
         </div>
+      </>
+    )}
+
+        {/* Analytics Tab */}
+        {activeTab === 'analytics' && analyticsData && (
+          <div className="space-y-8">
+            {/* Overview KPI Grid */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
+                <Users className="text-indigo-500 mb-2" size={24} />
+                <p className="text-2xl font-bold text-white">{analyticsData.overview.totalUsers || 0}</p>
+                <p className="text-xs font-bold uppercase tracking-widest text-slate-500">Total Users</p>
+              </div>
+              <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
+                <Link2 className="text-emerald-500 mb-2" size={24} />
+                <p className="text-2xl font-bold text-white">{analyticsData.overview.totalConnections || 0}</p>
+                <p className="text-xs font-bold uppercase tracking-widest text-slate-500">Connections</p>
+              </div>
+              <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
+                <GraduationCap className="text-violet-500 mb-2" size={24} />
+                <p className="text-2xl font-bold text-white">{analyticsData.overview.totalMentorships || 0}</p>
+                <p className="text-xs font-bold uppercase tracking-widest text-slate-500">Mentorships</p>
+              </div>
+              <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
+                <FolderOpen className="text-amber-500 mb-2" size={24} />
+                <p className="text-2xl font-bold text-white">{analyticsData.overview.totalProjects || 0}</p>
+                <p className="text-xs font-bold uppercase tracking-widest text-slate-500">Projects</p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {/* Collaboration Rates */}
+              <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6">
+                <h3 className="text-lg font-bold text-white mb-6 border-b border-slate-800 pb-4 flex items-center gap-2">
+                  <TrendingUp className="text-emerald-500" /> Collaboration Success Rates
+                </h3>
+                <div className="space-y-6">
+                  <div>
+                    <div className="flex justify-between text-sm font-bold text-slate-400 mb-2">
+                      <span>Milestone Completion</span>
+                      <span className="text-emerald-400">{analyticsData.collaboration.milestones?.completionRate || 0}%</span>
+                    </div>
+                    <div className="h-3 bg-slate-800 rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-emerald-500 rounded-full"
+                        style={{ width: `${analyticsData.collaboration.milestones?.completionRate || 0}%` }}
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-3 gap-4 pt-4 border-t border-slate-800/50">
+                    <div>
+                      <p className="text-xl font-bold text-white">{analyticsData.collaboration.projects?.active || 0}</p>
+                      <p className="text-[10px] uppercase tracking-wider text-slate-500 font-bold">Active Projects</p>
+                    </div>
+                    <div>
+                      <p className="text-xl font-bold text-white">{analyticsData.collaboration.projects?.completed || 0}</p>
+                      <p className="text-[10px] uppercase tracking-wider text-slate-500 font-bold">Completed</p>
+                    </div>
+                    <div>
+                      <p className="text-xl font-bold text-white">{analyticsData.collaboration.projects?.total || 0}</p>
+                      <p className="text-[10px] uppercase tracking-wider text-slate-500 font-bold">Total</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Top Domains */}
+              <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6">
+                <h3 className="text-lg font-bold text-white mb-6 border-b border-slate-800 pb-4 flex items-center gap-2">
+                  <BarChart3 className="text-indigo-500" /> Top Research Domains
+                </h3>
+                <div className="space-y-3">
+                  {analyticsData.overview.topDomains?.length > 0 ? (
+                    analyticsData.overview.topDomains.map((d: any, i: number) => {
+                      const max = Math.max(...analyticsData.overview.topDomains.map((x: any) => x.count));
+                      const percent = Math.round((d.count / max) * 100);
+                      return (
+                        <div key={d.domain} className="flex items-center gap-3">
+                          <span className="w-4 text-xs font-bold text-slate-500">{i + 1}</span>
+                          <div className="flex-1">
+                            <div className="flex justify-between text-xs font-bold text-slate-300 mb-1">
+                              <span>{d.domain}</span>
+                              <span>{d.count} users</span>
+                            </div>
+                            <div className="h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                              <div 
+                                className="h-full bg-indigo-500 rounded-full"
+                                style={{ width: `${percent}%` }}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })
+                  ) : (
+                    <p className="text-sm italic text-slate-600">No domain data available.</p>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
       </main>
     </div>
   );

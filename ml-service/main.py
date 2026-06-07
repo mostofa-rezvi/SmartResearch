@@ -7,6 +7,9 @@ from cache import get_cache
 from recommender.matrix_builder import MatrixBuilder
 from recommender.cf_engine import CFEngine
 from recommender.scorer import rrf_merge
+from llm_service import router as llm_router
+from graphql_schema import graphql_router
+from pdf_service import router as pdf_router
 import logging
 
 import os
@@ -32,6 +35,15 @@ async def lifespan(app: FastAPI):
     # Shutdown logic can go here if needed
 
 app = FastAPI(title="ResearchBridge ML Service", lifespan=lifespan)
+
+# Register LLM routes (/llm/citations, /llm/feedback)
+app.include_router(llm_router)
+
+# Register GraphQL v2 — interactive playground at /graphql/v2
+app.include_router(graphql_router, prefix="/graphql/v2")
+
+# Register PDF extraction route (/library/extract-pdf)
+app.include_router(pdf_router)
 
 class RecRequest(BaseModel):
     profile_text: Optional[str] = None

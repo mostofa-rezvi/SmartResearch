@@ -5,13 +5,14 @@ import { motion, AnimatePresence } from "framer-motion";
 import { 
   Book, Search, Filter, Globe, School, Award, 
   ChevronRight, ExternalLink, Library as LibraryIcon, 
-  Bookmark, Info, RefreshCw, X, SlidersHorizontal, FileText
+  Bookmark, Info, RefreshCw, X, SlidersHorizontal, FileText, FileSearch
 } from "lucide-react";
 import { Virtuoso } from "react-virtuoso";
 import Navbar from "@/components/Navbar";
 import { API } from "@/config/api";
 import JournalPapersModal from "@/components/journal/JournalPapersModal";
 import AllSavedPapersModal from "@/components/journal/AllSavedPapersModal";
+import { PdfExtractor } from "@/components/library/PdfExtractor";
 
 // --- Types ---
 interface Journal {
@@ -54,6 +55,7 @@ export default function LibraryPage() {
   // Saved Papers State
   const [savedPapersCount, setSavedPapersCount] = useState(0);
   const [showSavedPapers, setShowSavedPapers] = useState(false);
+  const [showPdfExtractor, setShowPdfExtractor] = useState(false);
 
   // Search & Filter State
   const [searchQuery, setSearchQuery] = useState("");
@@ -352,6 +354,20 @@ export default function LibraryPage() {
                 <p className="text-sm font-black text-slate-700 dark:text-slate-200">{savedPapersCount} Papers</p>
               </div>
             </button>
+
+            {/* PDF Extractor button */}
+            <button
+              onClick={() => setShowPdfExtractor(true)}
+              className="group flex items-center gap-3 px-6 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-sm hover:shadow-md hover:border-rose-400 transition-all"
+            >
+              <div className="p-2 bg-rose-500/10 text-rose-500 rounded-lg group-hover:bg-rose-500 group-hover:text-white transition-colors">
+                <FileSearch size={18} />
+              </div>
+              <div className="text-left">
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">PDF Tool</p>
+                <p className="text-sm font-black text-slate-700 dark:text-slate-200">Extract Text</p>
+              </div>
+            </button>
           </div>
 
           <div className="flex items-center gap-3 w-full md:w-auto">
@@ -634,6 +650,49 @@ export default function LibraryPage() {
             onClose={() => setShowSavedPapers(false)}
             onRefreshCount={refreshSavedPapersCount}
           />
+        )}
+      </AnimatePresence>
+
+      {/* PDF Extractor Slide-Over */}
+      <AnimatePresence>
+        {showPdfExtractor && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowPdfExtractor(false)}
+              className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[100]"
+            />
+            <motion.div
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+              className="fixed right-0 top-0 h-full w-full max-w-xl bg-white dark:bg-slate-900 shadow-2xl z-[101] flex flex-col"
+            >
+              <div className="flex items-center justify-between p-6 border-b border-slate-100 dark:border-slate-800 shrink-0">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 bg-rose-500/10 rounded-xl flex items-center justify-center">
+                    <FileSearch className="text-rose-500" size={18} />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-black text-slate-900 dark:text-white">PDF Extractor</h2>
+                    <p className="text-xs text-slate-400">Knowledge Library tool</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowPdfExtractor(false)}
+                  className="p-2 text-slate-400 hover:text-slate-700 dark:hover:text-white transition-colors rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+              <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
+                <PdfExtractor />
+              </div>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
 

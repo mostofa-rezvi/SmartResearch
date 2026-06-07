@@ -53,12 +53,6 @@ export const API = {
     adminList: `${API_BASE}/api/v1/blogs/admin`,
     updateStatus: (id: string | number) => `${API_BASE}/api/v1/blogs/${id}/status`,
   },
-  // Library domain
-  library: {
-    journals: `${API_BASE}/api/v1/journals`,
-    categories: `${API_BASE}/api/v1/journals/categories`,
-    metadata: `${API_BASE}/api/v1/journals/metadata`,
-  },
   // Groups domain
   groups: {
     list: `${API_BASE}/api/v1/groups`,
@@ -113,5 +107,42 @@ export const API = {
     createMilestone: (projectId: string) => `${API_BASE}/api/v1/projects/${projectId}/milestones`,
     updateMilestoneStatus: (milestoneId: string) => `${API_BASE}/api/v1/projects/milestones/${milestoneId}/status`,
     getProject: (projectId: string) => `${API_BASE}/api/v1/projects/${projectId}`,
+  },
+  // Connections domain
+  connections: {
+    request: `${API_BASE}/api/v1/connections/request`,
+    list: `${API_BASE}/api/v1/connections`,
+    pending: `${API_BASE}/api/v1/connections/pending`,
+    respond: (id: string) => `${API_BASE}/api/v1/connections/${id}/respond`,
+    remove: (id: string) => `${API_BASE}/api/v1/connections/${id}`,
+    status: (recipientId: string) => `${API_BASE}/api/v1/connections/status/${recipientId}`,
+  },
+  // Notifications domain
+  notifications: {
+    list: `${API_BASE}/api/v1/notifications`,
+    unreadCount: `${API_BASE}/api/v1/notifications/unread-count`,
+    markRead: (id: string) => `${API_BASE}/api/v1/notifications/${id}/read`,
+    markAllRead: `${API_BASE}/api/v1/notifications/read-all`,
+  },
+  // Library domain
+  library: {
+    journals: `${API_BASE}/api/v1/library/journals`,
+    categories: `${API_BASE}/api/v1/library/journals/categories`,
+    metadata: `${API_BASE}/api/v1/library/metadata`,
+    extractPdf: `${API_BASE}/api/v1/library/extract-pdf`,
+  },
+  // Publications / LLM domain
+  publications: {
+    cite: `${API_BASE}/api/v1/publications/cite`,
+    feedback: `${API_BASE}/api/v1/publications/feedback`,
+    scimago: `${API_BASE}/api/v1/publications/scimago`,
+    checklist: `${API_BASE}/api/v1/publications/checklist`,
+  },
+  // Analytics domain (admin)
+  analytics: {
+    overview: `${API_BASE}/api/v1/analytics/overview`,
+    matchQuality: `${API_BASE}/api/v1/analytics/match-quality`,
+    collaboration: `${API_BASE}/api/v1/analytics/collaboration`,
+    growth: `${API_BASE}/api/v1/analytics/growth`,
   },
 } as const;
