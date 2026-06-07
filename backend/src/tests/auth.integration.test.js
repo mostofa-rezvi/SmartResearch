@@ -7,10 +7,6 @@ const { envelope } = require('../utils/responseEnvelope');
 const errorHandler = require('../middleware/errorHandler');
 
 // Mock dependencies
-jest.mock('../config/db', () => ({
-  query: jest.fn(),
-}));
-
 jest.mock('../config/redis', () => ({
   getRedisClient: jest.fn().mockReturnValue({
     set: jest.fn(),

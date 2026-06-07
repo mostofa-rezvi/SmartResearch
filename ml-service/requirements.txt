@@ -10,3 +10,4 @@ psycopg2-binary
 pytest
 httpx
 neo4j
+huggingface_hub<0.26.0

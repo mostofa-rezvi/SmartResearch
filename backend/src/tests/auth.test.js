@@ -16,6 +16,13 @@ const jwt = require('jsonwebtoken');
 const { hashPassword, comparePassword } = require('../utils/hash');
 const config = require('../config/index');
 
+jest.mock('../config/db', () => ({
+  query: jest.fn().mockResolvedValue({
+    rows: [{ id: 42, name: 'Test User', email: 'test@example.com', role: 'user', onboarding_completed: true }]
+  })
+}));
+
+
 // ─── 1. Password Hashing ────────────────────────────────────────────────────
 
 describe('Password Hashing (hash.js)', () => {
@@ -122,45 +129,45 @@ describe('Auth Middleware (auth.middleware.js)', () => {
 
   afterEach(() => jest.clearAllMocks());
 
-  it('should reject requests with no Authorization header', () => {
+  it('should reject requests with no Authorization header', async () => {
     const req = { headers: {} };
     const res = mockRes();
-    verifyAuth(req, res, mockNext);
+    await verifyAuth(req, res, mockNext);
     expect(res.status).toHaveBeenCalledWith(401);
     expect(res.json).toHaveBeenCalledWith({ error: 'Unauthorized: No token provided' });
     expect(mockNext).not.toHaveBeenCalled();
   });
 
-  it('should reject requests with malformed Authorization header', () => {
+  it('should reject requests with malformed Authorization header', async () => {
     const req = { headers: { authorization: 'Token abc' } };
     const res = mockRes();
-    verifyAuth(req, res, mockNext);
+    await verifyAuth(req, res, mockNext);
     expect(res.status).toHaveBeenCalledWith(401);
     expect(mockNext).not.toHaveBeenCalled();
   });
 
-  it('should reject requests with an invalid token', () => {
+  it('should reject requests with an invalid token', async () => {
     const req = { headers: { authorization: 'Bearer invalidtoken' } };
     const res = mockRes();
-    verifyAuth(req, res, mockNext);
+    await verifyAuth(req, res, mockNext);
     expect(res.status).toHaveBeenCalledWith(401);
     expect(res.json).toHaveBeenCalledWith({ error: 'Unauthorized: Invalid token' });
   });
 
-  it('should reject expired tokens with specific message', () => {
+  it('should reject expired tokens with specific message', async () => {
     const expiredToken = jwt.sign({ id: 1 }, config.jwt.accessSecret, { expiresIn: '-1s' });
     const req = { headers: { authorization: `Bearer ${expiredToken}` } };
     const res = mockRes();
-    verifyAuth(req, res, mockNext);
+    await verifyAuth(req, res, mockNext);
     expect(res.status).toHaveBeenCalledWith(401);
     expect(res.json).toHaveBeenCalledWith({ error: 'Unauthorized: Token expired' });
   });
 
-  it('should attach decoded user to req and call next() for valid token', () => {
+  it('should attach decoded user to req and call next() for valid token', async () => {
     const validToken = jwt.sign({ id: 42 }, config.jwt.accessSecret, { expiresIn: '15m' });
     const req = { headers: { authorization: `Bearer ${validToken}` } };
     const res = mockRes();
-    verifyAuth(req, res, mockNext);
+    await verifyAuth(req, res, mockNext);
     expect(mockNext).toHaveBeenCalledTimes(1);
     expect(req.user).toBeDefined();
     expect(req.user.id).toBe(42);
