@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS users (
     password VARCHAR(255),
     provider VARCHAR(50) DEFAULT 'local',
     provider_id VARCHAR(255),
+    openalex_id VARCHAR(255) UNIQUE,                         -- Direct link to OpenAlex researcher profile
     role VARCHAR(20) DEFAULT 'user' CHECK (role IN ('super_admin', 'admin', 'user', 'invited_user')),
     researcher_type VARCHAR(20) CHECK (researcher_type IN ('new_researcher', 'amateur_researcher')),
     status VARCHAR(50) DEFAULT 'active', -- Keep status for active/inactive/suspended
@@ -303,8 +304,11 @@ CREATE TABLE IF NOT EXISTS researcher_profiles (
     cited_by_count INTEGER DEFAULT 0,
     h_index INTEGER DEFAULT 0,
     research_interests JSONB DEFAULT '[]',
+    user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,  -- Platform user link (null = not registered)
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE INDEX IF NOT EXISTS idx_researcher_profiles_user_id ON researcher_profiles(user_id);
 
 -- Mentorships Table
 CREATE TABLE IF NOT EXISTS mentorships (

@@ -11,3 +11,7 @@ pytest
 httpx
 neo4j
 huggingface_hub<0.26.0
+google-generativeai>=0.8.0
+strawberry-graphql[fastapi]>=0.227.0
+pdfplumber>=0.11.0
+python-multipart>=0.0.9

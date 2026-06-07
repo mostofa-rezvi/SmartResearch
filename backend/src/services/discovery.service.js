@@ -100,14 +100,41 @@ class DiscoveryService {
 
       if (!mlResults.length) return [];
 
-      // 3. Fetch researcher profiles for the recommended IDs
+      // 3. Fetch researcher profiles for the recommended IDs, LEFT JOIN users to resolve internalUserId
       const recommendedIds = mlResults.map(r => r[0]); // Extracted IDs
       
+      // Strategy: match platform user via (a) direct openalex_id link, or
+      // (b) name+institution fuzzy match where exactly one platform user matches.
       const researchers = await db.query(
-        `SELECT id, name, role, institution, country, works_count, cited_by_count, h_index, research_interests 
-         FROM researcher_profiles 
-         WHERE id = ANY($1::varchar[])`,
-        [recommendedIds]
+        `SELECT
+           rp.id,
+           rp.name,
+           rp.role,
+           rp.institution,
+           rp.country,
+           rp.works_count,
+           rp.cited_by_count,
+           rp.h_index,
+           rp.research_interests,
+           rp.user_id,
+           -- Fallback: resolve platform user by openalex_id direct match
+           COALESCE(
+             rp.user_id,
+             (SELECT u.id FROM users u WHERE u.openalex_id = rp.id LIMIT 1),
+             -- Fuzzy name+institution match — only if unambiguous (exactly one result)
+             CASE WHEN (
+               SELECT COUNT(*) FROM users u
+               WHERE LOWER(TRIM(u.name)) = LOWER(TRIM(rp.name))
+                 AND ($2::integer IS NULL OR u.id != $2)
+             ) = 1 THEN (
+               SELECT u.id FROM users u
+               WHERE LOWER(TRIM(u.name)) = LOWER(TRIM(rp.name))
+               LIMIT 1
+             ) ELSE NULL END
+           ) AS resolved_user_id
+         FROM researcher_profiles rp
+         WHERE rp.id = ANY($1::varchar[])`,
+        [recommendedIds, userId]
       );
 
       // 4. Map scores to researchers and sort
@@ -116,8 +143,7 @@ class DiscoveryService {
         const match = mlResults.find(r => r[0] === researcher.id);
         const score = match ? match[1] : 0;
         
-        // Normalize score 0-100 for frontend display (RRF scores are typically small floats like 0.01)
-        // Here we just map it creatively for UI, or use the raw score. We'll give a base 70 + (score * 1000)
+        // Normalize score 0-100 for frontend display
         let similarityScore = Math.min(99, Math.round(70 + (score * 500)));
 
         return {
@@ -131,6 +157,8 @@ class DiscoveryService {
           h_index: researcher.h_index,
           research_interests: researcher.research_interests,
           similarityScore,
+          // Platform user ID — null if this OpenAlex researcher hasn't registered yet
+          internalUserId: researcher.resolved_user_id || null,
         };
       });
 

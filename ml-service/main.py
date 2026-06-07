@@ -7,6 +7,9 @@ from cache import get_cache
 from recommender.matrix_builder import MatrixBuilder
 from recommender.cf_engine import CFEngine
 from recommender.scorer import rrf_merge
+from llm_service import router as llm_router
+from graphql_schema import graphql_router
+from pdf_service import router as pdf_router
 import logging
 
 import os
@@ -32,6 +35,15 @@ async def lifespan(app: FastAPI):
     # Shutdown logic can go here if needed
 
 app = FastAPI(title="ResearchBridge ML Service", lifespan=lifespan)
+
+# Register LLM routes (/llm/citations, /llm/feedback)
+app.include_router(llm_router)
+
+# Register GraphQL v2 — interactive playground at /graphql/v2
+app.include_router(graphql_router, prefix="/graphql/v2")
+
+# Register PDF extraction route (/library/extract-pdf)
+app.include_router(pdf_router)
 
 class RecRequest(BaseModel):
     profile_text: Optional[str] = None
@@ -113,6 +125,34 @@ async def get_recommendations(user_id: int, req: Optional[RecRequest] = None):
         logger.error(f"Recommendation error: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+
+
+class InteractionRequest(BaseModel):
+    user_id: int
+    item_id: str
+    action: str
+
+@app.post("/interactions")
+async def record_interaction(interaction: InteractionRequest):
+    # Determine weight
+    weight = 0.5
+    if interaction.action == 'bookmark':
+        weight = 2.0
+    elif interaction.action == 'download':
+        weight = 3.0
+    elif interaction.action == 'view':
+        weight = 0.5
+    
+    # Add interaction in memory and rebuild sparse matrix
+    builder.add_interaction(interaction.user_id, interaction.item_id, weight)
+    # Recompute user similarity matrix in real-time
+    cf_engine.compute_user_similarity()
+    
+    # Clear cache for this user since their recommendations should change
+    cache = get_cache()
+    cache.delete_rec(interaction.user_id)
+    
+    return {"status": "ok", "message": "Interaction recorded and similarity matrix updated"}
 
 
 class EmbedRequest(BaseModel):

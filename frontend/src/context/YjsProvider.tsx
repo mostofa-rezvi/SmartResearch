@@ -10,23 +10,26 @@ export interface YjsContextType {
   provider: SocketIOProvider | null;
   awareness: any;
   status: 'connecting' | 'connected' | 'disconnected';
+  versionTrigger: number;
 }
 
 export const YjsContext = createContext<YjsContextType | null>(null);
 
 export const YjsProvider = ({ documentId, children }: { documentId: string, children: React.ReactNode }) => {
   const [status, setStatus] = useState<'connecting' | 'connected' | 'disconnected'>('connecting');
+  const [versionTrigger, setVersionTrigger] = useState(0);
 
-  // Initialize Doc exactly once per mount
-  const doc = useMemo(() => new Y.Doc(), []);
+  // Initialize Doc exactly once per versionTrigger
+  const doc = useMemo(() => new Y.Doc(), [versionTrigger]);
 
   const [provider, setProvider] = useState<SocketIOProvider | null>(null);
 
   useEffect(() => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
     // 1. Initialize Socket.IO with Reconnection Logic
-    const socket = io(process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:4000', {
+    const socket = io(socketUrl, {
       reconnectionDelayMax: 10000,
       reconnectionAttempts: Infinity,
       transports: ['websocket'],
@@ -34,7 +37,6 @@ export const YjsProvider = ({ documentId, children }: { documentId: string, chil
     });
 
     // 2. Initialize y-socket.io Provider
-    const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:4000';
     const yjsProvider = new SocketIOProvider(
       socketUrl,
       `doc-room-${documentId}`,
@@ -52,6 +54,11 @@ export const YjsProvider = ({ documentId, children }: { documentId: string, chil
     socket.on('connect', () => setStatus('connected'));
     socket.on('disconnect', () => setStatus('disconnected'));
 
+    // Reconnection hook when the document has been reverted
+    socket.on('sync:reverted', () => {
+      setVersionTrigger(prev => prev + 1);
+    });
+
     // 4. Awareness setup
     const awareness = yjsProvider.awareness;
     
@@ -67,10 +74,10 @@ export const YjsProvider = ({ documentId, children }: { documentId: string, chil
       socket.disconnect();
       doc.destroy();
     };
-  }, [documentId, doc]);
+  }, [documentId, doc, versionTrigger]);
 
   return (
-    <YjsContext.Provider value={{ doc, provider, awareness: provider?.awareness, status }}>
+    <YjsContext.Provider value={{ doc, provider, awareness: provider?.awareness, status, versionTrigger }}>
       {children}
     </YjsContext.Provider>
   );

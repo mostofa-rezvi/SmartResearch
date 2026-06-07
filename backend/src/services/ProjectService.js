@@ -79,6 +79,63 @@ class ProjectService {
     );
     return { success: true };
   }
+
+  async requestReview(projectId, requesterId, reviewerId) {
+    // 1. Authorization check for requester: must be member of project
+    const authCheck = await db.query(
+      'SELECT role FROM project_members WHERE project_id = $1 AND user_id = $2',
+      [projectId, requesterId]
+    );
+    if (authCheck.rowCount === 0) throw new Error('Unauthorized');
+
+    // 2. Validate reviewer exists
+    const reviewerCheck = await db.query('SELECT name FROM users WHERE id = $1', [reviewerId]);
+    if (reviewerCheck.rowCount === 0) throw new Error('Reviewer not found');
+
+    // 3. Create review request
+    const res = await db.query(
+      'INSERT INTO peer_reviews (project_id, requester_id, reviewer_id, status) VALUES ($1, $2, $3, $4) RETURNING *',
+      [projectId, requesterId, reviewerId, 'requested']
+    );
+    return res.rows[0];
+  }
+
+  async respondToReviewRequest(reviewId, reviewerId, status) {
+    // 1. Verify review request exists
+    const reviewCheck = await db.query('SELECT * FROM peer_reviews WHERE id = $1', [reviewId]);
+    if (reviewCheck.rowCount === 0) throw new Error('Review request not found');
+
+    // 2. Authorization check: must be the assigned reviewer
+    if (reviewCheck.rows[0].reviewer_id !== reviewerId) throw new Error('Unauthorized');
+
+    // 3. Update status
+    const res = await db.query(
+      'UPDATE peer_reviews SET status = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2 RETURNING *',
+      [status, reviewId]
+    );
+    return res.rows[0];
+  }
+
+  async submitReview(reviewId, reviewerId, reviewContent) {
+    // 1. Verify review request exists
+    const reviewCheck = await db.query('SELECT * FROM peer_reviews WHERE id = $1', [reviewId]);
+    if (reviewCheck.rowCount === 0) throw new Error('Review request not found');
+
+    // 2. Authorization check: must be the assigned reviewer
+    if (reviewCheck.rows[0].reviewer_id !== reviewerId) throw new Error('Unauthorized');
+
+    // 3. Check status is 'accepted'
+    if (reviewCheck.rows[0].status !== 'accepted') {
+      throw new Error('Review request has not been accepted');
+    }
+
+    // 4. Submit review content and mark complete
+    const res = await db.query(
+      'UPDATE peer_reviews SET review_content = $1, status = $2, updated_at = CURRENT_TIMESTAMP WHERE id = $3 RETURNING *',
+      [reviewContent, 'completed', reviewId]
+    );
+    return res.rows[0];
+  }
 }
 
 module.exports = new ProjectService();

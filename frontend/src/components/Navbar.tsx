@@ -6,6 +6,7 @@ import { Search, Users, BookOpen, Compass, MessageSquare, ChevronRight, X } from
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useRef, useEffect } from "react";
 import { usePathname } from "next/navigation";
+import { NotificationBell } from "@/components/NotificationBell";
 
 export default function Navbar() {
   const { user, isAdmin, logout } = useAuth();
@@ -117,6 +118,8 @@ export default function Navbar() {
               <Link href="/search" className="text-sm font-bold text-primary px-4 py-2 bg-primary/5 rounded-lg hover:bg-primary/10 transition-colors">
                 DOI
               </Link>
+              {/* Notification Bell */}
+              <NotificationBell />
               <div className="flex items-center gap-4 border-l border-slate-200 pl-6">
                 <Link href={`/profile/${user.id}`} className="text-sm font-semibold text-slate-700 hover:text-primary transition-colors">
                   {user.name}

@@ -1,16 +1,18 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useParams } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import { CollaborativeEditor } from "@/components/collaborative-editor";
 import { LiveCursors } from "@/components/live-cursors";
 import { NotificationsPanel } from "@/components/notifications-panel";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, History } from "lucide-react";
 import Link from "next/link";
+import VersionHistorySidebar from "@/components/workspace/VersionHistorySidebar";
 
 export default function DocumentWorkspacePage() {
   const { id } = useParams();
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
 
   const mockUsers = [
     { color: "#EC4899", initials: "DS" },
@@ -36,6 +38,13 @@ export default function DocumentWorkspacePage() {
           </div>
 
           <div className="flex items-center gap-3">
+            <button
+              onClick={() => setIsHistoryOpen(true)}
+              className="flex items-center gap-1.5 px-3.5 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-bold transition-all border border-slate-200/50 dark:border-slate-800"
+            >
+              <History size={14} /> Version History
+            </button>
+
             <div className="flex -space-x-3">
               {mockUsers.map((u, i) => (
                 <div 
@@ -52,9 +61,15 @@ export default function DocumentWorkspacePage() {
         </div>
 
         <div className="relative flex-1">
-          <CollaborativeEditor />
+          <CollaborativeEditor documentId={id as string} />
           <LiveCursors />
         </div>
+
+        <VersionHistorySidebar
+          isOpen={isHistoryOpen}
+          onClose={() => setIsHistoryOpen(false)}
+          projectId={id as string}
+        />
       </main>
     </div>
   );

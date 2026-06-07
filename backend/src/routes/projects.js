@@ -27,4 +27,30 @@ router.post('/:id/milestones', verifyAuth, projectController.createMilestone);
 // @desc    Update milestone status
 router.patch('/milestones/:milestoneId/status', verifyAuth, projectController.updateMilestone);
 
+// ── Collaborative Document Version Snapshot Endpoints ────────────────────────
+// @route   POST /api/v1/projects/:id/versions
+// @desc    Create a version snapshot of the project document
+router.post('/:id/versions', verifyAuth, projectController.createVersion);
+
+// @route   GET /api/v1/projects/:id/versions
+// @desc    List all version snapshots of the project document
+router.get('/:id/versions', verifyAuth, projectController.listVersions);
+
+// @route   POST /api/v1/projects/:id/versions/:versionId/revert
+// @desc    Revert the project document to a specific version snapshot
+router.post('/:id/versions/:versionId/revert', verifyAuth, projectController.revertVersion);
+
+// ── Peer Review System Endpoints ────────────────────────
+// @route   POST /api/v1/projects/:id/reviews/request
+// @desc    Request a peer review for a project
+router.post('/:id/reviews/request', verifyAuth, projectController.requestReview);
+
+// @route   PATCH /api/v1/projects/reviews/:reviewId/status
+// @desc    Accept or decline a peer review request
+router.patch('/reviews/:reviewId/status', verifyAuth, projectController.respondToReviewRequest);
+
+// @route   POST /api/v1/projects/reviews/:reviewId/submit
+// @desc    Submit peer review content
+router.post('/reviews/:reviewId/submit', verifyAuth, projectController.submitReview);
+
 module.exports = router;

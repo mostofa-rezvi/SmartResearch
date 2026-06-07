@@ -2,7 +2,7 @@ const { Joi, Segments } = require('celebrate');
 
 const createPost = {
   [Segments.BODY]: Joi.object().keys({
-    type: Joi.string().valid('Question', 'Thought', 'question', 'thought').required(),
+    type: Joi.string().valid('Question', 'Thought', 'question', 'thought', 'ama', 'AMA').required(),
     title: Joi.string().optional().max(200).allow('', null),
     content: Joi.string().required().min(10),
     tags: Joi.array().items(Joi.string()).optional().default([]),
@@ -37,9 +37,20 @@ const addComment = {
   }),
 };
 
+const createAMA = {
+  [Segments.BODY]: Joi.object().keys({
+    professor_id: Joi.number().integer().required(),
+    title: Joi.string().required().max(200),
+    description: Joi.string().required().min(10),
+    scheduled_at: Joi.date().iso().required(),
+    end_at: Joi.date().iso().required(),
+  }),
+};
+
 module.exports = {
   createPost,
   votePost,
   reactPost,
   addComment,
+  createAMA,
 };

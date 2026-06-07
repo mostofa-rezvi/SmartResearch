@@ -7,6 +7,7 @@ import StarterKit from "@tiptap/starter-kit";
 import Collaboration from "@tiptap/extension-collaboration";
 import CollaborationCursor from "@tiptap/extension-collaboration-cursor";
 import { useYjs } from "../hooks/useYjs";
+import { YjsProvider } from "../context/YjsProvider";
 
 export function CollaborativeEditorInner() {
   const { doc, provider, awareness, status, activeUsers } = useYjs();
@@ -138,13 +139,15 @@ export function CollaborativeEditorInner() {
   );
 }
 
-// We need to export a component wrapped in the YjsProvider
-import { YjsProvider } from "../context/YjsProvider";
+function CollaborativeEditorWithKey() {
+  const { versionTrigger } = useYjs();
+  return <CollaborativeEditorInner key={versionTrigger} />;
+}
 
 export function CollaborativeEditor({ documentId = "default-doc" }: { documentId?: string }) {
   return (
     <YjsProvider documentId={documentId}>
-      <CollaborativeEditorInner />
+      <CollaborativeEditorWithKey />
     </YjsProvider>
   );
 }

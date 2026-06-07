@@ -4,6 +4,8 @@ const db = require('../config/db');
 const { getSession } = require('../config/neo4j');
 const { auth } = require('../middleware/auth');
 const logger = require('../utils/logger');
+const notificationService = require('../services/notification.service');
+const { templates } = require('../services/email.service');
 
 // POST /request
 router.post('/request', auth, async (req, res) => {
@@ -21,7 +23,32 @@ router.post('/request', auth, async (req, res) => {
       [mentor_id, mentee_id, message]
     );
 
-    res.status(201).json({ success: true, data: result.rows[0] });
+    const mentorship = result.rows[0];
+
+    res.status(201).json({ success: true, data: mentorship });
+
+    // Notify the mentor about the request
+    setImmediate(async () => {
+      try {
+        const mentorRes = await db.query('SELECT email FROM users WHERE id = $1', [mentor_id]);
+        const menteeRes = await db.query('SELECT name FROM users WHERE id = $1', [mentee_id]);
+        if (mentorRes.rows.length > 0) {
+          const menteeName = menteeRes.rows[0]?.name || 'A student';
+          const emailTpl = templates.mentorshipRequest(menteeName);
+          await notificationService.notify(
+            parseInt(mentor_id, 10),
+            'mentorship_request',
+            `New mentorship request from ${menteeName}`,
+            `${menteeName} sent you a mentorship request on ResearchBridge.`,
+            { from_user_id: mentee_id, mentorship_id: mentorship.id },
+            mentorRes.rows[0].email,
+            emailTpl
+          );
+        }
+      } catch (notifyErr) {
+        logger.warn('[Mentorship] Initial request notification failed:', notifyErr.message);
+      }
+    });
   } catch (error) {
     logger.error(`Error requesting mentorship: ${error.message}`);
     res.status(500).json({ success: false, message: 'Server error' });
@@ -102,6 +129,37 @@ router.patch('/:id/respond', auth, async (req, res) => {
     }
 
     res.json({ success: true, data: mentorship });
+
+    // Notify the mentee about the decision
+    setImmediate(async () => {
+      try {
+        const menteeRes = await db.query('SELECT email FROM users WHERE id = $1', [mentorship.mentee_id]);
+        const mentorRes = await db.query('SELECT name FROM users WHERE id = $1', [mentor_id]);
+        if (menteeRes.rows.length > 0 && status === 'accepted') {
+          const mentorName = mentorRes.rows[0]?.name || 'Your mentor';
+          const emailTpl = templates.mentorshipAccepted(mentorName);
+          await notificationService.notify(
+            mentorship.mentee_id,
+            'mentorship_accepted',
+            `${mentorName} accepted your mentorship request`,
+            `You now have a mentorship connection with ${mentorName} on ResearchBridge.`,
+            { from_user_id: parseInt(mentor_id, 10), mentorship_id: mentorship.id },
+            menteeRes.rows[0].email,
+            emailTpl
+          );
+        } else if (menteeRes.rows.length > 0 && status === 'rejected') {
+          await notificationService.notify(
+            mentorship.mentee_id,
+            'mentorship_rejected',
+            'Mentorship request not accepted',
+            'The mentor was unable to accept your request at this time.',
+            { from_user_id: parseInt(mentor_id, 10), mentorship_id: mentorship.id }
+          );
+        }
+      } catch (notifyErr) {
+        logger.warn('[Mentorship] Notification failed (non-fatal):', notifyErr.message);
+      }
+    });
   } catch (error) {
     logger.error(`Error responding to mentorship: ${error.message}`);
     res.status(500).json({ success: false, message: 'Server error' });

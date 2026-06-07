@@ -350,6 +350,39 @@ class CommunityService {
     comment.user_vote = null;
 
     eventBus.emitEvent('event.behaviour', { type: 'community.comment.created', userId, postId, commentId: comment.id, timestamp: new Date().toISOString() });
+
+    // Notify the post author
+    setImmediate(async () => {
+      try {
+        const postRes = await db.query('SELECT user_id, title FROM community_posts WHERE id = $1', [postId]);
+        if (postRes.rows.length > 0) {
+          const postAuthorId = postRes.rows[0].user_id;
+          const postTitle = postRes.rows[0].title;
+          
+          if (parseInt(postAuthorId, 10) !== parseInt(userId, 10)) {
+            const authorRes = await db.query('SELECT email FROM users WHERE id = $1', [postAuthorId]);
+            const authorEmail = authorRes.rows[0]?.email;
+            const commenterName = userResult.rows[0].name;
+            const emailService = require('./email.service');
+            const notificationService = require('./notification.service');
+            const emailTpl = emailService.templates.forumReply(commenterName, postTitle);
+            
+            await notificationService.notify(
+              parseInt(postAuthorId, 10),
+              'forum_reply',
+              `New reply on your post`,
+              `${commenterName} replied to your post: "${postTitle}"`,
+              { from_user_id: userId, post_id: postId, comment_id: comment.id },
+              authorEmail,
+              emailTpl
+            );
+          }
+        }
+      } catch (notifyErr) {
+        logger.warn('[Community] Reply notification failed:', notifyErr.message);
+      }
+    });
+
     return comment;
   }
 
@@ -454,6 +487,60 @@ class CommunityService {
       [content, commentId]
     );
     return result.rows[0];
+  }
+
+  async createAMA(userId, data) {
+    const { professor_id, title, description, scheduled_at, end_at } = data;
+
+    const profRes = await db.query('SELECT role, name FROM users WHERE id = $1', [professor_id]);
+    if (profRes.rows.length === 0) {
+      const err = new Error('Professor user not found');
+      err.statusCode = 404;
+      throw err;
+    }
+
+    if (new Date(scheduled_at) >= new Date(end_at)) {
+      const err = new Error('Scheduled start time must be before end time');
+      err.statusCode = 400;
+      throw err;
+    }
+
+    // 1. Create a community post for the AMA
+    const postResult = await db.query(
+      'INSERT INTO community_posts (user_id, type, title, content) VALUES ($1, $2, $3, $4) RETURNING *',
+      [professor_id, 'ama', `AMA: ${title}`, description]
+    );
+    const post = postResult.rows[0];
+
+    // 2. Create the AMA session
+    const amaResult = await db.query(
+      'INSERT INTO ama_sessions (professor_id, post_id, title, description, scheduled_at, end_at) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+      [professor_id, post.id, title, description, scheduled_at, end_at]
+    );
+    const ama = amaResult.rows[0];
+
+    eventBus.emitEvent('event.behaviour', { type: 'community.ama.created', userId, amaId: ama.id, timestamp: new Date().toISOString() });
+
+    return {
+      ...ama,
+      post_id: post.id
+    };
+  }
+
+  async getAMAs() {
+    const result = await db.query(`
+      SELECT a.*, u.name as professor_name, u.avatar_url as professor_avatar,
+        p.view_count as post_views,
+        COALESCE(c.comment_count, 0) as question_count
+      FROM ama_sessions a
+      JOIN users u ON a.professor_id = u.id
+      LEFT JOIN community_posts p ON a.post_id = p.id
+      LEFT JOIN (
+        SELECT post_id, COUNT(*) as comment_count FROM comments GROUP BY post_id
+      ) c ON c.post_id = a.post_id
+      ORDER BY a.scheduled_at ASC
+    `);
+    return result.rows;
   }
 }
 

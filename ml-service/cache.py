@@ -68,6 +68,13 @@ class EmbeddingCache:
         self.redis.set(key, json.dumps(results), ex=3600)
         logger.info(f"Cached recommendations for user {user_id}")
 
+    def delete_rec(self, user_id: int):
+        if not self.redis:
+            return
+        key = f"rec:v1:{user_id}"
+        self.redis.delete(key)
+        logger.info(f"Cleared recommendation cache for user {user_id}")
+
 # Singleton instance
 _cache = EmbeddingCache()
 
