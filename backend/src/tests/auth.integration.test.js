@@ -27,7 +27,12 @@ jest.mock('pg', () => {
     connect: jest.fn(),
     end: jest.fn(),
   };
-  return { Pool: jest.fn(() => mPool) };
+  return { 
+    Pool: jest.fn(() => mPool),
+    types: {
+      setTypeParser: jest.fn(),
+    },
+  };
 });
 
 const app = express();

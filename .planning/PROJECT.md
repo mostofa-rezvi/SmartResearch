@@ -69,10 +69,11 @@ Empowering research collaboration through a verifiable trust graph, advanced sem
 - ✓ **Templates Seeding** — LaTeX and Word templates seeded in public directory — v1.3.
 - ✓ **Mentorship Module** — Mentorships table, Express API, booking UI, and Neo4j sync — v1.4.
 - ✓ **Reading History** — Reading history database tables, GET/POST routes, and dashboard counts — v1.4.
+- ✓ **Security & ML Hardening** — JWT auth on Socket.IO and SBERT threshold calibration — v1.5.
 
 ### Active
 
-- [ ] **Security & ML Hardening** — JWT auth on Socket.IO and SBERT threshold calibration.
+(None - All requirements satisfied for v1.5)
 
 ### Out of Scope
 
