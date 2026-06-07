@@ -67,6 +67,21 @@ class UserService {
       'INSERT INTO reading_history (user_id, paper_id, paper_title, paper_doi, action) VALUES ($1, $2, $3, $4, $5) RETURNING *',
       [userId, paper_id, paper_title, paper_doi, action]
     );
+
+    // Feed forward behavioral signals to ML recommender
+    try {
+      const axios = require('axios');
+      const ML_SERVICE_URL = process.env.ML_SERVICE_URL || 'http://localhost:8000';
+      await axios.post(`${ML_SERVICE_URL}/interactions`, {
+        user_id: userId,
+        item_id: paper_id || paper_doi,
+        action: action
+      });
+    } catch (err) {
+      const logger = require('../utils/logger');
+      logger.error(`Failed to push reading interaction to ML Service: ${err.message}`);
+    }
+
     return result.rows[0];
   }
 }

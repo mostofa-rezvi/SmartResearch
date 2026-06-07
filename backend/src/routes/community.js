@@ -86,4 +86,19 @@ router.delete('/comments/:id', [verifyAuth], communityController.deleteComment);
 // Image Upload
 router.post('/upload', [verifyAuth, upload.single('image')], communityController.uploadImage);
 
+// AMA Endpoints (Calendar and scheduling)
+// @route   POST /api/v1/community/amas
+// @desc    Schedule a new AMA session
+router.post('/amas',
+  [verifyAuth, celebrate(communityValidation.createAMA)],
+  communityController.createAMA
+);
+
+// @route   GET /api/v1/community/amas
+// @desc    Get all scheduled and past AMA sessions
+router.get('/amas',
+  [verifyAuth],
+  communityController.getAMAs
+);
+
 module.exports = router;

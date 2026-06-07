@@ -9,6 +9,7 @@ import { motion } from "framer-motion";
 import { User, Award, ShieldCheck, Mail, MapPin, Building, BookOpen, Clock, Activity, MessageSquare, Lightbulb, Users, Bookmark, Settings, Globe, ExternalLink, Microscope } from "lucide-react";
 import Link from "next/link";
 import EditProfileModal from "@/components/profile/EditProfileModal";
+import CredentialDashboard from "@/components/profile/CredentialDashboard";
 
 export default function ProfilePage() {
   const { id } = useParams();
@@ -298,6 +299,14 @@ export default function ProfilePage() {
           </div>
 
         </div>
+
+          {/* Credential Dashboard — own profile only */}
+          {isOwnProfile && (
+            <div className="lg:col-span-3">
+              <CredentialDashboard />
+            </div>
+          )}
+
       </main>
     </div>
   );

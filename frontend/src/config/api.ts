@@ -73,6 +73,8 @@ export const API = {
   profiles: {
     me: `${API_BASE}/api/v1/profiles/me`,
     avatar: `${API_BASE}/api/v1/profiles/avatar`,
+    auditLog: `${API_BASE}/api/v1/profiles/me/audit-log`,
+    achievements: `${API_BASE}/api/v1/profiles/me/achievements`,
   },
   // Admin domain
   admin: {
@@ -107,6 +109,9 @@ export const API = {
     createMilestone: (projectId: string) => `${API_BASE}/api/v1/projects/${projectId}/milestones`,
     updateMilestoneStatus: (milestoneId: string) => `${API_BASE}/api/v1/projects/milestones/${milestoneId}/status`,
     getProject: (projectId: string) => `${API_BASE}/api/v1/projects/${projectId}`,
+    listVersions: (projectId: string) => `${API_BASE}/api/v1/projects/${projectId}/versions`,
+    createVersion: (projectId: string) => `${API_BASE}/api/v1/projects/${projectId}/versions`,
+    revertVersion: (projectId: string, versionId: string | number) => `${API_BASE}/api/v1/projects/${projectId}/versions/${versionId}/revert`,
   },
   // Connections domain
   connections: {

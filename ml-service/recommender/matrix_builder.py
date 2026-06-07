@@ -23,9 +23,10 @@ class MatrixBuilder:
         self.user_map = {} # userId -> row_idx
         self.item_map = {} # itemId -> col_idx
         self.interaction_matrix = None
+        self.interactions_raw = []
 
     def fetch_interactions(self):
-        interactions = [] # List of (user_id, item_id, weight)
+        self.interactions_raw = [] # List of (user_id, item_id, weight)
         
         # 1. Fetch from Postgres
         try:
@@ -35,12 +36,25 @@ class MatrixBuilder:
             # Saved Papers (Weight: 2.0)
             cur.execute("SELECT user_id, paper_doi as item_id FROM saved_papers")
             for row in cur.fetchall():
-                interactions.append((row['user_id'], row['item_id'], 2.0))
+                if row['item_id']:
+                    self.interactions_raw.append((row['user_id'], row['item_id'], 2.0))
             
             # Votes (Weight: 1.0)
             cur.execute("SELECT user_id, post_id as item_id FROM votes WHERE value = 1")
             for row in cur.fetchall():
-                interactions.append((row['user_id'], f"post_{row['item_id']}", 1.0))
+                if row['item_id']:
+                    self.interactions_raw.append((row['user_id'], f"post_{row['item_id']}", 1.0))
+
+            # Reading History (Weight based on action)
+            cur.execute("SELECT user_id, paper_id as item_id, action FROM reading_history")
+            for row in cur.fetchall():
+                if row['item_id']:
+                    weight = 0.5
+                    if row['action'] == 'bookmark':
+                        weight = 2.0
+                    elif row['action'] == 'download':
+                        weight = 3.0
+                    self.interactions_raw.append((row['user_id'], row['item_id'], weight))
                 
             cur.close()
             conn.close()
@@ -53,12 +67,17 @@ class MatrixBuilder:
             with driver.session() as session:
                 result = session.run("MATCH (r1:Researcher)-[s:SUPPORTS]->(r2:Researcher) RETURN r1.userId as u1, r2.userId as u2, s.weight as w")
                 for record in result:
-                    interactions.append((record['u1'], f"user_{record['u2']}", record['w'] or 3.0))
+                    if record['u1'] and record['u2']:
+                        self.interactions_raw.append((record['u1'], f"user_{record['u2']}", record['w'] or 3.0))
             driver.close()
         except Exception as e:
             logger.error(f"Neo4j interaction fetch failed: {e}")
 
-        return interactions
+        return self.interactions_raw
+
+    def add_interaction(self, user_id, item_id, weight):
+        self.interactions_raw.append((user_id, item_id, weight))
+        self.build_matrix(self.interactions_raw)
 
     def build_matrix(self, interactions):
         if not interactions:

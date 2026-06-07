@@ -2,11 +2,12 @@ const db = require('../config/db');
 const { envelope } = require('../utils/responseEnvelope');
 const { calculateCompleteness } = require('../services/profile.service');
 const storageService = require('../services/storage.service');
+const auditService = require('../services/audit.service');
 
 class ProfileController {
   async getProfile(req, res, next) {
     try {
-      const userId = req.user ? req.user.id : req.params.id;
+      const userId = req.params.id ? req.params.id : req.user.id;
       
       // 1. Get base user
       const userResult = await db.query(
@@ -78,6 +79,18 @@ class ProfileController {
       } = req.body;
 
       await client.query('BEGIN');
+
+      // ── Snapshot old values for audit log ──────────────────────────────────
+      const TRACKED_FIELDS = [
+        'name', 'bio', 'institution_id', 'personal_website',
+        'linkedin_url', 'google_scholar_url', 'researchgate_url',
+        'educational_status', 'research_interests',
+      ];
+      const { rows: snapshot } = await client.query(
+        `SELECT ${TRACKED_FIELDS.join(', ')} FROM users WHERE id = $1`,
+        [userId]
+      );
+      const oldValues = snapshot[0] || {};
 
       // 1. Update basic fields
       const updates = [];
@@ -152,14 +165,44 @@ class ProfileController {
 
       await client.query('COMMIT');
 
+      // ── Determine which fields actually changed ────────────────────────────
+      const incomingBasic = {
+        name, bio, institution_id, personal_website, linkedin_url,
+        google_scholar_url, researchgate_url, educational_status, research_interests,
+      };
+      const changedFields = TRACKED_FIELDS.filter(f => {
+        const incoming = incomingBasic[f];
+        if (incoming === undefined) return false;
+        return JSON.stringify(incoming) !== JSON.stringify(oldValues[f]);
+      });
+
+      // Add junction table changes
+      if (skills !== undefined) changedFields.push('skills');
+      if (domains !== undefined) changedFields.push('domains');
+      if (goals !== undefined) changedFields.push('goals');
+
+      // ── Fire-and-forget: audit log + achievement check ─────────────────────
+      if (changedFields.length > 0) {
+        const newValues = Object.fromEntries(
+          changedFields.filter(f => TRACKED_FIELDS.includes(f)).map(f => [f, incomingBasic[f]])
+        );
+        const redactedOld = Object.fromEntries(
+          changedFields.filter(f => TRACKED_FIELDS.includes(f)).map(f => [f, oldValues[f]])
+        );
+
+        auditService.logProfileChange(userId, 'profile_update', changedFields, redactedOld, newValues, req);
+      }
+
+      // Always re-check achievements after any profile update (completeness may have changed)
+      auditService.checkAndAwardAchievements(userId).catch(() => {});
+
       // Fetch the updated profile to return
-      req.params.id = userId;
-      // Note: this is a bit hacky for returning the response directly, better to extract the logic
-      // but it serves the immediate requirement.
-      const updatedUserResult = await db.query('SELECT id, name, email, bio, avatar_url, institution_id, onboarding_completed, researcher_type FROM users WHERE id = $1', [userId]);
+      const updatedUserResult = await db.query(
+        'SELECT id, name, email, bio, avatar_url, institution_id, onboarding_completed, researcher_type FROM users WHERE id = $1',
+        [userId]
+      );
       const user = updatedUserResult.rows[0];
       
-      // Let's just return a success message for brevity, or full profile
       res.json(envelope({ message: 'Profile updated successfully', user }));
     } catch (err) {
       await client.query('ROLLBACK');
@@ -180,9 +223,62 @@ class ProfileController {
       const userId = req.user.id;
       const avatarUrl = await storageService.uploadFile(req.file, 'avatars');
 
+      // Snapshot old avatar for audit
+      const { rows } = await db.query('SELECT avatar_url FROM users WHERE id = $1', [userId]);
+      const oldAvatarUrl = rows[0]?.avatar_url || null;
+
       await db.query('UPDATE users SET avatar_url = $1 WHERE id = $2', [avatarUrl, userId]);
 
+      // Audit log
+      auditService.logProfileChange(
+        userId,
+        'avatar_update',
+        ['avatar_url'],
+        { avatar_url: oldAvatarUrl },
+        { avatar_url: avatarUrl },
+        req
+      );
+
+      // Re-check achievements (profile completeness may be affected)
+      auditService.checkAndAwardAchievements(userId).catch(() => {});
+
       res.json(envelope({ avatar_url: avatarUrl }));
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  /**
+   * GET /api/v1/profiles/me/audit-log
+   * Returns the paginated, append-only profile change history for the authenticated user.
+   */
+  async getAuditLog(req, res, next) {
+    try {
+      const userId = req.user.id;
+      const page = parseInt(req.query.page) || 1;
+      const limit = Math.min(parseInt(req.query.limit) || 20, 100);
+
+      const result = await auditService.getAuditLog(userId, page, limit);
+      res.json(envelope({ ...result, page, limit }));
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  /**
+   * GET /api/v1/profiles/me/achievements
+   * Returns the full achievement catalogue with current progress and earned badges.
+   * Also triggers an achievement re-check so data is always fresh.
+   */
+  async getAchievements(req, res, next) {
+    try {
+      const userId = req.user.id;
+
+      // Re-check achievements before returning (ensures DB is up-to-date)
+      await auditService.checkAndAwardAchievements(userId);
+
+      const achievements = await auditService.getAchievements(userId);
+      res.json(envelope({ achievements }));
     } catch (err) {
       next(err);
     }

@@ -7,7 +7,7 @@ export const useYjs = (): YjsContextType & { activeUsers: any[] } => {
     throw new Error('useYjs must be used within a YjsProvider');
   }
   
-  const { doc, provider, awareness, status } = context;
+  const { doc, provider, awareness, status, versionTrigger } = context;
   const [activeUsers, setActiveUsers] = useState<any[]>([]);
 
   // Reactive awareness subscription
@@ -29,5 +29,5 @@ export const useYjs = (): YjsContextType & { activeUsers: any[] } => {
     return () => awareness.off('change', handleAwarenessChange);
   }, [awareness]);
 
-  return { doc, provider, awareness, status, activeUsers };
+  return { doc, provider, awareness, status, versionTrigger, activeUsers };
 };

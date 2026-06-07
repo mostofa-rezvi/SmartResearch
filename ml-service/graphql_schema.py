@@ -236,4 +236,4 @@ class Query:
 schema = strawberry.Schema(query=Query)
 
 # Mount this router in main.py:  app.include_router(graphql_router, prefix="/graphql")
-graphql_router = GraphQLRouter(schema, graphiql=True)
+graphql_router = GraphQLRouter(schema)

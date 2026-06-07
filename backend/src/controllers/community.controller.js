@@ -141,6 +141,23 @@ class CommunityController {
       next(err);
     }
   }
+  async createAMA(req, res, next) {
+    try {
+      const ama = await communityService.createAMA(req.user.id, req.body);
+      res.status(201).json(envelope(ama));
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async getAMAs(req, res, next) {
+    try {
+      const amas = await communityService.getAMAs();
+      res.json(envelope(amas));
+    } catch (err) {
+      next(err);
+    }
+  }
 }
 
 module.exports = new CommunityController();

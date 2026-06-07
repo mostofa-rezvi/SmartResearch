@@ -127,6 +127,34 @@ async def get_recommendations(user_id: int, req: Optional[RecRequest] = None):
 
 
 
+class InteractionRequest(BaseModel):
+    user_id: int
+    item_id: str
+    action: str
+
+@app.post("/interactions")
+async def record_interaction(interaction: InteractionRequest):
+    # Determine weight
+    weight = 0.5
+    if interaction.action == 'bookmark':
+        weight = 2.0
+    elif interaction.action == 'download':
+        weight = 3.0
+    elif interaction.action == 'view':
+        weight = 0.5
+    
+    # Add interaction in memory and rebuild sparse matrix
+    builder.add_interaction(interaction.user_id, interaction.item_id, weight)
+    # Recompute user similarity matrix in real-time
+    cf_engine.compute_user_similarity()
+    
+    # Clear cache for this user since their recommendations should change
+    cache = get_cache()
+    cache.delete_rec(interaction.user_id)
+    
+    return {"status": "ok", "message": "Interaction recorded and similarity matrix updated"}
+
+
 class EmbedRequest(BaseModel):
     text: Union[str, List[str]]
 
