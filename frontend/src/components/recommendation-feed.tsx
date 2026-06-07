@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { CollaboratorCard } from "./collaborator-card";
 import { API } from "@/config/api";
 import { useAuth, useApi } from "@/context/AuthContext";
 import { 
-  Loader2, X, Building, BookOpen, GraduationCap, Award, Globe, FileText, ExternalLink 
+  Loader2, X, Building, BookOpen, GraduationCap, Award, Globe, FileText, ExternalLink, UserPlus, UserCheck, Clock
 } from "lucide-react";
 
 interface RecommendationFeedProps {
@@ -32,6 +32,10 @@ export function RecommendationFeed({ filters }: RecommendationFeedProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [papers, setPapers] = useState<any[]>([]);
   const [isLoadingPapers, setIsLoadingPapers] = useState(false);
+
+  // Connection state: { [userId]: 'none' | 'pending' | 'accepted' | 'loading' }
+  const [connectionStates, setConnectionStates] = useState<Record<string, string>>({});
+  const [connectToast, setConnectToast] = useState<string | null>(null);
 
   const trackPaperEvent = async (paper: any, action: 'view' | 'bookmark' | 'download') => {
     if (!token) return;
@@ -67,7 +71,9 @@ export function RecommendationFeed({ filters }: RecommendationFeedProps) {
             hIndex: r.h_index || 0,
             citations: r.cited_by_count || 0,
             country: r.country || "US",
-            interests: (r.research_interests || []).filter((i: any) => typeof i === 'string')
+            interests: (r.research_interests || []).filter((i: any) => typeof i === 'string'),
+            // Critical: platform user ID — enables the Connect button when non-null
+            internalUserId: r.internalUserId ?? null,
           }));
           setRecommendations(formatted);
         }
@@ -101,7 +107,59 @@ export function RecommendationFeed({ filters }: RecommendationFeedProps) {
     setSelectedResearcher(rec);
     setIsModalOpen(true);
     fetchPapers(rec.id);
+    // Fetch live connection status when modal opens
+    fetchConnectionStatus(rec.internalUserId);
   };
+
+  // Fetch connection status for a given platform user id
+  const fetchConnectionStatus = useCallback(async (userId: string | number | undefined) => {
+    if (!userId || !token) return;
+    try {
+      const res = await fetchWithAuth(API.connections.status(String(userId)));
+      const json = await res.json();
+      if (json.success) {
+        setConnectionStates(prev => ({ ...prev, [String(userId)]: json.data.status }));
+      }
+    } catch {
+      // non-critical
+    }
+  }, [fetchWithAuth, token]);
+
+  // Handle Connect button click
+  const handleConnect = async () => {
+    if (!selectedResearcher) return;
+    const userId = selectedResearcher.internalUserId;
+    if (!userId) {
+      setConnectToast("Cannot connect — researcher has no platform account yet.");
+      setTimeout(() => setConnectToast(null), 3000);
+      return;
+    }
+
+    setConnectionStates(prev => ({ ...prev, [String(userId)]: 'loading' }));
+    try {
+      const res = await fetchWithAuth(API.connections.request, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ recipient_id: userId, message: `Hi, I'd love to collaborate with you on ResearchBridge!` })
+      });
+      const json = await res.json();
+      if (json.success) {
+        setConnectionStates(prev => ({ ...prev, [String(userId)]: 'pending' }));
+        setConnectToast("Connection request sent! 🎉");
+      } else if (res.status === 409) {
+        setConnectionStates(prev => ({ ...prev, [String(userId)]: json.message.includes('connected') ? 'accepted' : 'pending' }));
+        setConnectToast(json.message);
+      } else {
+        setConnectionStates(prev => ({ ...prev, [String(userId)]: 'none' }));
+        setConnectToast("Failed to send request. Try again.");
+      }
+    } catch {
+      setConnectionStates(prev => ({ ...prev, [String(userId)]: 'none' }));
+      setConnectToast("Network error. Try again.");
+    }
+    setTimeout(() => setConnectToast(null), 3500);
+  };
+
 
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 30;
@@ -407,12 +465,54 @@ export function RecommendationFeed({ filters }: RecommendationFeedProps) {
               >
                 Close
               </button>
-              <button 
-                className="px-6 py-2.5 bg-primary hover:bg-primary-hover text-white font-bold rounded-xl text-sm shadow-md transition-all"
-              >
-                Connect
-              </button>
+              {(() => {
+                const uid = selectedResearcher?.internalUserId;
+                const connStatus = uid ? (connectionStates[String(uid)] || 'none') : 'unavailable';
+                if (connStatus === 'accepted') {
+                  return (
+                    <button disabled className="px-6 py-2.5 bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 font-bold rounded-xl text-sm flex items-center gap-2 cursor-default">
+                      <UserCheck size={16} /> Connected
+                    </button>
+                  );
+                }
+                if (connStatus === 'pending') {
+                  return (
+                    <button disabled className="px-6 py-2.5 bg-amber-500/10 text-amber-600 border border-amber-500/20 font-bold rounded-xl text-sm flex items-center gap-2 cursor-default">
+                      <Clock size={16} /> Request Pending
+                    </button>
+                  );
+                }
+                if (connStatus === 'loading') {
+                  return (
+                    <button disabled className="px-6 py-2.5 bg-primary/10 text-primary font-bold rounded-xl text-sm flex items-center gap-2 cursor-wait">
+                      <Loader2 size={16} className="animate-spin" /> Sending...
+                    </button>
+                  );
+                }
+                if (connStatus === 'unavailable') {
+                  return (
+                    <button disabled className="px-6 py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-400 font-bold rounded-xl text-sm flex items-center gap-2 cursor-not-allowed">
+                      <UserPlus size={16} /> Connect
+                    </button>
+                  );
+                }
+                return (
+                  <button
+                    onClick={handleConnect}
+                    className="px-6 py-2.5 bg-primary hover:bg-primary/90 text-white font-bold rounded-xl text-sm shadow-md transition-all flex items-center gap-2"
+                  >
+                    <UserPlus size={16} /> Connect
+                  </button>
+                );
+              })()}
             </div>
+
+            {/* Toast notification */}
+            {connectToast && (
+              <div className="absolute bottom-20 left-1/2 -translate-x-1/2 px-5 py-2.5 bg-slate-900 dark:bg-slate-700 text-white text-sm font-semibold rounded-xl shadow-xl animate-in fade-in-0 slide-in-from-bottom-2 duration-300 whitespace-nowrap z-50">
+                {connectToast}
+              </div>
+            )}
           </div>
         </div>
       )}
