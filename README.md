@@ -9,6 +9,7 @@ SmartResearch is an AI-powered social and collaboration platform for the academi
 - **Publication Assistant:** Live DOAJ journal recommendations and comprehensive submission checklists.
 - **Community Forum:** Threaded discussions protected by **TrustRank** reputation gating and automated spam filtering.
 - **Verified Profiles:** Institutional badge display and social citation integration.
+- **Mentorship Module:** Matchmaking for junior and senior researchers, structured learning paths, and progress tracking.
 
 ## 🛠️ Technical Stack
 
@@ -34,6 +35,22 @@ npm install
 ### Development
 ```bash
 npm run dev
+```
+
+### WebSocket Authentication
+Real-time features via Socket.IO require JWT authentication during the handshake. Clients must provide their JWT token in the `auth` object:
+```javascript
+const socket = io("http://your-server-url", {
+  auth: {
+    token: "your_jwt_token_here"
+  }
+});
+```
+
+### Running Templates
+To instantiate standard research templates (e.g., proposals, ethics reviews), run the built-in generator script:
+```bash
+npm run generate:template -- --name="My Project" --type="proposal"
 ```
 
 ## 📜 Documentation
