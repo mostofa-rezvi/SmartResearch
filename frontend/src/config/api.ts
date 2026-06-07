@@ -144,5 +144,7 @@ export const API = {
     matchQuality: `${API_BASE}/api/v1/analytics/match-quality`,
     collaboration: `${API_BASE}/api/v1/analytics/collaboration`,
     growth: `${API_BASE}/api/v1/analytics/growth`,
+    publications: `${API_BASE}/api/v1/analytics/publications`,
+    weeklyReport: `${API_BASE}/api/v1/analytics/weekly-report`,
   },
 } as const;

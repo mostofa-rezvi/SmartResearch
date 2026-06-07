@@ -26,4 +26,14 @@ router.get('/collaboration', verifyAuth, analyticsController.getCollaboration);
 // @access  Admin
 router.get('/growth', verifyAuth, analyticsController.getGrowth);
 
+// @route   GET /api/v1/analytics/publications
+// @desc    Publication outcomes and reading engagement stats
+// @access  Admin
+router.get('/publications', verifyAuth, analyticsController.getPublicationOutcomes);
+
+// @route   GET /api/v1/analytics/weekly-report
+// @desc    Downloadable weekly report (JSON or CSV)
+// @access  Admin
+router.get('/weekly-report', verifyAuth, analyticsController.getWeeklyReport);
+
 module.exports = router;
