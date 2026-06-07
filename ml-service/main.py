@@ -76,24 +76,31 @@ async def get_recommendations(user_id: int, req: Optional[RecRequest] = None):
         
         # 4. Merge using RRF
         hybrid_results = rrf_merge(cbf_results, cf_results)
-        final_results = hybrid_results[:20]
+        
+        # Apply calibrated threshold (0.533) to filter low-quality matches
+        THRESHOLD = float(os.getenv("RECOMMENDATION_THRESHOLD", "0.533"))
+        filtered_results = [res for res in hybrid_results if res[1] >= THRESHOLD]
+        
+        final_results = filtered_results[:20]
 
-        # 4.5 Fallback if no matches found (Cold Start)
-        if not final_results:
-            logger.info("No ML recommendations found, applying popular researchers fallback.")
+        # 4.5 Fallback if too few matches found (Cold Start / Too strict threshold)
+        if len(final_results) < 5:
+            logger.info(f"Only {len(final_results)} ML recommendations passed threshold, applying popular researchers fallback.")
             try:
                 import psycopg2
                 import os
                 conn = psycopg2.connect(os.getenv("DATABASE_URL", "postgresql://postgres:postgres@localhost:5434/researchbridge"))
                 cur = conn.cursor()
-                # If we have a profile text, we could do basic ILIKE matching, otherwise just top cited
                 cur.execute(
                     "SELECT id, cited_by_count FROM researcher_profiles ORDER BY cited_by_count DESC NULLS LAST LIMIT 10"
                 )
                 rows = cur.fetchall()
+                # Track existing IDs to prevent duplicates
+                existing_ids = {res[0] for res in final_results}
                 for row in rows:
-                    # Append id and a dummy score based on citations
-                    final_results.append((row[0], min(0.99, (row[1] or 0) / 1000000.0)))
+                    if row[0] not in existing_ids and len(final_results) < 20:
+                        # Append id and a dummy score based on citations (always < threshold so it's clear it's a fallback)
+                        final_results.append((row[0], min(THRESHOLD - 0.01, (row[1] or 0) / 1000000.0)))
                 cur.close()
                 conn.close()
             except Exception as db_fallback_err:
