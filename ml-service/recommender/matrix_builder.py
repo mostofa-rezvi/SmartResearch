@@ -24,6 +24,8 @@ class MatrixBuilder:
         self.item_map = {} # itemId -> col_idx
         self.interaction_matrix = None
         self.interactions_raw = []
+        self._pending_count = 0
+        self._last_rebuild_time = 0
 
     def fetch_interactions(self):
         self.interactions_raw = [] # List of (user_id, item_id, weight)
@@ -75,9 +77,22 @@ class MatrixBuilder:
 
         return self.interactions_raw
 
-    def add_interaction(self, user_id, item_id, weight):
+    def add_interaction(self, user_id, item_id, weight, force=False):
+        # Prevent exact duplicates from dual-path delivery (HTTP + Redis stream)
+        if (user_id, item_id, weight) in self.interactions_raw:
+            return False
+            
         self.interactions_raw.append((user_id, item_id, weight))
-        self.build_matrix(self.interactions_raw)
+        self._pending_count += 1
+        
+        import time
+        now = time.time()
+        if force or self._pending_count >= 10 or (now - self._last_rebuild_time) >= 60:
+            self.build_matrix(self.interactions_raw)
+            self._pending_count = 0
+            self._last_rebuild_time = now
+            return True
+        return False
 
     def build_matrix(self, interactions):
         if not interactions:

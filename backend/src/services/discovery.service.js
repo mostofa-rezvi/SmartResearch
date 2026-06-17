@@ -242,6 +242,17 @@ class DiscoveryService {
     // Rule #17: Emit events
     eventBus.emitEvent('event.behaviour', { type: 'library.paper.saved', userId, doi, timestamp: new Date().toISOString() });
     
+    // Notify ML service immediately for real-time recommendation updates
+    try {
+      axios.post(`${ML_SERVICE_URL}/interactions`, {
+        user_id: userId,
+        item_id: doi,
+        action: 'bookmark'
+      }).catch(err => logger.warn(`[ML] savePaper interaction signal failed: ${err.message}`));
+    } catch (err) {
+      logger.warn(`[ML] savePaper interaction sync failed: ${err.message}`);
+    }
+
     logger.info({ userId, doi }, 'Paper saved to library');
 
     return { message: 'Paper saved' };

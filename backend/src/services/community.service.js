@@ -3,6 +3,9 @@ const eventBus = require('./eventBus.service');
 const logger = require('../utils/logger');
 const reputationService = require('./reputation.service');
 const socketService = require('./socket.service');
+const axios = require('axios');
+
+const ML_SERVICE_URL = process.env.ML_SERVICE_URL || 'http://localhost:8000';
 
 const VALID_REACTIONS = ['insightful', 'support', 'curious', 'celebrate', 'love'];
 
@@ -261,6 +264,20 @@ class CommunityService {
     // -------------------------------
 
     eventBus.emitEvent('event.behaviour', { type: 'community.post.voted', userId, postId, value, timestamp: new Date().toISOString() });
+
+    // Notify ML service immediately for real-time recommendation updates on upvote
+    if (value === 1) {
+      try {
+        axios.post(`${ML_SERVICE_URL}/interactions`, {
+          user_id: userId,
+          item_id: `post_${postId}`,
+          action: 'upvote'
+        }).catch(err => logger.warn(`[ML] vote interaction signal failed: ${err.message}`));
+      } catch (err) {
+        logger.warn(`[ML] vote interaction sync failed: ${err.message}`);
+      }
+    }
+
     return { 
       vote_score: parseInt(stats.total), 
       upvotes: parseInt(stats.upvotes),
@@ -350,6 +367,17 @@ class CommunityService {
     comment.user_vote = null;
 
     eventBus.emitEvent('event.behaviour', { type: 'community.comment.created', userId, postId, commentId: comment.id, timestamp: new Date().toISOString() });
+
+    // Notify ML service immediately for real-time recommendation updates
+    try {
+      axios.post(`${ML_SERVICE_URL}/interactions`, {
+        user_id: userId,
+        item_id: `post_${postId}`,
+        action: 'comment'
+      }).catch(err => logger.warn(`[ML] addComment interaction signal failed: ${err.message}`));
+    } catch (err) {
+      logger.warn(`[ML] addComment interaction sync failed: ${err.message}`);
+    }
 
     // Notify the post author
     setImmediate(async () => {

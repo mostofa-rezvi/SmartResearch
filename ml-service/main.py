@@ -15,6 +15,8 @@ import logging
 import os
 import psycopg2
 from contextlib import asynccontextmanager
+from workers.behaviour_worker import start_behaviour_worker
+from apscheduler.schedulers.background import BackgroundScheduler
 
 # Initialize Recommender Components
 builder = MatrixBuilder()
@@ -24,6 +26,19 @@ cf_engine = CFEngine(builder)
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+def rebuild_matrix_job():
+    logger.info("[Scheduler] Starting periodic recommendation matrix rebuild...")
+    try:
+        data = builder.fetch_interactions()
+        builder.build_matrix(data)
+        cf_engine.compute_user_similarity()
+        cache = get_cache()
+        for user_id in list(builder.user_map.keys()):
+            cache.delete_rec(user_id)
+        logger.info("[Scheduler] Periodic recommendation matrix rebuild complete and cache invalidated.")
+    except Exception as e:
+        logger.error(f"[Scheduler] Periodic rebuild failed: {str(e)}")
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup: Initialize recommendation matrix
@@ -31,8 +46,26 @@ async def lifespan(app: FastAPI):
     data = builder.fetch_interactions()
     builder.build_matrix(data)
     cf_engine.compute_user_similarity()
+    
+    # Start background scheduler for periodic rebuilds (every 15 minutes)
+    scheduler = BackgroundScheduler()
+    scheduler.add_job(rebuild_matrix_job, 'interval', minutes=15)
+    scheduler.start()
+    logger.info("[Scheduler] Started periodic matrix rebuild job (every 15 min)")
+    
+    # Start the event.behaviour Redis Stream worker as an asyncio background task
+    bg_task = asyncio.create_task(start_behaviour_worker(builder, cf_engine))
+    logger.info("[Worker] Started event.behaviour stream consumer task")
+    
     yield
-    # Shutdown logic can go here if needed
+    # Shutdown
+    scheduler.shutdown()
+    bg_task.cancel()
+    try:
+        await bg_task
+    except asyncio.CancelledError:
+        pass
+    logger.info("Lifespan shutdown complete.")
 
 app = FastAPI(title="ResearchBridge ML Service", lifespan=lifespan)
 
@@ -142,11 +175,16 @@ async def record_interaction(interaction: InteractionRequest):
         weight = 3.0
     elif interaction.action == 'view':
         weight = 0.5
+    elif interaction.action == 'comment':
+        weight = 1.5
+    elif interaction.action == 'upvote':
+        weight = 1.0
     
     # Add interaction in memory and rebuild sparse matrix
-    builder.add_interaction(interaction.user_id, interaction.item_id, weight)
-    # Recompute user similarity matrix in real-time
-    cf_engine.compute_user_similarity()
+    rebuilt = builder.add_interaction(interaction.user_id, interaction.item_id, weight)
+    # Recompute user similarity matrix in real-time if rebuilt
+    if rebuilt:
+        cf_engine.compute_user_similarity()
     
     # Clear cache for this user since their recommendations should change
     cache = get_cache()
