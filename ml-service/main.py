@@ -16,6 +16,7 @@ import os
 import psycopg2
 from contextlib import asynccontextmanager
 from workers.behaviour_worker import start_behaviour_worker
+# pyrefly: ignore [missing-import]
 from apscheduler.schedulers.background import BackgroundScheduler
 
 # Initialize Recommender Components
