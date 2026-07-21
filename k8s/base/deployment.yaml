@@ -36,7 +36,18 @@ spec:
       - name: backend
         image: smartresearch/backend:latest
         ports:
-        - containerPort: 8080
+        - containerPort: 5000
+        envFrom:
+        - configMapRef:
+            name: researchbridge-config
+        - secretRef:
+            name: researchbridge-secrets
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 10
+          periodSeconds: 15
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -56,7 +67,18 @@ spec:
       - name: ml-service
         image: smartresearch/ml-service:latest
         ports:
-        - containerPort: 5000
+        - containerPort: 8000
+        envFrom:
+        - configMapRef:
+            name: researchbridge-config
+        - secretRef:
+            name: researchbridge-secrets
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 20
+          periodSeconds: 20
         resources:
           requests:
             cpu: "500m"

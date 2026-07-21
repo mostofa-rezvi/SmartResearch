@@ -53,6 +53,8 @@ services:
     depends_on:
       - postgres
       - redis
+      - elasticsearch
+      - neo4j
 
   postgres:
     image: postgres:15-alpine

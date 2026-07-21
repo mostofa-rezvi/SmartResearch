@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: researchbridge-config
+data:
+  NODE_ENV: "production"
+  PORT: "5000"
+  REDIS_HOST: "redis"
+  REDIS_PORT: "6379"
+  REDIS_URL: "redis://redis:6379"
+  ELASTICSEARCH_NODE: "http://elasticsearch:9200"
+  ELASTICSEARCH_URL: "http://elasticsearch:9200"
+  NEO4J_URI: "bolt://neo4j:7687"
+  ML_SERVICE_URL: "http://ml-service:8000"
+  HF_LLM_MODEL: "meta-llama/Llama-3.1-8B-Instruct"
+  HF_EMBEDDING_MODEL: "sentence-transformers/all-mpnet-base-v2"
+  RECOMMENDATION_THRESHOLD: "0.533"
+  S3_ENDPOINT: "http://minio:9000"
+  S3_BUCKET: "researchbridge"
+  S3_REGION: "us-east-1"

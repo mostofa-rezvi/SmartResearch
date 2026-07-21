@@ -1,0 +1,13 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# ResearchBridge base — app Deployments/Services + in-cluster stateful backing
+# services + config. Copy secret.example.yaml → secret.yaml (real values) before
+# applying, or create the secret out-of-band. Apply with:  kubectl apply -k k8s/base
+resources:
+  - configmap.yaml
+  - secret.example.yaml     # replace with secret.yaml in real deployments
+  - statefulsets.yaml       # postgres / redis / elasticsearch / neo4j / minio
+  - deployment.yaml         # frontend / backend / ml-service
+  - service.yaml            # frontend / backend / ml-service
+  - ingress.yaml
