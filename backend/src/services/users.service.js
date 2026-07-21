@@ -2,9 +2,14 @@ const db = require('../config/db');
 
 class UserService {
   async getProfile(userId) {
-    // 1. Base User Info
+    // 1. Base User Info (includes trust tier / verification / reputation for Module 9)
     const userResult = await db.query(
-      'SELECT id, name, email, role, researcher_type, status, institution, research_interests, bio, avatar_url, educational_status, personal_website, linkedin_url, google_scholar_url, researchgate_url, created_at FROM users WHERE id = $1',
+      `SELECT id, name, email, role, researcher_type, status, institution, research_interests,
+              domain_tags, skills, bio, avatar_url, educational_status,
+              personal_website, linkedin_url, google_scholar_url, researchgate_url,
+              trust_tier, trust_rank, institution_verified, is_institutional,
+              reputation_points, created_at
+         FROM users WHERE id = $1`,
       [userId]
     );
 
@@ -50,6 +55,44 @@ class UserService {
     `, [userId]);
 
     userProfile.recent_activity = recentActivity.rows;
+
+    // 5. Collaborations formed (accepted connections) — Module 9
+    const collabRes = await db.query(
+      `SELECT COUNT(*)::int AS count FROM connections
+        WHERE status = 'accepted' AND (requester_id = $1 OR recipient_id = $1)`,
+      [userId]
+    ).catch(() => ({ rows: [{ count: 0 }] }));
+    userProfile.collaborations_count = collabRes.rows[0].count;
+
+    // 6. Mentorship history (as mentor and as mentee) — Module 9
+    const mentorshipRes = await db.query(
+      `SELECT m.id, m.status, m.created_at,
+              CASE WHEN m.mentor_id = $1 THEN 'mentor' ELSE 'mentee' END AS my_role,
+              mentor.name AS mentor_name, mentee.name AS mentee_name
+         FROM mentorships m
+         JOIN users mentor ON m.mentor_id = mentor.id
+         JOIN users mentee ON m.mentee_id = mentee.id
+        WHERE (m.mentor_id = $1 OR m.mentee_id = $1) AND m.status = 'accepted'
+        ORDER BY m.created_at DESC LIMIT 20`,
+      [userId]
+    ).catch(() => ({ rows: [] }));
+    userProfile.mentorship_history = mentorshipRes.rows;
+
+    // 7. Public achievements / credentials (verifiable portfolio) — Module 9
+    const achievementsRes = await db.query(
+      `SELECT badge_type, title, description, earned_at
+         FROM user_achievements WHERE user_id = $1 ORDER BY earned_at DESC`,
+      [userId]
+    ).catch(() => ({ rows: [] }));
+    userProfile.achievements = achievementsRes.rows;
+
+    // 8. Authored / uploaded library items (papers) — Module 9
+    const papersRes = await db.query(
+      `SELECT id, title, item_type, doi, created_at FROM library_items
+        WHERE user_id = $1 AND item_type = 'paper' ORDER BY created_at DESC LIMIT 20`,
+      [userId]
+    ).catch(() => ({ rows: [] }));
+    userProfile.authored_papers = papersRes.rows;
 
     return userProfile;
   }

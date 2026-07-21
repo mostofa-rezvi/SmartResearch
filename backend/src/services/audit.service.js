@@ -22,6 +22,24 @@
 
 const db = require('../config/db');
 const logger = require('../utils/logger');
+const crypto = require('crypto');
+
+/** Deterministic (key-sorted) serialization so hashes reproduce regardless of jsonb key order. */
+function stableStringify(v) {
+  if (Array.isArray(v)) return '[' + v.map(stableStringify).join(',') + ']';
+  if (v && typeof v === 'object') {
+    return '{' + Object.keys(v).sort().map((k) => JSON.stringify(k) + ':' + stableStringify(v[k])).join(',') + '}';
+  }
+  return JSON.stringify(v === undefined ? null : v);
+}
+
+/** Canonical content string for one audit entry (excludes id/timestamp/hashes). */
+function auditCanonical(row) {
+  return [row.action, stableStringify(row.changed_fields || []),
+    stableStringify(row.old_values || {}), stableStringify(row.new_values || {})].join('|');
+}
+
+function sha256(s) { return crypto.createHash('sha256').update(s).digest('hex'); }
 
 // ─── Achievement Catalogue ────────────────────────────────────────────────────
 
@@ -175,11 +193,22 @@ async function logProfileChange(userId, action, changedFields, oldValues, newVal
     const ip = req.ip || req.connection?.remoteAddress || null;
     const ua = req.headers?.['user-agent'] || null;
 
+    // Hash chain: link each entry to the previous one for this user so the log is
+    // tamper-EVIDENT (any altered row breaks the chain). Combined with the DB
+    // append-only trigger, this makes the credential portfolio verifiable.
+    const prevRes = await db.query(
+      'SELECT entry_hash FROM profile_audit_logs WHERE user_id = $1 AND entry_hash IS NOT NULL ORDER BY id DESC LIMIT 1',
+      [userId]
+    );
+    const prevHash = prevRes.rows[0]?.entry_hash || '';
+    const canonical = auditCanonical({ action, changed_fields: changedFields, old_values: oldValues, new_values: newValues });
+    const entryHash = sha256(prevHash + '|' + canonical);
+
     await db.query(
       `INSERT INTO profile_audit_logs
-         (user_id, action, changed_fields, old_values, new_values, ip_address, user_agent)
-       VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-      [userId, action, changedFields, JSON.stringify(oldValues), JSON.stringify(newValues), ip, ua]
+         (user_id, action, changed_fields, old_values, new_values, ip_address, user_agent, prev_hash, entry_hash)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+      [userId, action, changedFields, JSON.stringify(oldValues), JSON.stringify(newValues), ip, ua, prevHash, entryHash]
     );
   } catch (err) {
     // Audit logging must never break the primary operation
@@ -308,4 +337,33 @@ async function getAchievements(userId) {
   return result;
 }
 
-module.exports = { logProfileChange, checkAndAwardAchievements, getAuditLog, getAchievements };
+/**
+ * Verify the integrity of a user's append-only audit chain.
+ * Re-walks the hash chain and confirms each entry_hash reproduces from its content
+ * + the previous hash — detecting any tampering (even though the DB trigger already
+ * prevents UPDATE/DELETE). Returns { valid, entries, verified, brokenAt?, reason? }.
+ * @param {number} userId
+ */
+async function verifyAuditChain(userId) {
+  const { rows } = await db.query(
+    'SELECT id, action, changed_fields, old_values, new_values, prev_hash, entry_hash FROM profile_audit_logs WHERE user_id = $1 ORDER BY id ASC',
+    [userId]
+  );
+  let prevHash = '';
+  let verified = 0;
+  for (const r of rows) {
+    if (!r.entry_hash) continue; // legacy row written before hashing — skip in the chain
+    const expected = sha256(prevHash + '|' + auditCanonical(r));
+    if (r.prev_hash !== prevHash) {
+      return { valid: false, entries: rows.length, verified, brokenAt: r.id, reason: 'broken chain link' };
+    }
+    if (r.entry_hash !== expected) {
+      return { valid: false, entries: rows.length, verified, brokenAt: r.id, reason: 'content tampered' };
+    }
+    prevHash = r.entry_hash;
+    verified++;
+  }
+  return { valid: true, entries: rows.length, verified };
+}
+
+module.exports = { logProfileChange, checkAndAwardAchievements, getAuditLog, getAchievements, verifyAuditChain };

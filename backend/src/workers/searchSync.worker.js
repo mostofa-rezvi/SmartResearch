@@ -1,6 +1,22 @@
 const { createClient } = require('../config/redis');
 const { getEsClient } = require('../config/elasticsearch');
 const logger = require('../utils/logger');
+const axios = require('axios');
+
+const ML_SERVICE_URL = process.env.ML_SERVICE_URL || 'http://localhost:8000';
+
+/** Compute a 768-dim SBERT embedding for the profile text via the ML service. */
+async function embedProfile(text) {
+  if (!text || !text.trim()) return null;
+  try {
+    // 30s: the ML service's first SBERT inference can be slow (model cold-start/warmup)
+    const res = await axios.post(`${ML_SERVICE_URL}/embed`, { text }, { timeout: 30000 });
+    return res.data?.embedding || res.data?.vectors || null;
+  } catch (err) {
+    logger.warn(`[SearchSync] embedding failed (indexing without vector): ${err.message}`);
+    return null;
+  }
+}
 
 const STREAM_KEY = 'profile.created';
 const GROUP_NAME = 'search_sync_group';
@@ -100,18 +116,29 @@ class SearchSyncWorker {
 
       logger.info(`[SearchSync] Processing message ${messageId} for user ${payload.id}`);
 
+      // Build the semantic text from name + interests + tags + bio, then embed it.
+      const interests = Array.isArray(payload.research_interests) ? payload.research_interests.join(', ') : '';
+      const tags = Array.isArray(payload.domain_tags) ? payload.domain_tags.join(', ') : '';
+      const profileText = [payload.name, payload.institution, interests, tags, payload.bio]
+        .filter(Boolean).join('. ');
+      const embedding = await embedProfile(profileText);
+
       const esClient = getEsClient();
-      await esClient.index({
-        index: 'users',
-        id: payload.id.toString(),
-        document: {
-          name: payload.name || 'Unknown',
-          email: payload.email || '',
-          content: payload.bio || '', // Example mapping
-        }
-      });
-      
-      logger.info(`[SearchSync] Elasticsearch document created/updated for user ${payload.id}`);
+      const document = {
+        name: payload.name || 'Unknown',
+        email: payload.email || '',
+        content: payload.bio || '',
+        institution: payload.institution || '',
+        trust_tier: payload.trust_tier || 'unverified',
+        tags: Array.isArray(payload.domain_tags) ? payload.domain_tags : [],
+      };
+      // Only attach the dense_vector when we actually computed one (avoids ES mapping errors)
+      if (Array.isArray(embedding) && embedding.length > 0) {
+        document.embedding = embedding;
+      }
+      await esClient.index({ index: 'users', id: payload.id.toString(), document });
+
+      logger.info(`[SearchSync] ES doc upserted for user ${payload.id} (embedding: ${embedding ? 'yes' : 'no'})`);
 
       // Acknowledge the message
       await this.redisClient.xack(STREAM_KEY, GROUP_NAME, messageId);

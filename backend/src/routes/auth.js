@@ -29,8 +29,16 @@ const validateOAuthState = async (state) => {
 router.post('/register', authController.register);
 
 // @route   POST /api/v1/auth/login
-// @desc    Login with email and password
+// @desc    Login with email and password (may return otp_required when 2FA is on)
 router.post('/login', authController.login);
+
+// @route   POST /api/v1/auth/verify-otp
+// @desc    Complete a two-factor login with the emailed one-time code
+router.post('/verify-otp', authController.verifyOtp);
+
+// @route   POST /api/v1/auth/resend-otp
+// @desc    Re-issue a login one-time code
+router.post('/resend-otp', authController.resendOtp);
 
 // @route   POST /api/v1/auth/refresh
 // @desc    Refresh access token using refresh token cookie

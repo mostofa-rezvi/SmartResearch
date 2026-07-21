@@ -9,6 +9,8 @@ const { generateAccessToken, generateRefreshToken, storeRefreshToken, getUserIdF
 const { getRedisClient } = require('../config/redis');
 const { envelope, errorEnvelope } = require('../utils/responseEnvelope');
 const logger = require('../utils/logger');
+const eventBus = require('../services/eventBus.service');
+const trustService = require('../services/trust.service');
 
 // Using centralized db pool from config
 
@@ -27,9 +29,48 @@ const isAllowedRedirect = (url) => {
   return ALLOWED_REDIRECT_ORIGINS.some(origin => url.startsWith(origin));
 };
 
+// ── OTP (two-factor login) helpers ──────────────────────────────────────────────
+const OTP_EXPIRY_SECONDS = (config.otp?.expiryMinutes || 5) * 60;
+
+/** Issue an access token, store+cookie a refresh token, and return the session payload. */
+async function issueSession(res, userId) {
+  const accessToken = generateAccessToken(userId);
+  const refreshToken = generateRefreshToken(userId);
+  await storeRefreshToken(refreshToken, userId);
+  res.cookie('refreshToken', refreshToken, {
+    httpOnly: true,
+    secure: config.env === 'production',
+    sameSite: 'lax',
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  });
+  const result = await db.query(
+    'SELECT id, name, email, role, onboarding_completed, researcher_type FROM users WHERE id = $1',
+    [userId]
+  );
+  return { accessToken, user: result.rows[0] };
+}
+
+/** Generate a 6-digit login OTP, store it in Redis (keyed by id + email), and email it. */
+async function sendLoginOtp(user) {
+  const otp = String(crypto.randomInt(100000, 1000000));
+  const redis = getRedisClient();
+  await redis.set(`login_otp:${user.id}`, otp, 'EX', OTP_EXPIRY_SECONDS);
+  await redis.set(`login_otp_email:${user.email}`, String(user.id), 'EX', OTP_EXPIRY_SECONDS);
+  sendEmail({
+    to: user.email,
+    subject: 'Your ResearchBridge login code',
+    text: `Your ResearchBridge verification code is ${otp}. It expires in ${config.otp?.expiryMinutes || 5} minutes.`,
+    html: `<p>Your ResearchBridge verification code is <b style="font-size:22px;letter-spacing:3px">${otp}</b>.</p>` +
+          `<p>It expires in ${config.otp?.expiryMinutes || 5} minutes. If you did not try to sign in, you can ignore this email.</p>`,
+  }).catch((err) => logger.error({ email: user.email, error: err.message }, 'Failed to send login OTP email'));
+  logger.info(`[Auth] Login OTP issued for user ${user.id}`);
+  return otp;
+}
+
 class AuthController {
   async register(req, res, next) {
-    const { name, email, password, status, institution, personal_website, linkedin_url, google_scholar_url, researchgate_url } = req.body;
+    const { name, email, password, status, institution, personal_website, linkedin_url, google_scholar_url, researchgate_url,
+      research_interests, domain_tags, skills } = req.body;
 
     if (!name || !email || !password) {
       return res.status(400).json(errorEnvelope('Name, email, and password are required', 400));
@@ -67,22 +108,48 @@ class AuthController {
         educational_status = status;
       }
 
+      // Module 1: automatic institutional-domain detection (.edu/.ac.bd/...) → trust tier
+      const trust = trustService.classifyAtRegistration(email);
+
+      // Optional research interests / domain tags / skills collected at registration
+      const interestsJson = JSON.stringify(Array.isArray(research_interests) ? research_interests : []);
+      const domainTagsJson = JSON.stringify(Array.isArray(domain_tags) ? domain_tags : []);
+      const skillsJson = JSON.stringify(Array.isArray(skills) ? skills : []);
+
       const insertResult = await db.query(
         `INSERT INTO users (
-          name, email, password, verification_token, provider, 
+          name, email, password, verification_token, provider,
           institution, researcher_type, educational_status,
-          personal_website, linkedin_url, google_scholar_url, researchgate_url
-        ) 
-         VALUES ($1, $2, $3, $4, 'local', $5, $6, $7, $8, $9, $10, $11) 
-         RETURNING id, name, email, is_verified`,
+          personal_website, linkedin_url, google_scholar_url, researchgate_url,
+          is_institutional, institution_verified, trust_tier,
+          research_interests, domain_tags, skills
+        )
+         VALUES ($1, $2, $3, $4, 'local', $5, $6, $7, $8, $9, $10, $11,
+                 $12, $13, $14, $15, $16, $17)
+         RETURNING id, name, email, is_verified, is_institutional, trust_tier`,
         [
-          name, email, hashedPassword, verificationToken, 
+          name, email, hashedPassword, verificationToken,
           institution, researcher_type, educational_status,
-          personal_website, linkedin_url, google_scholar_url, researchgate_url
+          personal_website, linkedin_url, google_scholar_url, researchgate_url,
+          trust.is_institutional, trust.institution_verified, trust.trust_tier,
+          interestsJson, domainTagsJson, skillsJson
         ]
       );
 
       const user = insertResult.rows[0];
+
+      // Emit profile.created so the search (ES) + graph (Neo4j) sync workers fire.
+      eventBus.emitEvent('profile.created', {
+        id: user.id,
+        name,
+        email,
+        institution: institution || '',
+        is_institutional: trust.is_institutional,
+        trust_tier: trust.trust_tier,
+        research_interests: Array.isArray(research_interests) ? research_interests : [],
+        domain_tags: Array.isArray(domain_tags) ? domain_tags : [],
+        bio: '',
+      }).catch((e) => logger.warn(`[register] profile.created emit failed: ${e.message}`));
 
       // Store verification token expiry in Redis (since schema doesn't have the column yet)
       const redis = getRedisClient();
@@ -116,33 +183,77 @@ class AuthController {
       }
 
       try {
-        const accessToken = generateAccessToken(user.id);
-        const refreshToken = generateRefreshToken(user.id);
-        
-        await storeRefreshToken(refreshToken, user.id);
-
-        res.cookie('refreshToken', refreshToken, {
-          httpOnly: true,
-          secure: config.env === 'production',
-          sameSite: 'lax',
-          maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-        });
-
-        res.json(envelope({
-          accessToken,
-          user: {
-            id: user.id,
-            name: user.name,
+        // Two-factor: when enabled, email a one-time code and require /verify-otp
+        // to complete login. Disabled by default → direct token (below).
+        if (config.otp?.loginEnabled) {
+          const otp = await sendLoginOtp(user);
+          const payload = {
+            otp_required: true,
             email: user.email,
-            role: user.role,
-            onboarding_completed: user.onboarding_completed,
-            researcher_type: user.researcher_type,
-          }
-        }, { message: 'Login successful' }));
+            message: 'A one-time verification code was sent to your email.',
+          };
+          // Dev convenience only — never expose the code in production
+          if (config.env !== 'production') payload.dev_otp = otp;
+          return res.json(envelope(payload));
+        }
+
+        const session = await issueSession(res, user.id);
+        res.json(envelope(session, { message: 'Login successful' }));
       } catch (e) {
         next(e);
       }
     })(req, res, next);
+  }
+
+  /**
+   * POST /api/v1/auth/verify-otp — complete a two-factor login.
+   * Verifies { email, otp } against Redis and issues session tokens.
+   */
+  async verifyOtp(req, res, next) {
+    const { email, otp } = req.body;
+    if (!email || !otp) {
+      return res.status(400).json(errorEnvelope('Email and verification code are required', 400));
+    }
+    try {
+      const redis = getRedisClient();
+      const userId = await redis.get(`login_otp_email:${email}`);
+      if (!userId) {
+        return res.status(401).json(errorEnvelope('Code expired or not requested. Please sign in again.', 401));
+      }
+      const stored = await redis.get(`login_otp:${userId}`);
+      if (!stored || stored !== String(otp).trim()) {
+        return res.status(401).json(errorEnvelope('Invalid verification code.', 401));
+      }
+      // Single-use
+      await redis.del(`login_otp:${userId}`);
+      await redis.del(`login_otp_email:${email}`);
+
+      const session = await issueSession(res, userId);
+      res.json(envelope(session, { message: 'Login successful' }));
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  /**
+   * POST /api/v1/auth/resend-otp — re-issue a login code.
+   * Does not reveal whether the account exists.
+   */
+  async resendOtp(req, res, next) {
+    const { email } = req.body;
+    if (!email) return res.status(400).json(errorEnvelope('Email is required', 400));
+    try {
+      const result = await db.query('SELECT id, email FROM users WHERE email = $1', [email]);
+      if (result.rows.length === 0) {
+        return res.json(envelope({ message: 'If the account exists, a new code was sent.' }));
+      }
+      const otp = await sendLoginOtp(result.rows[0]);
+      const payload = { message: 'A new verification code was sent.' };
+      if (config.env !== 'production') payload.dev_otp = otp;
+      res.json(envelope(payload));
+    } catch (err) {
+      next(err);
+    }
   }
 
   async refresh(req, res, next) {
@@ -219,8 +330,20 @@ class AuthController {
         return res.status(400).json(errorEnvelope('Invalid, expired, or already verified token. If you are already verified, please try logging in.', 400));
       }
 
+      // On verify: mark verified, and upgrade trust tier + institutional verification.
+      // institution_verified becomes true only when the (now-verified) email is on an academic domain.
       const result = await db.query(
-        'UPDATE users SET is_verified = true, verification_token = NULL WHERE verification_token = $1 RETURNING id',
+        `UPDATE users
+            SET is_verified = true,
+                verification_token = NULL,
+                institution_verified = is_institutional,
+                trust_tier = CASE
+                  WHEN role IN ('professor','invited_user') THEN 'professor'
+                  WHEN is_institutional THEN 'verified'
+                  ELSE 'basic'
+                END
+          WHERE verification_token = $1
+          RETURNING id, trust_tier, is_institutional`,
         [token]
       );
 

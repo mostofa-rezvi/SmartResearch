@@ -19,6 +19,7 @@ router.use(verifyAuth);
 
 // Credential Dashboard: append-only profile change history
 router.get('/me/audit-log', profileController.getAuditLog);
+router.get('/me/audit-log/verify', profileController.verifyAuditLog);
 
 // Credential Dashboard: achievement / badge catalogue with current progress
 router.get('/me/achievements', profileController.getAchievements);

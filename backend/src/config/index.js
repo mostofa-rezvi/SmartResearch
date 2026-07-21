@@ -11,7 +11,10 @@ const envVarsSchema = Joi.object()
     NODE_ENV: Joi.string().valid('production', 'development', 'test').required(),
     PORT: Joi.number().default(5000),
     DATABASE_URL: Joi.string().required().description('Postgres connection URL'),
-    REDIS_URL: Joi.string().required().description('Redis connection URL'),
+    // REDIS_URL is optional — falls back to REDIS_HOST/REDIS_PORT (see below)
+    REDIS_URL: Joi.string().description('Redis connection URL'),
+    REDIS_HOST: Joi.string().default('localhost'),
+    REDIS_PORT: Joi.number().default(6379),
     ELASTICSEARCH_NODE: Joi.string().required().description('Elasticsearch node URL'),
     NEO4J_URI: Joi.string().required().description('Neo4j connection URI'),
     NEO4J_AUTH: Joi.string().required().description('Neo4j auth (user/password)'),
@@ -24,6 +27,9 @@ const envVarsSchema = Joi.object()
     S3_BUCKET: Joi.string().required().description('S3 bucket name'),
     S3_REGION: Joi.string().default('us-east-1'),
     S3_FORCE_PATH_STYLE: Joi.boolean().default(true),
+    // Two-factor OTP login (off by default so the app is usable without SMTP)
+    OTP_LOGIN_ENABLED: Joi.boolean().default(false),
+    OTP_EXPIRY_MINUTES: Joi.number().default(5),
   })
   .unknown();
 
@@ -40,7 +46,9 @@ module.exports = {
     url: envVars.DATABASE_URL,
   },
   redis: {
-    url: envVars.REDIS_URL,
+    // Prefer REDIS_URL; otherwise build it from REDIS_HOST/REDIS_PORT so the
+    // stack works with either style of configuration.
+    url: envVars.REDIS_URL || `redis://${envVars.REDIS_HOST}:${envVars.REDIS_PORT}`,
   },
   elasticsearch: {
     node: envVars.ELASTICSEARCH_NODE,
@@ -55,6 +63,10 @@ module.exports = {
   jwt: {
     accessSecret: envVars.JWT_ACCESS_SECRET,
     refreshSecret: envVars.JWT_REFRESH_SECRET,
+  },
+  otp: {
+    loginEnabled: envVars.OTP_LOGIN_ENABLED,
+    expiryMinutes: envVars.OTP_EXPIRY_MINUTES,
   },
   s3: {
     endpoint: envVars.S3_ENDPOINT,

@@ -266,6 +266,19 @@ class ProfileController {
   }
 
   /**
+   * GET /api/v1/profiles/me/audit-log/verify
+   * Verifies the tamper-evidence of the append-only credential audit chain.
+   */
+  async verifyAuditLog(req, res, next) {
+    try {
+      const result = await auditService.verifyAuditChain(req.user.id);
+      res.json(envelope(result));
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  /**
    * GET /api/v1/profiles/me/achievements
    * Returns the full achievement catalogue with current progress and earned badges.
    * Also triggers an achievement re-check so data is always fresh.
