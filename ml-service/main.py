@@ -89,7 +89,10 @@ async def get_recommendations(user_id: int, req: Optional[RecRequest] = None):
         # 1. Check Cache
         cached = cache.get_rec(user_id)
         if cached:
-            return {"recommendations": cached, "cached": True}
+            return {"recommendations": cached, "cached": True, "source": "cache"}
+
+        # R1: track whether the response came from the real ML pipeline or a DB fallback
+        used_fallback = False
 
         # 2. Get CF Results
         cf_results = cf_engine.get_recommendations(user_id)
@@ -132,6 +135,7 @@ async def get_recommendations(user_id: int, req: Optional[RecRequest] = None):
 
         # 4.5 Fallback if too few matches found (Cold Start / Too strict threshold)
         if len(final_results) < 5:
+            used_fallback = True
             logger.info(f"Only {len(final_results)} ML recommendations passed threshold, applying popular researchers fallback.")
             try:
                 conn = psycopg2.connect(os.getenv("DATABASE_URL", "postgresql://postgres:postgres@localhost:5434/researchbridge"))
@@ -153,8 +157,10 @@ async def get_recommendations(user_id: int, req: Optional[RecRequest] = None):
         
         # 5. Set Cache
         cache.set_rec(user_id, final_results)
-        
-        return {"recommendations": final_results, "cached": False}
+
+        # R1: 'fallback' means some/all results are popular-researcher DB rows, not ML matches
+        source = "fallback" if used_fallback else "ml"
+        return {"recommendations": final_results, "cached": False, "source": source}
     except Exception as e:
         logger.error(f"Recommendation error: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -203,27 +209,36 @@ async def root():
 
 @app.get("/health")
 async def health():
-    return {"status": "ok", "model": "all-mpnet-base-v2"}
+    model = get_model()
+    return {
+        "status": "ok",
+        "model": "all-mpnet-base-v2",
+        "embedding_source": model.source,   # "local" | "hf_api" | "mock"
+        "degraded": model.degraded,         # R2: True => embeddings are meaningless mock vectors
+    }
 
 @app.post("/embed")
 async def embed(request: EmbedRequest):
     try:
         model = get_model()
         cache = get_cache()
-        
+
         # Handle single string case with caching
         if isinstance(request.text, str):
             cached = cache.get(request.text)
             if cached:
-                return {"vectors": cached, "embedding": cached, "cached": True}
-            
+                return {"vectors": cached, "embedding": cached, "cached": True, "source": "cache", "degraded": False}
+
             vector = await asyncio.to_thread(model.encode, request.text)
             cache.set(request.text, vector)
-            return {"vectors": vector, "embedding": vector, "cached": False}
-        
+            # R2: expose provenance so callers can detect degraded (mock) embeddings
+            return {"vectors": vector, "embedding": vector, "cached": False,
+                    "source": model.source, "degraded": model.degraded}
+
         # Handle list case (batch caching is more complex, simple pass-through for now)
         vectors = await asyncio.to_thread(model.encode, request.text)
-        return {"vectors": vectors, "embedding": vectors}
+        return {"vectors": vectors, "embedding": vectors,
+                "source": model.source, "degraded": model.degraded}
     except Exception as e:
         logger.error(f"Embedding error: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))

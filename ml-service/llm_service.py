@@ -1,35 +1,39 @@
 """
-LLM Service — Gemini-powered citation generation and writing feedback.
+LLM Service — Hugging Face-powered citation generation and writing feedback.
+
+Uses the Hugging Face Inference Providers router (OpenAI-compatible chat
+completions endpoint) so any hosted instruct model can be swapped in via
+the HF_LLM_MODEL env var without code changes.
 
 Endpoints:
   POST /llm/citations  — Generate formatted citations (BibTeX/APA/IEEE)
   POST /llm/feedback   — Return structured writing feedback for a paper abstract
+
+Config:
+  HF_API_TOKEN  — Hugging Face access token (required; endpoints return 503 without it)
+  HF_LLM_MODEL  — model id (default: meta-llama/Llama-3.1-8B-Instruct)
 """
 
 import os
+import asyncio
 import logging
+import requests
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import Optional, Literal
 
 logger = logging.getLogger(__name__)
 
-# ── Gemini client setup ────────────────────────────────────────────────────────
-try:
-    # pyrefly: ignore [missing-import]
-    import google.generativeai as genai
-    GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
-    if GEMINI_API_KEY:
-        genai.configure(api_key=GEMINI_API_KEY)
-        _gemini_model = genai.GenerativeModel("gemini-1.5-flash")
-        GEMINI_AVAILABLE = True
-        logger.info("[LLM] Gemini 1.5 Flash initialized")
-    else:
-        GEMINI_AVAILABLE = False
-        logger.warning("[LLM] GEMINI_API_KEY not set — LLM endpoints will return stubs")
-except ImportError:
-    GEMINI_AVAILABLE = False
-    logger.warning("[LLM] google-generativeai not installed — run: pip install google-generativeai")
+# ── Hugging Face client setup ───────────────────────────────────────────────────
+HF_API_TOKEN = os.getenv("HF_API_TOKEN", "")
+HF_LLM_MODEL = os.getenv("HF_LLM_MODEL", "meta-llama/Llama-3.1-8B-Instruct")
+HF_CHAT_URL = "https://router.huggingface.co/v1/chat/completions"
+HF_AVAILABLE = bool(HF_API_TOKEN)
+
+if HF_AVAILABLE:
+    logger.info(f"[LLM] Hugging Face LLM initialized (model={HF_LLM_MODEL})")
+else:
+    logger.warning("[LLM] HF_API_TOKEN not set — LLM endpoints will return HTTP 503")
 
 router = APIRouter(prefix="/llm", tags=["LLM"])
 
@@ -74,18 +78,38 @@ class FeedbackResponse(BaseModel):
     generated_by: str
 
 
-# ── Helper: call Gemini ────────────────────────────────────────────────────────
+# ── Helper: call Hugging Face chat completions ──────────────────────────────────
 
-async def _call_gemini(prompt: str) -> str:
-    """Call Gemini 1.5 Flash and return the text response."""
-    if not GEMINI_AVAILABLE:
-        raise HTTPException(status_code=503, detail="LLM service not configured. Set GEMINI_API_KEY.")
+def _hf_chat_sync(system: str, user: str, temperature: float = 0.4, max_tokens: int = 1024) -> str:
+    """Blocking POST to the HF router (OpenAI-compatible). Returns the assistant text."""
+    payload = {
+        "model": HF_LLM_MODEL,
+        "messages": [
+            {"role": "system", "content": system},
+            {"role": "user", "content": user},
+        ],
+        "temperature": temperature,
+        "max_tokens": max_tokens,
+    }
+    headers = {
+        "Authorization": f"Bearer {HF_API_TOKEN}",
+        "Content-Type": "application/json",
+    }
+    resp = requests.post(HF_CHAT_URL, headers=headers, json=payload, timeout=55)
+    if resp.status_code != 200:
+        raise RuntimeError(f"HF API {resp.status_code}: {resp.text[:300]}")
+    data = resp.json()
+    return data["choices"][0]["message"]["content"].strip()
+
+
+async def _call_llm(system: str, user: str, **kwargs) -> str:
+    """Async wrapper — runs the blocking HF call in a thread and maps errors to HTTP codes."""
+    if not HF_AVAILABLE:
+        raise HTTPException(status_code=503, detail="LLM service not configured. Set HF_API_TOKEN.")
     try:
-        import asyncio
-        response = await asyncio.to_thread(_gemini_model.generate_content, prompt)
-        return response.text.strip()
+        return await asyncio.to_thread(_hf_chat_sync, system, user, **kwargs)
     except Exception as e:
-        logger.error(f"[LLM] Gemini call failed: {e}")
+        logger.error(f"[LLM] Hugging Face call failed: {e}")
         raise HTTPException(status_code=502, detail=f"LLM call failed: {str(e)}")
 
 
@@ -115,9 +139,8 @@ async def generate_citation(req: CitationRequest):
         ),
     }
 
-    prompt = f"""You are an academic citation formatter. {format_instructions[req.format]}
-
-Paper details:
+    system = f"You are an academic citation formatter. {format_instructions[req.format]}"
+    user = f"""Paper details:
 - Title: {req.title}
 - Authors: {authors_str}
 - Journal/Conference: {req.journal or "Unknown"}
@@ -128,8 +151,11 @@ Paper details:
 Format: {req.format.upper()}
 """
 
-    citation = await _call_gemini(prompt)
-    return CitationResponse(format=req.format, citation=citation, generated_by="gemini-1.5-flash")
+    citation = await _call_llm(system, user, temperature=0.2, max_tokens=512)
+    # Strip markdown code fences some models wrap the output in
+    import re
+    citation = re.sub(r"^```(?:bibtex|latex|text)?\n?|```$", "", citation.strip()).strip()
+    return CitationResponse(format=req.format, citation=citation, generated_by=HF_LLM_MODEL)
 
 
 @router.post("/feedback", response_model=FeedbackResponse)
@@ -138,7 +164,11 @@ async def get_writing_feedback(req: FeedbackRequest):
     Provide structured writing feedback on a paper abstract.
     Returns scored feedback across 5 dimensions.
     """
-    prompt = f"""You are an expert academic peer reviewer. Analyze the following research abstract and provide structured feedback.
+    system = (
+        "You are an expert academic peer reviewer. "
+        "You always respond with a single valid JSON object and nothing else — no markdown, no prose."
+    )
+    user = f"""Analyze the following research abstract and provide structured feedback.
 
 Title: {req.title or "Not provided"}
 Research Area: {req.research_area or "Not specified"}
@@ -146,58 +176,36 @@ Research Area: {req.research_area or "Not specified"}
 Abstract:
 {req.abstract}
 
-Provide feedback in the following EXACT JSON format (no markdown, just the JSON object):
+Respond in the following EXACT JSON format:
 {{
   "overall_score": <integer 1-10>,
   "summary": "<2-3 sentence overall assessment>",
   "items": [
-    {{
-      "dimension": "Clarity",
-      "score": <integer 1-10>,
-      "comment": "<specific observation>",
-      "suggestions": ["<suggestion 1>", "<suggestion 2>"]
-    }},
-    {{
-      "dimension": "Novelty & Contribution",
-      "score": <integer 1-10>,
-      "comment": "<specific observation>",
-      "suggestions": ["<suggestion 1>", "<suggestion 2>"]
-    }},
-    {{
-      "dimension": "Methodology",
-      "score": <integer 1-10>,
-      "comment": "<specific observation>",
-      "suggestions": ["<suggestion 1>", "<suggestion 2>"]
-    }},
-    {{
-      "dimension": "Research Gap",
-      "score": <integer 1-10>,
-      "comment": "<specific observation>",
-      "suggestions": ["<suggestion 1>", "<suggestion 2>"]
-    }},
-    {{
-      "dimension": "Impact & Scope",
-      "score": <integer 1-10>,
-      "comment": "<specific observation>",
-      "suggestions": ["<suggestion 1>", "<suggestion 2>"]
-    }}
+    {{"dimension": "Clarity", "score": <integer 1-10>, "comment": "<specific observation>", "suggestions": ["<suggestion 1>", "<suggestion 2>"]}},
+    {{"dimension": "Novelty & Contribution", "score": <integer 1-10>, "comment": "<specific observation>", "suggestions": ["<suggestion 1>", "<suggestion 2>"]}},
+    {{"dimension": "Methodology", "score": <integer 1-10>, "comment": "<specific observation>", "suggestions": ["<suggestion 1>", "<suggestion 2>"]}},
+    {{"dimension": "Research Gap", "score": <integer 1-10>, "comment": "<specific observation>", "suggestions": ["<suggestion 1>", "<suggestion 2>"]}},
+    {{"dimension": "Impact & Scope", "score": <integer 1-10>, "comment": "<specific observation>", "suggestions": ["<suggestion 1>", "<suggestion 2>"]}}
   ]
 }}"""
 
-    raw = await _call_gemini(prompt)
+    raw = await _call_llm(system, user, temperature=0.4, max_tokens=1200)
 
-    # Parse JSON from Gemini response
+    # Parse JSON from the LLM response
     import json, re
     try:
-        # Strip markdown code fences if present
+        # Strip markdown code fences if present, then isolate the JSON object
         clean = re.sub(r"```(?:json)?", "", raw).strip()
+        start, end = clean.find("{"), clean.rfind("}")
+        if start != -1 and end != -1:
+            clean = clean[start:end + 1]
         data = json.loads(clean)
         return FeedbackResponse(
-            overall_score=data["overall_score"],
+            overall_score=int(data["overall_score"]),
             summary=data["summary"],
             items=[FeedbackItem(**item) for item in data["items"]],
-            generated_by="gemini-1.5-flash"
+            generated_by=HF_LLM_MODEL,
         )
-    except (json.JSONDecodeError, KeyError) as e:
-        logger.error(f"[LLM] Failed to parse Gemini feedback JSON: {e}\nRaw: {raw[:300]}")
+    except (json.JSONDecodeError, KeyError, ValueError, TypeError) as e:
+        logger.error(f"[LLM] Failed to parse feedback JSON: {e}\nRaw: {raw[:300]}")
         raise HTTPException(status_code=502, detail="Failed to parse LLM response")

@@ -1,6 +1,9 @@
 fastapi
 uvicorn
-sentence-transformers
+# Pin modern versions: the old huggingface_hub<0.26 ceiling forced an ancient
+# sentence-transformers that imports the removed `cached_download` symbol and crashed
+# the container on boot. 3.x+ / hub 0.24+ are compatible and cached_download-free.
+sentence-transformers>=3.0.0
 redis
 numpy
 pydantic
@@ -8,10 +11,10 @@ elasticsearch<9.0.0
 requests
 psycopg2-binary
 pytest
+pytest-asyncio
 httpx
 neo4j
-huggingface_hub<0.26.0
-google-generativeai>=0.8.0
+huggingface_hub>=0.24
 strawberry-graphql[fastapi]>=0.227.0
 pdfplumber>=0.11.0
 python-multipart>=0.0.9

@@ -35,15 +35,20 @@ class CFEngine:
         # Find top similar users (excluding self)
         similar_users = np.argsort(user_sims)[::-1][1:11] # Top 10 peers
         
+        # R3: precompute reverse map once (O(n)) instead of an O(n) index() lookup per item
+        idx_to_item = {idx: item_id for item_id, idx in self.builder.item_map.items()}
+
         # Aggregate items from similar users
         item_scores = {}
         for peer_idx in similar_users:
             peer_weight = user_sims[peer_idx]
             peer_interactions = self.builder.interaction_matrix[peer_idx].toarray().flatten()
-            
+
             for item_idx, interaction_weight in enumerate(peer_interactions):
                 if interaction_weight > 0:
-                    item_id = list(self.builder.item_map.keys())[list(self.builder.item_map.values()).index(item_idx)]
+                    item_id = idx_to_item.get(item_idx)
+                    if item_id is None:
+                        continue
                     item_scores[item_id] = item_scores.get(item_id, 0) + (peer_weight * interaction_weight)
                     
         # Sort and return
