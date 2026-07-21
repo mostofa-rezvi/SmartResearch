@@ -3,6 +3,10 @@ const router = express.Router();
 const projectController = require('../controllers/ProjectController');
 const { verifyAuth } = require('../middleware/auth.middleware');
 
+// @route   GET /api/v1/projects
+// @desc    List all projects the current user is a member of
+router.get('/', verifyAuth, projectController.list);
+
 // @route   POST /api/v1/projects
 // @desc    Create a new project
 router.post('/', verifyAuth, projectController.create);

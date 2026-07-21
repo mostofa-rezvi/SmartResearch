@@ -39,6 +39,19 @@ class ProjectService {
     }
   }
 
+  /** List every project the user is a member of (for the workspace project selector). */
+  async listUserProjects(userId) {
+    const result = await db.query(`
+      SELECT p.id, p.name, p.description, p.status, p.created_at, pm.role,
+             (SELECT COUNT(*) FROM project_members WHERE project_id = p.id) AS member_count
+        FROM projects p
+        JOIN project_members pm ON pm.project_id = p.id
+       WHERE pm.user_id = $1
+       ORDER BY p.created_at DESC
+    `, [userId]);
+    return result.rows;
+  }
+
   async getProject(projectId, userId) {
     // Basic authorization check
     const authCheck = await db.query(

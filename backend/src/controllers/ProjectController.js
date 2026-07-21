@@ -2,8 +2,36 @@ const projectService = require('../services/ProjectService');
 const milestoneService = require('../services/MilestoneService');
 const collaborationService = require('../services/CollaborationService');
 const { envelope, errorEnvelope } = require('../utils/responseEnvelope');
+const db = require('../config/db');
+const notificationService = require('../services/notification.service');
+const logger = require('../utils/logger');
+
+/** Notify all members of a project (except the actor) of workspace activity. */
+async function notifyWorkspace(projectId, actorId, title, message, meta = {}) {
+  try {
+    const { rows } = await db.query(
+      'SELECT user_id FROM project_members WHERE project_id = $1 AND user_id <> $2',
+      [projectId, actorId]
+    );
+    await Promise.all(rows.map((r) =>
+      notificationService.notify(r.user_id, 'workspace_activity', title, message, { project_id: projectId, ...meta })
+        .catch(() => {})
+    ));
+  } catch (e) {
+    logger.warn(`[Workspace] notify failed: ${e.message}`);
+  }
+}
 
 class ProjectController {
+  async list(req, res, next) {
+    try {
+      const projects = await projectService.listUserProjects(req.user.id);
+      res.json(envelope(projects));
+    } catch (err) {
+      next(err);
+    }
+  }
+
   async create(req, res, next) {
     try {
       const project = await projectService.createProject(req.user.id, req.body);
@@ -37,6 +65,13 @@ class ProjectController {
     try {
       const result = await milestoneService.updateStatus(req.params.milestoneId, req.user.id, req.body.status);
       res.json(envelope(result));
+      // Module 8: workspace_activity notification to co-members
+      if (result && result.project_id) {
+        notifyWorkspace(result.project_id, req.user.id,
+          'Milestone updated',
+          `A milestone moved to ${req.body.status} in your project`,
+          { milestone_id: req.params.milestoneId, status: req.body.status });
+      }
     } catch (err) {
       if (err.message.includes('Only admins') || err.message.includes('Invalid transition')) {
         return res.status(400).json(errorEnvelope(err.message, 400));
