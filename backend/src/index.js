@@ -83,6 +83,7 @@ app.use('/api/v1/dashboard', require('./routes/dashboard'));
 app.use('/api/v1/blogs', require('./routes/blogs'));
 app.use('/api/v1/projects', require('./routes/projects'));
 app.use('/api/v1/mentorship', require('./routes/mentorship'));
+app.use('/api/v1/tasks', require('./routes/tasks'));
 app.use('/api/v1/connections', require('./routes/connections'));
 app.use('/api/v1/notifications', require('./routes/notifications'));
 app.use('/api/v1/publications', require('./routes/publications'));
@@ -122,7 +123,14 @@ io.use(socketAuthMiddleware);
 // Socket.IO Connection Event
 io.on('connection', (socket) => {
   logger.info(`A user connected via WebSocket: ${socket.user?.id}`);
-  
+
+  // Auto-join the authenticated user's personal room so live notifications
+  // (`notification:new` emitted to `user_${id}`) always reach every socket
+  // they open — the notification bell no longer needs to emit `join_feed`.
+  if (socket.user?.id) {
+    socket.join(`user_${socket.user.id}`);
+  }
+
   socket.on('join_feed', (userId) => {
     if (userId !== socket.user?.id) return;
     socket.join(`user_${userId}`);
@@ -178,6 +186,13 @@ io.on('connection', (socket) => {
     }
   });
 
+  // Awareness (live cursors / presence) — relay-only, not persisted
+  socket.on('awareness:update', (projectId, updateBinary) => {
+    const room = `project_${projectId}`;
+    if (!socket.rooms.has(room)) return;
+    socket.to(room).emit('awareness:update', updateBinary);
+  });
+
   socket.on('leave_project', (projectId, user) => {
     const room = `project_${projectId}`;
     socket.leave(room);
@@ -197,6 +212,46 @@ const withTimeout = (promise, ms) => {
     new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), ms))
   ]);
 };
+
+// Prometheus metrics (dependency-free exposition). Scrape at GET /metrics.
+let _httpRequests = 0;
+app.use((req, _res, next) => { _httpRequests++; next(); });
+app.get('/metrics', (req, res) => {
+  const mem = process.memoryUsage();
+  const lines = [
+    '# HELP process_uptime_seconds Process uptime in seconds.',
+    '# TYPE process_uptime_seconds gauge',
+    `process_uptime_seconds ${process.uptime().toFixed(0)}`,
+    '# HELP process_resident_memory_bytes Resident memory size in bytes.',
+    '# TYPE process_resident_memory_bytes gauge',
+    `process_resident_memory_bytes ${mem.rss}`,
+    '# HELP nodejs_heap_used_bytes Node.js heap used in bytes.',
+    '# TYPE nodejs_heap_used_bytes gauge',
+    `nodejs_heap_used_bytes ${mem.heapUsed}`,
+    '# HELP http_requests_total Total HTTP requests handled since boot.',
+    '# TYPE http_requests_total counter',
+    `http_requests_total ${_httpRequests}`,
+  ];
+  res.set('Content-Type', 'text/plain; version=0.0.4');
+  res.send(lines.join('\n') + '\n');
+});
+
+// API documentation — raw OpenAPI spec + a dependency-free Redoc viewer.
+app.get('/openapi.yaml', (req, res) => {
+  const fs = require('fs');
+  const path = require('path');
+  res.type('text/yaml');
+  fs.createReadStream(path.join(__dirname, '../openapi.yaml')).on('error', () =>
+    res.status(404).send('spec not found')).pipe(res);
+});
+app.get('/api-docs', (req, res) => {
+  res.type('html').send(
+    '<!doctype html><html><head><title>ResearchBridge API</title><meta charset="utf-8"/>' +
+    '<meta name="viewport" content="width=device-width,initial-scale=1"/></head>' +
+    '<body style="margin:0"><redoc spec-url="/openapi.yaml"></redoc>' +
+    '<script src="https://cdn.redoc.ly/redoc/latest/bundles/redoc.standalone.js"></script></body></html>'
+  );
+});
 
 // Health Check
 app.get('/health', async (req, res) => {
@@ -274,7 +329,14 @@ server.listen(PORT, async () => {
     const notificationWorker = require('./workers/notification.worker');
     await notificationWorker.init();
     notificationWorker.start().catch(err => logger.error('Notification worker error', err));
-    
+
+    // TrustRank (Module 5): recompute credibility PageRank periodically (every 15 min) + once at boot
+    const trustRankService = require('./services/trustrank.service');
+    const runTrustRank = () => trustRankService.refreshTrustRank()
+      .catch(err => logger.error(`[TrustRank] refresh failed: ${err.message}`));
+    setTimeout(runTrustRank, 8000); // after datastores settle
+    setInterval(runTrustRank, 15 * 60 * 1000);
+
     logger.info('Multi-database environment initialized successfully');
   } catch (err) {
     logger.error('Core database connection failed:', err.message);

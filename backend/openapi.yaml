@@ -1,38 +1,83 @@
-openapi: 3.0.0
+openapi: 3.0.3
 info:
-  title: ResearchBridge (SRCP) API
-  description: High-integrity API for academic research discovery and community interaction.
-  version: 1.0.0
+  title: ResearchBridge API
+  version: 2.0.0
+  description: >
+    ResearchBridge — a smart research collaboration platform. REST API served by the
+    Node.js/Express backend. Most endpoints require a Bearer JWT (obtained via
+    `/auth/login`). Responses use a standard envelope: `{ success, data, meta }`
+    (some legacy endpoints use `{ status, data }`). The AI layer (embeddings + LLM)
+    is provided by the FastAPI ML service and Hugging Face.
 servers:
-  - url: http://localhost:5000/api/v1
-    description: Local Development Server
+  - url: /api/v1
+    description: API v1 (prefix)
+tags:
+  - { name: Auth }
+  - { name: Discovery }
+  - { name: Community }
+  - { name: Mentorship }
+  - { name: Library }
+  - { name: Publications }
+  - { name: Projects }
+  - { name: Tasks }
+  - { name: Profiles }
+  - { name: Notifications }
+  - { name: Admin }
+  - { name: Analytics }
+
+components:
+  securitySchemes:
+    bearerAuth: { type: http, scheme: bearer, bearerFormat: JWT }
+  schemas:
+    Envelope:
+      type: object
+      properties:
+        success: { type: boolean }
+        data: {}
+        meta: { type: object }
+    Error:
+      type: object
+      properties:
+        success: { type: boolean, example: false }
+        error:
+          type: object
+          properties:
+            message: { type: string }
+            statusCode: { type: integer }
+security:
+  - bearerAuth: []
 
 paths:
+  # ── Auth ──────────────────────────────────────────────────────────────────
   /auth/register:
     post:
-      summary: Register a new researcher
       tags: [Auth]
+      summary: Register a new user
+      security: []
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
-              required: [name, email, password, status, institution]
+              required: [name, email, password]
               properties:
                 name: { type: string }
                 email: { type: string, format: email }
-                password: { type: string, minLength: 8 }
-                status: { type: string }
+                password: { type: string, format: password }
+                status: { type: string, description: academic status (phd, professor, …) }
                 institution: { type: string }
+                research_interests: { type: array, items: { type: string } }
+                domain_tags: { type: array, items: { type: string } }
+                skills: { type: array, items: { type: string } }
       responses:
-        '201':
-          description: Created
-  
+        '201': { description: Registered (email verification sent) }
+        '409': { description: Email already in use }
   /auth/login:
     post:
-      summary: Step 1 of OTP Login
       tags: [Auth]
+      summary: Login (returns tokens, or otp_required when 2FA is on)
+      security: []
       requestBody:
         required: true
         content:
@@ -42,25 +87,80 @@ paths:
               required: [email, password]
               properties:
                 email: { type: string, format: email }
-                password: { type: string }
+                password: { type: string, format: password }
       responses:
-        '200':
-          description: OTP Sent
+        '200': { description: "accessToken+user, or { otp_required: true }" }
+        '401': { description: Invalid credentials }
+        '403': { description: Email not verified }
+  /auth/verify-otp:
+    post:
+      tags: [Auth]
+      summary: Complete two-factor login with the emailed code
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, otp]
+              properties: { email: { type: string }, otp: { type: string } }
+      responses: { '200': { description: accessToken + user }, '401': { description: Invalid/expired code } }
+  /auth/resend-otp:
+    post:
+      tags: [Auth]
+      summary: Re-issue a login one-time code
+      security: []
+      requestBody:
+        content: { application/json: { schema: { type: object, properties: { email: { type: string } } } } }
+      responses: { '200': { description: Code re-sent (if account exists) } }
+  /auth/verify-email:
+    get:
+      tags: [Auth]
+      summary: Verify an account via the emailed link token
+      security: []
+      parameters: [{ name: token, in: query, required: true, schema: { type: string } }]
+      responses: { '200': { description: Verified }, '400': { description: Invalid/expired token } }
+  /auth/refresh:
+    post: { tags: [Auth], summary: Rotate the access token via refresh cookie, security: [], responses: { '200': { description: New access token } } }
+  /auth/logout:
+    post: { tags: [Auth], summary: Invalidate the refresh token, responses: { '200': { description: Logged out } } }
 
+  # ── Discovery / Matching ──────────────────────────────────────────────────
+  /discovery/recommendations:
+    get:
+      tags: [Discovery]
+      summary: ML researcher recommendations (CF+CB, from onboarding)
+      responses: { '200': { description: Ranked researcher matches } }
+  /discovery/feed:
+    get:
+      tags: [Discovery]
+      summary: Unified feed — collaborators + relevant papers + open projects
+      responses: { '200': { description: "{ collaborators, papers, projects }" } }
+  /discovery/search:
+    get:
+      tags: [Discovery]
+      summary: Hybrid semantic search (users, papers, projects, forum posts)
+      parameters: [{ name: query, in: query, required: true, schema: { type: string, minLength: 2 } }]
+      responses: { '200': { description: Ranked results with result_type } }
+  /discovery/suggested-collaborators:
+    get:
+      tags: [Discovery]
+      summary: Neo4j 2nd-degree suggestions (friend-of-friend + co-authorship)
+      responses: { '200': { description: Suggested collaborators } }
+
+  # ── Community / Forum ─────────────────────────────────────────────────────
   /community/posts:
     get:
-      summary: Get personalized research feed
       tags: [Community]
-      security:
-        - BearerAuth: []
-      responses:
-        '200':
-          description: List of ranked posts
+      summary: List community posts (TrustRank-ranked feed)
+      parameters:
+        - { name: limit, in: query, schema: { type: integer } }
+        - { name: type, in: query, schema: { type: string } }
+      responses: { '200': { description: Posts with author trust info } }
     post:
-      summary: Create a new research question or thought
       tags: [Community]
-      security:
-        - BearerAuth: []
+      summary: Create a post (content is sanitized)
       requestBody:
         required: true
         content:
@@ -69,17 +169,173 @@ paths:
               type: object
               required: [type, title, content]
               properties:
-                type: { type: string, enum: [Question, Thought] }
+                type: { type: string, enum: [question, thought, discussion] }
                 title: { type: string }
                 content: { type: string }
                 tags: { type: array, items: { type: string } }
-      responses:
-        '201':
-          description: Post Created
+      responses: { '201': { description: Created } }
+  /community/posts/{id}/comments:
+    post:
+      tags: [Community]
+      summary: Add a comment (optionally threaded via parent_id)
+      parameters: [{ name: id, in: path, required: true, schema: { type: integer } }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { type: object, required: [content], properties: { content: { type: string }, parent_id: { type: integer, nullable: true } } }
+      responses: { '201': { description: Created } }
+  /community/posts/{id}/accept-answer:
+    post:
+      tags: [Community]
+      summary: Accept a comment as the answer (post author only)
+      parameters: [{ name: id, in: path, required: true, schema: { type: integer } }]
+      requestBody:
+        required: true
+        content: { application/json: { schema: { type: object, required: [comment_id], properties: { comment_id: { type: integer } } } } }
+      responses: { '200': { description: Accepted }, '403': { description: Not the author } }
+  /community/posts/{id}/vote:
+    post:
+      tags: [Community]
+      summary: Upvote/downvote a post
+      parameters: [{ name: id, in: path, required: true, schema: { type: integer } }]
+      responses: { '200': { description: Vote recorded } }
 
-components:
-  securitySchemes:
-    BearerAuth:
-      type: apiKey
-      in: header
-      name: x-auth-token
+  # ── Mentorship ────────────────────────────────────────────────────────────
+  /mentorship/slots:
+    get: { tags: [Mentorship], summary: List open mentorship slots, parameters: [{ name: domain, in: query, schema: { type: string } }], responses: { '200': { description: Slots } } }
+    post:
+      tags: [Mentorship]
+      summary: Create a mentorship slot
+      requestBody:
+        required: true
+        content: { application/json: { schema: { type: object, required: [domain], properties: { domain: { type: string }, title: { type: string }, capacity: { type: integer }, availability: { type: string } } } } }
+      responses: { '201': { description: Created } }
+  /mentorship/recommend:
+    get:
+      tags: [Mentorship]
+      summary: CF+CB mentor recommendations (SBERT semantic + domain + tier)
+      responses: { '200': { description: Ranked mentors with match_score/semantic_score } }
+  /mentorship/request:
+    post:
+      tags: [Mentorship]
+      summary: Request mentorship (optionally against a slot)
+      requestBody:
+        required: true
+        content: { application/json: { schema: { type: object, required: [mentor_id], properties: { mentor_id: { type: integer }, message: { type: string }, slot_id: { type: integer } } } } }
+      responses: { '201': { description: Requested } }
+  /mentorship/{id}/sessions:
+    post: { tags: [Mentorship], summary: Schedule a session, parameters: [{ name: id, in: path, required: true, schema: { type: integer } }], responses: { '201': { description: Created } } }
+    get: { tags: [Mentorship], summary: List sessions, parameters: [{ name: id, in: path, required: true, schema: { type: integer } }], responses: { '200': { description: Sessions } } }
+
+  # ── Knowledge Library ─────────────────────────────────────────────────────
+  /library/items:
+    get: { tags: [Library], summary: List my library items, parameters: [{ name: type, in: query, schema: { type: string } }], responses: { '200': { description: Items } } }
+    post:
+      tags: [Library]
+      summary: Create a library item (JSON or multipart with a PDF file; PDFs are auto-extracted)
+      requestBody:
+        content:
+          application/json:
+            schema: { type: object, required: [title], properties: { item_type: { type: string, enum: [paper, dataset, note, literature_review] }, title: { type: string }, abstract: { type: string }, authors: { type: string }, doi: { type: string }, tags: { type: array, items: { type: string } } } }
+          multipart/form-data:
+            schema: { type: object, properties: { file: { type: string, format: binary }, item_type: { type: string }, title: { type: string } } }
+      responses: { '201': { description: Created } }
+  /library/search:
+    get: { tags: [Library], summary: Semantic + full-text search over library items, parameters: [{ name: q, in: query, schema: { type: string } }], responses: { '200': { description: Ranked items } } }
+  /library/discover:
+    get: { tags: [Library], summary: Discover shared content across all users, parameters: [{ name: q, in: query, schema: { type: string } }, { name: type, in: query, schema: { type: string } }], responses: { '200': { description: Shared items with owner } } }
+  /library/items/{id}/download:
+    get: { tags: [Library], summary: Download a stored PDF (streamed through the backend), parameters: [{ name: id, in: path, required: true, schema: { type: integer } }], responses: { '200': { description: PDF stream } } }
+
+  # ── Publication Assistant ─────────────────────────────────────────────────
+  /publications/cite:
+    post: { tags: [Publications], summary: "LLM citation (BibTeX/APA/IEEE) via Hugging Face", responses: { '200': { description: Citation } } }
+  /publications/feedback:
+    post: { tags: [Publications], summary: LLM 5-dimension writing feedback via Hugging Face, responses: { '200': { description: Structured feedback } } }
+  /publications/scimago:
+    get:
+      tags: [Publications]
+      summary: Journal search over the real Scimago table (+ live DOAJ fallback)
+      parameters:
+        - { name: q, in: query, schema: { type: string } }
+        - { name: open_access, in: query, schema: { type: boolean } }
+      responses: { '200': { description: Ranked journals } }
+  /publications/recommend-journals:
+    post:
+      tags: [Publications]
+      summary: Recommend journals for a manuscript by abstract-embedding semantic scope match
+      requestBody:
+        required: true
+        content: { application/json: { schema: { type: object, required: [abstract], properties: { abstract: { type: string }, subject: { type: string }, open_access: { type: boolean }, min_impact: { type: number }, limit: { type: integer } } } } }
+      responses: { '200': { description: Journals ranked by fit_score + SJR } }
+
+  # ── Projects & Tasks ──────────────────────────────────────────────────────
+  /projects:
+    get: { tags: [Projects], summary: List projects the current user belongs to, responses: { '200': { description: Projects } } }
+    post: { tags: [Projects], summary: Create a project, responses: { '201': { description: Created } } }
+  /projects/{id}/milestones:
+    get: { tags: [Projects], summary: List milestones, parameters: [{ name: id, in: path, required: true, schema: { type: integer } }], responses: { '200': { description: Milestones } } }
+    post: { tags: [Projects], summary: Create a milestone, parameters: [{ name: id, in: path, required: true, schema: { type: integer } }], responses: { '201': { description: Created } } }
+  /tasks:
+    get: { tags: [Tasks], summary: List tasks for a milestone, parameters: [{ name: milestone_id, in: query, required: true, schema: { type: integer } }], responses: { '200': { description: Tasks } } }
+    post:
+      tags: [Tasks]
+      summary: Create a task
+      requestBody:
+        required: true
+        content: { application/json: { schema: { type: object, required: [milestone_id, title], properties: { milestone_id: { type: integer }, title: { type: string }, status: { type: string, enum: [TODO, IN_PROGRESS, REVIEW, DONE] }, assignee_id: { type: integer } } } } }
+      responses: { '201': { description: Created } }
+  /tasks/{id}:
+    patch: { tags: [Tasks], summary: Update a task (status/title/assignee), parameters: [{ name: id, in: path, required: true, schema: { type: integer } }], responses: { '200': { description: Updated } } }
+    delete: { tags: [Tasks], summary: Delete a task, parameters: [{ name: id, in: path, required: true, schema: { type: integer } }], responses: { '200': { description: Deleted } } }
+
+  # ── Profiles & Credentials ────────────────────────────────────────────────
+  /users/{id}/profile:
+    get:
+      tags: [Profiles]
+      summary: Public researcher profile (trust, collaborations, mentorship, achievements, papers)
+      security: []
+      parameters: [{ name: id, in: path, required: true, schema: { type: integer } }]
+      responses: { '200': { description: Profile } }
+  /profiles/me/audit-log:
+    get: { tags: [Profiles], summary: Append-only profile change history, responses: { '200': { description: Audit entries } } }
+  /profiles/me/audit-log/verify:
+    get: { tags: [Profiles], summary: Verify the tamper-evident hash chain, responses: { '200': { description: "{ valid, entries, verified }" } } }
+
+  # ── Notifications ─────────────────────────────────────────────────────────
+  /notifications:
+    get: { tags: [Notifications], summary: List notifications (paginated), responses: { '200': { description: Notifications } } }
+  /notifications/{id}/read:
+    patch: { tags: [Notifications], summary: Mark a notification read, parameters: [{ name: id, in: path, required: true, schema: { type: integer } }], responses: { '200': { description: OK } } }
+
+  # ── Admin (admin/super_admin only) ────────────────────────────────────────
+  /admin/users:
+    get: { tags: [Admin], summary: List users with trust/verification info, responses: { '200': { description: Users }, '403': { description: Admin only } } }
+  /admin/users/{id}/trust-tier:
+    patch:
+      tags: [Admin]
+      summary: Set a user's trust tier
+      parameters: [{ name: id, in: path, required: true, schema: { type: integer } }]
+      requestBody: { required: true, content: { application/json: { schema: { type: object, required: [tier], properties: { tier: { type: string, enum: [unverified, basic, verified, professor] } } } } } }
+      responses: { '200': { description: Updated }, '403': { description: Admin only } }
+  /admin/users/{id}/verify-institution:
+    patch:
+      tags: [Admin]
+      summary: Verify/revoke a user's institutional badge
+      parameters: [{ name: id, in: path, required: true, schema: { type: integer } }]
+      responses: { '200': { description: Updated } }
+  /admin/trustrank/refresh:
+    post: { tags: [Admin], summary: Recompute the TrustRank PageRank, responses: { '200': { description: Recomputed } } }
+  /admin/backfill:
+    post: { tags: [Admin], summary: Backfill ES (users/library) + seed the Neo4j graph, responses: { '200': { description: Backfill complete } } }
+
+  # ── Analytics (admin) ─────────────────────────────────────────────────────
+  /analytics/overview:
+    get: { tags: [Analytics], summary: Platform-wide statistics, responses: { '200': { description: Overview } } }
+  /analytics/match-quality:
+    get: { tags: [Analytics], summary: ML match-quality histogram + avgMatchScore, responses: { '200': { description: Match quality } } }
+  /analytics/publications:
+    get: { tags: [Analytics], summary: "Publication outcomes (uploads, saved papers, top journals)", responses: { '200': { description: Outcomes } } }
+  /analytics/weekly-report:
+    get: { tags: [Analytics], summary: "Weekly aggregated report (JSON or CSV via ?format=csv)", responses: { '200': { description: Report } } }
