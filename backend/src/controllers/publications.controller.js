@@ -2,6 +2,7 @@ const axios = require('axios');
 const path = require('path');
 const fs = require('fs');
 const logger = require('../utils/logger');
+const db = require('../config/db');
 
 const ML_SERVICE_URL = process.env.ML_SERVICE_URL || 'http://localhost:8000';
 
@@ -92,41 +93,220 @@ exports.getWritingFeedback = async (req, res) => {
  * GET /api/v1/publications/scimago?q=keyword&subject=Physics&limit=20
  * Search local Scimago journal index.
  */
-exports.searchScimago = (req, res) => {
+/**
+ * GET /api/v1/publications/scimago?q=&subject=&limit=&open_access=&min_impact=
+ * Journal recommendation over the real Scimago-seeded `journals` table (~405K rows).
+ * Ranks by SJR / impact factor; supports topic (q), subject, open-access and
+ * minimum-impact filters. Falls back to a live DOAJ query if the local table is empty.
+ */
+exports.searchScimago = async (req, res) => {
   try {
-    const query = (req.query.q || '').toLowerCase();
-    const subject = (req.query.subject || '').toLowerCase();
+    const query = (req.query.q || '').trim();
+    const subject = (req.query.subject || '').trim();
     const limit = Math.min(parseInt(req.query.limit) || 20, 50);
     const openAccessOnly = req.query.open_access === 'true';
+    const minImpact = parseFloat(req.query.min_impact) || 0;
 
-    let results = scimagoData;
-
+    const params = [];
+    const where = ["status IS DISTINCT FROM 'rejected'"];
     if (query) {
-      results = results.filter(j =>
-        j.title.toLowerCase().includes(query) ||
-        j.subject?.toLowerCase().includes(query) ||
-        j.publisher?.toLowerCase().includes(query)
-      );
+      params.push(`%${query}%`);
+      const i = params.length;
+      where.push(`(name ILIKE $${i} OR category ILIKE $${i} OR publisher ILIKE $${i} OR subjects::text ILIKE $${i})`);
+    }
+    if (subject) { params.push(`%${subject}%`); where.push(`(category ILIKE $${params.length} OR subjects::text ILIKE $${params.length})`); }
+    if (openAccessOnly) where.push('is_open_access = TRUE');
+    if (minImpact > 0) { params.push(minImpact); where.push(`COALESCE(sjr_score, impact_factor, 0) >= $${params.length}`); }
+    params.push(limit);
+
+    const sql = `
+      SELECT name, issn, category, quality_tier, sjr_score, impact_factor, h_index,
+             publisher, country, is_open_access, homepage_url, doaj_url
+        FROM journals
+       WHERE ${where.join(' AND ')}
+       ORDER BY COALESCE(sjr_score, impact_factor, 0) DESC NULLS LAST
+       LIMIT $${params.length}`;
+    const { rows } = await db.query(sql, params);
+
+    const data = rows.map((j) => ({
+      title: j.name,
+      issn: j.issn,
+      subject: j.category,
+      sjr: j.sjr_score != null ? Number(j.sjr_score) : null,
+      impact_factor: j.impact_factor != null ? Number(j.impact_factor) : null,
+      h_index: j.h_index,
+      country: j.country,
+      publisher: j.publisher,
+      quartile: j.quality_tier,
+      open_access: j.is_open_access === true,
+      homepage_url: j.homepage_url,
+      doaj_url: j.doaj_url,
+      source: 'scimago',
+    }));
+
+    // D2: live DOAJ fallback when the local table yields nothing
+    if (data.length === 0 && query) {
+      try {
+        const doaj = await exports._queryDoaj(query, limit);
+        return res.status(200).json({ success: true, data: doaj, total: doaj.length, source: 'doaj' });
+      } catch (e) {
+        logger.warn(`[Publications] DOAJ fallback failed: ${e.message}`);
+      }
     }
 
-    if (subject) {
-      results = results.filter(j => j.subject?.toLowerCase().includes(subject));
-    }
-
-    if (openAccessOnly) {
-      results = results.filter(j => j.open_access === true);
-    }
-
-    // Sort by SJR descending
-    results = results
-      .sort((a, b) => (b.sjr || 0) - (a.sjr || 0))
-      .slice(0, limit);
-
-    res.status(200).json({ success: true, data: results, total: results.length });
+    res.status(200).json({ success: true, data, total: data.length, source: 'scimago' });
   } catch (err) {
     logger.error('[Publications] Scimago search failed:', err.message);
     res.status(500).json({ success: false, message: 'Server error' });
   }
+};
+
+// ── Abstract-based journal recommendation (semantic re-ranking) ─────────────────
+
+const _STOP = new Set(('the a an of and or to in for on with we our is are this that by as from using based can be which it at has have not also more than these their study paper results method methods approach approaches propose present show novel new via into between within their they them such may many most much both each other over under about across among per via given while where when what how why who whom whose').split(' '));
+
+/** Extract the most frequent content keywords from an abstract. */
+function _topKeywords(text, n = 8) {
+  const freq = {};
+  (String(text).toLowerCase().match(/[a-z][a-z-]{3,}/g) || []).forEach((w) => {
+    if (!_STOP.has(w)) freq[w] = (freq[w] || 0) + 1;
+  });
+  return Object.entries(freq).sort((a, b) => b[1] - a[1]).slice(0, n).map((x) => x[0]);
+}
+
+function _cosine(a, b) {
+  if (!Array.isArray(a) || !Array.isArray(b) || a.length !== b.length || a.length === 0) return 0;
+  let dot = 0, na = 0, nb = 0;
+  for (let i = 0; i < a.length; i++) { dot += a[i] * b[i]; na += a[i] * a[i]; nb += b[i] * b[i]; }
+  const d = Math.sqrt(na) * Math.sqrt(nb);
+  return d > 0 ? dot / d : 0;
+}
+
+/**
+ * POST /api/v1/publications/recommend-journals
+ * Body: { abstract, subject?, open_access?, min_impact?, limit? }
+ *
+ * Recommends journals for a manuscript by (1) cheaply retrieving keyword candidates
+ * from the real ~405K Scimago journals table, then (2) semantically re-ranking them
+ * by cosine similarity between the paper abstract and each journal's scope (both
+ * embedded with Sentence-BERT), blended with the journal's SJR/impact.
+ */
+exports.recommendJournalsByAbstract = async (req, res) => {
+  try {
+    const abstract = (req.body.abstract || '').trim();
+    if (abstract.length < 40) {
+      return res.status(400).json({ success: false, message: 'Provide a manuscript abstract (≥ 40 chars).' });
+    }
+    const limit = Math.min(parseInt(req.body.limit) || 10, 25);
+    const openAccessOnly = req.body.open_access === true || req.body.open_access === 'true';
+    const minImpact = parseFloat(req.body.min_impact) || 0;
+    const subject = (req.body.subject || '').trim();
+
+    // 1) Retrieve candidates by keyword (abstract terms + optional subject)
+    const keywords = _topKeywords(abstract, 8);
+    if (subject) keywords.push(subject.toLowerCase());
+    const patterns = keywords.map((k) => `%${k}%`);
+    const params = [patterns];
+    const where = ["status IS DISTINCT FROM 'rejected'",
+      // real journals only (exclude conference proceedings / book series)
+      "COALESCE(journal_type,'journal') IN ('journal','trade journal')",
+      '(name ILIKE ANY($1) OR category ILIKE ANY($1) OR subjects::text ILIKE ANY($1))'];
+    if (openAccessOnly) where.push('is_open_access = TRUE');
+    if (minImpact > 0) { params.push(minImpact); where.push(`COALESCE(sjr_score, impact_factor, 0) >= $${params.length}`); }
+
+    const candSql = `
+      SELECT DISTINCT ON (name) name, issn, category, subcategory, subjects, areas,
+             sjr_score, impact_factor, h_index, country, publisher, quality_tier,
+             is_open_access, homepage_url, doaj_url
+        FROM journals
+       WHERE ${where.join(' AND ')}
+       ORDER BY name, COALESCE(sjr_score, impact_factor, 0) DESC NULLS LAST
+       LIMIT 80`;
+    const { rows } = await db.query(candSql, params);
+
+    if (rows.length === 0) {
+      return res.status(200).json({ success: true, data: [], total: 0, source: 'scimago', note: 'No keyword candidates matched the abstract.' });
+    }
+
+    // 2) Embed the abstract + each candidate's scope text (batch), then cosine re-rank
+    const scopeText = (j) => {
+      const subs = Array.isArray(j.subjects) ? j.subjects.join(', ') : '';
+      const areas = Array.isArray(j.areas) ? j.areas.join(', ') : '';
+      return [j.name, j.category, j.subcategory, subs, areas].filter(Boolean).join('. ');
+    };
+    let vectors = null;
+    try {
+      const emb = await axios.post(`${ML_SERVICE_URL}/embed`,
+        { text: [abstract, ...rows.map(scopeText)] }, { timeout: 60000 });
+      vectors = emb.data?.vectors || emb.data?.embedding || null;
+    } catch (e) {
+      logger.warn(`[Publications] abstract embedding failed, falling back to SJR order: ${e.message}`);
+    }
+
+    const maxSjr = Math.max(1e-6, ...rows.map((j) => Number(j.sjr_score) || 0));
+    let scored;
+    if (Array.isArray(vectors) && vectors.length === rows.length + 1) {
+      const abstractVec = vectors[0];
+      scored = rows.map((j, i) => {
+        const semantic = Math.max(0, _cosine(abstractVec, vectors[i + 1]));
+        const sjrNorm = (Number(j.sjr_score) || 0) / maxSjr;
+        // Semantic scope-fit is the primary signal; SJR is a light prestige tiebreak.
+        return { j, semantic, composite: semantic + 0.12 * sjrNorm };
+      });
+    } else {
+      // fallback: SJR-only ordering
+      scored = rows.map((j) => ({ j, semantic: 0, composite: (Number(j.sjr_score) || 0) / maxSjr }));
+    }
+    scored.sort((a, b) => b.composite - a.composite);
+
+    const data = scored.slice(0, limit).map(({ j, semantic }) => ({
+      title: j.name,
+      issn: j.issn,
+      subject: j.category,
+      sjr: j.sjr_score != null ? Number(j.sjr_score) : null,
+      impact_factor: j.impact_factor != null ? Number(j.impact_factor) : null,
+      h_index: j.h_index,
+      country: j.country,
+      publisher: j.publisher,
+      quartile: j.quality_tier,
+      open_access: j.is_open_access === true,
+      homepage_url: j.homepage_url,
+      doaj_url: j.doaj_url,
+      fit_score: Math.round(semantic * 100),     // semantic scope-match 0..100
+      source: 'scimago',
+    }));
+
+    res.status(200).json({ success: true, data, total: data.length, keywords, source: 'scimago',
+      ranked_by: (Array.isArray(vectors)) ? 'abstract-embedding' : 'sjr' });
+  } catch (err) {
+    logger.error('[Publications] recommend-journals failed:', err.message);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+
+/** Live DOAJ journal search (open-access). Returns the normalized journal shape. */
+exports._queryDoaj = async (query, limit = 20) => {
+  const url = `https://doaj.org/api/v2/search/journals/${encodeURIComponent(query)}?pageSize=${Math.min(limit, 50)}`;
+  const resp = await axios.get(url, { timeout: 8000 });
+  const results = resp.data?.results || [];
+  return results.map((r) => {
+    const b = r.bibjson || {};
+    return {
+      title: b.title || 'Unknown',
+      issn: (b.pissn || b.eissn || (b.identifier || []).map((x) => x.id)[0]) || null,
+      subject: (b.subject || []).map((s) => s.term).join(', ') || null,
+      sjr: null,
+      impact_factor: null,
+      h_index: null,
+      country: b.publisher?.country || null,
+      publisher: b.publisher?.name || null,
+      quartile: null,
+      open_access: true,
+      homepage_url: (b.link || []).find((l) => l.type === 'homepage')?.url || null,
+      doaj_url: `https://doaj.org/toc/${b.pissn || b.eissn || ''}`,
+      source: 'doaj',
+    };
+  });
 };
 
 /**

@@ -18,6 +18,10 @@ router.post('/feedback', verifyAuth, publicationsController.getWritingFeedback);
 // @access  Private
 router.get('/scimago', verifyAuth, publicationsController.searchScimago);
 
+// @route   POST /api/v1/publications/recommend-journals
+// @desc    Recommend journals for a manuscript by semantic abstract↔scope match (+ SJR)
+router.post('/recommend-journals', verifyAuth, publicationsController.recommendJournalsByAbstract);
+
 // @route   GET /api/v1/publications/checklist
 // @desc    Get publication readiness checklist template
 // @access  Private
