@@ -58,6 +58,26 @@ npm run generate:template -- --name="My Project" --type="proposal"
 - [API Reference](API.md)
 - [Deployment Guide](DEPLOYMENT.md)
 - [Contributing](CONTRIBUTING.md)
+- **Compliance & test report**: [others/PROPOSAL-COMPLIANCE-CHECKLIST.md](others/PROPOSAL-COMPLIANCE-CHECKLIST.md)
+
+### Interactive API docs (OpenAPI)
+The full OpenAPI 3.0 spec lives at [`backend/openapi.yaml`](backend/openapi.yaml) and is served by the backend:
+- **`GET /api-docs`** — interactive Redoc UI
+- **`GET /openapi.yaml`** — raw spec (load into Swagger/Postman/Insomnia)
+- **`GET /health`** — deep health check (Postgres, Redis, Elasticsearch, Neo4j)
+- **`GET /metrics`** — Prometheus metrics
+
+## ☸️ Kubernetes
+Self-contained manifests under [`k8s/`](k8s/) (Kustomize):
+```bash
+# copy k8s/base/secret.example.yaml -> secret.yaml and fill in real values, then:
+kubectl apply -k k8s/overlays/prod
+```
+The base includes app Deployments/Services (frontend, backend, ml-service), in-cluster
+**StatefulSets** for PostgreSQL / Redis / Elasticsearch / Neo4j / MinIO (with PVCs), a
+ConfigMap, an Ingress, and a production HPA overlay. After the pods are up, run
+`POST /api/v1/admin/backfill` once to index existing data into Elasticsearch and seed
+the Neo4j graph.
 
 ## 🛡️ License
 MIT
