@@ -15,6 +15,7 @@ interface Journal {
   publisher: string;
   quartile: string;
   open_access: boolean;
+  fit_score?: number; // semantic abstract↔scope match (0..100), present in abstract mode
 }
 
 const TIER_COLORS: Record<string, string> = {
@@ -32,6 +33,8 @@ export function ScimagoJournalFinder() {
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
   const [selectedJournal, setSelectedJournal] = useState<Journal | null>(null);
+  const [abstract, setAbstract] = useState("");
+  const [abstractMode, setAbstractMode] = useState(false);
 
   // Load default list and saved target on mount
   useEffect(() => {
@@ -86,6 +89,29 @@ export function ScimagoJournalFinder() {
     search();
   };
 
+  // Recommend journals by semantically matching a manuscript abstract to journal scope.
+  const recommendByAbstract = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (abstract.trim().length < 40) return;
+    setLoading(true);
+    try {
+      const res = await fetchWithAuth(API.publications.recommendJournals, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ abstract, open_access: openAccessOnly, limit: 15 }),
+      });
+      const json = await res.json();
+      if (json.success) {
+        setJournals(json.data);
+        setSearched(true);
+      }
+    } catch {
+      // silent
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 space-y-5">
       <div className="flex items-center gap-3">
@@ -98,25 +124,63 @@ export function ScimagoJournalFinder() {
         </div>
       </div>
 
-      {/* Search Form */}
-      <form onSubmit={handleSearch} className="flex gap-3">
-        <div className="flex-1 relative">
-          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-          <input
-            value={query}
-            onChange={e => setQuery(e.target.value)}
-            placeholder="Search by title, subject area, or publisher..."
-            className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl pl-9 pr-4 py-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
-          />
-        </div>
+      {/* Mode toggle: keyword search vs. semantic abstract match */}
+      <div className="inline-flex rounded-xl bg-slate-100 dark:bg-slate-800 p-1 text-sm font-bold">
         <button
-          type="submit"
-          disabled={loading}
-          className="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm rounded-xl transition-all disabled:opacity-60"
+          type="button"
+          onClick={() => setAbstractMode(false)}
+          className={`px-3 py-1.5 rounded-lg transition-all ${!abstractMode ? "bg-white dark:bg-slate-900 text-emerald-600 shadow-sm" : "text-slate-500"}`}
         >
-          {loading ? <Loader2 size={16} className="animate-spin" /> : "Search"}
+          Keyword
         </button>
-      </form>
+        <button
+          type="button"
+          onClick={() => setAbstractMode(true)}
+          className={`px-3 py-1.5 rounded-lg transition-all ${abstractMode ? "bg-white dark:bg-slate-900 text-emerald-600 shadow-sm" : "text-slate-500"}`}
+        >
+          Match by Abstract
+        </button>
+      </div>
+
+      {!abstractMode ? (
+        /* Keyword Search Form */
+        <form onSubmit={handleSearch} className="flex gap-3">
+          <div className="flex-1 relative">
+            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <input
+              value={query}
+              onChange={e => setQuery(e.target.value)}
+              placeholder="Search by title, subject area, or publisher..."
+              className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl pl-9 pr-4 py-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={loading}
+            className="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm rounded-xl transition-all disabled:opacity-60"
+          >
+            {loading ? <Loader2 size={16} className="animate-spin" /> : "Search"}
+          </button>
+        </form>
+      ) : (
+        /* Abstract → semantic journal recommendation */
+        <form onSubmit={recommendByAbstract} className="space-y-3">
+          <textarea
+            value={abstract}
+            onChange={e => setAbstract(e.target.value)}
+            placeholder="Paste your manuscript abstract — we'll semantically match journals whose scope fits your work…"
+            rows={4}
+            className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 resize-y"
+          />
+          <button
+            type="submit"
+            disabled={loading || abstract.trim().length < 40}
+            className="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm rounded-xl transition-all disabled:opacity-50"
+          >
+            {loading ? <Loader2 size={16} className="animate-spin inline" /> : "Recommend Journals"}
+          </button>
+        </form>
+      )}
 
       {/* Filter */}
       <label className="flex items-center gap-2.5 cursor-pointer group">
@@ -146,7 +210,7 @@ export function ScimagoJournalFinder() {
             >
               {/* SJR Badge */}
               <div className="text-center w-14 shrink-0">
-                <div className="text-lg font-black text-slate-900 dark:text-white">{j.sjr.toFixed(2)}</div>
+                <div className="text-lg font-black text-slate-900 dark:text-white">{(j.sjr ?? 0).toFixed(2)}</div>
                 <div className="text-[9px] font-bold uppercase tracking-wider text-slate-400">SJR</div>
               </div>
 
@@ -154,9 +218,16 @@ export function ScimagoJournalFinder() {
               <div className="flex-1 min-w-0">
                 <div className="flex flex-wrap items-center gap-2 mb-1">
                   <h3 className="font-bold text-slate-900 dark:text-white text-sm truncate">{j.title}</h3>
-                  <span className={`text-[10px] font-black px-2 py-0.5 rounded-md border ${TIER_COLORS[j.quartile] || ""}`}>
-                    {j.quartile}
-                  </span>
+                  {typeof j.fit_score === "number" && (
+                    <span className="text-[10px] font-black px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20" title="Semantic fit to your abstract">
+                      {j.fit_score}% fit
+                    </span>
+                  )}
+                  {j.quartile && (
+                    <span className={`text-[10px] font-black px-2 py-0.5 rounded-md border ${TIER_COLORS[j.quartile] || ""}`}>
+                      {j.quartile}
+                    </span>
+                  )}
                   {j.open_access && (
                     <span className="text-[10px] font-black px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 flex items-center gap-1">
                       <Globe size={9} /> OA

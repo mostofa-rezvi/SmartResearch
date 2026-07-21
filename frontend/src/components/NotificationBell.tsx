@@ -2,7 +2,8 @@
 
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import { Bell, Check, CheckCheck, X, User2 } from "lucide-react";
-import { API } from "@/config/api";
+import { io } from "socket.io-client";
+import { API, API_BASE } from "@/config/api";
 import { useAuth, useApi } from "@/context/AuthContext";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -82,16 +83,32 @@ export function NotificationBell() {
     return () => clearInterval(interval);
   }, [fetchUnreadCount]);
 
-  // Listen for live socket notifications
+  // Real-time notifications via Socket.IO.
+  // Backend emits `notification:new` to room `user_${userId}` and auto-joins
+  // the authenticated user's room on connect (see backend notification.service.js).
   useEffect(() => {
-    // The socket is already set up in the workspace — we attach a window event for simplicity
-    const handleLiveNotification = () => {
+    if (!token) return;
+    const authToken = typeof window !== "undefined" ? localStorage.getItem("token") : token;
+
+    const socket = io(API_BASE, {
+      transports: ["websocket"],
+      auth: { token: authToken },
+    });
+
+    socket.on("notification:new", (notification: Notification) => {
+      // Prepend the new notification and bump the unread badge instantly.
+      setNotifications(prev => {
+        if (notification?.id != null && prev.some(n => n.id === notification.id)) return prev;
+        return [notification, ...prev];
+      });
       setUnreadCount(prev => prev + 1);
-      if (open) fetchNotifications();
+    });
+
+    return () => {
+      socket.off("notification:new");
+      socket.disconnect();
     };
-    window.addEventListener("notification:new", handleLiveNotification);
-    return () => window.removeEventListener("notification:new", handleLiveNotification);
-  }, [open, fetchNotifications]);
+  }, [token]);
 
   // Fetch when dropdown opens
   useEffect(() => {

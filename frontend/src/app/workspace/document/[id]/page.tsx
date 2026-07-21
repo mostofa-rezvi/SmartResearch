@@ -4,20 +4,14 @@ import React, { useState } from "react";
 import { useParams } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import { CollaborativeEditor } from "@/components/collaborative-editor";
-import { LiveCursors } from "@/components/live-cursors";
 import { NotificationsPanel } from "@/components/notifications-panel";
-import { ArrowLeft, History } from "lucide-react";
+import { ArrowLeft, History, Users } from "lucide-react";
 import Link from "next/link";
 import VersionHistorySidebar from "@/components/workspace/VersionHistorySidebar";
 
 export default function DocumentWorkspacePage() {
   const { id } = useParams();
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
-
-  const mockUsers = [
-    { color: "#EC4899", initials: "DS" },
-    { color: "#8B5CF6", initials: "ER" }
-  ];
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#020617] flex flex-col">
@@ -45,24 +39,15 @@ export default function DocumentWorkspacePage() {
               <History size={14} /> Version History
             </button>
 
-            <div className="flex -space-x-3">
-              {mockUsers.map((u, i) => (
-                <div 
-                  key={i} 
-                  className="w-8 h-8 rounded-full border-2 border-white dark:border-slate-900 flex items-center justify-center text-[10px] font-bold text-white shadow-sm ring-2 ring-transparent"
-                  style={{ backgroundColor: u.color }}
-                >
-                  {u.initials}
-                </div>
-              ))}
-            </div>
-            <span className="text-xs text-slate-500 font-medium">2 active</span>
+            {/* Live presence is rendered inside the editor toolbar (real awareness). */}
+            <span className="flex items-center gap-1.5 text-xs text-slate-500 font-medium">
+              <Users size={14} /> Live collaboration
+            </span>
           </div>
         </div>
 
         <div className="relative flex-1">
           <CollaborativeEditor documentId={id as string} />
-          <LiveCursors />
         </div>
 
         <VersionHistorySidebar

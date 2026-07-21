@@ -28,7 +28,10 @@ export function SearchBar() {
     const fetchSuggestions = async () => {
       setIsLoading(true);
       try {
-        const res = await fetch(`/api/search/suggestions?q=${encodeURIComponent(debouncedQuery)}`);
+        const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+        const res = await fetch(`/api/search/suggestions?q=${encodeURIComponent(debouncedQuery)}`, {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        });
         if (res.ok) {
           const data = await res.json();
           setSuggestions(data.suggestions || []);

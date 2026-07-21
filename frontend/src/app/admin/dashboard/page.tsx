@@ -9,13 +9,14 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { API } from "@/config/api";
 import { useApi } from "@/context/AuthContext";
+import TrustManagement from "@/components/admin/TrustManagement";
 
 export default function AdminDashboardPage() {
   const { user, token, isSuperAdmin, isAdmin } = useAuth();
   const { fetchWithAuth } = useApi();
   const router = useRouter();
 
-  const [activeTab, setActiveTab] = useState<'moderation' | 'analytics'>('moderation');
+  const [activeTab, setActiveTab] = useState<'moderation' | 'analytics' | 'trust'>('moderation');
   const [stats, setStats] = useState<any>({ totalUsers: 0, pendingFlags: 0, activeHubs: [] });
   const [queue, setQueue] = useState({ flags: [], journals: [] });
   const [logs, setLogs] = useState([]);
@@ -160,6 +161,14 @@ export default function AdminDashboardPage() {
                 }`}
               >
                 <BarChart3 size={14} className="inline mr-1.5" />Analytics
+              </button>
+              <button
+                onClick={() => setActiveTab('trust')}
+                className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
+                  activeTab === 'trust' ? 'bg-slate-700 text-white' : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                <Users size={14} className="inline mr-1.5" />Trust
               </button>
             </div>
             {isSuperAdmin && (
@@ -745,6 +754,13 @@ export default function AdminDashboardPage() {
             </div>
           );
         })()}
+
+        {/* Trust Management Tab */}
+        {activeTab === 'trust' && (
+          <div className="animate-fade-in">
+            <TrustManagement />
+          </div>
+        )}
 
       </main>
     </div>

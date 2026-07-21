@@ -14,6 +14,8 @@ interface QuestionDetailViewProps {
     id: string;
     title: string;
     content: string;
+    authorId?: string;
+    acceptedCommentId?: string | null;
     author: {
       id: string;
       name: string;
@@ -31,12 +33,62 @@ interface QuestionDetailViewProps {
   answers: any[];
   isLoading?: boolean;
   onAnswerSubmit?: (content: string) => Promise<void>;
+  currentUserId?: string;
+  onReply?: (parentId: string, content: string) => Promise<void> | void;
+  onAcceptAnswer?: (commentId: string) => Promise<void> | void;
 }
 
-export const QuestionDetailView: React.FC<QuestionDetailViewProps> = ({ question, answers, isLoading, onAnswerSubmit }) => {
+export const QuestionDetailView: React.FC<QuestionDetailViewProps> = ({ question, answers, isLoading, onAnswerSubmit, currentUserId, onReply, onAcceptAnswer }) => {
   const [sortOrder, setSortOrder] = useState<"reputation" | "newest">("reputation");
   const editorRef = useRef<HTMLDivElement>(null);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const [replyTo, setReplyTo] = useState<string | null>(null);
+
+  const isAuthor = currentUserId != null && String(currentUserId) === String(question.authorId);
+
+  // Group comments by parent to build the thread tree
+  const byParent = new Map<string | null, any[]>();
+  answers.forEach((a) => {
+    const key = a.parentId != null ? String(a.parentId) : null;
+    if (!byParent.has(key)) byParent.set(key, []);
+    byParent.get(key)!.push(a);
+  });
+
+  const isAccepted = (answer: any) =>
+    answer.isAccepted || (question.acceptedCommentId != null && String(answer.id) === String(question.acceptedCommentId));
+
+  const sortAnswers = (list: any[]) => {
+    const sorted = [...list].sort((a, b) => {
+      if (sortOrder === "newest") return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      return (b.upvotes || 0) - (a.upvotes || 0);
+    });
+    // Accepted answer always floats to the top
+    return sorted.sort((a, b) => Number(isAccepted(b)) - Number(isAccepted(a)));
+  };
+
+  const renderAnswer = (answer: any, depth: number): React.ReactNode => {
+    const children = byParent.get(String(answer.id)) || [];
+    return (
+      <div key={answer.id} className={depth > 0 ? "ml-4 md:ml-8 pl-4 md:pl-6 border-l-2 border-slate-100 dark:border-slate-800" : ""}>
+        <AnswerCard
+          answer={answer}
+          isAccepted={isAccepted(answer)}
+          canAccept={isAuthor && !isAccepted(answer)}
+          onAccept={onAcceptAnswer ? () => onAcceptAnswer(String(answer.id)) : undefined}
+          replyOpen={replyTo === String(answer.id)}
+          onToggleReply={onReply ? () => setReplyTo(replyTo === String(answer.id) ? null : String(answer.id)) : undefined}
+          onReplySubmit={onReply ? async (content: string) => { await onReply(String(answer.id), content); setReplyTo(null); } : undefined}
+        />
+        {children.length > 0 && (
+          <div className="mt-6 space-y-6">
+            {sortAnswers(children).map((child) => renderAnswer(child, depth + 1))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const topLevel = sortAnswers(byParent.get(null) || []);
 
   const handleAnswerClick = () => {
     editorRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -153,12 +205,10 @@ export const QuestionDetailView: React.FC<QuestionDetailViewProps> = ({ question
         />
       </div>
 
-      {/* Answers List */}
+      {/* Answers List (threaded) */}
       <div className="space-y-8">
 
-        {answers.map((answer) => (
-          <AnswerCard key={answer.id} answer={answer} />
-        ))}
+        {topLevel.map((answer) => renderAnswer(answer, 0))}
 
         {answers.length === 0 && !isLoading && (
           <div className="py-20 text-center bg-slate-50 dark:bg-slate-900/50 rounded-[2rem] border-2 border-dashed border-slate-200 dark:border-slate-800">

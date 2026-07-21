@@ -17,6 +17,7 @@ export const API = {
     register: `${API_BASE}/api/v1/auth/register`,
     login: `${API_BASE}/api/v1/auth/login`,
     verifyOtp: `${API_BASE}/api/v1/auth/verify-otp`,
+    resendOtp: `${API_BASE}/api/v1/auth/resend-otp`,
     refresh: `${API_BASE}/api/v1/auth/refresh`,
     verifyEmail: `${API_BASE}/api/v1/auth/verify-email`,
     onboardingComplete: `${API_BASE}/api/v1/auth/onboarding/complete`,
@@ -37,6 +38,8 @@ export const API = {
     updateComment: (id: string) => `${API_BASE}/api/v1/community/comments/${id}`,
     deleteComment: (id: string) => `${API_BASE}/api/v1/community/comments/${id}`,
     upload: `${API_BASE}/api/v1/community/upload`,
+    // Threaded comments reuse the `comments` endpoint (optional `parent_id` in body)
+    acceptAnswer: (id: string) => `${API_BASE}/api/v1/community/posts/${id}/accept-answer`,
   },
   // Discovery domain
   discovery: {
@@ -44,6 +47,8 @@ export const API = {
     searchDoi: (doi: string) => `${API_BASE}/api/v1/search/doi?doi=${encodeURIComponent(doi)}`,
     save: `${API_BASE}/api/v1/discovery/save`,
     recommendations: `${API_BASE}/api/v1/discovery/recommendations`,
+    // Module 2 — unified discovery feed (collaborators + papers + open projects)
+    feed: `${API_BASE}/api/v1/discovery/feed`,
   },
   // Blogs domain
   blogs: {
@@ -74,6 +79,7 @@ export const API = {
     me: `${API_BASE}/api/v1/profiles/me`,
     avatar: `${API_BASE}/api/v1/profiles/avatar`,
     auditLog: `${API_BASE}/api/v1/profiles/me/audit-log`,
+    verifyAuditLog: `${API_BASE}/api/v1/profiles/me/audit-log/verify`,
     achievements: `${API_BASE}/api/v1/profiles/me/achievements`,
   },
   // Admin domain
@@ -84,6 +90,18 @@ export const API = {
     auditLogs: `${API_BASE}/api/v1/moderation/audit_logs`,
     resolveFlag: (id: string) => `${API_BASE}/api/v1/moderation/resolve_flag/${id}`,
     journalStatus: (id: string) => `${API_BASE}/api/v1/moderation/journals/${id}/status`,
+    // Trust management (Module 10)
+    users: (params?: { tier?: string; q?: string; limit?: number }) => {
+      const qs = new URLSearchParams();
+      if (params?.tier) qs.set('tier', params.tier);
+      if (params?.q) qs.set('q', params.q);
+      if (params?.limit != null) qs.set('limit', String(params.limit));
+      const query = qs.toString();
+      return `${API_BASE}/api/v1/admin/users${query ? `?${query}` : ''}`;
+    },
+    setTrustTier: (id: string) => `${API_BASE}/api/v1/admin/users/${id}/trust-tier`,
+    verifyInstitution: (id: string) => `${API_BASE}/api/v1/admin/users/${id}/verify-institution`,
+    trustRankRefresh: `${API_BASE}/api/v1/admin/trustrank/refresh`,
   },
   // Researchers domain (seeded from OpenAlex)
   researchers: {
@@ -105,6 +123,7 @@ export const API = {
   },
   // Projects & Kanban domain
   projects: {
+    list: `${API_BASE}/api/v1/projects`,
     listMilestones: (projectId: string) => `${API_BASE}/api/v1/projects/${projectId}/milestones`,
     createMilestone: (projectId: string) => `${API_BASE}/api/v1/projects/${projectId}/milestones`,
     updateMilestoneStatus: (milestoneId: string) => `${API_BASE}/api/v1/projects/milestones/${milestoneId}/status`,
@@ -112,6 +131,12 @@ export const API = {
     listVersions: (projectId: string) => `${API_BASE}/api/v1/projects/${projectId}/versions`,
     createVersion: (projectId: string) => `${API_BASE}/api/v1/projects/${projectId}/versions`,
     revertVersion: (projectId: string, versionId: string | number) => `${API_BASE}/api/v1/projects/${projectId}/versions/${versionId}/revert`,
+  },
+  tasks: {
+    listByMilestone: (milestoneId: string | number) => `${API_BASE}/api/v1/tasks?milestone_id=${milestoneId}`,
+    create: `${API_BASE}/api/v1/tasks`,
+    update: (id: string | number) => `${API_BASE}/api/v1/tasks/${id}`,
+    remove: (id: string | number) => `${API_BASE}/api/v1/tasks/${id}`,
   },
   // Connections domain
   connections: {
@@ -135,13 +160,33 @@ export const API = {
     categories: `${API_BASE}/api/v1/library/journals/categories`,
     metadata: `${API_BASE}/api/v1/library/metadata`,
     extractPdf: `${API_BASE}/api/v1/library/extract-pdf`,
+    // Knowledge Library items (Module 4) — POST create / GET list / semantic search
+    items: `${API_BASE}/api/v1/library/items`,
+    itemsByType: (type: string) => `${API_BASE}/api/v1/library/items?type=${encodeURIComponent(type)}`,
+    searchItems: `${API_BASE}/api/v1/library/search`,
+    discover: `${API_BASE}/api/v1/library/discover`,
+    downloadItem: (id: string | number) => `${API_BASE}/api/v1/library/items/${id}/download`,
   },
   // Publications / LLM domain
   publications: {
     cite: `${API_BASE}/api/v1/publications/cite`,
+    recommendJournals: `${API_BASE}/api/v1/publications/recommend-journals`,
     feedback: `${API_BASE}/api/v1/publications/feedback`,
     scimago: `${API_BASE}/api/v1/publications/scimago`,
     checklist: `${API_BASE}/api/v1/publications/checklist`,
+  },
+  // Mentorship domain (Module 6)
+  mentorship: {
+    slots: `${API_BASE}/api/v1/mentorship/slots`,
+    slotsByDomain: (domain: string) =>
+      `${API_BASE}/api/v1/mentorship/slots${domain ? `?domain=${encodeURIComponent(domain)}` : ''}`,
+    recommend: `${API_BASE}/api/v1/mentorship/recommend`,
+    request: `${API_BASE}/api/v1/mentorship/request`,
+    my: `${API_BASE}/api/v1/mentorship/my`,
+    respond: (id: string | number) => `${API_BASE}/api/v1/mentorship/${id}/respond`,
+    sessions: (id: string | number) => `${API_BASE}/api/v1/mentorship/${id}/sessions`,
+    completeSession: (sessionId: string | number) =>
+      `${API_BASE}/api/v1/mentorship/sessions/${sessionId}/complete`,
   },
   // Analytics domain (admin)
   analytics: {

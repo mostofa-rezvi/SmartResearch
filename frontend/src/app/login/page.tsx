@@ -54,6 +54,25 @@ function LoginContent() {
     }
   };
 
+  const handleResendOtp = async () => {
+    setError(null);
+    try {
+      const response = await fetch(API.auth.resendOtp, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      const result = await response.json();
+      if (response.ok) {
+        setSuccessMessage(result.data?.message || "A new code was sent.");
+      } else {
+        setError(result.error?.message || "Could not resend the code.");
+      }
+    } catch (err) {
+      setError("Could not resend the code. Please try again.");
+    }
+  };
+
   const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -181,7 +200,7 @@ function LoginContent() {
                   </div>
                   
                   <div className="text-sm font-medium text-slate-500">
-                    Didn't receive it? <button type="button" className="text-primary font-bold hover:underline">Resend in 59s</button>
+                    Didn't receive it? <button type="button" onClick={handleResendOtp} className="text-primary font-bold hover:underline">Resend code</button>
                   </div>
                 </div>
               </div>

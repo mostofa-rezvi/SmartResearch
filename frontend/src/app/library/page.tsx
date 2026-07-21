@@ -2,17 +2,30 @@
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  Book, Search, Filter, Globe, School, Award, 
-  ChevronRight, ExternalLink, Library as LibraryIcon, 
-  Bookmark, Info, RefreshCw, X, SlidersHorizontal, FileText, FileSearch
+import {
+  Book, Search, Filter, Globe, School, Award,
+  ChevronRight, ExternalLink, Library as LibraryIcon,
+  Bookmark, Info, RefreshCw, X, SlidersHorizontal, FileText, FileSearch,
+  BookMarked
 } from "lucide-react";
 import { Virtuoso } from "react-virtuoso";
 import Navbar from "@/components/Navbar";
 import { API } from "@/config/api";
+import { useApi, useAuth } from "@/context/AuthContext";
 import JournalPapersModal from "@/components/journal/JournalPapersModal";
 import AllSavedPapersModal from "@/components/journal/AllSavedPapersModal";
 import { PdfExtractor } from "@/components/library/PdfExtractor";
+import KnowledgeLibrary from "@/components/library/KnowledgeLibrary";
+
+// Decode OpenAlex inverted-index abstracts back into plain text (for library sync).
+function decodeInverted(index: Record<string, number[]> | null | undefined): string {
+  if (!index) return "";
+  const words: [string, number][] = [];
+  for (const [word, positions] of Object.entries(index)) {
+    for (const pos of positions) words.push([word, pos]);
+  }
+  return words.sort((a, b) => a[1] - b[1]).map(([w]) => w).join(" ");
+}
 
 // --- Types ---
 interface Journal {
@@ -42,6 +55,12 @@ interface Metadata {
 }
 
 export default function LibraryPage() {
+  const { fetchWithAuth } = useApi();
+  const { token } = useAuth();
+
+  // Top-level view: existing journal catalog vs. Knowledge Library items (Module 4)
+  const [view, setView] = useState<"catalog" | "library">("catalog");
+
   const [journals, setJournals] = useState<Journal[]>([]);
   const [totalCount, setTotalCount] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -115,9 +134,68 @@ export default function LibraryPage() {
     setSavedPapersCount(count);
   }, []);
 
+  // #23 cleanup — persist locally-saved papers to the backend library so they
+  // feed the recommender. Non-breaking: localStorage remains the source of truth,
+  // and each paper is POSTed at most once (tracked in `library_synced_paper_ids`).
+  const syncSavedPapersToLibrary = useCallback(async () => {
+    if (typeof window === "undefined" || !token) return;
+
+    let syncedIds: string[] = [];
+    try {
+      syncedIds = JSON.parse(localStorage.getItem("library_synced_paper_ids") ?? "[]");
+    } catch { /* ignore */ }
+    const syncedSet = new Set<string>(Array.isArray(syncedIds) ? syncedIds : []);
+
+    const toSync: any[] = [];
+    try {
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith("saved_papers_")) {
+          const list = JSON.parse(localStorage.getItem(key) ?? "[]");
+          if (Array.isArray(list)) {
+            for (const p of list) {
+              if (p?.id && !syncedSet.has(p.id)) toSync.push(p);
+            }
+          }
+        }
+      }
+    } catch { /* ignore */ }
+
+    if (toSync.length === 0) return;
+
+    for (const p of toSync) {
+      try {
+        const body = {
+          item_type: "paper",
+          title: p.title || "Untitled",
+          abstract: decodeInverted(p.abstract_inverted_index) || undefined,
+          authors: Array.isArray(p.authorships)
+            ? p.authorships.map((a: any) => a?.author?.display_name).filter(Boolean).join(", ")
+            : undefined,
+          doi: p.doi || undefined,
+          tags: Array.isArray(p.concepts)
+            ? p.concepts.slice(0, 6).map((c: any) => c?.display_name).filter(Boolean)
+            : [],
+        };
+        const res = await fetchWithAuth(API.library.items, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+        // Mark as synced on success (or if already exists) to avoid re-posting.
+        if (res.ok) syncedSet.add(p.id);
+      } catch { /* best-effort, non-breaking */ }
+    }
+
+    try {
+      localStorage.setItem("library_synced_paper_ids", JSON.stringify(Array.from(syncedSet)));
+    } catch { /* ignore */ }
+  }, [token, fetchWithAuth]);
+
   useEffect(() => {
     refreshSavedPapersCount();
-  }, [refreshSavedPapersCount, selectedJournal]);
+    syncSavedPapersToLibrary();
+  }, [refreshSavedPapersCount, syncSavedPapersToLibrary, selectedJournal]);
 
   const exportToCSV = () => {
     if (savedJournals.length === 0) return;
@@ -313,6 +391,40 @@ export default function LibraryPage() {
       <Navbar />
       
       <main className="pt-24 h-screen flex flex-col max-w-[1600px] mx-auto px-4 md:px-8">
+        {/* View Switcher: Journal Catalog vs. My Library (Knowledge Library items) */}
+        <div className="flex items-center gap-2 mb-6 shrink-0">
+          <button
+            onClick={() => setView("catalog")}
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-black transition-all ${
+              view === "catalog"
+                ? "bg-primary text-white shadow-lg shadow-primary/20"
+                : "bg-white dark:bg-slate-800 text-slate-500 border border-slate-200 dark:border-slate-700 hover:border-primary/40"
+            }`}
+          >
+            <LibraryIcon size={16} /> Journal Catalog
+          </button>
+          <button
+            onClick={() => setView("library")}
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-black transition-all ${
+              view === "library"
+                ? "bg-primary text-white shadow-lg shadow-primary/20"
+                : "bg-white dark:bg-slate-800 text-slate-500 border border-slate-200 dark:border-slate-700 hover:border-primary/40"
+            }`}
+          >
+            <BookMarked size={16} /> My Library
+          </button>
+        </div>
+
+        {view === "library" ? (
+          <div className="flex-1 overflow-y-auto pb-8 custom-scrollbar">
+            <div className="mb-6">
+              <h1 className="text-3xl font-serif font-black tracking-tight">My Library</h1>
+              <p className="text-slate-500 font-medium italic">Your papers, datasets, notes &amp; literature reviews — searchable by meaning.</p>
+            </div>
+            <KnowledgeLibrary />
+          </div>
+        ) : (
+        <>
         {/* Header Section */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8 shrink-0">
           <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
@@ -545,6 +657,8 @@ export default function LibraryPage() {
             )}
           </div>
         </div>
+        </>
+        )}
       </main>
 
       {/* Saved Journals Popup */}

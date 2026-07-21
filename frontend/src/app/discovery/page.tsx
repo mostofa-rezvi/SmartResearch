@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar";
 import { SearchBar } from "@/components/search-bar";
 import { FilterSidebar } from "@/components/filter-sidebar";
 import { RecommendationFeed } from "@/components/recommendation-feed";
+import { UnifiedFeed } from "@/components/discovery/UnifiedFeed";
 import { API } from "@/config/api";
 import { useAuth, useApi } from "@/context/AuthContext";
 
@@ -89,6 +90,16 @@ export default function DiscoveryPage() {
           </p>
           <SearchBar />
         </div>
+
+        {/* Unified discovery feed — collaborators, papers & open projects (Module 2) */}
+        <section className="mb-14">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold font-serif text-slate-900 dark:text-white">
+              Your Discovery Feed
+            </h2>
+          </div>
+          <UnifiedFeed />
+        </section>
 
         <div className="flex flex-col md:flex-row gap-8 items-start">
           <FilterSidebar 

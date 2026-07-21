@@ -6,10 +6,11 @@ import { useAuth } from "@/context/AuthContext";
 import Navbar from "@/components/Navbar";
 import { API } from "@/config/api";
 import { motion } from "framer-motion";
-import { User, Award, ShieldCheck, Mail, MapPin, Building, BookOpen, Clock, Activity, MessageSquare, Lightbulb, Users, Bookmark, Settings, Globe, ExternalLink, Microscope } from "lucide-react";
+import { User, Award, ShieldCheck, Mail, MapPin, Building, BookOpen, Clock, Activity, MessageSquare, Lightbulb, Users, Bookmark, Settings, Globe, ExternalLink, Microscope, GraduationCap, Trophy, Handshake, Star, FileText } from "lucide-react";
 import Link from "next/link";
 import EditProfileModal from "@/components/profile/EditProfileModal";
 import CredentialDashboard from "@/components/profile/CredentialDashboard";
+import TrustBadge from "@/components/profile/TrustBadge";
 
 export default function ProfilePage() {
   const { id } = useParams();
@@ -126,25 +127,38 @@ export default function ProfilePage() {
         {/* Left Column: Stats & Contact */}
         <div className="space-y-6">
           
-          {/* Trust Score & Shared Interests */}
+          {/* Trust & Reputation */}
           <div className="bg-white p-8 rounded-[32px] border border-slate-100 shadow-xl">
             <h3 className="mono-academic text-xs font-black tracking-[0.2em] text-slate-400 mb-6 flex items-center gap-2">
-              <ShieldCheck size={18} className="text-emerald-500" /> Trust Score
+              <ShieldCheck size={18} className="text-emerald-500" /> Trust & Reputation
             </h3>
             <div className="mb-6 flex flex-col items-center justify-center p-6 bg-slate-50 rounded-2xl border border-slate-100">
-              <div className="text-4xl font-black text-slate-900 mb-2">94/100</div>
-              <div className="text-sm font-bold text-amber-500 bg-amber-50 px-3 py-1 rounded-full border border-amber-200">
-                Gold Tier
+              <div className="text-4xl font-black text-slate-900 mb-3">
+                {Math.round((profile.trust_rank ?? 0) * 100)}<span className="text-2xl text-slate-400">/100</span>
+              </div>
+              <TrustBadge tier={profile.trust_tier} institutionVerified={profile.institution_verified} />
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="flex flex-col items-center justify-center p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                <div className="flex items-center gap-1.5 text-amber-500 mb-1"><Star size={16} /></div>
+                <div className="text-xl font-black text-slate-900 leading-none">{profile.reputation_points ?? 0}</div>
+                <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mt-1">Reputation</div>
+              </div>
+              <div className="flex flex-col items-center justify-center p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                <div className="flex items-center gap-1.5 text-primary mb-1"><Handshake size={16} /></div>
+                <div className="text-xl font-black text-slate-900 leading-none">{profile.collaborations_count ?? 0}</div>
+                <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mt-1">Collaborations</div>
               </div>
             </div>
 
-            {!isOwnProfile && (
+            {!isOwnProfile && profile.research_interests?.interests?.length > 0 && (
               <>
                 <h3 className="mono-academic text-xs font-black tracking-[0.2em] text-slate-400 mb-4 flex items-center gap-2 mt-8">
-                  <Users size={18} className="text-primary" /> Shared Interests
+                  <Users size={18} className="text-primary" /> Research Interests
                 </h3>
                 <div className="flex flex-wrap gap-2">
-                  {["Machine Learning", "Quantum Computing"].map((interest, idx) => (
+                  {profile.research_interests.interests.map((interest: string, idx: number) => (
                     <span key={idx} className="text-xs font-bold text-primary bg-primary/10 px-3 py-1.5 rounded-lg border border-primary/20">
                       {interest}
                     </span>
@@ -230,6 +244,104 @@ export default function ProfilePage() {
               <p className="text-slate-600  leading-relaxed font-serif">
                 {isInvited && profile.extended_profile?.academic_bio ? profile.extended_profile.academic_bio : profile.bio}
               </p>
+            </motion.div>
+          )}
+
+          {/* Achievements / Badges */}
+          {profile.achievements?.length > 0 && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="bg-white p-8 rounded-3xl border border-slate-100 shadow-xl">
+              <h3 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-3">
+                <Trophy className="text-amber-500" /> Achievements
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {profile.achievements.map((badge: any, idx: number) => (
+                  <div key={idx} className="flex items-start gap-3 bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                    <div className="shrink-0 w-10 h-10 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center">
+                      <Award size={18} />
+                    </div>
+                    <div className="min-w-0">
+                      <h4 className="font-bold text-sm text-slate-900">{badge.title}</h4>
+                      {badge.description && <p className="text-xs text-slate-500 mt-0.5 line-clamp-2">{badge.description}</p>}
+                      {badge.earned_at && (
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mt-1 block">
+                          {new Date(badge.earned_at).toLocaleDateString()}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          )}
+
+          {/* Authored Papers */}
+          {profile.authored_papers?.length > 0 && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="bg-white p-8 rounded-3xl border border-slate-100 shadow-xl">
+              <h3 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-3">
+                <FileText className="text-primary" /> Authored Papers
+              </h3>
+              <div className="space-y-3">
+                {profile.authored_papers.map((paper: any) => (
+                  <div key={paper.id} className="flex items-start justify-between gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                    <div className="min-w-0">
+                      <h4 className="font-bold text-sm text-slate-900 line-clamp-2">{paper.title}</h4>
+                      {paper.created_at && (
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mt-1 block">
+                          {new Date(paper.created_at).toLocaleDateString()}
+                        </span>
+                      )}
+                    </div>
+                    {paper.doi && (
+                      <a
+                        href={`https://doi.org/${paper.doi}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="shrink-0 flex items-center gap-1.5 text-xs font-bold text-primary hover:underline"
+                      >
+                        DOI <ExternalLink size={12} />
+                      </a>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          )}
+
+          {/* Mentorship History */}
+          {profile.mentorship_history?.length > 0 && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="bg-white p-8 rounded-3xl border border-slate-100 shadow-xl">
+              <h3 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-3">
+                <GraduationCap className="text-secondary" /> Mentorship History
+              </h3>
+              <div className="space-y-3">
+                {profile.mentorship_history.map((m: any) => {
+                  const counterpart = m.my_role === 'mentor' ? m.mentee_name : m.mentor_name;
+                  return (
+                    <div key={m.id} className="flex items-center justify-between gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="shrink-0 w-9 h-9 rounded-xl bg-secondary/10 text-secondary flex items-center justify-center">
+                          <Handshake size={16} />
+                        </div>
+                        <div className="min-w-0">
+                          <h4 className="font-bold text-sm text-slate-900 truncate">
+                            {m.my_role === 'mentor' ? 'Mentoring' : 'Mentored by'} {counterpart || 'Researcher'}
+                          </h4>
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                            {m.my_role} {m.created_at && `• ${new Date(m.created_at).toLocaleDateString()}`}
+                          </span>
+                        </div>
+                      </div>
+                      <span className={`shrink-0 text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full border ${
+                        m.status === 'active' ? 'bg-emerald-50 text-emerald-600 border-emerald-200'
+                        : m.status === 'completed' ? 'bg-sky-50 text-sky-600 border-sky-200'
+                        : 'bg-slate-100 text-slate-500 border-slate-200'
+                      }`}>
+                        {m.status}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
             </motion.div>
           )}
 

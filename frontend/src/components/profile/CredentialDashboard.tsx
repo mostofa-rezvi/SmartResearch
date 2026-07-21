@@ -291,8 +291,19 @@ export default function CredentialDashboard() {
   const [auditPage, setAuditPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [verify, setVerify] = useState<{ valid: boolean; verified: number } | null>(null);
 
   const AUDIT_LIMIT = 10;
+
+  const fetchVerify = useCallback(async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(API.profiles.verifyAuditLog, { headers: { Authorization: `Bearer ${token}` } });
+      if (res.ok) setVerify((await res.json()).data);
+    } catch {
+      /* non-fatal */
+    }
+  }, []);
 
   const fetchAchievements = useCallback(async () => {
     try {
@@ -326,11 +337,11 @@ export default function CredentialDashboard() {
   useEffect(() => {
     const init = async () => {
       setLoading(true);
-      await Promise.all([fetchAchievements(), fetchAuditLog(1)]);
+      await Promise.all([fetchAchievements(), fetchAuditLog(1), fetchVerify()]);
       setLoading(false);
     };
     init();
-  }, [fetchAchievements, fetchAuditLog]);
+  }, [fetchAchievements, fetchAuditLog, fetchVerify]);
 
   const handlePageChange = (newPage: number) => {
     setAuditPage(newPage);
@@ -423,6 +434,18 @@ export default function CredentialDashboard() {
         ) : (
           /* Audit Log Tab */
           <div className="space-y-4">
+            {verify && (
+              <div className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold border ${
+                verify.valid
+                  ? "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20"
+                  : "bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 border-red-200 dark:border-red-500/20"
+              }`}>
+                <ShieldCheck size={15} />
+                {verify.valid
+                  ? `Integrity verified — ${verify.verified} record${verify.verified === 1 ? "" : "s"} form an unbroken, tamper-evident chain.`
+                  : "Integrity check failed — this credential log has been tampered with."}
+              </div>
+            )}
             {auditLogs.length === 0 ? (
               <div className="text-center py-16 text-slate-400">
                 <ShieldCheck size={40} className="mx-auto mb-3 opacity-30" />

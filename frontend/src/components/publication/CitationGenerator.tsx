@@ -90,7 +90,7 @@ export function CitationGenerator() {
         setError(json.message || "Generation failed. Is the ML service running?");
       }
     } catch {
-      setError("Network error. Ensure the ML service is running with GEMINI_API_KEY set.");
+      setError("Network error. Ensure the ML service is running with HF_API_TOKEN set.");
     } finally {
       setLoading(false);
     }
@@ -111,7 +111,7 @@ export function CitationGenerator() {
         </div>
         <div>
           <h2 className="text-lg font-bold text-slate-900 dark:text-white">Citation Generator</h2>
-          <p className="text-sm text-slate-500">AI-powered citation formatting via Gemini</p>
+          <p className="text-sm text-slate-500">AI-powered citation formatting</p>
         </div>
       </div>
 
@@ -209,7 +209,7 @@ export function CitationGenerator() {
         className="w-full flex items-center justify-center gap-2.5 bg-indigo-500 hover:bg-indigo-600 disabled:bg-indigo-300 text-white font-bold py-3 rounded-xl transition-all shadow-sm shadow-indigo-500/20"
       >
         {loading ? (
-          <><Loader2 size={18} className="animate-spin" /> Generating with Gemini...</>
+          <><Loader2 size={18} className="animate-spin" /> Generating…</>
         ) : (
           <><Sparkles size={18} /> Generate {FORMAT_LABELS[format]} Citation</>
         )}

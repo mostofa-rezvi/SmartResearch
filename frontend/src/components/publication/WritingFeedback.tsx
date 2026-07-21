@@ -101,7 +101,7 @@ export function WritingFeedback() {
         setError(json.message || "Feedback generation failed.");
       }
     } catch {
-      setError("Network error. Ensure the ML service is running with GEMINI_API_KEY set.");
+      setError("Network error. Ensure the ML service is running with HF_API_TOKEN set.");
     } finally {
       setLoading(false);
     }
@@ -115,7 +115,7 @@ export function WritingFeedback() {
         </div>
         <div>
           <h2 className="text-lg font-bold text-slate-900 dark:text-white">AI Writing Feedback</h2>
-          <p className="text-sm text-slate-500">Get structured peer-review style feedback powered by Gemini</p>
+          <p className="text-sm text-slate-500">Get structured peer-review style AI feedback</p>
         </div>
       </div>
 
@@ -166,7 +166,7 @@ export function WritingFeedback() {
         className="w-full flex items-center justify-center gap-2.5 bg-violet-500 hover:bg-violet-600 disabled:bg-violet-300 text-white font-bold py-3 rounded-xl transition-all shadow-sm shadow-violet-500/20"
       >
         {loading ? (
-          <><Loader2 size={18} className="animate-spin" /> Analyzing with Gemini...</>
+          <><Loader2 size={18} className="animate-spin" /> Analyzing…</>
         ) : (
           <><Sparkles size={18} /> Get AI Feedback</>
         )}
