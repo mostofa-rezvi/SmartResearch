@@ -8,6 +8,41 @@ const socketService = require('./socket.service');
  */
 class ReputationService {
   /**
+   * Award (or deduct) reputation points to any user, recording a ledger entry.
+   * Works for all users (not just invited profiles). Used by mentorship,
+   * accepted answers, endorsements, etc.
+   * @param {number} userId
+   * @param {number} points  positive to award, negative to deduct
+   * @param {string} reason  e.g. 'accepted_answer', 'mentorship_accepted'
+   * @param {string} [refType]
+   * @param {string|number} [refId]
+   */
+  async award(userId, points, reason, refType = null, refId = null) {
+    if (!userId) throw new Error('User ID is required');
+    await db.query(
+      `INSERT INTO reputation_events (user_id, points, reason, ref_type, ref_id)
+       VALUES ($1, $2, $3, $4, $5)`,
+      [userId, points, reason, refType, refId != null ? String(refId) : null]
+    );
+    const res = await db.query(
+      `UPDATE users SET reputation_points = COALESCE(reputation_points, 0) + $1
+        WHERE id = $2 RETURNING reputation_points`,
+      [points, userId]
+    );
+    const total = res.rows[0]?.reputation_points ?? null;
+
+    eventBus.emitEvent('event.behaviour', {
+      type: 'reputation_awarded', userId, points, reason, refType, refId,
+      timestamp: new Date().toISOString(),
+    });
+    try {
+      socketService.emitToUser(userId, 'reputation_update', { delta: points, reason, total });
+    } catch (_) { /* socket optional */ }
+
+    return { userId, points, total, reason };
+  }
+
+  /**
    * Calculates the citation impact and updates the user's reputation score.
    * Emits a Kafka event to the Machine Learning pipeline to update global discovery weights.
    */

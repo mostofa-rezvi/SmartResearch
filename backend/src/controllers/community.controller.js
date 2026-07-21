@@ -75,8 +75,19 @@ class CommunityController {
 
   async addComment(req, res, next) {
     try {
-      const comment = await communityService.addComment(req.user.id, req.params.id, req.body.content);
+      const comment = await communityService.addComment(
+        req.user.id, req.params.id, req.body.content, req.body.parent_id || null
+      );
       res.status(201).json(envelope(comment));
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async acceptAnswer(req, res, next) {
+    try {
+      const result = await communityService.acceptAnswer(req.user.id, req.params.id, req.body.comment_id);
+      res.json(envelope(result));
     } catch (err) {
       next(err);
     }

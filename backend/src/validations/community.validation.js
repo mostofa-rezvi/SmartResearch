@@ -34,6 +34,16 @@ const addComment = {
   }),
   [Segments.BODY]: Joi.object().keys({
     content: Joi.string().required().min(1).max(2000),
+    parent_id: Joi.number().integer().optional().allow(null),
+  }),
+};
+
+const acceptAnswer = {
+  [Segments.PARAMS]: Joi.object().keys({
+    id: Joi.number().required(),
+  }),
+  [Segments.BODY]: Joi.object().keys({
+    comment_id: Joi.number().integer().required(),
   }),
 };
 
@@ -52,5 +62,6 @@ module.exports = {
   votePost,
   reactPost,
   addComment,
+  acceptAnswer,
   createAMA,
 };

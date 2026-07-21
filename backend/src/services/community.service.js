@@ -4,6 +4,7 @@ const logger = require('../utils/logger');
 const reputationService = require('./reputation.service');
 const socketService = require('./socket.service');
 const axios = require('axios');
+const { sanitizeText } = require('../utils/sanitize');
 
 const ML_SERVICE_URL = process.env.ML_SERVICE_URL || 'http://localhost:8000';
 
@@ -11,7 +12,11 @@ const VALID_REACTIONS = ['insightful', 'support', 'curious', 'celebrate', 'love'
 
 class CommunityService {
   async createPost(userId, postData) {
-    const { type, title, content, tags, group_id } = postData;
+    const { type, group_id } = postData;
+    // Sanitize user-generated content before persisting
+    const title = sanitizeText(postData.title);
+    const content = sanitizeText(postData.content);
+    const tags = postData.tags;
 
     const result = await db.query(
       'INSERT INTO community_posts (user_id, type, title, content, tags, group_id) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
@@ -27,14 +32,38 @@ class CommunityService {
     newPost.reactions = {};
 
     eventBus.emitEvent('event.behaviour', { type: 'community.post.created', userId, postId: newPost.id, postType: type, timestamp: new Date().toISOString() });
-    
+
     // Broadcast to all users for real-time feed updates
     socketService.broadcast('new_post', newPost);
-    
+
+    // Module 5: embed the post into the shared semantic space (fire-and-forget)
+    this._indexPostSemantically(newPost).catch((e) =>
+      logger.warn(`[Community] post semantic index failed: ${e.message}`));
+
     logger.info({ userId, postId: newPost.id }, 'Community post created');
 
 
     return newPost;
+  }
+
+  /** Embed a forum post and index it into the ES `posts` index (same 768-dim space as profiles/papers). */
+  async _indexPostSemantically(post) {
+    const text = [post.title, post.content].filter(Boolean).join('. ');
+    if (!text.trim()) return;
+    let embedding = null;
+    try {
+      const res = await axios.post(`${ML_SERVICE_URL}/embed`, { text }, { timeout: 30000 });
+      embedding = res.data?.embedding || res.data?.vectors || null;
+    } catch (e) {
+      logger.warn(`[Community] embed for post ${post.id} failed: ${e.message}`);
+    }
+    const { getEsClient } = require('../config/elasticsearch');
+    const document = {
+      title: post.title || '', content: post.content || '',
+      type: post.type || 'discussion', author_id: post.user_id,
+    };
+    if (Array.isArray(embedding) && embedding.length > 0) document.embedding = embedding;
+    await getEsClient().index({ index: 'posts', id: String(post.id), document });
   }
 
   async getGroupFeed(groupId, userId, limit = 20, offset = 0) {
@@ -129,6 +158,8 @@ class CommunityService {
     const result = await db.query(`
       SELECT 
         p.*, u.name as author_name, u.role as author_role,
+        u.trust_tier as author_trust_tier, u.trust_rank as author_trust_rank,
+        u.reputation_points as author_reputation_points,
         iup.impact_score as author_reputation,
         iup.title as author_primary_field,
         COALESCE(v.vote_score, 0) as vote_score,
@@ -152,7 +183,11 @@ class CommunityService {
     let posts = result.rows.map(post => {
       const matchCount = post.tags ? post.tags.filter(tag => interests.includes(tag)).length : 0;
       let score = (parseInt(post.vote_score) || 0) + (matchCount * 10);
-      if (post.author_role === 'invited_user') score += 5;
+      // Surface quality knowledge via TrustRank: boost content from higher-credibility authors
+      const trustRank = parseFloat(post.author_trust_rank) || 0; // 0..1 normalized PageRank
+      score += Math.round(trustRank * 20);
+      const isAuthority = post.author_trust_tier === 'professor' || post.author_role === 'invited_user';
+      if (isAuthority) score += 5;
       return {
         ...post,
         discovery_score: score,
@@ -160,9 +195,11 @@ class CommunityService {
         user_reaction: null,
         discovery_reason: matchCount > 0
           ? `Matched your interest in "${post.tags.find(tag => interests.includes(tag))}"`
-          : post.author_role === 'invited_user'
-            ? 'From a verified scholar in your field'
-            : 'Trending in the community'
+          : trustRank >= 0.7
+            ? 'High-credibility contributor (TrustRank)'
+            : isAuthority
+              ? 'From a verified scholar in your field'
+              : 'Trending in the community'
       };
     });
 
@@ -176,6 +213,8 @@ class CommunityService {
     const result = await db.query(`
       SELECT 
         p.*, u.name as author_name, u.role as author_role,
+        u.trust_tier as author_trust_tier, u.trust_rank as author_trust_rank,
+        u.reputation_points as author_reputation_points,
         iup.impact_score as author_reputation,
         iup.title as author_primary_field,
         COALESCE(v.vote_score, 0) as vote_score,
@@ -338,6 +377,8 @@ class CommunityService {
   async getComments(postId, userId) {
     const result = await db.query(`
       SELECT c.*, u.name as author_name, u.role as author_role,
+        u.trust_tier as author_trust_tier, u.trust_rank as author_trust_rank,
+        u.reputation_points as author_reputation_points,
         COALESCE(v.vote_score, 0) as vote_score,
         uv.value as user_vote
       FROM comments c
@@ -353,10 +394,20 @@ class CommunityService {
     return result.rows;
   }
 
-  async addComment(userId, postId, content) {
+  async addComment(userId, postId, content, parentId = null) {
+    // Threaded replies: validate parent belongs to the same post
+    if (parentId) {
+      const parent = await db.query('SELECT id FROM comments WHERE id = $1 AND post_id = $2', [parentId, postId]);
+      if (parent.rows.length === 0) {
+        const e = new Error('Parent comment not found on this post');
+        e.status = 400;
+        throw e;
+      }
+    }
+
     const result = await db.query(
-      'INSERT INTO comments (user_id, post_id, content) VALUES ($1, $2, $3) RETURNING *',
-      [userId, postId, content]
+      'INSERT INTO comments (user_id, post_id, content, parent_id) VALUES ($1, $2, $3, $4) RETURNING *',
+      [userId, postId, sanitizeText(content), parentId]
     );
 
     const comment = result.rows[0];
@@ -569,6 +620,50 @@ class CommunityService {
       ORDER BY a.scheduled_at ASC
     `);
     return result.rows;
+  }
+
+  /**
+   * Accept a comment as the answer to a question post (Module 5).
+   * Only the post author may accept. Marks the comment is_accepted, records
+   * accepted_comment_id on the post, and awards reputation to the answerer.
+   */
+  async acceptAnswer(userId, postId, commentId) {
+    const post = await db.query('SELECT user_id FROM community_posts WHERE id = $1', [postId]);
+    if (post.rows.length === 0) {
+      const e = new Error('Post not found'); e.status = 404; throw e;
+    }
+    if (parseInt(post.rows[0].user_id, 10) !== parseInt(userId, 10)) {
+      const e = new Error('Only the post author can accept an answer'); e.status = 403; throw e;
+    }
+    const comment = await db.query('SELECT id, user_id FROM comments WHERE id = $1 AND post_id = $2', [commentId, postId]);
+    if (comment.rows.length === 0) {
+      const e = new Error('Comment not found on this post'); e.status = 404; throw e;
+    }
+
+    await db.query('BEGIN');
+    try {
+      // Clear any previous accepted answer on this post, then set the new one
+      await db.query('UPDATE comments SET is_accepted = FALSE WHERE post_id = $1', [postId]);
+      await db.query('UPDATE comments SET is_accepted = TRUE WHERE id = $1', [commentId]);
+      await db.query('UPDATE community_posts SET accepted_comment_id = $1 WHERE id = $2', [commentId, postId]);
+      await db.query('COMMIT');
+    } catch (err) {
+      await db.query('ROLLBACK');
+      throw err;
+    }
+
+    // Reward the answerer's reputation (fire-and-forget) + emit an endorsement signal for TrustRank
+    const answererId = comment.rows[0].user_id;
+    try {
+      const reputationService = require('./reputation.service');
+      await reputationService.award(answererId, 15, 'accepted_answer', 'comment', commentId);
+    } catch (e) { logger.warn(`[acceptAnswer] reputation award failed: ${e.message}`); }
+    eventBus.emitEvent('event.behaviour', {
+      type: 'community.answer.accepted', userId, endorsedUserId: answererId, postId, commentId,
+      timestamp: new Date().toISOString(),
+    });
+
+    return { postId, commentId, acceptedUserId: answererId };
   }
 }
 

@@ -68,6 +68,13 @@ router.post('/posts/:id/comments',
   communityController.addComment
 );
 
+// @route   POST /api/v1/community/posts/:id/accept-answer
+// @desc    Accept a comment as the answer (post author only)
+router.post('/posts/:id/accept-answer',
+  [verifyAuth, celebrate(communityValidation.acceptAnswer)],
+  communityController.acceptAnswer
+);
+
 // @route   POST /api/v1/community/posts/:id/share
 // @desc    Share / repost a post
 router.post('/posts/:id/share',
