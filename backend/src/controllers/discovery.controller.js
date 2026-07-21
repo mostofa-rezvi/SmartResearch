@@ -39,6 +39,15 @@ class DiscoveryController {
       next(err);
     }
   }
+
+  async getFeed(req, res, next) {
+    try {
+      const feed = await discoveryService.getUnifiedFeed(req.user.id);
+      res.json(envelope(feed));
+    } catch (err) {
+      next(err);
+    }
+  }
 }
 
 module.exports = new DiscoveryController();

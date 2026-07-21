@@ -33,4 +33,11 @@ router.get('/recommendations',
   discoveryController.getRecommendations
 );
 
+// @route   GET /api/v1/discovery/feed
+// @desc    Unified recommendation feed: collaborators + relevant papers + open projects
+router.get('/feed',
+  auth,
+  discoveryController.getFeed
+);
+
 module.exports = router;
