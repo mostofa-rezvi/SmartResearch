@@ -106,22 +106,19 @@ exports.getMatchQuality = async (req, res) => {
         GROUP BY week_start
         ORDER BY week_start ASC
       `).catch(() => ({ rows: [] })),
+      // Histogram of REAL ML recommendation match scores (logged when recs are served)
       db.query(`
         SELECT
           CASE
-            WHEN view_count >= 10 THEN '0.9-1.0'
-            WHEN view_count >= 7  THEN '0.8-0.9'
-            WHEN view_count >= 5  THEN '0.7-0.8'
-            WHEN view_count >= 3  THEN '0.6-0.7'
-            WHEN view_count >= 1  THEN '0.5-0.6'
+            WHEN score >= 0.9 THEN '0.9-1.0'
+            WHEN score >= 0.8 THEN '0.8-0.9'
+            WHEN score >= 0.7 THEN '0.7-0.8'
+            WHEN score >= 0.6 THEN '0.6-0.7'
+            WHEN score >= 0.5 THEN '0.5-0.6'
             ELSE '0.0-0.5'
           END as score_bucket,
           COUNT(*) as count
-        FROM (
-          SELECT paper_id, COUNT(*) as view_count
-          FROM reading_history
-          GROUP BY paper_id
-        ) t
+        FROM recommendation_scores
         GROUP BY score_bucket
         ORDER BY score_bucket DESC
       `).catch(() => ({ rows: [] })),
@@ -133,22 +130,29 @@ exports.getMatchQuality = async (req, res) => {
         ? Math.round((parseInt(eRow.engaged) / parseInt(eRow.total_viewed)) * 100)
         : 0;
 
+    // Histogram of real ML match scores; zero-count buckets as an honest empty-state.
+    const EMPTY_BUCKETS = ['0.9-1.0', '0.8-0.9', '0.7-0.8', '0.6-0.7', '0.5-0.6', '0.0-0.5'];
     const histogram =
       histogramRes.rows.length > 0
         ? histogramRes.rows
-        : [
-            { score_bucket: '0.9-1.0', count: 12 },
-            { score_bucket: '0.8-0.9', count: 34 },
-            { score_bucket: '0.7-0.8', count: 56 },
-            { score_bucket: '0.6-0.7', count: 43 },
-            { score_bucket: '0.5-0.6', count: 28 },
-            { score_bucket: '0.0-0.5', count: 15 },
-          ];
+        : EMPTY_BUCKETS.map((bucket) => ({ score_bucket: bucket, count: 0 }));
+
+    // Average & count of logged ML match scores (true match-quality signal)
+    let matchStatsRow = { total: 0, avg_pct: 0 };
+    try {
+      const r = await db.query(
+        `SELECT COUNT(*)::int AS total, COALESCE(ROUND(AVG(score) * 100)::int, 0) AS avg_pct FROM recommendation_scores`
+      );
+      if (r?.rows?.[0]) matchStatsRow = r.rows[0];
+    } catch (_) { /* table may not exist yet — empty state */ }
 
     res.status(200).json({
       success: true,
       data: {
         histogram,
+        histogramSource: 'ml_match_scores',
+        avgMatchScore: matchStatsRow.avg_pct,     // 0..100
+        totalMatchesScored: matchStatsRow.total,
         actionDistribution: actionRes.rows,
         engagementRate,
         totalEngaged: parseInt(eRow.engaged),
@@ -316,7 +320,7 @@ exports.getPublicationOutcomes = async (req, res) => {
   if (!requireAdmin(req, res)) return;
 
   try {
-    const [savedPapersRes, doiActionsRes, weeklyPapersRes, topJournalsRes] = await Promise.all([
+    const [savedPapersRes, doiActionsRes, weeklyPapersRes, topJournalsRes, libraryPapersRes] = await Promise.all([
       db.query(`
         SELECT COUNT(*) as total_saved, COUNT(DISTINCT user_id) as unique_researchers
         FROM saved_papers
@@ -336,9 +340,15 @@ exports.getPublicationOutcomes = async (req, res) => {
         WHERE journal_name IS NOT NULL AND journal_name != ''
         GROUP BY journal_name ORDER BY count DESC LIMIT 8
       `).catch(() => ({ rows: [] })),
+      // Real publication signal: papers actually uploaded to the knowledge library
+      db.query(`
+        SELECT COUNT(*)::int AS total_papers, COUNT(DISTINCT user_id)::int AS unique_authors
+        FROM library_items WHERE item_type = 'paper'
+      `).catch(() => ({ rows: [{ total_papers: 0, unique_authors: 0 }] })),
     ]);
 
     const spRow = savedPapersRes.rows[0];
+    const libRow = libraryPapersRes.rows[0] || { total_papers: 0, unique_authors: 0 };
     const actionMap = {};
     for (const r of doiActionsRes.rows) actionMap[r.action] = parseInt(r.count);
 
@@ -348,6 +358,11 @@ exports.getPublicationOutcomes = async (req, res) => {
         savedPapers: {
           total: parseInt(spRow.total_saved),
           uniqueResearchers: parseInt(spRow.unique_researchers),
+        },
+        // Real publications: papers uploaded to the knowledge library
+        publications: {
+          totalUploaded: parseInt(libRow.total_papers) || 0,
+          uniqueAuthors: parseInt(libRow.unique_authors) || 0,
         },
         readingActivity: {
           views: actionMap['view'] || 0,

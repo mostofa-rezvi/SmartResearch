@@ -104,7 +104,8 @@ describe('Analytics Controller & Routes', () => {
             { score_bucket: '0.9-1.0', count: '5' },
             { score_bucket: '0.8-0.9', count: '10' },
           ],
-        }); // score buckets
+        }) // score buckets (real ML recommendation scores)
+        .mockResolvedValueOnce({ rows: [{ total: 15, avg_pct: 87 }] }); // match-score aggregate
 
       const response = await request(app)
         .get('/api/v1/analytics/match-quality')
@@ -114,6 +115,8 @@ describe('Analytics Controller & Routes', () => {
       expect(response.body.success).toBe(true);
       expect(response.body.data.engagementRate).toBe(40); // 10/25 * 100
       expect(response.body.data.histogram).toHaveLength(2);
+      expect(response.body.data.histogramSource).toBe('ml_match_scores');
+      expect(response.body.data.avgMatchScore).toBe(87);
       expect(response.body.data.actionDistribution).toHaveLength(3);
     });
   });
@@ -188,7 +191,8 @@ describe('Analytics Controller & Routes', () => {
         }) // weekly saved papers trend
         .mockResolvedValueOnce({
           rows: [{ journal_name: 'Nature Cell Biology', count: '8' }],
-        }); // top journals
+        }) // top journals
+        .mockResolvedValueOnce({ rows: [{ total_papers: 9, unique_authors: 4 }] }); // library papers uploaded
 
       const response = await request(app)
         .get('/api/v1/analytics/publications')
@@ -198,6 +202,7 @@ describe('Analytics Controller & Routes', () => {
       expect(response.body.success).toBe(true);
       expect(response.body.data.savedPapers.total).toBe(50);
       expect(response.body.data.savedPapers.uniqueResearchers).toBe(12);
+      expect(response.body.data.publications.totalUploaded).toBe(9);
       expect(response.body.data.readingActivity.views).toBe(100);
       expect(response.body.data.readingActivity.bookmarks).toBe(50);
       expect(response.body.data.readingActivity.downloads).toBe(0); // missing action defaults to 0

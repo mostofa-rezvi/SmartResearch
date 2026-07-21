@@ -45,9 +45,11 @@ exports.getOverview = async (req, res) => {
       });
     }
 
-    // 3. Tailored Recommendations (Based on user interests)
-    // For now, if no ML is strictly required, we query the journals DB using their interests
-    // Or we just mock 3 high-quality journals based on their primary interest
+    // 3. Suggested reading (NOT ML-personalized).
+    // This is a keyword match: approved blog posts whose category matches the user's
+    // primary research interest, newest first. The dashboard UI surfaces these as
+    // "Suggested Blog" reads — it is intentionally a content match, not an AI recommendation.
+    // (ML-personalized researcher recommendations live at /api/v1/discovery/recommendations.)
     const primaryInterest = interests.length > 0 ? interests[0] : 'Research';
     const recommendationsQuery = `
       SELECT b.id, b.title, u.name as author, b.category 
