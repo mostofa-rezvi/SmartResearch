@@ -37,4 +37,29 @@ router.post(
   libraryController.extractPdf
 );
 
+// @route   GET /api/v1/library/search?q=&type=
+// @desc    Semantic + full-text search over library items
+// @access  Private
+router.get('/search', verifyAuth, libraryController.searchItems);
+
+// @route   GET /api/v1/library/discover?q=&type=
+// @desc    Discover shared library content across all users
+// @access  Private
+router.get('/discover', verifyAuth, libraryController.discoverItems);
+
+// @route   GET /api/v1/library/items/:id/download
+// @desc    Stream a stored PDF for a library item
+// @access  Private
+router.get('/items/:id/download', verifyAuth, libraryController.downloadItem);
+
+// @route   GET /api/v1/library/items?type=
+// @desc    List the current user's library items
+// @access  Private
+router.get('/items', verifyAuth, libraryController.listItems);
+
+// @route   POST /api/v1/library/items
+// @desc    Create a library item (paper/dataset/note/literature_review); optional PDF upload
+// @access  Private
+router.post('/items', verifyAuth, upload.single('file'), libraryController.createItem);
+
 module.exports = router;

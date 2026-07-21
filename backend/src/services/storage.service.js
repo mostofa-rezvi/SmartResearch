@@ -1,4 +1,4 @@
-const { S3Client, CreateBucketCommand, HeadBucketCommand } = require('@aws-sdk/client-s3');
+const { S3Client, CreateBucketCommand, HeadBucketCommand, GetObjectCommand } = require('@aws-sdk/client-s3');
 const { Upload } = require('@aws-sdk/lib-storage');
 const config = require('../config');
 const logger = require('../utils/logger');
@@ -56,8 +56,21 @@ const uploadFile = async (file, folder = 'avatars') => {
   return `${config.s3.endpoint}/${config.s3.bucket}/${fileName}`;
 };
 
+/**
+ * Fetch an object as a readable stream for download/proxy.
+ * (MinIO's internal endpoint isn't browser-reachable, so files are served
+ *  through the backend instead of a direct URL.)
+ * @param {string} key - object key within the bucket
+ * @returns {Promise<{ body: any, contentType?: string, contentLength?: number }>}
+ */
+const getObjectStream = async (key) => {
+  const res = await s3Client.send(new GetObjectCommand({ Bucket: config.s3.bucket, Key: key }));
+  return { body: res.Body, contentType: res.ContentType, contentLength: res.ContentLength };
+};
+
 module.exports = {
   s3Client,
   initStorage,
   uploadFile,
+  getObjectStream,
 };

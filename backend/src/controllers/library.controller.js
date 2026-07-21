@@ -62,4 +62,69 @@ const extractPdf = async (req, res) => {
   }
 };
 
-module.exports = { searchJournals, getLibraryMetadata, extractPdf };
+/** POST /api/v1/library/items — create a library item (paper/dataset/note/review); optional file upload. */
+const createItem = async (req, res) => {
+  try {
+    const item = await libraryService.createItem(req.user.id, req.body, req.file || null);
+    res.status(201).json({ success: true, data: item });
+  } catch (error) {
+    logger.error('[Library] create item failed:', error.message);
+    res.status(error.status || 500).json({ success: false, message: error.message || 'Server error' });
+  }
+};
+
+/** GET /api/v1/library/items?type= — list the current user's library items. */
+const listItems = async (req, res) => {
+  try {
+    const items = await libraryService.listItems(req.user.id, req.query.type || null);
+    res.json({ success: true, data: items });
+  } catch (error) {
+    logger.error('[Library] list items failed:', error.message);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+
+/** GET /api/v1/library/search?q=&type= — semantic + full-text search over the current user's discoverable items. */
+const searchItems = async (req, res) => {
+  try {
+    const results = await libraryService.searchItems(
+      (req.query.q || '').trim(), Math.min(parseInt(req.query.limit) || 20, 50), { itemType: req.query.type || null });
+    res.json({ success: true, data: results });
+  } catch (error) {
+    logger.error('[Library] search items failed:', error.message);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+
+/** GET /api/v1/library/discover?q=&type= — discover shared content across all users. */
+const discoverItems = async (req, res) => {
+  try {
+    const results = await libraryService.discoverItems({
+      q: req.query.q || '', type: req.query.type || null, limit: Math.min(parseInt(req.query.limit) || 20, 50) });
+    res.json({ success: true, data: results });
+  } catch (error) {
+    logger.error('[Library] discover failed:', error.message);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+
+/** GET /api/v1/library/items/:id/download — stream a stored PDF through the backend. */
+const downloadItem = async (req, res) => {
+  try {
+    const { body, contentType, filename } = await libraryService.getItemFile(parseInt(req.params.id), req.user.id);
+    res.setHeader('Content-Type', contentType || 'application/pdf');
+    res.setHeader('Content-Disposition', `inline; filename="${filename}"`);
+    // AWS SDK v3 Body is a Node Readable stream in Node runtimes
+    if (body && typeof body.pipe === 'function') {
+      body.pipe(res);
+    } else {
+      const buf = Buffer.from(await body.transformToByteArray());
+      res.end(buf);
+    }
+  } catch (error) {
+    logger.error('[Library] download failed:', error.message);
+    res.status(error.status || 500).json({ success: false, message: error.message || 'Server error' });
+  }
+};
+
+module.exports = { searchJournals, getLibraryMetadata, extractPdf, createItem, listItems, searchItems, discoverItems, downloadItem };

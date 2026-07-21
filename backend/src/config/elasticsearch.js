@@ -45,8 +45,12 @@ const initIndices = async () => {
         properties: {
           title: { type: 'text' },
           abstract: { type: 'text' },
-          authors: { type: 'keyword' },
+          full_text: { type: 'text' },       // full extracted PDF text (semantic full-text search)
+          authors: { type: 'text' },
           tags: { type: 'keyword' },
+          item_type: { type: 'keyword' },
+          doi: { type: 'keyword' },
+          user_id: { type: 'integer' },      // owner (for shared-repository discovery)
           embedding: { type: 'dense_vector', dims: 768, index: true, similarity: 'cosine' }
         }
       }
@@ -57,6 +61,18 @@ const initIndices = async () => {
           title: { type: 'text' },
           description: { type: 'text' },
           tags: { type: 'keyword' },
+          embedding: { type: 'dense_vector', dims: 768, index: true, similarity: 'cosine' }
+        }
+      }
+    },
+    // Module 5: forum posts embedded in the same semantic space as profiles/papers
+    posts: {
+      mappings: {
+        properties: {
+          title: { type: 'text' },
+          content: { type: 'text' },
+          type: { type: 'keyword' },
+          author_id: { type: 'integer' },
           embedding: { type: 'dense_vector', dims: 768, index: true, similarity: 'cosine' }
         }
       }
