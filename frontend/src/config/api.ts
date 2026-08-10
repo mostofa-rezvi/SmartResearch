@@ -188,6 +188,15 @@ export const API = {
     completeSession: (sessionId: string | number) =>
       `${API_BASE}/api/v1/mentorship/sessions/${sessionId}/complete`,
   },
+  // AI Assistant domain (Agentic AI — RAG chat, volume summary, paper QA)
+  assistant: {
+    chat: `${API_BASE}/api/v1/assistant/chat`,
+    sessions: `${API_BASE}/api/v1/assistant/sessions`,
+    sessionMessages: (id: string | number) => `${API_BASE}/api/v1/assistant/sessions/${id}/messages`,
+    deleteSession: (id: string | number) => `${API_BASE}/api/v1/assistant/sessions/${id}`,
+    summarize: `${API_BASE}/api/v1/assistant/summarize`,
+    paperQa: `${API_BASE}/api/v1/assistant/paper-qa`,
+  },
   // Analytics domain (admin)
   analytics: {
     overview: `${API_BASE}/api/v1/analytics/overview`,

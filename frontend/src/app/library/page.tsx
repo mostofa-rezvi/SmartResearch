@@ -6,7 +6,7 @@ import {
   Book, Search, Filter, Globe, School, Award,
   ChevronRight, ExternalLink, Library as LibraryIcon,
   Bookmark, Info, RefreshCw, X, SlidersHorizontal, FileText, FileSearch,
-  BookMarked
+  BookMarked, Sparkles
 } from "lucide-react";
 import { Virtuoso } from "react-virtuoso";
 import Navbar from "@/components/Navbar";
@@ -16,6 +16,7 @@ import JournalPapersModal from "@/components/journal/JournalPapersModal";
 import AllSavedPapersModal from "@/components/journal/AllSavedPapersModal";
 import { PdfExtractor } from "@/components/library/PdfExtractor";
 import KnowledgeLibrary from "@/components/library/KnowledgeLibrary";
+import VolumeSummary from "@/components/assistant/VolumeSummary";
 
 // Decode OpenAlex inverted-index abstracts back into plain text (for library sync).
 function decodeInverted(index: Record<string, number[]> | null | undefined): string {
@@ -75,6 +76,7 @@ export default function LibraryPage() {
   const [savedPapersCount, setSavedPapersCount] = useState(0);
   const [showSavedPapers, setShowSavedPapers] = useState(false);
   const [showPdfExtractor, setShowPdfExtractor] = useState(false);
+  const [showVolumeSummary, setShowVolumeSummary] = useState(false);
 
   // Search & Filter State
   const [searchQuery, setSearchQuery] = useState("");
@@ -480,6 +482,20 @@ export default function LibraryPage() {
                 <p className="text-sm font-black text-slate-700 dark:text-slate-200">Extract Text</p>
               </div>
             </button>
+
+            {/* Summarize Volume — AI volume summary over the library */}
+            <button
+              onClick={() => setShowVolumeSummary(true)}
+              className="group flex items-center gap-3 px-6 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-sm hover:shadow-md hover:border-primary transition-all"
+            >
+              <div className="p-2 bg-primary/10 text-primary rounded-lg group-hover:bg-primary group-hover:text-white transition-colors">
+                <Sparkles size={18} />
+              </div>
+              <div className="text-left">
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">AI Tool</p>
+                <p className="text-sm font-black text-slate-700 dark:text-slate-200">Summarize Volume</p>
+              </div>
+            </button>
           </div>
 
           <div className="flex items-center gap-3 w-full md:w-auto">
@@ -809,6 +825,11 @@ export default function LibraryPage() {
           </>
         )}
       </AnimatePresence>
+
+      {/* Volume Summary (AI) */}
+      {showVolumeSummary && (
+        <VolumeSummary scope="my_library" onClose={() => setShowVolumeSummary(false)} />
+      )}
 
       <style jsx global>{`
         .custom-scrollbar::-webkit-scrollbar {
