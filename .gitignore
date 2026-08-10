@@ -11,3 +11,7 @@ venv/
 env/
 .venv/
 .pytest_cache/
+
+# Local report working backups (keep only the final deliverable)
+report/*_BACKUP.docx
+report/*_PREUPGRADE.docx
