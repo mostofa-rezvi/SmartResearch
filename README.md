@@ -12,6 +12,7 @@ SmartResearch is an AI-powered social and collaboration platform for the academi
 - **Community Forum:** Threaded discussions protected by **TrustRank** reputation gating and automated spam filtering.
 - **Verified Profiles:** Institutional badge display and social citation integration.
 - **Mentorship Module:** Matchmaking for junior and senior researchers, structured learning paths, and progress tracking.
+- **AI Assistant (Agentic RAG):** Conversational search grounded in the platform's own corpus (papers, researchers, forum posts) with cited answers; whole-**volume summaries** across your library; and **question-answering over a selected paper**. Retrieval (SBERT + Elasticsearch kNN) always runs; LLM synthesis uses the Hugging Face router and **degrades gracefully to extractive answers** when the LLM is unavailable. See [`spec/AGENTIC-AI-FEATURES.md`](spec/AGENTIC-AI-FEATURES.md).
 
 ## 🛠️ Technical Stack
 
@@ -68,6 +69,10 @@ The full OpenAPI 3.0 spec lives at [`backend/openapi.yaml`](backend/openapi.yaml
 - **`GET /openapi.yaml`** — raw spec (load into Swagger/Postman/Insomnia)
 - **`GET /health`** — deep health check (Postgres, Redis, Elasticsearch, Neo4j)
 - **`GET /metrics`** — Prometheus metrics
+
+### AI Assistant endpoints (v2.1)
+Backend (JWT-gated, proxy to the ML service): `POST /api/v1/assistant/chat`, `GET /api/v1/assistant/sessions`, `GET /api/v1/assistant/sessions/:id/messages`, `DELETE /api/v1/assistant/sessions/:id`, `POST /api/v1/assistant/summarize`, `POST /api/v1/assistant/paper-qa`.
+ML service (FastAPI): `POST /rag/chat`, `POST /rag/summarize`, `POST /rag/paper-qa`. Requires a Hugging Face token with available Inference credits for full generative answers (`HF_API_TOKEN`); without it, answers fall back to extractive mode (`degraded:true`). Run the assistant migration once: `backend/migrations/v3_assistant.sql`.
 
 ## ☸️ Kubernetes
 Self-contained manifests under [`k8s/`](k8s/) (Kustomize):
