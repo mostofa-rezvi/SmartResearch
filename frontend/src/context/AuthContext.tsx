@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo, useRef } from "react";
 
 type User = {
   id: string;
@@ -31,6 +31,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Keep a live ref to `user` so identity-stable callbacks can read the latest
+  // value without listing `user` as a dependency (which would churn identities).
+  const userRef = useRef<User>(user);
+  useEffect(() => { userRef.current = user; }, [user]);
+
   useEffect(() => {
     // Load auth data from localStorage on mount
     const savedToken = localStorage.getItem("token");
@@ -43,47 +48,53 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(false);
   }, []);
 
-  const login = (newToken: string, newUser: User) => {
+  const login = useCallback((newToken: string, newUser: User) => {
     setToken(newToken);
     setUser(newUser);
     localStorage.setItem("token", newToken);
     localStorage.setItem("user", JSON.stringify(newUser));
-  };
+  }, []);
 
-  const logout = () => {
+  const logout = useCallback(() => {
     setToken(null);
     setUser(null);
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     window.location.href = "/login";
-  };
+  }, []);
 
-  const completeOnboarding = () => {
-    if (user) {
-      const updatedUser = { ...user, onboarding_completed: true };
+  const completeOnboarding = useCallback(() => {
+    const current = userRef.current;
+    if (current) {
+      const updatedUser = { ...current, onboarding_completed: true };
       setUser(updatedUser);
       localStorage.setItem("user", JSON.stringify(updatedUser));
     }
-  };
+  }, []);
 
-  const updateUser = (updates: Partial<NonNullable<User>>) => {
-    if (user) {
-      const updatedUser = { ...user, ...updates };
+  const updateUser = useCallback((updates: Partial<NonNullable<User>>) => {
+    const current = userRef.current;
+    if (current) {
+      const updatedUser = { ...current, ...updates };
       setUser(updatedUser);
       localStorage.setItem("user", JSON.stringify(updatedUser));
     }
-  };
+  }, []);
 
-  const updateToken = (newToken: string) => {
+  const updateToken = useCallback((newToken: string) => {
     setToken(newToken);
     localStorage.setItem("token", newToken);
-  };
+  }, []);
 
   const isAdmin = user?.role === 'admin' || user?.role === 'super_admin';
   const isSuperAdmin = user?.role === 'super_admin';
 
+  const value = useMemo<AuthContextType>(() => ({
+    user, token, login, logout, completeOnboarding, isLoading, isAdmin, isSuperAdmin, updateUser, updateToken,
+  }), [user, token, login, logout, completeOnboarding, isLoading, isAdmin, isSuperAdmin, updateUser, updateToken]);
+
   return (
-    <AuthContext.Provider value={{ user, token, login, logout, completeOnboarding, isLoading, isAdmin, isSuperAdmin, updateUser, updateToken }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );
@@ -97,10 +108,48 @@ export const useAuth = () => {
   return context;
 };
 
+let refreshingPromise: Promise<string | null> | null = null;
+
+async function refreshTokenDeduplicated(logout: () => void, updateToken: (t: string) => void): Promise<string | null> {
+  if (refreshingPromise) {
+    return refreshingPromise;
+  }
+
+  refreshingPromise = (async () => {
+    try {
+      const refreshResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:5000'}/api/v1/auth/refresh`, {
+        method: 'POST',
+        credentials: 'include',
+      });
+
+      if (refreshResponse.ok) {
+        const json = await refreshResponse.json();
+        if (json.success && json.data?.accessToken) {
+          const newToken = json.data.accessToken;
+          updateToken(newToken);
+          return newToken;
+        }
+      }
+      logout();
+      return null;
+    } catch (err) {
+      logout();
+      return null;
+    } finally {
+      refreshingPromise = null;
+    }
+  })();
+
+  return refreshingPromise;
+}
+
 export function useApi() {
   const { token, updateToken, logout } = useAuth();
 
-  const fetchWithAuth = async (input: RequestInfo | URL, init?: RequestInit) => {
+  // Memoized so its identity is stable across renders. Components put
+  // `fetchWithAuth` in effect/useCallback dependency arrays; an unstable
+  // identity would re-fire those effects every render and hammer the API.
+  const fetchWithAuth = useCallback(async (input: RequestInfo | URL, init?: RequestInit) => {
     let currentToken = token;
     if (!currentToken && typeof window !== "undefined") {
       currentToken = localStorage.getItem("token");
@@ -111,36 +160,23 @@ export function useApi() {
       headers.set("Authorization", `Bearer ${currentToken}`);
     }
 
-    const requestInit = { ...init, headers };
+    const requestInit: RequestInit = {
+      ...init,
+      headers,
+      credentials: init?.credentials || 'include',
+    };
     let response = await fetch(input, requestInit);
 
     if (response.status === 401) {
-      try {
-        const refreshResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:5000'}/api/v1/auth/refresh`, {
-          method: 'POST',
-          credentials: 'include',
-        });
-
-        if (refreshResponse.ok) {
-          const json = await refreshResponse.json();
-          if (json.success && json.data?.accessToken) {
-            const newToken = json.data.accessToken;
-            updateToken(newToken);
-            headers.set("Authorization", `Bearer ${newToken}`);
-            response = await fetch(input, { ...init, headers });
-          } else {
-            logout();
-          }
-        } else {
-          logout();
-        }
-      } catch (err) {
-        logout();
+      const newToken = await refreshTokenDeduplicated(logout, updateToken);
+      if (newToken) {
+        headers.set("Authorization", `Bearer ${newToken}`);
+        response = await fetch(input, { ...init, headers, credentials: init?.credentials || 'include' });
       }
     }
 
     return response;
-  };
+  }, [token, updateToken, logout]);
 
   return { fetchWithAuth };
 }

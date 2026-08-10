@@ -42,8 +42,14 @@ interface DashboardData {
   }>;
 }
 
+const EMPTY_DASHBOARD: DashboardData = {
+  stats: { posts: 0, groups: 0, impactScore: 0, papersRead: 0 },
+  recentActivity: [],
+  recommendations: [],
+};
+
 export default function DashboardPage() {
-  const { user, token } = useAuth();
+  const { user, token, isLoading: authLoading } = useAuth();
   const { fetchWithAuth } = useApi();
   const router = useRouter();
   const [data, setData] = useState<DashboardData | null>(null);
@@ -58,24 +64,36 @@ export default function DashboardPage() {
   };
 
   useEffect(() => {
+    // Wait until auth has hydrated from localStorage before deciding.
+    if (authLoading) return;
+
+    // Not logged in → send to login instead of hanging on the skeleton.
+    if (!token) {
+      router.replace("/login");
+      return;
+    }
+
     const fetchDashboard = async () => {
       try {
         const res = await fetchWithAuth(API.dashboard.overview);
         const json = await res.json();
-        if (json.success) {
+        if (json.success && json.data) {
           setData(json.data);
+        } else {
+          // Backend reachable but returned no data — render empty rather than hang.
+          setData(EMPTY_DASHBOARD);
         }
       } catch (err) {
         console.error("Failed to fetch dashboard data:", err);
+        // Network/backend failure — still render the page with empty state.
+        setData(EMPTY_DASHBOARD);
       } finally {
         setIsLoading(false);
       }
     };
 
-    if (token) {
-      fetchDashboard();
-    }
-  }, [token]);
+    fetchDashboard();
+  }, [authLoading, token, router]);
 
   if (isLoading || !data) {
     return <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex items-center justify-center">

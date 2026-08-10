@@ -1,21 +1,109 @@
 @import "tailwindcss";
 
+/* ============================================================================
+   SmartResearch — Design Token System
+   Academic-premium identity: Deep Navy · Crimson · Warm Amber · Off-White.
+   Serif (Fraunces) for editorial moments, sans (Outfit) for UI chrome,
+   mono (JetBrains) for code & citations.
+   ---------------------------------------------------------------------------
+   USAGE RULES
+   - Navy (primary)   → surfaces, nav, primary CTAs, structural emphasis
+   - Crimson (secondary) → alerts, key badges, emphasis ONLY (never decorative)
+   - Amber (accent)   → active/highlight states, sparing accents ONLY
+   - Neutrals (ink)   → text & borders. Semantic tokens for success/warn/error.
+   ========================================================================== */
+
 @theme {
+  /* ---- Brand: Navy scale (primary) ---- */
+  --color-primary-50:  #EEF2F8;
+  --color-primary-100: #D5DEEC;
+  --color-primary-200: #A9BAD6;
+  --color-primary-300: #7389B4;
+  --color-primary-400: #3F5A8F;
+  --color-primary-500: #1E3A66;
+  --color-primary-600: #12294B;
+  --color-primary-700: #0D1F3C;
+  --color-primary-800: #0A192F; /* brand navy */
+  --color-primary-900: #060F1E;
+  --color-primary:     #0A192F;
+  --color-primary-foreground: #FFFFFF;
+
+  /* ---- Brand: Crimson scale (secondary) ---- */
+  --color-secondary-50:  #FCEBEB;
+  --color-secondary-100: #F7CFCF;
+  --color-secondary-200: #EC9E9E;
+  --color-secondary-300: #DE6B6B;
+  --color-secondary-400: #C93B3B;
+  --color-secondary-500: #B02222;
+  --color-secondary-600: #991B1B; /* brand crimson */
+  --color-secondary-700: #7F1515;
+  --color-secondary-800: #641010;
+  --color-secondary-900: #490B0B;
+  --color-secondary:     #991B1B;
+  --color-secondary-foreground: #FFFFFF;
+
+  /* ---- Brand: Amber scale (accent) ---- */
+  --color-accent-50:  #FEF6E7;
+  --color-accent-100: #FDE9C2;
+  --color-accent-200: #FBD489;
+  --color-accent-300: #F9BE51;
+  --color-accent-400: #F7AA2A;
+  --color-accent-500: #F59E0B; /* brand amber */
+  --color-accent-600: #C87E05;
+  --color-accent-700: #9A6008;
+  --color-accent-800: #6E440A;
+  --color-accent-900: #422908;
+  --color-accent:     #F59E0B;
+  --color-accent-foreground: #0A192F;
+
+  /* ---- Neutral ink scale (text / borders / surfaces) ---- */
+  --color-ink-50:  #F8FAFC;
+  --color-ink-100: #F1F5F9;
+  --color-ink-200: #E2E8F0;
+  --color-ink-300: #CBD5E1;
+  --color-ink-400: #94A3B8;
+  --color-ink-500: #64748B;
+  --color-ink-600: #475569;
+  --color-ink-700: #334155;
+  --color-ink-800: #1E293B;
+  --color-ink-900: #0F172A;
+
+  /* ---- Semantic state colors (derived from palette) ---- */
+  --color-success: #0F766E;
+  --color-success-foreground: #FFFFFF;
+  --color-success-surface: #ECFDF5;
+  --color-warning: #B45309;
+  --color-warning-foreground: #FFFFFF;
+  --color-warning-surface: #FFFBEB;
+  --color-error: #991B1B;
+  --color-error-foreground: #FFFFFF;
+  --color-error-surface: #FEF2F2;
+  --color-info: #1E3A66;
+  --color-info-foreground: #FFFFFF;
+  --color-info-surface: #EEF2F8;
+
+  /* ---- Role tokens ---- */
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-primary: #0A192F;
-  --color-primary-foreground: #FFFFFF;
-  --color-secondary: #991B1B;
-  --color-secondary-foreground: #FFFFFF;
-  --color-accent: #F59E0B;
-  --color-accent-foreground: #0F172A;
   --color-muted: #64748B;
   --color-muted-foreground: #94A3B8;
   --color-card: #FFFFFF;
   --color-card-foreground: #0F172A;
+
+  /* ---- Elevation (box-shadow) ---- */
+  --shadow-elev-1: 0 1px 2px 0 rgba(10, 25, 47, 0.05), 0 1px 3px 0 rgba(10, 25, 47, 0.06);
+  --shadow-elev-2: 0 4px 12px -2px rgba(10, 25, 47, 0.08), 0 2px 6px -2px rgba(10, 25, 47, 0.06);
+  --shadow-elev-3: 0 24px 48px -12px rgba(10, 25, 47, 0.18), 0 8px 16px -8px rgba(10, 25, 47, 0.10);
+
+  /* ---- Motion ---- */
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-entrance: cubic-bezier(0.16, 1, 0.3, 1);
+  --duration-fast: 150ms;
+  --duration-base: 250ms;
+  --duration-slow: 450ms;
 }
 
 :root {
@@ -28,16 +116,24 @@
   --input: #E2E8F0;
   --ring: #0A192F;
   --card: #FFFFFF;
-  
-  --font-serif: var(--font-fraunces), serif;
-  --font-sans: var(--font-outfit), var(--font-inter), sans-serif;
-  --font-mono: var(--font-jetbrains-mono), monospace;
+
+  --font-serif: var(--font-fraunces), Georgia, serif;
+  --font-sans: var(--font-outfit), var(--font-inter), system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
+
+  /* Radius scale — namespaced so it does NOT override Tailwind's rounded-* utilities.
+     Used by component primitives (.btn / .card / .input) below. */
+  --r-sm: 0.5rem;   /* 8px  — chips, small controls */
+  --r-md: 0.75rem;  /* 12px — buttons, inputs */
+  --r-lg: 1rem;     /* 16px — cards */
+  --r-xl: 1.5rem;   /* 24px — panels, feature cards */
+  --r-2xl: 2rem;    /* 32px — hero / marketing surfaces */
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     /* Keep it light and airy as requested, even in dark preference */
-    --background: #F7F7F7; 
+    --background: #F7F7F7;
     --foreground: #0F172A;
     --border: #E2E8F0;
     --card: #FFFFFF;
@@ -50,10 +146,86 @@ body {
   font-family: var(--font-sans);
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
+/* Editorial serif for headings — kept as brand identity.
+   Dense UI text (buttons, labels, table cells) is sans by default because
+   those are not heading elements. */
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-serif);
+  letter-spacing: -0.02em;
+}
+
+/* ============================================================================
+   TYPE SCALE — intentional weight / line-height / tracking per role.
+   ========================================================================== */
+.text-display {
+  font-family: var(--font-serif);
+  font-size: clamp(2.75rem, 6vw, 5rem);
+  line-height: 1.04;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+.text-h1 {
+  font-family: var(--font-serif);
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1.1;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+.text-h2 {
+  font-family: var(--font-serif);
+  font-size: clamp(1.5rem, 3vw, 2.25rem);
+  line-height: 1.15;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.text-h3 {
+  font-family: var(--font-serif);
+  font-size: 1.5rem;
+  line-height: 1.25;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+.text-h4 {
+  font-family: var(--font-sans);
+  font-size: 1.125rem;
+  line-height: 1.4;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.text-body-lg {
+  font-family: var(--font-sans);
+  font-size: 1.125rem;
+  line-height: 1.65;
+  font-weight: 400;
+}
+.text-body {
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  line-height: 1.6;
+  font-weight: 400;
+}
+.text-caption {
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+.text-overline {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+.text-mono {
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  line-height: 1.5;
 }
 
 .mono-academic {
@@ -61,52 +233,232 @@ h1, h2, h3, h4, h5, h6 {
   font-variant-caps: all-small-caps;
 }
 
+/* ============================================================================
+   ELEVATION UTILITIES — flat / raised / floating.
+   ========================================================================== */
+.elev-1 { box-shadow: var(--shadow-elev-1); }
+.elev-2 { box-shadow: var(--shadow-elev-2); }
+.elev-3 { box-shadow: var(--shadow-elev-3); }
+
+/* ============================================================================
+   COMPONENT PRIMITIVES — one design system across every view.
+   Views opt in by swapping classNames; no logic changes required.
+   ========================================================================== */
+
+/* Focus — visible, on-brand keyboard states everywhere. */
+.focus-ring:focus-visible,
+.btn:focus-visible,
+.input:focus-visible,
+.chip:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--background), 0 0 0 4px var(--color-accent-500);
+  border-color: var(--color-accent-500);
+}
+:where(a, button, input, textarea, select, [tabindex]):focus-visible {
+  outline: 2px solid var(--color-accent-500);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 0.9375rem;
+  line-height: 1;
+  padding: 0.75rem 1.25rem;
+  border-radius: var(--r-md);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: background-color var(--duration-fast) var(--ease-standard),
+              color var(--duration-fast) var(--ease-standard),
+              box-shadow var(--duration-fast) var(--ease-standard),
+              transform var(--duration-fast) var(--ease-standard);
+  white-space: nowrap;
+}
+.btn:active { transform: translateY(0.5px) scale(0.99); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.btn-primary {
+  background-color: var(--color-primary-800);
+  color: var(--color-primary-foreground);
+  box-shadow: var(--shadow-elev-2);
+}
+.btn-primary:hover { background-color: var(--color-primary-700); }
+
+.btn-secondary {
+  background-color: var(--color-secondary-600);
+  color: var(--color-secondary-foreground);
+  box-shadow: var(--shadow-elev-2);
+}
+.btn-secondary:hover { background-color: var(--color-secondary-700); }
+
+.btn-outline {
+  background-color: transparent;
+  color: var(--color-primary-800);
+  border-color: var(--color-ink-200);
+}
+.btn-outline:hover { background-color: var(--color-ink-50); border-color: var(--color-ink-300); }
+
+.btn-ghost {
+  background-color: transparent;
+  color: var(--color-ink-700);
+}
+.btn-ghost:hover { background-color: var(--color-ink-100); color: var(--color-primary-800); }
+
+.btn-sm { padding: 0.5rem 0.875rem; font-size: 0.8125rem; border-radius: var(--r-sm); }
+.btn-lg { padding: 1rem 1.75rem; font-size: 1.0625rem; border-radius: var(--r-lg); }
+
+/* Inputs */
+.input {
+  width: 100%;
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
+  color: var(--foreground);
+  background-color: var(--color-card);
+  border: 1px solid var(--color-ink-200);
+  border-radius: var(--r-md);
+  padding: 0.625rem 0.875rem;
+  transition: border-color var(--duration-fast) var(--ease-standard),
+              box-shadow var(--duration-fast) var(--ease-standard);
+}
+.input::placeholder { color: var(--color-ink-400); }
+.input:hover { border-color: var(--color-ink-300); }
+
+/* Cards */
+.card {
+  background-color: var(--color-card);
+  border: 1px solid var(--color-ink-200);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-elev-1);
+}
+.card-interactive {
+  transition: box-shadow var(--duration-base) var(--ease-standard),
+              transform var(--duration-base) var(--ease-standard),
+              border-color var(--duration-base) var(--ease-standard);
+}
+.card-interactive:hover {
+  box-shadow: var(--shadow-elev-3);
+  border-color: var(--color-primary-200);
+  transform: translateY(-2px);
+}
+
+/* Badges & chips */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3125rem;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 0.75rem;
+  line-height: 1;
+  padding: 0.3125rem 0.625rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+}
+.badge-primary { background: var(--color-primary-50); color: var(--color-primary-700); border-color: var(--color-primary-100); }
+.badge-secondary { background: var(--color-secondary-50); color: var(--color-secondary-700); border-color: var(--color-secondary-100); }
+.badge-accent { background: var(--color-accent-50); color: var(--color-accent-700); border-color: var(--color-accent-100); }
+.badge-success { background: var(--color-success-surface); color: var(--color-success); border-color: color-mix(in srgb, var(--color-success) 20%, transparent); }
+.badge-warning { background: var(--color-warning-surface); color: var(--color-warning); border-color: color-mix(in srgb, var(--color-warning) 20%, transparent); }
+.badge-error { background: var(--color-error-surface); color: var(--color-error); border-color: color-mix(in srgb, var(--color-error) 20%, transparent); }
+.badge-neutral { background: var(--color-ink-100); color: var(--color-ink-600); border-color: var(--color-ink-200); }
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 0.875rem;
+  padding: 0.4375rem 0.875rem;
+  border-radius: 999px;
+  border: 1px solid var(--color-ink-200);
+  background: var(--color-card);
+  color: var(--color-ink-700);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-standard);
+}
+.chip:hover { border-color: var(--color-primary-300); color: var(--color-primary-800); }
+.chip-active { background: var(--color-primary-800); color: #fff; border-color: var(--color-primary-800); }
+
+/* ============================================================================
+   SURFACES & DECORATION
+   ========================================================================== */
 .glass-morphism {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: rgba(253, 252, 251, 0.72);
+  backdrop-filter: blur(12px) saturate(1.4);
+  -webkit-backdrop-filter: blur(12px) saturate(1.4);
   border-bottom: 1px solid rgba(226, 232, 240, 0.8);
 }
 
 .dark .glass-morphism {
-  background: rgba(2, 6, 23, 0.7);
+  background: rgba(6, 15, 30, 0.72);
   border-bottom: 1px solid rgba(30, 41, 59, 0.8);
 }
 
+/* Subtle radial grid — navy, on-brand (was indigo). */
 .bg-grid {
-  background-image: radial-gradient(circle, rgba(79, 70, 229, 0.05) 1px, transparent 1px);
+  background-image: radial-gradient(circle, rgba(10, 25, 47, 0.06) 1px, transparent 1px);
   background-size: 24px 24px;
 }
+.bg-grid-fine {
+  background-image: radial-gradient(circle, rgba(10, 25, 47, 0.05) 1px, transparent 1px);
+  background-size: 16px 16px;
+}
 
+/* ============================================================================
+   MOTION — restrained, purposeful, respects reduced-motion.
+   ========================================================================== */
 @keyframes fade-up {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-up { animation: fade-up var(--duration-slow) var(--ease-entrance) forwards; }
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.animate-fade-in { animation: fade-in var(--duration-base) var(--ease-standard) forwards; }
+
+@keyframes gradient-x {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+.animate-gradient-x {
+  background-size: 200% 200%;
+  animation: gradient-x 6s ease infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg, var(--color-ink-100) 25%, var(--color-ink-200) 37%, var(--color-ink-100) 63%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+  border-radius: var(--r-md);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 
-.animate-fade-up {
-  animation: fade-up 0.5s ease-out forwards;
-}
-
-/* Custom Scrollbar Utilities */
-.custom-scrollbar::-webkit-scrollbar {
-  width: 6px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #E2E8F0;
-  border-radius: 10px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #CBD5E1;
-}
+/* ============================================================================
+   SCROLLBAR
+   ========================================================================== */
+.custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background: var(--color-ink-200); border-radius: 10px; }
+.custom-scrollbar::-webkit-scrollbar-thumb:hover { background: var(--color-ink-300); }

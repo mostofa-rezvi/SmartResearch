@@ -35,24 +35,25 @@ export default function Navbar() {
             initial={{ opacity: 0, y: 20, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.9 }}
-            className="fixed bottom-6 right-6 z-[100] bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-primary/20 p-5 max-w-sm"
+            className="fixed bottom-6 right-6 z-[100] bg-card dark:bg-slate-800 rounded-xl elev-3 border border-primary-100 dark:border-primary/20 p-5 max-w-sm"
           >
             <button
               onClick={() => setShowOnboardingPrompt(false)}
-              className="absolute top-3 right-3 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+              aria-label="Dismiss"
+              className="focus-ring absolute top-3 right-3 rounded-md p-1 text-ink-400 hover:text-ink-600 dark:hover:text-slate-300"
             >
               <X size={16} />
             </button>
-            <h3 className="font-bold text-slate-900 dark:text-white mb-2 pr-6">Complete Your Profile</h3>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
-              Get personalized research recommendations and connect with peers by completing your onboarding!
+            <h3 className="text-h4 text-ink-900 dark:text-white mb-2 pr-6">Complete your profile</h3>
+            <p className="text-caption text-ink-500 dark:text-slate-400 mb-4">
+              Get personalized research recommendations and connect with peers by finishing your onboarding.
             </p>
             <Link
               href="/onboarding"
               onClick={() => setShowOnboardingPrompt(false)}
-              className="block text-center w-full bg-primary text-white py-2 rounded-xl text-sm font-bold hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20"
+              className="btn btn-primary btn-sm w-full"
             >
-              Finish Onboarding
+              Finish onboarding
             </Link>
           </motion.div>
         )}
@@ -76,21 +77,23 @@ export default function Navbar() {
 
           {/* Essential Navigation */}
           {user && (
-            <div className="hidden lg:flex items-center gap-8 text-[15px] font-bold text-slate-600">
+            <div className="hidden lg:flex items-center gap-7 text-[15px] font-semibold text-ink-600">
               <Link href="/library" className="hover:text-primary transition-colors">Library</Link>
               <Link href="/discovery" className="hover:text-primary transition-colors">Discovery</Link>
               <Link href="/researchers" className="hover:text-primary transition-colors">Researchers</Link>
               <Link href="/community" className="hover:text-primary transition-colors">Community</Link>
               <Link href="/groups" className="hover:text-primary transition-colors">Groups</Link>
+              <Link href="/assistant" className="hover:text-primary transition-colors">AI Assistant</Link>
             </div>
           )}
         </div>
 
         <div className="flex items-center gap-6">
-          <div className="hidden md:flex items-center gap-6 text-[15px] font-medium text-slate-500 relative" ref={dropdownRef}>
+          <div className="hidden md:flex items-center gap-6 text-[15px] font-medium text-ink-500 relative" ref={dropdownRef}>
             <button
               onClick={() => setShowResources(!showResources)}
-              className="flex items-center gap-1 hover:text-primary transition-colors focus:outline-none"
+              aria-expanded={showResources}
+              className="focus-ring flex items-center gap-1 rounded-md px-1 py-0.5 hover:text-primary transition-colors"
             >
               Resources <ChevronRight size={14} className={`transform transition-transform ${showResources ? 'rotate-90' : ''}`} />
             </button>
@@ -101,32 +104,32 @@ export default function Navbar() {
                   initial={{ opacity: 0, y: 10, scale: 0.95 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                  className="absolute top-10 left-1/2 -translate-x-1/2 w-48 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-700 py-2 flex flex-col z-50 overflow-hidden"
+                  className="absolute top-10 left-1/2 -translate-x-1/2 w-48 bg-card dark:bg-slate-800 rounded-xl elev-3 border border-ink-100 dark:border-slate-700 py-2 flex flex-col z-50 overflow-hidden text-sm font-medium"
                 >
-                  <Link href="/about" onClick={() => setShowResources(false)} className="px-5 py-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 hover:text-primary transition-colors">About</Link>
-                  <Link href="/blog" onClick={() => setShowResources(false)} className="px-5 py-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 hover:text-primary transition-colors">Blog</Link>
-                  <Link href="/support" onClick={() => setShowResources(false)} className="px-5 py-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 hover:text-primary transition-colors">Support</Link>
+                  <Link href="/about" onClick={() => setShowResources(false)} className="px-5 py-2.5 hover:bg-ink-50 dark:hover:bg-slate-700/50 hover:text-primary transition-colors">About</Link>
+                  <Link href="/blog" onClick={() => setShowResources(false)} className="px-5 py-2.5 hover:bg-ink-50 dark:hover:bg-slate-700/50 hover:text-primary transition-colors">Blog</Link>
+                  <Link href="/support" onClick={() => setShowResources(false)} className="px-5 py-2.5 hover:bg-ink-50 dark:hover:bg-slate-700/50 hover:text-primary transition-colors">Support</Link>
                 </motion.div>
               )}
             </AnimatePresence>
           </div>
 
-          <div className="w-px h-6 bg-slate-200 hidden md:block" />
+          <div className="w-px h-6 bg-ink-200 hidden md:block" />
 
           {user ? (
             <div className="flex items-center gap-6">
-              <Link href="/search" className="text-sm font-bold text-primary px-4 py-2 bg-primary/5 rounded-lg hover:bg-primary/10 transition-colors">
+              <Link href="/search" className="focus-ring text-sm font-bold text-primary px-4 py-2 bg-primary-50 rounded-md hover:bg-primary-100 transition-colors">
                 DOI
               </Link>
               {/* Notification Bell */}
               <NotificationBell />
-              <div className="flex items-center gap-4 border-l border-slate-200 pl-6">
-                <Link href={`/profile/${user.id}`} className="text-sm font-semibold text-slate-700 hover:text-primary transition-colors">
+              <div className="flex items-center gap-4 border-l border-ink-200 pl-6">
+                <Link href={`/profile/${user.id}`} className="text-sm font-semibold text-ink-700 hover:text-primary transition-colors">
                   {user.name}
                 </Link>
                 <button
                   onClick={logout}
-                  className="text-sm font-medium text-slate-500 hover:text-red-500 transition-colors"
+                  className="focus-ring rounded-md text-sm font-medium text-ink-500 hover:text-secondary transition-colors"
                 >
                   Sign out
                 </button>
@@ -134,13 +137,10 @@ export default function Navbar() {
             </div>
           ) : (
             <div className="flex items-center gap-2">
-              <Link href="/login" className="px-5 py-2.5 text-[15px] font-bold text-slate-700 hover:text-primary transition-colors">
-                Login
+              <Link href="/login" className="btn btn-ghost">
+                Log in
               </Link>
-              <Link
-                href="/register"
-                className="bg-[#0D9488] text-white px-6 py-2.5 rounded-full text-[15px] font-bold hover:bg-[#0D9488]/90 transition-all shadow-xl shadow-teal-500/20 active:scale-95"
-              >
+              <Link href="/register" className="btn btn-primary rounded-full">
                 Join the Lab
               </Link>
             </div>

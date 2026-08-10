@@ -18,11 +18,11 @@ export default function Footer() {
               "Unifying Global Knowledge from Student to Professor. Escaping academic isolation through structured discovery."
             </p>
             <div className="flex gap-4">
-               <div className="px-3 py-1 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 text-[10px] font-black rounded border border-emerald-100 dark:border-emerald-800 uppercase tracking-widest">Email Verified</div>
-               <div className="px-3 py-1 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 text-[10px] font-black rounded border border-blue-100 dark:border-blue-800 uppercase tracking-widest">Data Protected</div>
+              <div className="px-3 py-1 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 text-[10px] font-black rounded border border-emerald-100 dark:border-emerald-800 uppercase tracking-widest">Email Verified</div>
+              <div className="px-3 py-1 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 text-[10px] font-black rounded border border-blue-100 dark:border-blue-800 uppercase tracking-widest">Data Protected</div>
             </div>
           </div>
-          
+
           <div>
             <h4 className="mono-academic font-black text-primary dark:text-slate-400 mb-8 uppercase text-xs tracking-[0.2em]">The Library</h4>
             <ul className="space-y-4 text-sm font-medium text-slate-500 dark:text-slate-400">
@@ -53,9 +53,9 @@ export default function Footer() {
             </ul>
           </div>
         </div>
-        
+
         <div className="pt-8 border-t border-slate-100 dark:border-white/5 flex flex-col md:flex-row justify-between items-center gap-6 text-sm text-slate-500 font-medium">
-          <p>© 2026 ResearchBridge Ecosystem. Built with Antigravity for the Global Research Community.</p>
+          <p>© 2026 ResearchBridge Ecosystem.</p>
           <div className="flex gap-8">
             <Link href="/privacy" className="hover:text-secondary transition-colors">Privacy</Link>
             <Link href="/terms" className="hover:text-secondary transition-colors">Terms</Link>

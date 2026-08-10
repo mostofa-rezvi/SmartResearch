@@ -96,11 +96,11 @@ export function KanbanBoard({ projectId = "1" }: { projectId?: string }) {
             initial={{ opacity: 0, y: 50, x: "-50%" }}
             animate={{ opacity: 1, y: 0, x: "-50%" }}
             exit={{ opacity: 0, y: 50, x: "-50%" }}
-            className="fixed bottom-10 left-1/2 z-50 bg-slate-900 dark:bg-slate-950 text-white px-8 py-4 rounded-[2rem] shadow-2xl border border-white/10 flex items-center gap-3 backdrop-blur-xl"
+            className="fixed bottom-10 left-1/2 z-50 bg-primary-900 dark:bg-slate-950 text-white px-8 py-4 rounded-[2rem] elev-3 border border-white/10 flex items-center gap-3 backdrop-blur-xl"
           >
             <div
               className={`w-8 h-8 rounded-full flex items-center justify-center font-bold ${
-                toast.type === "error" ? "bg-red-500" : "bg-primary"
+                toast.type === "error" ? "bg-secondary" : "bg-accent text-primary-900"
               }`}
             >
               {toast.type === "error" ? <AlertCircle size={16} /> : <CheckCircle size={16} />}

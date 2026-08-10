@@ -170,31 +170,38 @@ export default function Home() {
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
           >
             {[
-              { icon: <Search className="text-primary" />, title: "Semantic Discovery", desc: "Find exactly what you need with our AI-powered semantic search that understands context, not just keywords." },
-              { icon: <Users className="text-blue-500" />, title: "Team Collaboration", desc: "Real-time shared workspaces for labs and remote teams. Track progress, share datasets, and co-write papers." },
-              { icon: <Zap className="text-amber-500" />, title: "Instant Citations", desc: "Automated citation management that supports thousands of styles. Focus on writing, not formatting." },
-              { icon: <ShieldCheck className="text-emerald-500" />, title: "Verify & Secure", desc: "Blockchain-backed version control for your data ensuring integrity and clear lineage of your breakthroughs." },
-              { icon: <Globe className="text-indigo-500" />, title: "Global Network", desc: "Connect with experts in your niche. Peer review, mentorship, and networking redefined for the digital age." },
-              { icon: <Lightbulb className="text-accent" />, title: "Smart Insights", desc: "Receive automated summaries and trend analysis in your field. Stay ahead of the curve without the noise." }
-            ].map((f, i) => (
+              { icon: <Search />, tone: "primary", title: "Semantic Discovery", desc: "Find exactly what you need with our AI-powered semantic search that understands context, not just keywords." },
+              { icon: <Users />, tone: "primary", title: "Team Collaboration", desc: "Real-time shared workspaces for labs and remote teams. Track progress, share datasets, and co-write papers." },
+              { icon: <Zap />, tone: "primary", title: "Instant Citations", desc: "Automated citation management that supports thousands of styles. Focus on writing, not formatting." },
+              { icon: <ShieldCheck />, tone: "secondary", title: "Verify & Secure", desc: "Blockchain-backed version control for your data ensuring integrity and clear lineage of your breakthroughs." },
+              { icon: <Globe />, tone: "primary", title: "Global Network", desc: "Connect with experts in your niche. Peer review, mentorship, and networking redefined for the digital age." },
+              { icon: <Lightbulb />, tone: "accent", title: "Smart Insights", desc: "Receive automated summaries and trend analysis in your field. Stay ahead of the curve without the noise." }
+            ].map((f, i) => {
+              const tone =
+                f.tone === "secondary" ? "bg-secondary-50 text-secondary" :
+                f.tone === "accent" ? "bg-accent-50 text-accent-700" :
+                "bg-primary-50 text-primary";
+              return (
               <motion.div
                 key={i}
                 variants={fadeInUp}
-                className="group p-8 rounded-3xl bg-white dark:bg-white/5 border border-slate-100 dark:border-white/10 hover:border-primary/50 transition-all duration-300 hover:shadow-2xl hover:shadow-primary/5 hover:-translate-y-1"
+                className="card card-interactive group p-8 rounded-3xl hover:border-primary/40"
               >
-                <div className="w-14 h-14 rounded-2xl bg-slate-50 dark:bg-white/5 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                <div className={`w-14 h-14 rounded-2xl ${tone} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 [&>svg]:size-6`}>
                   {f.icon}
                 </div>
-                <h3 className="text-xl font-bold mb-3 text-slate-900 dark:text-white">{f.title}</h3>
-                <p className="text-slate-600 dark:text-slate-400 leading-relaxed">{f.desc}</p>
+                <h3 className="text-h4 mb-3 text-ink-900 dark:text-white">{f.title}</h3>
+                <p className="text-ink-600 dark:text-slate-400 leading-relaxed">{f.desc}</p>
               </motion.div>
-            ))}
+              );
+            })}
           </motion.div>
         </section>
 
         {/* How It Works */}
-        <section className="py-32 px-6 bg-slate-900 text-white rounded-[40px] md:rounded-[60px] mx-4 md:mx-8 mb-32 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-primary/20 rounded-full blur-[120px] -z-0" />
+        <section className="py-32 px-6 bg-primary-900 text-white rounded-[40px] md:rounded-[60px] mx-4 md:mx-8 mb-32 relative overflow-hidden">
+          <div className="absolute inset-0 -z-0 bg-grid opacity-[0.15] pointer-events-none" />
+          <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-accent/10 rounded-full blur-[120px] -z-0" />
 
           <div className="relative z-10 max-w-7xl mx-auto">
             <div className="text-center mb-20">
@@ -210,7 +217,7 @@ export default function Home() {
               ].map((s, i) => (
                 <div key={i} className="relative flex flex-col items-center text-center">
                   <div className="text-8xl font-black text-white/5 absolute -top-12 left-1/2 -translate-x-1/2 select-none">{s.step}</div>
-                  <div className="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center text-2xl font-bold mb-8 shadow-xl shadow-primary/40 relative z-10">
+                  <div className="w-16 h-16 rounded-2xl bg-accent text-primary-900 flex items-center justify-center text-2xl font-bold mb-8 shadow-xl shadow-accent/30 relative z-10">
                     {i + 1}
                   </div>
                   <h3 className="text-2xl font-bold mb-4">{s.title}</h3>

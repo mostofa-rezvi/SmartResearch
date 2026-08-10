@@ -218,9 +218,9 @@ export function RecommendationFeed({ filters }: RecommendationFeedProps) {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between mb-8">
-        <h2 className="text-2xl font-bold font-serif text-slate-900 dark:text-white">Recommended Collaborators</h2>
-        <span className="text-sm text-slate-500">{filteredRecommendations.length} matches found</span>
+      <div className="flex items-end justify-between gap-4 mb-8">
+        <h2 className="text-h2 text-ink-900 dark:text-white">Recommended collaborators</h2>
+        <span className="badge badge-neutral shrink-0">{filteredRecommendations.length} matches</span>
       </div>
       
       {filteredRecommendations.length > 0 ? (
@@ -295,8 +295,12 @@ export function RecommendationFeed({ filters }: RecommendationFeedProps) {
           )}
         </>
       ) : (
-        <div className="p-10 text-center bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700">
-          <p className="text-slate-500">No matching collaborators found for the selected filters.</p>
+        <div className="card flex flex-col items-center text-center p-12 dark:bg-slate-800 dark:border-slate-700">
+          <div className="w-14 h-14 rounded-2xl bg-primary-50 text-primary flex items-center justify-center mb-4">
+            <UserPlus size={24} />
+          </div>
+          <h3 className="text-h4 text-ink-900 dark:text-white mb-1.5">No collaborators match these filters</h3>
+          <p className="text-caption text-ink-500 max-w-sm">Try widening your domains or clearing the institution and tier filters to see more researchers.</p>
         </div>
       )}
 
@@ -304,7 +308,7 @@ export function RecommendationFeed({ filters }: RecommendationFeedProps) {
       {isModalOpen && selectedResearcher && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in-0 duration-200">
           {/* Modal Container */}
-          <div className="relative w-full max-w-3xl max-h-[85vh] flex flex-col bg-white dark:bg-slate-950 rounded-[32px] border border-slate-100 dark:border-slate-850 shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+          <div className="relative w-full max-w-3xl max-h-[85vh] flex flex-col bg-white dark:bg-slate-950 rounded-[32px] border border-slate-100 dark:border-slate-800 shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
             
             {/* Modal Header */}
             <div className="p-6 md:p-8 border-b border-slate-100 dark:border-slate-900 flex justify-between items-start gap-4">
@@ -342,36 +346,36 @@ export function RecommendationFeed({ filters }: RecommendationFeedProps) {
             <div className="flex-1 overflow-y-auto p-6 md:p-8 space-y-8">
               {/* Stats Grid */}
               <div className="grid grid-cols-3 gap-4">
-                <div className="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-2xl border border-slate-100 dark:border-slate-850 text-center">
+                <div className="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 text-center">
                   <div className="flex justify-center mb-1.5 text-primary">
                     <BookOpen size={20} />
                   </div>
                   <div className="text-lg md:text-xl font-bold text-slate-800 dark:text-white">
                     {selectedResearcher.publications}
                   </div>
-                  <div className="text-[10px] uppercase font-bold tracking-wider text-slate-450">
+                  <div className="text-[10px] uppercase font-bold tracking-wider text-ink-400">
                     Publications
                   </div>
                 </div>
-                <div className="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-2xl border border-slate-100 dark:border-slate-850 text-center">
+                <div className="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 text-center">
                   <div className="flex justify-center mb-1.5 text-secondary">
                     <Award size={20} />
                   </div>
                   <div className="text-lg md:text-xl font-bold text-slate-800 dark:text-white">
                     {selectedResearcher.citations.toLocaleString()}
                   </div>
-                  <div className="text-[10px] uppercase font-bold tracking-wider text-slate-450">
+                  <div className="text-[10px] uppercase font-bold tracking-wider text-ink-400">
                     Citations
                   </div>
                 </div>
-                <div className="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-2xl border border-slate-100 dark:border-slate-850 text-center">
+                <div className="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 text-center">
                   <div className="flex justify-center mb-1.5 text-emerald-500">
                     <GraduationCap size={20} />
                   </div>
                   <div className="text-lg md:text-xl font-bold text-slate-800 dark:text-white">
                     {selectedResearcher.hIndex}
                   </div>
-                  <div className="text-[10px] uppercase font-bold tracking-wider text-slate-450">
+                  <div className="text-[10px] uppercase font-bold tracking-wider text-ink-400">
                     h-Index
                   </div>
                 </div>
@@ -435,7 +439,7 @@ export function RecommendationFeed({ filters }: RecommendationFeedProps) {
                             </a>
                           )}
                         </div>
-                        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-450 dark:text-slate-500">
+                        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-ink-400 dark:text-slate-500">
                           <span className="font-semibold">{paper.journal || "Unknown Journal"}</span>
                           <span>•</span>
                           <span>{paper.publication_year}</span>
@@ -461,7 +465,7 @@ export function RecommendationFeed({ filters }: RecommendationFeedProps) {
             <div className="p-6 border-t border-slate-100 dark:border-slate-900 bg-slate-50 dark:bg-slate-950 flex justify-end gap-3">
               <button 
                 onClick={() => setIsModalOpen(false)}
-                className="px-6 py-2.5 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-750 font-bold rounded-xl text-sm transition-all"
+                className="px-6 py-2.5 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 font-bold rounded-xl text-sm transition-all"
               >
                 Close
               </button>
