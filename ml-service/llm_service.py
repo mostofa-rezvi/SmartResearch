@@ -25,15 +25,19 @@ from typing import Optional, Literal
 logger = logging.getLogger(__name__)
 
 # ── Hugging Face client setup ───────────────────────────────────────────────────
-HF_API_TOKEN = os.getenv("HF_API_TOKEN", "")
-HF_LLM_MODEL = os.getenv("HF_LLM_MODEL", "meta-llama/Llama-3.1-8B-Instruct")
-HF_CHAT_URL = "https://router.huggingface.co/v1/chat/completions"
-HF_AVAILABLE = bool(HF_API_TOKEN)
+def get_hf_token() -> str:
+    return os.getenv("HF_API_TOKEN", "")
 
-if HF_AVAILABLE:
-    logger.info(f"[LLM] Hugging Face LLM initialized (model={HF_LLM_MODEL})")
-else:
-    logger.warning("[LLM] HF_API_TOKEN not set — LLM endpoints will return HTTP 503")
+def get_hf_model() -> str:
+    return os.getenv("HF_LLM_MODEL", "meta-llama/Llama-3.1-8B-Instruct")
+
+def is_hf_available() -> bool:
+    return bool(get_hf_token())
+
+HF_API_TOKEN = get_hf_token()
+HF_LLM_MODEL = get_hf_model()
+HF_CHAT_URL = "https://router.huggingface.co/v1/chat/completions"
+HF_AVAILABLE = is_hf_available()
 
 router = APIRouter(prefix="/llm", tags=["LLM"])
 
@@ -82,8 +86,10 @@ class FeedbackResponse(BaseModel):
 
 def _hf_chat_sync(system: str, user: str, temperature: float = 0.4, max_tokens: int = 1024) -> str:
     """Blocking POST to the HF router (OpenAI-compatible). Returns the assistant text."""
+    token = get_hf_token()
+    model = get_hf_model()
     payload = {
-        "model": HF_LLM_MODEL,
+        "model": model,
         "messages": [
             {"role": "system", "content": system},
             {"role": "user", "content": user},
@@ -92,7 +98,7 @@ def _hf_chat_sync(system: str, user: str, temperature: float = 0.4, max_tokens: 
         "max_tokens": max_tokens,
     }
     headers = {
-        "Authorization": f"Bearer {HF_API_TOKEN}",
+        "Authorization": f"Bearer {token}",
         "Content-Type": "application/json",
     }
     resp = requests.post(HF_CHAT_URL, headers=headers, json=payload, timeout=55)
@@ -104,7 +110,7 @@ def _hf_chat_sync(system: str, user: str, temperature: float = 0.4, max_tokens: 
 
 async def _call_llm(system: str, user: str, **kwargs) -> str:
     """Async wrapper — runs the blocking HF call in a thread and maps errors to HTTP codes."""
-    if not HF_AVAILABLE:
+    if not is_hf_available():
         raise HTTPException(status_code=503, detail="LLM service not configured. Set HF_API_TOKEN.")
     try:
         return await asyncio.to_thread(_hf_chat_sync, system, user, **kwargs)

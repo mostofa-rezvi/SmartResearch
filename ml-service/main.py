@@ -1,3 +1,16 @@
+import os
+from pathlib import Path
+
+# Load local .env into os.environ if present
+env_path = Path(__file__).parent / ".env"
+if env_path.exists():
+    with open(env_path, "r", encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if line and not line.startswith("#") and "=" in line:
+                k, v = line.split("=", 1)
+                os.environ[k.strip()] = v.strip()
+
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import List, Union, Optional
@@ -10,6 +23,7 @@ from recommender.scorer import rrf_merge
 from llm_service import router as llm_router
 from graphql_schema import graphql_router
 from pdf_service import router as pdf_router
+from rag_service import router as rag_router
 import logging
 
 import os
@@ -78,6 +92,9 @@ app.include_router(graphql_router, prefix="/graphql/v2")
 
 # Register PDF extraction route (/library/extract-pdf)
 app.include_router(pdf_router)
+
+# Register RAG / Agentic AI routes (/rag/chat, /rag/summarize, /rag/paper-qa)
+app.include_router(rag_router)
 
 class RecRequest(BaseModel):
     profile_text: Optional[str] = None

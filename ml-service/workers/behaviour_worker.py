@@ -3,6 +3,7 @@ import os
 import logging
 import json
 from redis import asyncio as aioredis
+from redis.exceptions import TimeoutError as RedisTimeoutError
 from cache import get_cache
 
 # Configure logging
@@ -13,6 +14,8 @@ REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
 STREAM_NAME = "event.behaviour"
 GROUP_NAME = "ml_behaviour_group"
 CONSUMER_NAME = os.getenv("HOSTNAME", "ml_behaviour_worker_1")
+# How long each XREADGROUP blocks server-side waiting for new events.
+BLOCK_MS = 5000
 
 async def process_behaviour_message(msg_id, data, builder, cf_engine):
     try:
@@ -73,7 +76,10 @@ async def process_behaviour_message(msg_id, data, builder, cf_engine):
 
 async def start_behaviour_worker(builder, cf_engine):
     logger.info(f"Starting ML Behaviour Worker consumer: {CONSUMER_NAME}")
-    redis = await aioredis.from_url(REDIS_URL)
+    # Give the socket read timeout headroom beyond the server-side BLOCK window.
+    # Without this, redis-py aborts the read at the exact block deadline and
+    # raises TimeoutError instead of returning an empty batch on every idle poll.
+    redis = await aioredis.from_url(REDIS_URL, socket_timeout=(BLOCK_MS / 1000) + 5)
 
     # Ensure group exists
     try:
@@ -90,8 +96,13 @@ async def start_behaviour_worker(builder, cf_engine):
             # Read from stream
             # ">" means "messages that have never been delivered to any other consumer"
             messages = await redis.xreadgroup(
-                GROUP_NAME, CONSUMER_NAME, {STREAM_NAME: ">"}, count=10, block=5000
+                GROUP_NAME, CONSUMER_NAME, {STREAM_NAME: ">"}, count=10, block=BLOCK_MS
             )
+
+            # An idle poll returns an empty list (or None) once the block window
+            # elapses with no new events — that's normal, just poll again.
+            if not messages:
+                continue
 
             for stream, msgs in messages:
                 for msg_id, data in msgs:
@@ -105,6 +116,9 @@ async def start_behaviour_worker(builder, cf_engine):
                         await redis.xack(STREAM_NAME, GROUP_NAME, msg_id)
                         logger.error(f"Behaviour message {msg_id} failed and moved to event.behaviour.failed")
 
+        except RedisTimeoutError:
+            # Blocking read hit the socket timeout with no events — benign, keep polling.
+            continue
         except Exception as e:
             logger.error(f"Behaviour worker loop error: {str(e)}")
             await asyncio.sleep(5)
