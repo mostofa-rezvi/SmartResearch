@@ -305,7 +305,7 @@ class AuthController {
     
     try {
       if (token) {
-        await deleteRefreshToken(token);
+        await deleteRefreshToken(token, true);
         res.clearCookie('refreshToken');
       }
       res.json(envelope({}, { message: 'Logged out successfully' }));

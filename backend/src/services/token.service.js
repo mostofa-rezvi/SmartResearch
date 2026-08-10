@@ -49,12 +49,20 @@ const getUserIdFromRefreshToken = async (token) => {
 };
 
 /**
- * Delete refresh token from Redis
+ * Delete refresh token from Redis.
+ * Supports a short grace period (15s) during rotation to prevent race conditions
+ * with concurrent in-flight requests.
  * @param {string} token 
+ * @param {boolean} [immediate=false]
  */
-const deleteRefreshToken = async (token) => {
+const deleteRefreshToken = async (token, immediate = false) => {
   const redis = getRedisClient();
-  await redis.del(`refresh_token:${token}`);
+  if (immediate) {
+    await redis.del(`refresh_token:${token}`);
+  } else {
+    // Grace period of 15 seconds for in-flight requests right during rotation
+    await redis.expire(`refresh_token:${token}`, 15);
+  }
 };
 
 /**
