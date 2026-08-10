@@ -89,6 +89,7 @@ app.use('/api/v1/notifications', require('./routes/notifications'));
 app.use('/api/v1/publications', require('./routes/publications'));
 app.use('/api/v1/analytics', require('./routes/analytics'));
 app.use('/api/v1/library', require('./routes/library.routes'));
+app.use('/api/v1/assistant', require('./routes/assistant'));
 
 
 // Backward-compatible non-versioned routes (transitional)
@@ -114,6 +115,7 @@ app.use('/api/notifications', require('./routes/notifications'));
 app.use('/api/publications', require('./routes/publications'));
 app.use('/api/analytics', require('./routes/analytics'));
 app.use('/api/library', require('./routes/library.routes'));
+app.use('/api/assistant', require('./routes/assistant'));
 
 
 

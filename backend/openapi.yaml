@@ -24,6 +24,7 @@ tags:
   - { name: Notifications }
   - { name: Admin }
   - { name: Analytics }
+  - { name: Assistant }
 
 components:
   securitySchemes:
@@ -339,3 +340,127 @@ paths:
     get: { tags: [Analytics], summary: "Publication outcomes (uploads, saved papers, top journals)", responses: { '200': { description: Outcomes } } }
   /analytics/weekly-report:
     get: { tags: [Analytics], summary: "Weekly aggregated report (JSON or CSV via ?format=csv)", responses: { '200': { description: Report } } }
+
+  # ── Assistant (Agentic AI: RAG chat, volume summary, paper QA) ────────────
+  /assistant/chat:
+    post:
+      tags: [Assistant]
+      summary: Agentic RAG chat over research entities (grounded, cited)
+      description: >
+        Creates/continues a chat session, proxies the ML `/rag/chat` endpoint and
+        persists the turns. On ML failure returns 200 with `meta.degraded:true`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [query]
+              properties:
+                query: { type: string, minLength: 1 }
+                session_id: { type: integer, nullable: true }
+      responses:
+        '200':
+          description: "Grounded answer + persisted session"
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          session_id: { type: integer }
+                          answer: { type: string }
+                          sources: { type: array, items: { type: object } }
+                          followups: { type: array, items: { type: string } }
+                          degraded: { type: boolean }
+  /assistant/sessions:
+    get:
+      tags: [Assistant]
+      summary: List the caller's chat sessions
+      responses: { '200': { description: "Sessions (id, title, updated_at)" } }
+  /assistant/sessions/{id}/messages:
+    get:
+      tags: [Assistant]
+      summary: Messages for a session the caller owns (403 otherwise)
+      parameters: [{ name: id, in: path, required: true, schema: { type: integer } }]
+      responses: { '200': { description: Messages }, '403': { description: Not owner }, '404': { description: Not found } }
+  /assistant/sessions/{id}:
+    delete:
+      tags: [Assistant]
+      summary: Delete the caller's session (messages cascade)
+      parameters: [{ name: id, in: path, required: true, schema: { type: integer } }]
+      responses: { '200': { description: Deleted }, '404': { description: Not found } }
+  /assistant/summarize:
+    post:
+      tags: [Assistant]
+      summary: Volume summary (map-reduce) over a scope of library items
+      description: >
+        Gathers up to 20 `library_items` per scope and proxies ML `/rag/summarize`.
+        On ML failure returns 200 with `meta.degraded:true`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [scope]
+              properties:
+                scope: { type: string, enum: [my_library, all, journal, ids] }
+                journal: { type: string, nullable: true }
+                ids: { type: array, items: { type: integer } }
+      responses:
+        '200':
+          description: "Overview + themes + notable works"
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          overview: { type: string }
+                          themes: { type: array, items: { type: object } }
+                          notable: { type: array, items: { type: object } }
+                          doc_count: { type: integer }
+                          degraded: { type: boolean }
+  /assistant/paper-qa:
+    post:
+      tags: [Assistant]
+      summary: Question-answering grounded in a single library item
+      description: >
+        Fetches the library item (404 if missing), proxies ML `/rag/paper-qa`.
+        On ML failure returns 200 with `degraded:true`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [item_id, question]
+              properties:
+                item_id: { type: integer }
+                question: { type: string, minLength: 1 }
+      responses:
+        '200':
+          description: "Answer + supporting quotes"
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          answer: { type: string }
+                          supporting_quotes: { type: array, items: { type: object } }
+                          degraded: { type: boolean }
+        '404': { description: Item not found }
