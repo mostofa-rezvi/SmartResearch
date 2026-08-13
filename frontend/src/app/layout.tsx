@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Fraunces, Outfit, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
+import { ThemeProvider, themeInitScript } from "@/context/ThemeContext";
 
 const fraunces = Fraunces({
   variable: "--font-fraunces",
@@ -22,6 +23,14 @@ export const metadata: Metadata = {
   title: "ResearchBridge — A Hub for the Global Research Community",
   description:
     "A unified digital platform for discovery, collaboration, and knowledge-sharing across the global research community.",
+  icons: {
+    icon: [
+      { url: "/favicon.ico" },
+      { url: "/logo-icon.png", type: "image/png" }
+    ],
+    shortcut: ["/logo-icon.png"],
+    apple: ["/logo-icon.png"],
+  },
 };
 
 export default function RootLayout({
@@ -35,10 +44,16 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${fraunces.variable} ${outfit.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
+      <head>
+        {/* Set theme before first paint to avoid a flash of the wrong theme. */}
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+      </head>
       <body suppressHydrationWarning className="min-h-full flex flex-col">
-        <AuthProvider>
-          {children}
-        </AuthProvider>
+        <ThemeProvider>
+          <AuthProvider>
+            {children}
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
