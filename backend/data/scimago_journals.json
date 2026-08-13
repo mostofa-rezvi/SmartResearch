@@ -1,0 +1,68 @@
+[
+  {
+    "title": "Nature",
+    "issn": "0028-0836",
+    "subject": "Multidisciplinary",
+    "sjr": 15.234,
+    "h_index": 1130,
+    "country": "United Kingdom",
+    "publisher": "Springer Nature",
+    "quartile": "Q1",
+    "open_access": false
+  },
+  {
+    "title": "Science",
+    "issn": "0036-8075",
+    "subject": "Multidisciplinary",
+    "sjr": 14.108,
+    "h_index": 1058,
+    "country": "United States",
+    "publisher": "AAAS",
+    "quartile": "Q1",
+    "open_access": false
+  },
+  {
+    "title": "Nature Communications",
+    "issn": "2041-1723",
+    "subject": "Multidisciplinary",
+    "sjr": 5.321,
+    "h_index": 295,
+    "country": "United Kingdom",
+    "publisher": "Springer Nature",
+    "quartile": "Q1",
+    "open_access": true
+  },
+  {
+    "title": "Cell",
+    "issn": "0092-8674",
+    "subject": "Biochemistry",
+    "sjr": 13.845,
+    "h_index": 719,
+    "country": "United States",
+    "publisher": "Elsevier",
+    "quartile": "Q1",
+    "open_access": false
+  },
+  {
+    "title": "The Lancet",
+    "issn": "0140-6736",
+    "subject": "Medicine",
+    "sjr": 12.456,
+    "h_index": 672,
+    "country": "United Kingdom",
+    "publisher": "Elsevier",
+    "quartile": "Q1",
+    "open_access": false
+  },
+  {
+    "title": "PLOS ONE",
+    "issn": "1932-6203",
+    "subject": "Multidisciplinary",
+    "sjr": 0.93,
+    "h_index": 332,
+    "country": "United States",
+    "publisher": "PLOS",
+    "quartile": "Q1",
+    "open_access": true
+  }
+]
