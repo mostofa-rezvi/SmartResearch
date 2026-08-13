@@ -71,26 +71,26 @@ export default function AdminBlogsPage() {
   };
 
   if (isLoading) {
-    return <div className="min-h-screen bg-slate-50 flex items-center justify-center">Loading...</div>;
+    return <div className="min-h-screen app-bg flex items-center justify-center">Loading...</div>;
   }
 
   if (error) {
-    return <div className="min-h-screen bg-slate-50 flex items-center justify-center text-red-500 font-bold">{error}</div>;
+    return <div className="min-h-screen app-bg flex items-center justify-center text-red-500 font-bold">{error}</div>;
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
+    <div className="min-h-screen app-bg">
       <Navbar />
       
       <main className="pt-32 pb-20 px-6 max-w-7xl mx-auto">
         <header className="mb-12">
           <h1 className="text-4xl font-serif font-black text-slate-900 dark:text-white mb-2">
-            Editorial <span className="text-secondary italic">Review</span>
+            Editorial <span className="text-secondary dark:text-rose-300 italic">Review</span>
           </h1>
-          <p className="text-slate-500 font-medium">Manage and approve user-submitted articles.</p>
+          <p className="text-slate-500 dark:text-slate-400 font-medium">Manage and approve user-submitted articles.</p>
         </header>
 
-        <div className="bg-white dark:bg-slate-800 rounded-[32px] shadow-xl border border-slate-100 dark:border-slate-700 overflow-hidden">
+        <div className="glass-neu-card overflow-hidden">
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-slate-50 dark:bg-slate-900/50 text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100 dark:border-slate-700">
@@ -106,37 +106,37 @@ export default function AdminBlogsPage() {
                 <tr key={blog.id} className="border-b border-slate-50 dark:border-slate-700/50 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                   <td className="p-6">
                     <p className="font-bold text-slate-900 dark:text-white mb-1 line-clamp-1">{blog.title}</p>
-                    <span className="text-[10px] font-black uppercase tracking-widest text-primary bg-primary/10 px-2 py-1 rounded">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-primary dark:text-white bg-primary/10 px-2 py-1 rounded">
                       {blog.category}
                     </span>
                   </td>
-                  <td className="p-6 text-sm text-slate-500 font-medium">{blog.author}</td>
+                  <td className="p-6 text-sm text-slate-500 dark:text-slate-400 font-medium">{blog.author}</td>
                   <td className="p-6">
                     <span className={`text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full ${
-                      blog.status === 'approved' ? 'bg-emerald-100 text-emerald-600' :
-                      blog.status === 'rejected' ? 'bg-red-100 text-red-600' :
-                      'bg-amber-100 text-amber-600'
+                      blog.status === 'approved' ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-300' :
+                      blog.status === 'rejected' ? 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-300' :
+                      'bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-300'
                     }`}>
                       {blog.status}
                     </span>
                   </td>
-                  <td className="p-6 text-sm text-slate-500 font-medium">
+                  <td className="p-6 text-sm text-slate-500 dark:text-slate-400 font-medium">
                     {new Date(blog.created_at).toLocaleDateString()}
                   </td>
                   <td className="p-6">
                     <div className="flex items-center justify-end gap-2">
-                      <button 
+                      <button
                         onClick={() => updateStatus(blog.id, 'approved')}
                         disabled={blog.status === 'approved'}
-                        className="p-2 rounded-xl bg-emerald-50 text-emerald-600 hover:bg-emerald-100 transition-colors disabled:opacity-50"
+                        className="p-2 rounded-xl bg-emerald-50 text-emerald-600 hover:bg-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-300 dark:hover:bg-emerald-900/50 transition-colors disabled:opacity-50"
                         title="Approve"
                       >
                         <Check size={18} />
                       </button>
-                      <button 
+                      <button
                         onClick={() => updateStatus(blog.id, 'rejected')}
                         disabled={blog.status === 'rejected'}
-                        className="p-2 rounded-xl bg-red-50 text-red-600 hover:bg-red-100 transition-colors disabled:opacity-50"
+                        className="p-2 rounded-xl bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-900/30 dark:text-red-300 dark:hover:bg-red-900/50 transition-colors disabled:opacity-50"
                         title="Reject"
                       >
                         <X size={18} />
@@ -145,10 +145,10 @@ export default function AdminBlogsPage() {
                   </td>
                 </tr>
               ))}
-              
+
               {blogs.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="p-12 text-center text-slate-500 font-medium">
+                  <td colSpan={5} className="p-12 text-center text-slate-500 dark:text-slate-400 font-medium">
                     No articles found.
                   </td>
                 </tr>

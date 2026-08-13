@@ -62,7 +62,7 @@ export default function CreateBlogPage() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="min-h-screen bg-white dark:bg-slate-900 flex items-center justify-center">
         <p className="text-xl">Please log in to write an article.</p>
       </div>
     );
@@ -75,14 +75,14 @@ export default function CreateBlogPage() {
       <main className="pt-32 pb-20 px-6 max-w-4xl mx-auto">
         <header className="mb-12 text-center">
           <h1 className="text-4xl md:text-5xl font-serif font-black text-primary dark:text-white mb-4">
-            Draft your <span className="text-secondary italic">Article</span>
+            Draft your <span className="text-secondary dark:text-rose-300 italic">Article</span>
           </h1>
-          <p className="text-slate-500 font-medium">Share your research, methodologies, or academic insights with the global community.</p>
+          <p className="text-slate-500 dark:text-slate-400 font-medium">Share your research, methodologies, or academic insights with the global community.</p>
         </header>
 
         <form onSubmit={handleSubmit} className="bg-white dark:bg-slate-800 p-8 md:p-12 rounded-[32px] shadow-2xl border border-slate-100 dark:border-slate-700">
           {error && (
-            <div className="bg-red-50 text-red-500 p-4 rounded-xl mb-8 font-bold text-sm">
+            <div className="bg-red-50 dark:bg-red-900/30 text-red-500 dark:text-red-300 p-4 rounded-xl mb-8 font-bold text-sm">
               {error}
             </div>
           )}

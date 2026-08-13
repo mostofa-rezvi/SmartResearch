@@ -3,10 +3,10 @@ const router = express.Router();
 const blogsController = require('../controllers/blogs.controller');
 const { auth } = require('../middleware/auth');
 
-// Public routes (though user might need to be logged in to view, we'll use auth)
-router.get('/', auth, blogsController.getApprovedBlogs);
+// Public routes
+router.get('/', blogsController.getApprovedBlogs);
 router.get('/admin', auth, blogsController.getAdminBlogs);
-router.get('/:id', auth, blogsController.getBlogById);
+router.get('/:id', blogsController.getBlogById);
 
 // Protected routes (User)
 router.post('/', auth, blogsController.createBlog);
