@@ -56,6 +56,48 @@ To instantiate standard research templates (e.g., proposals, ethics reviews), ru
 npm run generate:template -- --name="My Project" --type="proposal"
 ```
 
+## 🛡️ Admin / Staff Console
+
+A unified staff admin panel governs users, content, credibility, and system pipelines from one place, styled in the same glass-neumorphism system as the app.
+
+**URL:** `<baseurl>/staff/2024/25/admin-panel` — e.g. `http://localhost:3000/staff/2024/25/admin-panel`
+
+The path is intentionally obscure, and access is protected by **role-based access control end to end**:
+- The page renders a plain **404** for anyone who is not `admin` / `super_admin` (its existence is never advertised).
+- Every backend endpoint it calls independently enforces `requireRole(['admin','super_admin'])`; invitations additionally require `super_admin`.
+
+### Create / promote an administrator
+Run the idempotent bootstrap script from `backend/`:
+```bash
+cd backend
+node scripts/create-admin.js
+# …or supply your own values:
+ADMIN_EMAIL=you@school.edu ADMIN_PASSWORD='Str0ng!Pass' ADMIN_NAME='Jane Admin' node scripts/create-admin.js
+```
+To promote an existing account instead: `UPDATE users SET role='super_admin' WHERE email='you@school.edu';`
+
+**Default development credentials** (created by the command above — ⚠️ change these before any real deployment):
+
+| Field | Value |
+| --- | --- |
+| Panel URL | `/staff/2024/25/admin-panel` |
+| Email | `admin@researchbridge.app` |
+| Password | `Admin@2025!` |
+| Role | `super_admin` |
+
+> **Two-factor note.** When `OTP_LOGIN_ENABLED=true` (backend `.env`), sign-in emails a 6-digit one-time code to the admin address. Use a real inbox (set `ADMIN_EMAIL` to one you control), **or** in development the `POST /api/v1/auth/login` response includes a `dev_otp` field so you can complete login without email. Set `OTP_LOGIN_ENABLED=false` and restart the backend to disable 2FA locally.
+
+### What it controls
+- **Overview** — live platform KPIs, a weekly growth chart, role distribution, top research domains, and pending-moderation counts.
+- **Users & Trust** — search/filter, set trust tier (single or **bulk**), verify/revoke institutional badges, recompute TrustRank; **paginated**.
+- **Moderation** — resolve flagged posts (dismiss / delete) and approve/reject pending journals.
+- **Content** — review article submissions (approve/reject, single or **bulk**); filter by status.
+- **Invitations** *(super-admin only)* — issue secure onboarding invites to scholars.
+- **Audit Log** — immutable trail of the last 100 administrative actions; **paginated**.
+- **System** — recompute TrustRank and run the Elasticsearch/Neo4j **backfill** pipelines.
+
+The console is a pure client of existing, RBAC-protected endpoints — it introduces no new business logic and does not alter any existing admin flow.
+
 ## 📜 Documentation
 - [Architecture Guide](ARCHITECTURE.md)
 - [API Reference](API.md)
