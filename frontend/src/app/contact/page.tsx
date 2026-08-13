@@ -2,18 +2,20 @@
 
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import HeroBackdrop from "@/components/marketing/HeroBackdrop";
 import { motion } from "framer-motion";
 
 import { Mail, MessageSquare, MapPin, Phone, Send } from "lucide-react";
 
 export default function ContactPage() {
   return (
-    <div className="min-h-screen bg-white dark:bg-[#020617]">
+    <div className="min-h-screen overflow-x-clip bg-white dark:bg-[#020617]">
       <Navbar />
-      
+
       <main className="pt-32 pb-20 px-6">
         <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col lg:flex-row gap-16 lg:gap-24">
+          <div className="relative isolate flex flex-col lg:flex-row gap-16 lg:gap-24">
+            <HeroBackdrop tone="primary" />
             
             {/* Left Side: Contact Info */}
             <div className="flex-1">
@@ -23,7 +25,7 @@ export default function ContactPage() {
               >
                 <h1 className="text-5xl md:text-6xl font-black text-slate-900 dark:text-white mb-8">
                   Let's Connect <br />
-                  <span className="text-primary">Globally</span>
+                  <span className="text-primary dark:text-white">Globally</span>
                 </h1>
                 <p className="text-xl text-slate-600 dark:text-slate-400 mb-12 leading-relaxed">
                   Have questions about our platform or want to bring ResearchBridge to your university? 
@@ -32,7 +34,7 @@ export default function ContactPage() {
 
                 <div className="space-y-8">
                   {[
-                    { icon: <Mail className="text-primary" />, title: "Support", text: "support@researchbridge.org" },
+                    { icon: <Mail className="text-primary dark:text-white" />, title: "Support", text: "support@researchbridge.org" },
                     { icon: <MessageSquare className="text-accent" />, title: "Sales", text: "sales@researchbridge.org" },
                     { icon: <MapPin className="text-red-500" />, title: "Headquarters", text: "123 Innovation Way, Tech Valley, CA" },
                     { icon: <Phone className="text-emerald-500" />, title: "Phone", text: "+1 (555) 123-4567" }

@@ -2,6 +2,7 @@
 
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import HeroBackdrop from "@/components/marketing/HeroBackdrop";
 import { motion } from "framer-motion";
 
 import { Search, Users, Zap, ShieldCheck, Globe, Lightbulb, Database, Award, MessageSquare } from "lucide-react";
@@ -15,7 +16,7 @@ export default function FeaturesPage() {
 
   const features = [
     {
-      icon: <Search className="text-primary" />,
+      icon: <Search className="text-primary dark:text-white" />,
       title: "AI-Powered Discovery",
       description: "Our semantic search engine goes beyond keywords. It understands scientific context, methodology, and citations to find exactly what you need.",
       detail: "Supports LaTeX search, formula matching, and cross-language paper discovery."
@@ -53,19 +54,20 @@ export default function FeaturesPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#020617]">
+    <div className="min-h-screen overflow-x-clip bg-white dark:bg-[#020617]">
       <Navbar />
-      
+
       <main className="pt-32 pb-20 px-6">
         <div className="max-w-7xl mx-auto">
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-24"
+            className="relative isolate text-center mb-24 pt-4 pb-10"
           >
+            <HeroBackdrop tone="primary" />
             <h1 className="text-5xl md:text-6xl font-black text-slate-900 dark:text-white mb-6">
               Powerful Tools for <br />
-              <span className="text-primary">Serious Researchers</span>
+              <span className="text-primary dark:text-white">Serious Researchers</span>
             </h1>
             <p className="text-slate-600 dark:text-slate-400 text-xl max-w-3xl mx-auto leading-relaxed">
               ResearchBridge provides a unified ecosystem that handles everything from 
@@ -95,7 +97,7 @@ export default function FeaturesPage() {
                 
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-6">
-                    <span className="text-sm font-bold text-primary uppercase tracking-widest">Feature {i + 1}</span>
+                    <span className="text-sm font-bold text-primary dark:text-white uppercase tracking-widest">Feature {i + 1}</span>
                     <div className="h-px w-12 bg-primary/20" />
                   </div>
                   <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-6">{f.title}</h2>

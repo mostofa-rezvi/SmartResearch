@@ -2,6 +2,7 @@
 
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import HeroBackdrop from "@/components/marketing/HeroBackdrop";
 import { motion } from "framer-motion";
 
 import { CheckCircle2, HelpCircle, Zap } from "lucide-react";
@@ -60,19 +61,20 @@ export default function PricingPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#020617]">
+    <div className="min-h-screen overflow-x-clip bg-white dark:bg-[#020617]">
       <Navbar />
-      
+
       <main className="pt-32 pb-20 px-6">
         <div className="max-w-7xl mx-auto">
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-16"
+            className="relative isolate text-center mb-16 pt-4 pb-10"
           >
+            <HeroBackdrop tone="accent" />
             <h1 className="text-5xl md:text-6xl font-black text-slate-900 dark:text-white mb-6">
               Simple Pricing for <br />
-              <span className="text-primary">Breakthrough Research</span>
+              <span className="text-primary dark:text-white">Breakthrough Research</span>
             </h1>
             <p className="text-slate-600 dark:text-slate-400 text-xl max-w-2xl mx-auto mb-12">
               Choose the plan that fits your research speed. No hidden fees, cancel anytime.
@@ -80,7 +82,7 @@ export default function PricingPage() {
 
             {/* Billing Cycle Toggle */}
             <div className="flex items-center justify-center gap-4">
-              <span className={`text-sm font-bold ${billingCycle === "monthly" ? 'text-slate-900 dark:text-white' : 'text-slate-500'}`}>Monthly</span>
+              <span className={`text-sm font-bold ${billingCycle === "monthly" ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-slate-400'}`}>Monthly</span>
               <button 
                 onClick={() => setBillingCycle(billingCycle === "monthly" ? "yearly" : "monthly")}
                 className="w-14 h-8 bg-slate-200 dark:bg-white/10 rounded-full p-1 transition-all flex items-center"
@@ -88,7 +90,7 @@ export default function PricingPage() {
                 <div className={`w-6 h-6 bg-primary rounded-full shadow-lg transform transition-transform ${billingCycle === "yearly" ? 'translate-x-6' : 'translate-x-0'}`} />
               </button>
               <div className="flex items-center gap-2">
-                <span className={`text-sm font-bold ${billingCycle === "yearly" ? 'text-slate-900 dark:text-white' : 'text-slate-500'}`}>Yearly</span>
+                <span className={`text-sm font-bold ${billingCycle === "yearly" ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-slate-400'}`}>Yearly</span>
                 <span className="text-[10px] font-black bg-emerald-500 text-white px-2 py-0.5 rounded-full">SAVE 20%</span>
               </div>
             </div>
@@ -116,7 +118,7 @@ export default function PricingPage() {
                       {p.price !== "Custom" && "$"}
                       {p.price}
                     </span>
-                    {p.price !== "Custom" && <span className="text-slate-500 text-sm font-medium">/mo</span>}
+                    {p.price !== "Custom" && <span className="text-slate-500 dark:text-slate-400 text-sm font-medium">/mo</span>}
                   </div>
                   {billingCycle === "yearly" && p.price !== "Custom" && p.price !== "0" && (
                     <p className="text-xs text-emerald-500 font-bold mt-2">Billed annually (${parseInt(p.price) * 12}/yr)</p>
@@ -126,7 +128,7 @@ export default function PricingPage() {
                 <ul className="space-y-5 mb-12 flex-grow">
                   {p.features.map((f, fi) => (
                     <li key={fi} className="flex items-start gap-3 text-slate-700 dark:text-slate-300">
-                      <CheckCircle2 size={20} className="text-primary shrink-0 opacity-80" />
+                      <CheckCircle2 size={20} className="text-primary dark:text-white shrink-0 opacity-80" />
                       <span className="text-[15px]">{f}</span>
                     </li>
                   ))}
@@ -150,7 +152,7 @@ export default function PricingPage() {
               ].map((faq, i) => (
                 <div key={i} className="p-6 rounded-2xl border border-slate-100 dark:border-white/10">
                   <h4 className="font-bold text-slate-900 dark:text-white mb-2 flex items-center gap-2">
-                    <HelpCircle size={18} className="text-primary" />
+                    <HelpCircle size={18} className="text-primary dark:text-white" />
                     {faq.q}
                   </h4>
                   <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">{faq.a}</p>
