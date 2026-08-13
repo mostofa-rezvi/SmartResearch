@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { MessageSquare, ThumbsUp, ThumbsDown, Share2, Tag, Search, Sparkles, HelpCircle, Lightbulb, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
+import AppPageHeader from "@/components/app/AppPageHeader";
 import { useAuth } from "@/context/AuthContext";
 import { API, API_BASE } from "@/config/api";
 import { io } from "socket.io-client";
@@ -185,9 +186,25 @@ export default function CommunityFeedPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
+    <div className="min-h-screen app-bg">
       <Navbar />
-      <main className="pt-24 pb-20 max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <main className="pt-32 pb-20 max-w-7xl mx-auto px-6">
+        <AppPageHeader
+          eyebrow="Research Forum"
+          title="The"
+          accent="Living Room"
+          subtitle="Ask questions, share methodology and trade findings with researchers working in your field, live."
+          actions={
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className="flex items-center gap-2 bg-primary text-white px-6 py-3 rounded-2xl font-bold hover:bg-secondary transition-all shadow-xl hover:shadow-primary/20 group"
+            >
+              <Sparkles size={18} className="group-hover:rotate-12 transition-transform" /> Start New Discussion
+            </button>
+          }
+        />
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Toast Notification */}
         <AnimatePresence>
           {toast.show && (
@@ -207,14 +224,14 @@ export default function CommunityFeedPage() {
 
         {/* Left Sidebar - Filters */}
         <div className="lg:col-span-3 space-y-4">
-          <div className="bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-xl sticky top-24">
+          <div className="glass-neu-card p-6 sticky top-24">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                <Sparkles size={18} className="text-primary" /> Filter Feed
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <Sparkles size={18} className="text-primary dark:text-white" /> Filter Feed
               </h3>
               {socketConnected && <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" title="Live Connection Active" />}
             </div>
-            
+
             <div className="space-y-2">
               {[
                 { label: 'All Activity', id: 'all', icon: <MessageSquare size={16} /> },
@@ -224,10 +241,10 @@ export default function CommunityFeedPage() {
                 <button
                   key={item.id}
                   onClick={() => setFilter(item.id as any)}
-                  className={`w-full flex items-center gap-3 px-4 py-2 rounded-xl text-sm font-medium transition-all ${
-                    filter === item.id 
-                    ? 'bg-primary text-white shadow-lg shadow-primary/20' 
-                    : 'text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-900'
+                  className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm font-bold transition-all ${
+                    filter === item.id
+                    ? 'bg-primary text-white shadow-lg shadow-primary/20 rounded-full'
+                    : 'neu-btn text-slate-600 dark:text-slate-300'
                   }`}
                 >
                   {item.icon} {item.label}
@@ -235,37 +252,47 @@ export default function CommunityFeedPage() {
               ))}
             </div>
           </div>
-
-          <button 
-            onClick={() => setIsModalOpen(true)}
-            className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-primary text-white rounded-[2rem] font-bold text-sm shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all group"
-          >
-            <Sparkles size={18} className="group-hover:rotate-12 transition-transform" />
-            Start New Discussion
-          </button>
         </div>
 
 
         {/* Main Feed Content */}
         <div className="lg:col-span-6 space-y-6">
-          <div className="flex items-center gap-4 mb-2 bg-white dark:bg-slate-800 p-3 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm">
+          <div className="flex items-center gap-4 mb-2 neu-inset p-3">
             <Search className="text-slate-400 ml-2" size={20} />
-            <input 
-              type="text" 
+            <input
+              type="text"
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
-              placeholder="Search library, methodologies, papers..." 
+              placeholder="Search library, methodologies, papers..."
               className="w-full bg-transparent border-none outline-none text-sm text-slate-800 dark:text-slate-200"
             />
           </div>
 
           {loading ? (
-            <div className="py-20 text-center animate-pulse italic text-slate-400">Blending your personalized research feed...</div>
+            <div className="space-y-6">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="glass-neu-card p-8">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="skeleton w-10 h-10 rounded-full" />
+                    <div className="flex-1 space-y-2">
+                      <div className="skeleton h-3 w-32 rounded" />
+                      <div className="skeleton h-2.5 w-24 rounded" />
+                    </div>
+                  </div>
+                  <div className="skeleton h-5 w-3/4 rounded mb-3" />
+                  <div className="skeleton h-4 w-full rounded mb-2" />
+                  <div className="skeleton h-4 w-2/3 rounded mb-6" />
+                  <div className="skeleton h-8 w-40 rounded-full" />
+                </div>
+              ))}
+            </div>
           ) : posts.length === 0 ? (
-            <div className="py-20 text-center text-slate-400">
-              <div className="text-4xl mb-3">🔍</div>
-              <p className="font-bold text-slate-700 dark:text-white mb-1">No matches found</p>
-              <p className="text-sm">Try adjusting your search terms.</p>
+            <div className="text-center py-24 glass-neu-card">
+              <div className="w-16 h-16 neu-icon flex items-center justify-center text-primary dark:text-white mx-auto mb-5">
+                <Search size={28} />
+              </div>
+              <h3 className="text-xl font-serif font-black text-slate-900 dark:text-white mb-2">No matches found</h3>
+              <p className="text-slate-500 dark:text-slate-400 max-w-sm mx-auto">Try adjusting your search terms or filters.</p>
             </div>
           ) : (
             <>
@@ -282,32 +309,32 @@ export default function CommunityFeedPage() {
 
               {totalPages > 1 && (
                 <div className="flex items-center justify-center gap-2 pt-8 pb-12 overflow-x-auto">
-                  <button 
+                  <button
                     disabled={page === 1}
                     onClick={() => setPage(p => p - 1)}
-                    className="px-4 py-2 rounded-xl border border-slate-100 dark:border-slate-800 disabled:opacity-50 text-sm font-bold bg-white dark:bg-slate-800 text-slate-500 hover:text-primary transition-colors"
+                    className="px-4 py-2 neu-btn disabled:opacity-50 text-sm font-bold text-slate-500 dark:text-slate-400 hover:text-primary transition-colors"
                   >
                     Prev
                   </button>
-                  
+
                   {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
                     <button
                       key={pageNum}
                       onClick={() => setPage(pageNum)}
                       className={`min-w-[2.5rem] h-10 rounded-xl font-bold text-sm transition-all ${
-                        page === pageNum 
-                        ? 'bg-primary text-white shadow-lg shadow-primary/20 scale-110' 
-                        : 'bg-white dark:bg-slate-800 text-slate-400 hover:text-slate-600 dark:hover:text-white border border-slate-50 dark:border-slate-800 shadow-sm'
+                        page === pageNum
+                        ? 'bg-primary text-white shadow-lg shadow-primary/20 scale-110'
+                        : 'neu-btn text-slate-400 hover:text-slate-600 dark:hover:text-white'
                       }`}
                     >
                       {pageNum}
                     </button>
                   ))}
 
-                  <button 
+                  <button
                     disabled={page === totalPages}
                     onClick={() => setPage(p => p + 1)}
-                    className="px-4 py-2 rounded-xl border border-slate-100 dark:border-slate-800 disabled:opacity-50 text-sm font-bold bg-white dark:bg-slate-800 text-slate-500 hover:text-primary transition-colors"
+                    className="px-4 py-2 neu-btn disabled:opacity-50 text-sm font-bold text-slate-500 dark:text-slate-400 hover:text-primary transition-colors"
                   >
                     Next
                   </button>
@@ -319,10 +346,10 @@ export default function CommunityFeedPage() {
 
         {/* Right Sidebar - Researchers */}
         <div className="lg:col-span-3 space-y-6">
-          <div className="bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-xl sticky top-24">
+          <div className="glass-neu-card p-6 sticky top-24">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                <Globe size={18} className="text-primary" /> Global Researchers
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <Globe size={18} className="text-primary dark:text-white" /> Global Researchers
               </h3>
               <div className="p-1.5 bg-slate-50 dark:bg-slate-900 rounded-lg">
                 <Users size={14} className="text-slate-400" />
@@ -332,7 +359,7 @@ export default function CommunityFeedPage() {
             {loadingResearchers ? (
               <div className="space-y-4">
                 {[1, 2, 3].map(i => (
-                  <div key={i} className="h-24 bg-slate-50 dark:bg-slate-900 animate-pulse rounded-2xl" />
+                  <div key={i} className="skeleton h-24 rounded-2xl" />
                 ))}
               </div>
             ) : (
@@ -349,7 +376,7 @@ export default function CommunityFeedPage() {
                   />
                 ))}
                 
-                <button className="w-full py-3 text-xs font-bold text-primary hover:bg-primary/5 rounded-xl transition-all uppercase tracking-widest border border-dashed border-primary/20">
+                <button className="w-full py-3 text-xs font-bold text-primary dark:text-white hover:bg-primary/5 rounded-xl transition-all uppercase tracking-widest border border-dashed border-primary/20">
                   Discover More Scholars
                 </button>
               </div>
@@ -369,9 +396,10 @@ export default function CommunityFeedPage() {
             </button>
           </div>
         </div>
+        </div>
       </main>
 
-      <CreatePostModal 
+      <CreatePostModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSuccess={handlePostSuccess}

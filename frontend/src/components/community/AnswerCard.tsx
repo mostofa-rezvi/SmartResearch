@@ -43,10 +43,10 @@ export const AnswerCard: React.FC<AnswerCardProps> = ({ answer, isAccepted, canA
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className={`rounded-3xl p-6 border shadow-xl hover:shadow-2xl hover:shadow-primary/5 transition-all group ${
+      className={`rounded-3xl p-6 transition-all group ${
         isAccepted
-          ? "bg-emerald-50/60 dark:bg-emerald-500/5 border-emerald-300 dark:border-emerald-500/30 ring-1 ring-emerald-400/40"
-          : "bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-700"
+          ? "bg-emerald-50/60 dark:bg-emerald-500/5 border border-emerald-300 dark:border-emerald-500/30 ring-1 ring-emerald-400/40 shadow-xl hover:shadow-2xl hover:shadow-primary/5"
+          : "glass-neu-card glass-neu-hover"
       }`}
     >
       {isAccepted && (
@@ -56,7 +56,7 @@ export const AnswerCard: React.FC<AnswerCardProps> = ({ answer, isAccepted, canA
       )}
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 bg-slate-100 dark:bg-slate-900 rounded-full flex items-center justify-center font-bold text-primary text-lg border-2 border-primary/10">
+          <div className="w-12 h-12 bg-slate-100 dark:bg-slate-900 rounded-full flex items-center justify-center font-bold text-primary dark:text-white text-lg border-2 border-primary/10">
             {answer.author.name[0]}
           </div>
           <div>
@@ -124,7 +124,7 @@ export const AnswerCard: React.FC<AnswerCardProps> = ({ answer, isAccepted, canA
           {onToggleReply && (
             <button
               onClick={onToggleReply}
-              className={`flex items-center gap-2 transition-colors font-medium ${replyOpen ? "text-primary" : "text-slate-500 hover:text-primary"}`}
+              className={`flex items-center gap-2 transition-colors font-medium ${replyOpen ? "text-primary dark:text-white" : "text-slate-500 dark:text-slate-400 hover:text-primary"}`}
             >
               <Reply size={18} />
               <span className="text-sm">Reply</span>

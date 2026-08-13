@@ -35,31 +35,31 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, url, ti
     {
       name: "WhatsApp",
       icon: <MessageCircle className="text-emerald-500" />,
-      color: "hover:bg-emerald-50",
+      color: "hover:bg-emerald-50 dark:hover:bg-emerald-900/30",
       href: `https://wa.me/?text=${encodeURIComponent(title + " " + url)}`
     },
     {
       name: "Messenger",
       icon: <Send className="text-blue-500" />,
-      color: "hover:bg-blue-50",
+      color: "hover:bg-blue-50 dark:hover:bg-blue-900/30",
       href: `fb-messenger://share/?link=${encodeURIComponent(url)}`
     },
     {
       name: "Facebook",
       icon: <FacebookIcon />,
-      color: "hover:bg-blue-50 text-blue-600",
+      color: "hover:bg-blue-50 text-blue-600 dark:hover:bg-blue-900/30 dark:text-blue-400",
       href: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`
     },
     {
       name: "Twitter",
       icon: <TwitterIcon />,
-      color: "hover:bg-sky-50 text-sky-500",
+      color: "hover:bg-sky-50 text-sky-500 dark:hover:bg-sky-900/30 dark:text-sky-400",
       href: `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(title)}`
     },
     {
       name: "LinkedIn",
       icon: <LinkedinIcon />,
-      color: "hover:bg-indigo-50 text-indigo-600",
+      color: "hover:bg-indigo-50 text-indigo-600 dark:hover:bg-indigo-900/30 dark:text-indigo-400",
       href: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`
     }
   ];
@@ -90,7 +90,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, url, ti
                 onClick={onClose}
                 className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl transition-colors"
               >
-                <X size={20} className="text-slate-500" />
+                <X size={20} className="text-slate-500 dark:text-slate-400" />
               </button>
             </div>
 

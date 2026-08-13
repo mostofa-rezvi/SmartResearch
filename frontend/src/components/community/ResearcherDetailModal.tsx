@@ -86,7 +86,7 @@ export const ResearcherDetailModal: React.FC<ResearcherDetailModalProps> = ({
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className="relative w-full max-w-3xl bg-white dark:bg-slate-800 rounded-[2.5rem] shadow-2xl border border-white/10 overflow-hidden flex flex-col max-h-[90vh]"
+            className="relative w-full max-w-3xl glass-neu-card overflow-hidden flex flex-col max-h-[90vh]"
           >
             {/* Header / Cover */}
             <div className="h-32 bg-gradient-to-r from-primary to-blue-600 shrink-0" />
@@ -105,17 +105,17 @@ export const ResearcherDetailModal: React.FC<ResearcherDetailModalProps> = ({
                     {researcher.avatar_url ? (
                       <img src={researcher.avatar_url} alt={researcher.name} className="w-full h-full object-cover" />
                     ) : (
-                      <User size={48} className="text-primary/40" />
+                      <User size={48} className="text-primary/40 dark:text-white/40" />
                     )}
                   </div>
                 </div>
                 
                 <div className="pb-2">
-                  <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-1">
+                  <h2 className="text-3xl font-serif font-black text-slate-900 dark:text-white mb-1">
                     {researcher.name}
                   </h2>
                   <p className="flex items-center gap-2 text-slate-500 dark:text-slate-400 font-medium">
-                    <MapPin size={16} className="text-primary" />
+                    <MapPin size={16} className="text-primary dark:text-white" />
                     {researcher.institution || "Global Researcher"}
                     {researcher.country_code && (
                       <span className="text-[10px] bg-slate-100 dark:bg-slate-700 px-2 py-0.5 rounded-full uppercase">
@@ -129,7 +129,7 @@ export const ResearcherDetailModal: React.FC<ResearcherDetailModalProps> = ({
               {/* Bio Section */}
               <div className="mb-8">
                 <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2">
-                  <FileText size={14} className="text-primary" /> Professional Biography
+                  <FileText size={14} className="text-primary dark:text-white" /> Professional Biography
                 </h3>
                 <p className="text-slate-600 dark:text-slate-300 leading-relaxed font-serif italic">
                   A distinguished researcher with a focus on {researcher.research_domains.slice(0, 3).join(", ")}. 
@@ -144,7 +144,7 @@ export const ResearcherDetailModal: React.FC<ResearcherDetailModalProps> = ({
                   { label: "H-Index", value: researcher.h_index || "N/A", icon: <Award className="text-amber-500" /> },
                   { label: "Works", value: researcher.works_count || "N/A", icon: <BookOpen className="text-blue-500" /> },
                 ].map((stat, i) => (
-                  <div key={i} className="bg-slate-50 dark:bg-slate-900/50 rounded-2xl p-4 border border-slate-100 dark:border-slate-800">
+                  <div key={i} className="glass-neu-card p-4">
                     <div className="flex items-center gap-2 mb-1">
                       {stat.icon}
                       <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{stat.label}</span>
@@ -159,13 +159,13 @@ export const ResearcherDetailModal: React.FC<ResearcherDetailModalProps> = ({
               <div className="space-y-8">
                 <div>
                   <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2">
-                    <Layers size={14} className="text-primary" /> Expertise & Domains
+                    <Layers size={14} className="text-primary dark:text-white" /> Expertise & Domains
                   </h3>
                   <div className="flex flex-wrap gap-2">
                     {(researcher.research_domains || []).map((domain) => (
                       <span
                         key={domain}
-                        className="px-4 py-2 bg-primary/5 dark:bg-primary/10 text-primary rounded-xl text-sm font-bold border border-primary/10"
+                        className="px-4 py-2 bg-primary/5 dark:bg-primary/10 text-primary dark:text-white rounded-xl text-sm font-bold border border-primary/10"
                       >
                         {domain}
                       </span>
@@ -177,7 +177,7 @@ export const ResearcherDetailModal: React.FC<ResearcherDetailModalProps> = ({
                 <div>
                   <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center justify-between">
                     <span className="flex items-center gap-2">
-                      <BookOpen size={14} className="text-primary" /> Key Research Items
+                      <BookOpen size={14} className="text-primary dark:text-white" /> Key Research Items
                     </span>
                     <span className="text-[10px] font-medium lowercase italic text-slate-300">Click item to view source</span>
                   </h3>
@@ -196,7 +196,7 @@ export const ResearcherDetailModal: React.FC<ResearcherDetailModalProps> = ({
                           href={work.landing_page_url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="group flex items-center justify-between p-4 bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-100 dark:border-slate-800 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 transition-all"
+                          className="group flex items-center justify-between p-4 glass-neu-card glass-neu-hover transition-all"
                         >
                           <div className="min-w-0 pr-4">
                             <h4 className="font-bold text-slate-900 dark:text-white text-sm truncate group-hover:text-primary transition-colors">
@@ -206,7 +206,7 @@ export const ResearcherDetailModal: React.FC<ResearcherDetailModalProps> = ({
                               <span className="text-[10px] text-slate-400 font-medium">
                                 {work.journal} · {work.publication_year}
                               </span>
-                              <span className="text-[10px] bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 px-2 py-0.5 rounded-full font-bold">
+                              <span className="text-[10px] bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 rounded-full font-bold">
                                 {work.citation_count} citations
                               </span>
                             </div>

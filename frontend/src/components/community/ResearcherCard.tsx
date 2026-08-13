@@ -33,7 +33,7 @@ export const ResearcherCard: React.FC<ResearcherCardProps> = ({ researcher, onCl
             {researcher.avatar_url ? (
               <img src={researcher.avatar_url} alt={researcher.name} className="w-full h-full object-cover rounded-xl" />
             ) : (
-              <User size={20} className="text-primary/60" />
+              <User size={20} className="text-primary/60 dark:text-white/60" />
             )}
           </div>
           {researcher.h_index > 20 && (
@@ -88,7 +88,7 @@ export const ResearcherCard: React.FC<ResearcherCardProps> = ({ researcher, onCl
         animate={{ opacity: 1, x: 0 }}
         transition={{ delay: idx * 0.05 }}
         onClick={() => onClick(researcher)}
-        className="group bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-100 dark:border-slate-700 shadow-sm hover:shadow-md hover:border-primary/30 transition-all cursor-pointer relative overflow-hidden"
+        className="group glass-neu-card glass-neu-hover p-4 transition-all cursor-pointer relative overflow-hidden"
       >
         {CardContent}
       </motion.div>
@@ -104,7 +104,7 @@ export const ResearcherCard: React.FC<ResearcherCardProps> = ({ researcher, onCl
         initial={{ opacity: 0, x: 20 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ delay: idx * 0.05 }}
-        className="group bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-100 dark:border-slate-700 shadow-sm hover:shadow-md hover:border-primary/30 transition-all cursor-pointer relative overflow-hidden"
+        className="group glass-neu-card glass-neu-hover p-4 transition-all cursor-pointer relative overflow-hidden"
       >
         {CardContent}
       </motion.div>

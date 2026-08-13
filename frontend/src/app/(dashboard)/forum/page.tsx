@@ -20,7 +20,7 @@ export default function ForumPage() {
       <header className="mb-12 flex justify-between items-end">
         <div>
           <h1 className="text-4xl font-extrabold tracking-tight mb-2">Community Forum</h1>
-          <p className="text-gray-500">Ranked by TrustRank • Moderated by community reputation</p>
+          <p className="text-gray-500 dark:text-slate-400">Ranked by TrustRank • Moderated by community reputation</p>
         </div>
         <button className="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-700 transition-colors">
           New Thread
@@ -32,8 +32,8 @@ export default function ForumPage() {
       ) : (
         <div className="space-y-8">
           {threads.length === 0 ? (
-            <div className="text-center py-20 bg-gray-50 rounded-xl border-2 border-dashed">
-              <p className="text-gray-500">No threads found in your domain.</p>
+            <div className="text-center py-20 glass-neu-card">
+              <p className="text-gray-500 dark:text-slate-400">No threads found in your domain.</p>
             </div>
           ) : (
             threads.map((thread: any) => (

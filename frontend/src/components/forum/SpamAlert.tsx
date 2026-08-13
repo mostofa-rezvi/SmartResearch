@@ -2,7 +2,7 @@ import React from 'react';
 
 export const SpamAlert = () => {
   return (
-    <div className="bg-red-50 border-l-4 border-red-400 p-4 mb-4">
+    <div className="bg-red-50 dark:bg-red-900/30 border-l-4 border-red-400 p-4 mb-4">
       <div className="flex">
         <div className="flex-shrink-0">
           <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
@@ -10,7 +10,7 @@ export const SpamAlert = () => {
           </svg>
         </div>
         <div className="ml-3">
-          <p className="text-sm text-red-700">
+          <p className="text-sm text-red-700 dark:text-red-400">
             This content has been flagged as potential spam and is hidden from the public feed.
           </p>
         </div>

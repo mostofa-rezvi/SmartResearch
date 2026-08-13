@@ -30,7 +30,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({ post, onVote, idx })
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ delay: post.isLive ? 0 : idx * 0.05 }}
       onClick={handleCardClick}
-      className={`bg-white dark:bg-slate-800 rounded-3xl p-8 border border-slate-100 dark:border-slate-700 shadow-xl hover:shadow-primary/5 transition-all group relative overflow-hidden cursor-pointer ${post.isLive ? 'ring-2 ring-primary ring-opacity-50' : ''}`}
+      className={`glass-neu-card glass-neu-hover p-8 transition-all group relative overflow-hidden cursor-pointer ${post.isLive ? 'ring-2 ring-primary ring-opacity-50' : ''}`}
     >
       {post.isLive && (
         <div className="absolute top-0 right-0 bg-primary text-white text-[10px] font-bold px-3 py-1 rounded-bl-xl uppercase tracking-widest">
@@ -39,7 +39,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({ post, onVote, idx })
       )}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-slate-100 dark:bg-slate-900 rounded-full flex items-center justify-center font-bold text-primary">
+          <div className="w-10 h-10 bg-slate-100 dark:bg-slate-900 rounded-full flex items-center justify-center font-bold text-primary dark:text-white">
             {post.author_name ? post.author_name[0] : '?'}
           </div>
           <div>
@@ -55,14 +55,14 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({ post, onVote, idx })
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <span className={`text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full ${post.type === 'question' ? 'bg-blue-50 text-blue-600' : 'bg-amber-50 text-amber-600'}`}>
+          <span className={`text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full ${post.type === 'question' ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-300' : 'bg-amber-50 text-amber-600 dark:bg-amber-900/30 dark:text-amber-300'}`}>
             {post.type}
           </span>
         </div>
       </div>
 
       <Link href={`/community/${post.id}`}>
-        <h2 className="text-xl font-bold mb-3 text-slate-900 dark:text-white group-hover:text-primary transition-colors cursor-pointer">
+        <h2 className="text-xl font-serif font-black mb-3 text-slate-900 dark:text-white group-hover:text-primary transition-colors cursor-pointer">
           {post.title}
         </h2>
       </Link>

@@ -104,10 +104,10 @@ export const QuestionDetailView: React.FC<QuestionDetailViewProps> = ({ question
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white dark:bg-slate-800 rounded-[2.5rem] p-8 md:p-10 border border-slate-100 dark:border-slate-700 shadow-2xl mb-12 relative overflow-hidden"
+        className="glass-neu-card p-8 md:p-10 mb-12 relative overflow-hidden"
       >
         <div className="absolute top-0 right-0 p-8">
-          <div className="bg-primary/10 text-primary p-3 rounded-2xl">
+          <div className="neu-icon text-primary dark:text-white p-3">
             <HelpCircle size={24} />
           </div>
         </div>
@@ -177,19 +177,19 @@ export const QuestionDetailView: React.FC<QuestionDetailViewProps> = ({ question
       {/* Answers Section Header */}
       <div className="flex items-center justify-between mb-8 px-2">
         <h2 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
-          <MessageSquare className="text-primary" /> {question.answerCount} Expert Responses
+          <MessageSquare className="text-primary dark:text-white" /> {question.answerCount} Expert Responses
         </h2>
 
-        <div className="flex items-center gap-2 bg-white dark:bg-slate-800 p-1.5 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm">
+        <div className="flex items-center gap-2 neu-inset p-1.5">
           <button
             onClick={() => setSortOrder("reputation")}
-            className={`px-4 py-1.5 rounded-xl text-xs font-bold transition-all ${sortOrder === "reputation" ? "bg-primary text-white shadow-md shadow-primary/10" : "text-slate-400 hover:text-slate-600"}`}
+            className={`px-4 py-1.5 rounded-xl text-xs font-bold transition-all ${sortOrder === "reputation" ? "bg-primary text-white shadow-md shadow-primary/10" : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"}`}
           >
             Top Reputation
           </button>
           <button
             onClick={() => setSortOrder("newest")}
-            className={`px-4 py-1.5 rounded-xl text-xs font-bold transition-all ${sortOrder === "newest" ? "bg-primary text-white shadow-md shadow-primary/10" : "text-slate-400 hover:text-slate-600"}`}
+            className={`px-4 py-1.5 rounded-xl text-xs font-bold transition-all ${sortOrder === "newest" ? "bg-primary text-white shadow-md shadow-primary/10" : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"}`}
           >
             Newest
           </button>
@@ -214,10 +214,10 @@ export const QuestionDetailView: React.FC<QuestionDetailViewProps> = ({ question
           <div className="py-20 text-center bg-slate-50 dark:bg-slate-900/50 rounded-[2rem] border-2 border-dashed border-slate-200 dark:border-slate-800">
             <div className="text-4xl mb-4 opacity-50">🎓</div>
             <h3 className="font-bold text-slate-900 dark:text-white text-lg">No expert answers yet</h3>
-            <p className="text-slate-500 max-w-xs mx-auto mt-2 text-sm">Be the first researcher to provide an authoritative answer to this question!</p>
+            <p className="text-slate-500 dark:text-slate-400 max-w-xs mx-auto mt-2 text-sm">Be the first researcher to provide an authoritative answer to this question!</p>
             <button
               onClick={handleAnswerClick}
-              className="mt-6 px-8 py-3 bg-white dark:bg-slate-800 text-primary border border-primary/20 rounded-2xl font-bold shadow-sm hover:bg-primary hover:text-white transition-all"
+              className="mt-6 px-8 py-3 neu-btn text-primary dark:text-white font-bold transition-all"
             >
               Submit Your Answer
             </button>

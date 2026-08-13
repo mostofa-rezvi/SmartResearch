@@ -84,14 +84,14 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
           initial={{ opacity: 0, scale: 0.9, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.9, y: 20 }}
-          className="relative bg-white dark:bg-slate-800 w-full max-w-3xl rounded-[2.5rem] shadow-2xl border border-white/10 overflow-hidden"
+          className="relative glass-neu-card w-full max-w-3xl overflow-hidden"
         >
           <div className="flex items-center justify-between p-8 border-b border-slate-50 dark:border-slate-700">
             <div>
-               <h2 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                 <Sparkles className="text-primary" /> Share Knowledge
+               <h2 className="text-2xl font-serif font-black text-slate-900 dark:text-white flex items-center gap-2">
+                 <Sparkles className="text-primary dark:text-white" /> Share Knowledge
                </h2>
-               <p className="text-sm text-slate-500 mt-1">Contribute to the global researcher community.</p>
+               <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Contribute to the global researcher community.</p>
             </div>
             <button onClick={onClose} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full transition-colors">
               <X size={24} className="text-slate-400" />
@@ -103,13 +103,13 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
             <div className="flex gap-4">
               <button 
                 onClick={() => setType('question')}
-                className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl border-2 transition-all ${type === 'question' ? 'border-primary bg-primary/5 text-primary font-bold' : 'border-slate-100 dark:border-slate-700 text-slate-400'}`}
+                className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl border-2 transition-all ${type === 'question' ? 'border-primary bg-primary/5 text-primary dark:text-white font-bold' : 'border-slate-100 dark:border-slate-700 text-slate-400'}`}
               >
                 <MessageSquare size={18} /> Question
               </button>
               <button 
                 onClick={() => setType('thought')}
-                className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl border-2 transition-all ${type === 'thought' ? 'border-primary bg-primary/5 text-primary font-bold' : 'border-slate-100 dark:border-slate-700 text-slate-400'}`}
+                className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl border-2 transition-all ${type === 'thought' ? 'border-primary bg-primary/5 text-primary dark:text-white font-bold' : 'border-slate-100 dark:border-slate-700 text-slate-400'}`}
               >
                 <Lightbulb size={18} /> Open Thought
               </button>
@@ -124,7 +124,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="e.g. How to optimize RAG for medical datasets?"
-                  className="w-full px-6 py-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-700 focus:ring-2 focus:ring-primary outline-none transition-all"
+                  className="w-full px-6 py-4 neu-inset focus:ring-2 focus:ring-primary outline-none transition-all"
                 />
               </div>
             )}
@@ -159,12 +159,12 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
                       onChange={(e) => setTagInput(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && handleAddTag()}
                       placeholder="Add field (e.g. Physics, AI)"
-                      className="w-full pl-10 pr-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-700 outline-none"
+                      className="w-full pl-10 pr-4 py-3 neu-inset outline-none"
                     />
                   </div>
-                  <button 
+                  <button
                     onClick={handleAddTag}
-                    className="px-6 py-3 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-xl font-bold text-sm hover:bg-slate-200"
+                    className="px-6 py-3 neu-btn text-slate-600 dark:text-slate-300 font-bold text-sm"
                   >
                     Add
                   </button>
@@ -175,7 +175,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
           <div className="p-8 border-t border-slate-50 dark:border-slate-700 flex justify-end gap-4">
             <button 
               onClick={onClose}
-              className="px-8 py-3 rounded-2xl text-slate-500 font-bold hover:bg-slate-50 dark:hover:bg-slate-900 transition-all"
+              className="px-8 py-3 rounded-2xl text-slate-500 dark:text-slate-400 font-bold hover:bg-slate-50 dark:hover:bg-slate-900 transition-all"
             >
               Cancel
             </button>
