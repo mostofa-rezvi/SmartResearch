@@ -41,8 +41,8 @@ interface SessionSummary {
 }
 
 const TYPE_META: Record<string, { label: string; icon: React.ReactNode; cls: string }> = {
-  paper: { label: "Paper", icon: <FileText size={11} />, cls: "bg-primary-50 text-primary" },
-  researcher: { label: "Researcher", icon: <Users size={11} />, cls: "bg-secondary-50 text-secondary" },
+  paper: { label: "Paper", icon: <FileText size={11} />, cls: "bg-primary-50 text-primary dark:text-white" },
+  researcher: { label: "Researcher", icon: <Users size={11} />, cls: "bg-secondary-50 text-secondary dark:text-rose-300" },
   post: { label: "Post", icon: <MessageSquare size={11} />, cls: "bg-accent-50 text-accent-700" },
   journal: { label: "Journal", icon: <BookOpen size={11} />, cls: "bg-info-surface text-info" },
 };
@@ -51,17 +51,17 @@ function SourceChip({ source }: { source: Source }) {
   const meta = TYPE_META[source.type] || {
     label: source.type || "Source",
     icon: <FileText size={11} />,
-    cls: "bg-slate-100 text-slate-500 dark:bg-slate-700 dark:text-slate-300",
+    cls: "bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300",
   };
   return (
-    <div className="flex items-start gap-2 p-2.5 bg-white dark:bg-slate-800/60 rounded-xl border border-slate-100 dark:border-slate-700/50">
-      <span className={`shrink-0 mt-0.5 inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wide ${meta.cls}`}>
+    <div className="flex items-start gap-2 p-2.5 bg-slate-50 dark:bg-slate-900/40 rounded-xl border border-slate-100 dark:border-slate-700">
+      <span className={`shrink-0 mt-0.5 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wide ${meta.cls}`}>
         {meta.icon} {meta.label}
       </span>
       <div className="min-w-0">
         <p className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">{source.title}</p>
         {source.snippet && (
-          <p className="text-[11px] text-slate-400 line-clamp-2">{source.snippet}</p>
+          <p className="text-[11px] text-slate-400 dark:text-slate-500 line-clamp-2">{source.snippet}</p>
         )}
       </div>
     </div>
@@ -220,22 +220,22 @@ export default function AssistantPage() {
   const isEmpty = messages.length === 0 && !loadingThread;
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0F172A] text-slate-900 dark:text-slate-100">
+    <div className="min-h-screen app-bg text-slate-900 dark:text-slate-100">
       <Navbar />
 
-      <main className="pt-20 h-screen flex max-w-[1600px] mx-auto">
+      <main className="pt-20 h-screen flex max-w-[1600px] mx-auto gap-4 px-4 md:px-6 pb-4">
         {/* Sidebar — sessions */}
-        <aside className="hidden md:flex flex-col w-72 shrink-0 border-r border-slate-200 dark:border-slate-800 p-4">
+        <aside className="hidden md:flex flex-col w-72 shrink-0 my-3 glass-neu-card p-4">
           <button
             onClick={newChat}
-            className="flex items-center justify-center gap-2 w-full py-3 mb-4 bg-primary text-white font-black rounded-2xl shadow-lg shadow-primary/20 hover:scale-[1.02] transition-transform"
+            className="flex items-center justify-center gap-2 w-full py-3 mb-4 bg-primary text-white font-black rounded-2xl shadow-lg shadow-primary/20 hover:bg-secondary hover:scale-[1.02] transition-all"
           >
             <Plus size={18} /> New chat
           </button>
 
           <div className="flex-1 overflow-y-auto space-y-1 custom-scrollbar">
             {sessions.length === 0 ? (
-              <p className="text-xs text-slate-400 text-center mt-8 px-4">
+              <p className="text-xs text-slate-400 dark:text-slate-500 text-center mt-8 px-4">
                 No conversations yet. Ask something to get started.
               </p>
             ) : (
@@ -245,8 +245,8 @@ export default function AssistantPage() {
                   onClick={() => openSession(s.id)}
                   className={`group w-full flex items-center gap-2 px-3 py-2.5 rounded-xl text-left transition-colors ${
                     activeSessionId === s.id
-                      ? "bg-primary/10 text-primary"
-                      : "hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300"
+                      ? "bg-primary/10 text-primary dark:text-white"
+                      : "hover:bg-slate-50 dark:hover:bg-slate-800/60 text-slate-600 dark:text-slate-300"
                   }`}
                 >
                   <MessageSquare size={14} className="shrink-0" />
@@ -255,7 +255,7 @@ export default function AssistantPage() {
                   </span>
                   <span
                     onClick={(e) => deleteSession(s.id, e)}
-                    className="shrink-0 opacity-0 group-hover:opacity-100 p-1 text-slate-400 hover:text-secondary transition-all"
+                    className="shrink-0 opacity-0 group-hover:opacity-100 p-1 text-slate-400 dark:text-slate-500 hover:text-secondary transition-all"
                   >
                     <Trash2 size={14} />
                   </span>
@@ -266,22 +266,27 @@ export default function AssistantPage() {
         </aside>
 
         {/* Main pane */}
-        <section className="flex-1 flex flex-col min-w-0">
+        <section className="flex-1 flex flex-col min-w-0 my-3 glass-neu-card overflow-hidden">
           {/* Header */}
-          <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center gap-3 shrink-0">
-            <div className="p-2 bg-primary/10 text-primary rounded-xl">
+          <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-700 flex items-center gap-3 shrink-0">
+            <div className="w-9 h-9 neu-icon text-primary dark:text-white flex items-center justify-center shrink-0">
               <Sparkles size={18} />
             </div>
             <div>
-              <h1 className="text-lg font-serif font-black tracking-tight">AI Research Assistant</h1>
-              <p className="text-xs text-slate-400">
+              <span className="mono-academic text-[10px] font-black tracking-[0.2em] text-secondary dark:text-rose-300 uppercase block mb-0.5">
+                Research Companion
+              </span>
+              <h1 className="text-lg md:text-xl font-serif font-black text-primary dark:text-white leading-tight tracking-tight">
+                AI Research <span className="text-secondary dark:text-rose-300 italic">Assistant</span>
+              </h1>
+              <p className="text-xs text-slate-400 dark:text-slate-500 hidden sm:block mt-0.5">
                 Grounded, cited answers across papers, researchers &amp; the community.
               </p>
             </div>
             {/* Mobile new-chat */}
             <button
               onClick={newChat}
-              className="md:hidden ml-auto p-2 bg-primary/10 text-primary rounded-xl"
+              className="md:hidden ml-auto w-9 h-9 neu-btn text-primary dark:text-white flex items-center justify-center"
             >
               <Plus size={18} />
             </button>
@@ -290,17 +295,22 @@ export default function AssistantPage() {
           {/* Thread */}
           <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 md:px-8 py-6 custom-scrollbar">
             {loadingThread ? (
-              <div className="flex flex-col items-center justify-center h-full text-slate-400 space-y-3">
-                <RefreshCw className="animate-spin text-primary" size={28} />
+              <div className="flex flex-col items-center justify-center h-full text-slate-400 dark:text-slate-500 space-y-3">
+                <RefreshCw className="animate-spin text-primary dark:text-white" size={28} />
                 <p className="font-serif italic">Loading conversation...</p>
               </div>
             ) : isEmpty ? (
               <div className="flex flex-col items-center justify-center h-full text-center max-w-md mx-auto">
-                <div className="w-16 h-16 bg-primary/10 text-primary rounded-3xl flex items-center justify-center mb-5">
+                <div className="w-16 h-16 neu-icon text-primary dark:text-white flex items-center justify-center mb-5">
                   <Bot size={30} />
                 </div>
-                <h2 className="text-2xl font-serif font-black mb-2">How can I help your research?</h2>
-                <p className="text-slate-500 mb-6">
+                <span className="mono-academic text-[10px] font-black tracking-[0.2em] text-secondary dark:text-rose-300 uppercase block mb-2">
+                  Ask Anything
+                </span>
+                <h2 className="text-2xl font-serif font-black text-primary dark:text-white mb-2">
+                  How can I help your <span className="text-secondary dark:text-rose-300 italic">research</span>?
+                </h2>
+                <p className="text-slate-500 dark:text-slate-400 mb-6">
                   Ask about papers, find researchers, or explore what the community is discussing.
                 </p>
                 <div className="flex flex-col gap-2 w-full">
@@ -312,7 +322,7 @@ export default function AssistantPage() {
                     <button
                       key={s}
                       onClick={() => sendQuery(s)}
-                      className="flex items-center justify-between gap-2 px-4 py-3 bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl text-sm font-semibold text-slate-600 dark:text-slate-300 hover:border-primary/40 hover:text-primary transition-all"
+                      className="flex items-center justify-between gap-2 px-4 py-3 neu-btn text-sm font-semibold text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-white transition-all"
                     >
                       {s} <ArrowRight size={15} className="shrink-0" />
                     </button>
@@ -324,7 +334,7 @@ export default function AssistantPage() {
                 {messages.map((m, i) => (
                   <div key={m.id ?? i} className={`flex gap-3 ${m.role === "user" ? "justify-end" : "justify-start"}`}>
                     {m.role === "assistant" && (
-                      <div className="shrink-0 w-8 h-8 bg-primary/10 text-primary rounded-xl flex items-center justify-center">
+                      <div className="shrink-0 w-9 h-9 rounded-xl bg-primary/10 text-primary dark:text-white flex items-center justify-center">
                         <Bot size={16} />
                       </div>
                     )}
@@ -333,7 +343,7 @@ export default function AssistantPage() {
                         className={`px-4 py-3 rounded-2xl ${
                           m.role === "user"
                             ? "bg-primary text-white rounded-tr-sm"
-                            : "bg-white dark:bg-slate-800/60 border border-slate-100 dark:border-slate-700/50 rounded-tl-sm"
+                            : "glass-neu-card text-slate-900 dark:text-slate-100"
                         }`}
                       >
                         <p className="text-sm leading-relaxed whitespace-pre-line">{m.content}</p>
@@ -349,7 +359,7 @@ export default function AssistantPage() {
                       {/* Sources panel */}
                       {m.role === "assistant" && m.sources && m.sources.length > 0 && (
                         <div className="mt-3">
-                          <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">
+                          <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-2">
                             Sources
                           </p>
                           <div className="grid gap-2 sm:grid-cols-2">
@@ -368,7 +378,7 @@ export default function AssistantPage() {
                               key={fi}
                               onClick={() => sendQuery(f)}
                               disabled={sending}
-                              className="inline-flex items-center gap-1 px-3 py-1.5 bg-secondary/10 text-secondary text-xs font-bold rounded-full hover:bg-secondary/20 transition-colors disabled:opacity-50"
+                              className="inline-flex items-center gap-1 px-3 py-1.5 bg-secondary/10 text-secondary dark:text-rose-300 text-xs font-bold rounded-full hover:bg-secondary/20 transition-colors disabled:opacity-50"
                             >
                               {f} <ArrowRight size={12} />
                             </button>
@@ -377,7 +387,7 @@ export default function AssistantPage() {
                       )}
                     </div>
                     {m.role === "user" && (
-                      <div className="shrink-0 w-8 h-8 bg-slate-200 dark:bg-slate-700 text-slate-500 rounded-xl flex items-center justify-center">
+                      <div className="shrink-0 w-9 h-9 rounded-xl bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400 flex items-center justify-center">
                         <UserIcon size={16} />
                       </div>
                     )}
@@ -386,14 +396,14 @@ export default function AssistantPage() {
 
                 {sending && (
                   <div className="flex gap-3 justify-start">
-                    <div className="shrink-0 w-8 h-8 bg-primary/10 text-primary rounded-xl flex items-center justify-center">
+                    <div className="shrink-0 w-9 h-9 rounded-xl bg-primary/10 text-primary dark:text-white flex items-center justify-center">
                       <Bot size={16} />
                     </div>
-                    <div className="px-4 py-3 bg-white dark:bg-slate-800/60 border border-slate-100 dark:border-slate-700/50 rounded-2xl rounded-tl-sm">
+                    <div className="px-4 py-3 glass-neu-card">
                       <div className="flex gap-1.5">
-                        <span className="w-2 h-2 bg-slate-300 rounded-full animate-bounce [animation-delay:-0.3s]" />
-                        <span className="w-2 h-2 bg-slate-300 rounded-full animate-bounce [animation-delay:-0.15s]" />
-                        <span className="w-2 h-2 bg-slate-300 rounded-full animate-bounce" />
+                        <span className="w-2 h-2 bg-slate-300 dark:bg-slate-600 rounded-full animate-bounce [animation-delay:-0.3s]" />
+                        <span className="w-2 h-2 bg-slate-300 dark:bg-slate-600 rounded-full animate-bounce [animation-delay:-0.15s]" />
+                        <span className="w-2 h-2 bg-slate-300 dark:bg-slate-600 rounded-full animate-bounce" />
                       </div>
                     </div>
                   </div>
@@ -409,7 +419,7 @@ export default function AssistantPage() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0 }}
-                className="mx-4 md:mx-8 mb-2 flex items-center gap-2 text-xs font-medium text-error bg-error-surface border border-error/20 rounded-xl px-4 py-2.5"
+                className="mx-4 md:mx-8 mb-2 flex items-center gap-2 text-xs font-medium text-error bg-error-surface border border-error/20 rounded-2xl px-4 py-2.5"
               >
                 <AlertTriangle size={14} className="shrink-0" /> {error}
               </motion.div>
@@ -419,20 +429,20 @@ export default function AssistantPage() {
           {/* Composer */}
           <form
             onSubmit={handleSubmit}
-            className="px-4 md:px-8 py-4 border-t border-slate-200 dark:border-slate-800 shrink-0"
+            className="px-4 md:px-8 py-4 border-t border-slate-100 dark:border-slate-700 shrink-0"
           >
-            <div className="max-w-3xl mx-auto flex items-end gap-2">
+            <div className="max-w-3xl mx-auto flex items-end gap-2 neu-inset p-1.5">
               <input
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="Ask anything about research..."
-                className="flex-1 px-4 py-3 bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                className="flex-1 px-3.5 py-2.5 bg-transparent border-none rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary/20 transition-all"
               />
               <button
                 type="submit"
                 disabled={sending || !input.trim()}
-                className="p-3 bg-primary text-white rounded-2xl shadow-lg shadow-primary/20 hover:bg-primary/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                className="p-3 bg-primary text-white rounded-xl hover:bg-secondary transition-colors disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
               >
                 {sending ? <RefreshCw className="animate-spin" size={20} /> : <Send size={20} />}
               </button>

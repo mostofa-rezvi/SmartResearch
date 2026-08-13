@@ -308,73 +308,72 @@ export default function LibraryPage() {
       transition={{ duration: 0.2, delay: Math.min(index % 10 * 0.03, 0.3) }}
       className="mb-2 mx-4"
     >
-      <div 
+      <div
         onClick={() => setSelectedJournal(journal)}
-        className="bg-white dark:bg-slate-800/50 backdrop-blur-xl rounded-2xl p-4 border border-slate-100 dark:border-slate-700/50 shadow-sm hover:shadow-md transition-all group border-l-4 border-l-primary flex flex-col md:flex-row gap-4 cursor-pointer"
+        className="glass-neu-card glass-neu-hover p-4 border-l-4 border-l-primary transition-all group flex flex-col md:flex-row gap-4 cursor-pointer"
       >
         <div className="flex-1 min-w-0">
           <div className="flex flex-wrap items-center gap-2 mb-2">
-            <span className="text-[9px] font-black text-slate-400 tracking-wider bg-slate-100 dark:bg-slate-900 px-2 py-0.5 rounded uppercase">
+            <span className="text-[9px] font-black text-slate-400 tracking-wider bg-slate-100 dark:bg-slate-900 px-2 py-0.5 rounded-full uppercase">
               {journal.issn || "NO-ISSN"}
             </span>
             {journal.is_open_access && (
-              <span className="text-[9px] font-black text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded uppercase flex items-center gap-1">
+              <span className="text-[9px] font-black text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-full uppercase flex items-center gap-1">
                 <Globe size={9} /> OA
               </span>
             )}
-            <span className="text-[9px] font-black text-primary/60 bg-primary/5 px-2 py-0.5 rounded uppercase">
+            <span className="text-[9px] font-black text-primary/60 dark:text-white/60 bg-primary/5 px-2 py-0.5 rounded-full uppercase">
               {journal.year}
             </span>
           </div>
 
-          <h3 className="text-base font-serif font-black text-slate-900 dark:text-white mb-1 group-hover:text-primary transition-colors truncate">
+          <h3 className="text-base font-serif font-black text-slate-900 dark:text-white mb-1 group-hover:text-primary dark:group-hover:text-rose-300 transition-colors truncate">
             {journal.name}
           </h3>
 
           <div className="flex items-center gap-3 text-[10px] font-medium text-slate-500 dark:text-slate-400">
-            <span className="truncate max-w-[150px] font-bold text-primary/70">{journal.category}</span>
-            <span className="w-1 h-1 bg-slate-300 rounded-full" />
+            <span className="truncate max-w-[150px] font-bold text-primary/70 dark:text-white/70">{journal.category}</span>
+            <span className="w-1 h-1 bg-slate-300 dark:bg-slate-600 rounded-full" />
             <span className="truncate max-w-[150px]">{journal.publisher}</span>
             <span className="hidden sm:inline-flex items-center gap-1">
-              <Globe size={10} className="text-slate-300" />
+              <Globe size={10} className="text-slate-300 dark:text-slate-600" />
               {journal.geography || "Intl"}
             </span>
           </div>
         </div>
 
-        <div className="md:w-40 flex md:flex-row items-center justify-between gap-3 md:border-l border-slate-100 dark:border-slate-700/50 md:pl-4" onClick={(e) => e.stopPropagation()}>
+        <div className="md:w-44 flex md:flex-row items-center justify-between gap-2 md:border-l border-slate-100 dark:border-slate-700 md:pl-4" onClick={(e) => e.stopPropagation()}>
           <div className="flex items-center gap-2">
-             <div className={`w-9 h-9 rounded-xl flex flex-col items-center justify-center font-black shadow-sm ring-1 transition-transform group-hover:scale-105 ${
+             <span className={`inline-flex items-center justify-center px-3 py-1.5 rounded-full text-xs font-black ring-1 transition-transform group-hover:scale-105 ${
                 journal.quality_tier === 'Q1' ? 'bg-amber-400/10 text-amber-500 ring-amber-500/20' :
                 journal.quality_tier === 'Q2' ? 'bg-slate-400/10 text-slate-500 ring-slate-500/20' :
                 journal.quality_tier === 'Q3' ? 'bg-orange-400/10 text-orange-500 ring-orange-500/20' :
-                'bg-slate-100 text-slate-400 ring-slate-200'
+                'bg-slate-100 dark:bg-slate-900 text-slate-400 ring-slate-200 dark:ring-slate-700'
               }`}>
-                <span className="text-[8px] opacity-60 leading-none">SJR</span>
-                <span className="text-xs leading-none">{journal.quality_tier}</span>
-              </div>
-              <div className="text-right">
-                <p className="text-sm font-black text-primary leading-none">{Number(journal.sjr_score || 0).toFixed(3)}</p>
-                <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none mt-1">Impact</p>
-              </div>
+                {journal.quality_tier}
+              </span>
+              <span className="inline-flex flex-col items-end px-2.5 py-1 rounded-full bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-700">
+                <span className="text-sm font-black text-primary dark:text-white leading-none">{Number(journal.sjr_score || 0).toFixed(3)}</span>
+                <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none mt-0.5">SJR</span>
+              </span>
           </div>
 
           <div className="flex items-center gap-1">
-            <a 
+            <a
               href={journal.homepage_url || `https://www.google.com/search?q=${encodeURIComponent(journal.name + ' journal')}`}
-              target="_blank" 
+              target="_blank"
               rel="noreferrer"
-              className="p-2 text-slate-400 hover:text-primary hover:bg-primary/5 rounded-lg transition-all"
+              className="p-2 text-slate-400 hover:text-primary hover:bg-primary/5 rounded-xl transition-all"
               onClick={(e) => e.stopPropagation()}
             >
               <ExternalLink size={16} />
             </a>
-            <button 
+            <button
               onClick={(e) => {
                 e.stopPropagation();
                 toggleSave(journal);
               }}
-              className={`p-2 rounded-lg transition-all ${
+              className={`p-2 rounded-xl transition-all ${
                 savedJournals.some(j => j.id === journal.id)
                 ? 'bg-secondary text-white shadow-md shadow-secondary/20'
                 : 'text-slate-400 hover:text-secondary hover:bg-secondary/5'
@@ -389,29 +388,29 @@ export default function LibraryPage() {
   );
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0F172A] text-slate-900 dark:text-slate-100">
+    <div className="min-h-screen app-bg text-slate-900 dark:text-slate-100">
       <Navbar />
-      
+
       <main className="pt-24 h-screen flex flex-col max-w-[1600px] mx-auto px-4 md:px-8">
         {/* View Switcher: Journal Catalog vs. My Library (Knowledge Library items) */}
         <div className="flex items-center gap-2 mb-6 shrink-0">
           <button
             onClick={() => setView("catalog")}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-black transition-all ${
+            className={
               view === "catalog"
-                ? "bg-primary text-white shadow-lg shadow-primary/20"
-                : "bg-white dark:bg-slate-800 text-slate-500 border border-slate-200 dark:border-slate-700 hover:border-primary/40"
-            }`}
+                ? "flex items-center gap-2 px-5 py-2.5 rounded-2xl text-sm font-black transition-all bg-primary text-white shadow-xl shadow-primary/20"
+                : "flex items-center gap-2 px-5 py-2.5 text-sm font-black transition-all neu-btn text-slate-500 dark:text-slate-400 hover:border-primary/40"
+            }
           >
             <LibraryIcon size={16} /> Journal Catalog
           </button>
           <button
             onClick={() => setView("library")}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-black transition-all ${
+            className={
               view === "library"
-                ? "bg-primary text-white shadow-lg shadow-primary/20"
-                : "bg-white dark:bg-slate-800 text-slate-500 border border-slate-200 dark:border-slate-700 hover:border-primary/40"
-            }`}
+                ? "flex items-center gap-2 px-5 py-2.5 rounded-2xl text-sm font-black transition-all bg-primary text-white shadow-xl shadow-primary/20"
+                : "flex items-center gap-2 px-5 py-2.5 text-sm font-black transition-all neu-btn text-slate-500 dark:text-slate-400 hover:border-primary/40"
+            }
           >
             <BookMarked size={16} /> My Library
           </button>
@@ -420,31 +419,32 @@ export default function LibraryPage() {
         {view === "library" ? (
           <div className="flex-1 overflow-y-auto pb-8 custom-scrollbar">
             <div className="mb-6">
-              <h1 className="text-3xl font-serif font-black tracking-tight">My Library</h1>
-              <p className="text-slate-500 font-medium italic">Your papers, datasets, notes &amp; literature reviews — searchable by meaning.</p>
+              <span className="mono-academic text-xs font-black tracking-[0.2em] text-secondary dark:text-rose-300 uppercase mb-1 block">Knowledge Base</span>
+              <h1 className="text-2xl md:text-3xl font-serif font-black text-primary dark:text-white">
+                My <span className="text-secondary dark:text-rose-300 italic">Library</span>
+              </h1>
+              <p className="text-slate-500 dark:text-slate-400 font-medium text-sm mt-1">Your papers, datasets, notes &amp; literature reviews — searchable by meaning.</p>
             </div>
             <KnowledgeLibrary />
           </div>
         ) : (
         <>
         {/* Header Section */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8 shrink-0">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-6 shrink-0">
           <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
             <div>
-              <div className="flex items-center gap-3 mb-2">
-                <div className="p-3 bg-primary rounded-2xl text-white shadow-lg shadow-primary/20">
-                  <LibraryIcon size={24} />
-                </div>
-                <h1 className="text-4xl font-serif font-black tracking-tight">The Library</h1>
-              </div>
-              <p className="text-slate-500 font-medium italic">{totalCount.toLocaleString()}+ Peer-Reviewed Holdings Across 25 Years</p>
+              <span className="mono-academic text-xs font-black tracking-[0.2em] text-secondary dark:text-rose-300 uppercase mb-1 block">Journal Directory</span>
+              <h1 className="text-2xl md:text-3xl font-serif font-black text-primary dark:text-white">
+                The <span className="text-secondary dark:text-rose-300 italic">Library</span>
+              </h1>
+              <p className="text-slate-500 dark:text-slate-400 font-medium text-sm mt-1">{totalCount.toLocaleString()}+ Peer-Reviewed Holdings Across 25 Years</p>
             </div>
 
-            <button 
+            <button
               onClick={() => setShowSavedPopup(true)}
-              className="group flex items-center gap-3 px-6 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-sm hover:shadow-md hover:border-secondary transition-all"
+              className="group flex items-center gap-3 px-5 py-2.5 neu-btn hover:border-secondary transition-all"
             >
-              <div className="p-2 bg-secondary/10 text-secondary rounded-lg group-hover:bg-secondary group-hover:text-white transition-colors">
+              <div className="p-2 bg-secondary/10 text-secondary dark:text-rose-300 rounded-xl group-hover:bg-secondary group-hover:text-white transition-colors">
                 <Bookmark size={18} fill={savedJournals.length > 0 ? "currentColor" : "none"} />
               </div>
               <div className="text-left">
@@ -453,14 +453,14 @@ export default function LibraryPage() {
               </div>
             </button>
 
-            <button 
+            <button
               onClick={() => {
                 refreshSavedPapersCount();
                 setShowSavedPapers(true);
               }}
-              className="group flex items-center gap-3 px-6 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-sm hover:shadow-md hover:border-primary transition-all"
+              className="group flex items-center gap-3 px-5 py-2.5 neu-btn hover:border-primary transition-all"
             >
-              <div className="p-2 bg-primary/10 text-primary rounded-lg group-hover:bg-primary group-hover:text-white transition-colors">
+              <div className="p-2 bg-primary/10 text-primary dark:text-white rounded-xl group-hover:bg-primary group-hover:text-white transition-colors">
                 <FileText size={18} fill={savedPapersCount > 0 ? "currentColor" : "none"} />
               </div>
               <div className="text-left">
@@ -472,9 +472,9 @@ export default function LibraryPage() {
             {/* PDF Extractor button */}
             <button
               onClick={() => setShowPdfExtractor(true)}
-              className="group flex items-center gap-3 px-6 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-sm hover:shadow-md hover:border-rose-400 transition-all"
+              className="group flex items-center gap-3 px-5 py-2.5 neu-btn hover:border-rose-400 transition-all"
             >
-              <div className="p-2 bg-rose-500/10 text-rose-500 rounded-lg group-hover:bg-rose-500 group-hover:text-white transition-colors">
+              <div className="p-2 bg-rose-500/10 text-rose-500 rounded-xl group-hover:bg-rose-500 group-hover:text-white transition-colors">
                 <FileSearch size={18} />
               </div>
               <div className="text-left">
@@ -486,9 +486,9 @@ export default function LibraryPage() {
             {/* Summarize Volume — AI volume summary over the library */}
             <button
               onClick={() => setShowVolumeSummary(true)}
-              className="group flex items-center gap-3 px-6 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-sm hover:shadow-md hover:border-primary transition-all"
+              className="group flex items-center gap-3 px-5 py-2.5 neu-btn hover:border-primary transition-all"
             >
-              <div className="p-2 bg-primary/10 text-primary rounded-lg group-hover:bg-primary group-hover:text-white transition-colors">
+              <div className="p-2 bg-primary/10 text-primary dark:text-white rounded-xl group-hover:bg-primary group-hover:text-white transition-colors">
                 <Sparkles size={18} />
               </div>
               <div className="text-left">
@@ -501,15 +501,15 @@ export default function LibraryPage() {
           <div className="flex items-center gap-3 w-full md:w-auto">
             <div className="relative flex-1 md:w-96 group">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors" size={18} />
-              <input 
-                type="text" 
-                placeholder="Search journals, ISSN, or publishers..." 
+              <input
+                type="text"
+                placeholder="Search journals, ISSN, or publishers..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-4 py-4 bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 rounded-2xl outline-none focus:ring-4 focus:ring-primary/10 transition-all shadow-sm font-medium"
+                className="w-full pl-12 pr-4 py-3.5 neu-inset outline-none focus:ring-4 focus:ring-primary/10 transition-all font-medium text-slate-900 dark:text-white placeholder-slate-400"
               />
               {searchQuery && (
-                <button 
+                <button
                   onClick={() => setSearchQuery("")}
                   className="absolute right-4 top-1/2 -translate-y-1/2 p-1 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full"
                 >
@@ -517,7 +517,7 @@ export default function LibraryPage() {
                 </button>
               )}
             </div>
-            <button className="p-4 bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 rounded-2xl hover:bg-slate-50 transition-all md:hidden">
+            <button className="p-3.5 neu-btn transition-all md:hidden">
               <SlidersHorizontal size={18} />
             </button>
           </div>
@@ -526,12 +526,12 @@ export default function LibraryPage() {
         <div className="flex flex-1 overflow-hidden gap-8 pb-8">
           {/* Filters Sidebar */}
           <aside className="hidden md:flex flex-col w-80 shrink-0 space-y-6 overflow-y-auto pr-4 custom-scrollbar">
-            <div className="bg-white dark:bg-slate-800/50 rounded-3xl p-6 border border-slate-200 dark:border-slate-700/50 shadow-sm">
+            <div className="glass-neu-card p-6">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="font-black text-xs uppercase tracking-widest text-slate-400 flex items-center gap-2">
                   <Filter size={14} /> Refine Archives
                 </h3>
-                <button onClick={resetFilters} className="text-[10px] font-bold text-primary hover:underline">Reset</button>
+                <button onClick={resetFilters} className="text-[10px] font-bold text-primary dark:text-white hover:underline">Reset</button>
               </div>
 
               <div className="space-y-6">
@@ -543,10 +543,10 @@ export default function LibraryPage() {
                       <button
                         key={tier}
                         onClick={() => setFilters(f => ({ ...f, tier: f.tier === tier ? "" : tier }))}
-                        className={`py-3 rounded-xl text-xs font-black border transition-all ${
-                          filters.tier === tier 
-                          ? 'bg-primary text-white border-primary shadow-lg shadow-primary/20' 
-                          : 'bg-slate-50 dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-transparent hover:border-primary/30'
+                        className={`py-2.5 rounded-full text-xs font-black border transition-all ${
+                          filters.tier === tier
+                          ? 'bg-primary text-white border-primary shadow-lg shadow-primary/20'
+                          : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-100 dark:border-slate-700 hover:border-primary/30'
                         }`}
                       >
                         {tier}
@@ -558,10 +558,10 @@ export default function LibraryPage() {
                 {/* Categories */}
                 <section>
                   <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3">Academic Field</label>
-                  <select 
+                  <select
                     value={filters.category}
                     onChange={(e) => setFilters(f => ({ ...f, category: e.target.value }))}
-                    className="w-full p-3 bg-slate-50 dark:bg-slate-900 rounded-xl text-xs font-bold border-none outline-none appearance-none cursor-pointer hover:bg-slate-100 transition-colors"
+                    className="w-full p-3 neu-inset text-xs font-bold text-slate-700 dark:text-slate-200 outline-none appearance-none cursor-pointer transition-colors"
                   >
                     <option value="">All Disciplines</option>
                     {metadata?.categories.map(cat => (
@@ -578,20 +578,20 @@ export default function LibraryPage() {
                       <button
                         key={yr}
                         onClick={() => setFilters(f => ({ ...f, year: f.year === yr.toString() ? "" : yr.toString() }))}
-                        className={`px-3 py-1.5 rounded-lg text-[10px] font-black transition-all ${
-                          filters.year === yr.toString() 
-                          ? 'bg-secondary text-white shadow-md shadow-secondary/20' 
-                          : 'bg-slate-50 dark:bg-slate-900 text-slate-500 hover:text-secondary hover:bg-secondary/5'
+                        className={`px-3 py-1.5 rounded-full text-[10px] font-black border transition-all ${
+                          filters.year === yr.toString()
+                          ? 'bg-secondary text-white border-secondary shadow-md shadow-secondary/20'
+                          : 'bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-slate-100 dark:border-slate-700 hover:text-secondary hover:bg-secondary/5'
                         }`}
                       >
                         {yr}
                       </button>
                     ))}
                   </div>
-                  <select 
+                  <select
                     value={filters.year}
                     onChange={(e) => setFilters(f => ({ ...f, year: e.target.value }))}
-                    className="w-full p-3 bg-slate-50 dark:bg-slate-900 rounded-xl text-xs font-bold border-none outline-none appearance-none cursor-pointer hover:bg-slate-100 transition-colors"
+                    className="w-full p-3 neu-inset text-xs font-bold text-slate-700 dark:text-slate-200 outline-none appearance-none cursor-pointer transition-colors"
                   >
                     <option value="">All Years (1999-2025)</option>
                     {metadata?.years.map(yr => (
@@ -601,13 +601,13 @@ export default function LibraryPage() {
                 </section>
 
                  {/* Open Access Toggle */}
-                 <section className="pt-4 border-t border-slate-100 dark:border-slate-700/50">
+                 <section className="pt-4 border-t border-slate-100 dark:border-slate-700">
                   <label className="flex items-center justify-between cursor-pointer group">
                     <span className="text-xs font-bold text-slate-600 dark:text-slate-400 group-hover:text-primary transition-colors">Only Open Access</span>
                     <div className="relative">
-                      <input 
-                        type="checkbox" 
-                        className="sr-only" 
+                      <input
+                        type="checkbox"
+                        className="sr-only"
                         checked={filters.isOpenAccess}
                         onChange={() => setFilters(f => ({ ...f, isOpenAccess: !f.isOpenAccess }))}
                       />
@@ -621,11 +621,11 @@ export default function LibraryPage() {
             </div>
 
             {/* Quick Stats */}
-            <div className="p-6 bg-primary/5 rounded-3xl border border-primary/10">
-              <h4 className="text-[10px] font-black text-primary uppercase tracking-widest mb-4">Library Health</h4>
+            <div className="p-6 bg-primary/5 dark:bg-primary/10 rounded-3xl border border-primary/10 dark:border-primary/20">
+              <h4 className="text-[10px] font-black text-primary dark:text-white uppercase tracking-widest mb-4">Library Health</h4>
               <div className="space-y-4">
                 <div className="flex justify-between items-center">
-                  <span className="text-[10px] font-bold text-slate-500">Live Entries</span>
+                  <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400">Live Entries</span>
                   <span className="text-xs font-black text-slate-700 dark:text-slate-300">{totalCount.toLocaleString()}</span>
                 </div>
                 <div className="w-full bg-slate-200 dark:bg-slate-700 h-1.5 rounded-full overflow-hidden">
@@ -638,18 +638,32 @@ export default function LibraryPage() {
           {/* Results List */}
           <div className="flex-1 flex flex-col min-w-0">
             {journals.length === 0 && loading ? (
-               <div className="flex flex-col items-center justify-center h-full text-slate-400 space-y-4">
-                <RefreshCw className="animate-spin text-primary" size={32} />
-                <p className="font-serif italic text-lg">Unrolling the archives...</p>
+              <div className="flex-1 overflow-y-auto space-y-2 pb-4">
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <div key={i} className="mx-4 glass-neu-card p-4 flex flex-col md:flex-row gap-4">
+                    <div className="flex-1 min-w-0 space-y-3">
+                      <div className="flex gap-2">
+                        <div className="skeleton h-4 w-16 rounded" />
+                        <div className="skeleton h-4 w-10 rounded" />
+                      </div>
+                      <div className="skeleton h-5 w-2/3 rounded" />
+                      <div className="skeleton h-3 w-1/3 rounded" />
+                    </div>
+                    <div className="md:w-40 flex items-center gap-3 md:border-l border-slate-100 dark:border-slate-700 md:pl-4">
+                      <div className="skeleton w-9 h-9 rounded-full shrink-0" />
+                      <div className="skeleton h-8 w-16 rounded-full" />
+                    </div>
+                  </div>
+                ))}
               </div>
             ) : journals.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-full text-center p-8 bg-white dark:bg-slate-800/30 rounded-[3rem] border border-dashed border-slate-200 dark:border-slate-700">
+              <div className="flex flex-col items-center justify-center h-full text-center p-8 glass-neu-card">
                 <div className="w-20 h-20 bg-slate-50 dark:bg-slate-900 rounded-full flex items-center justify-center text-slate-300 mb-6">
                   <Search size={40} />
                 </div>
-                <h3 className="text-2xl font-serif font-black mb-2">No matching holdings</h3>
-                <p className="text-slate-500 max-w-md">Our library couldn't find any journals matching your current criteria. Try widening your search or resetting filters.</p>
-                <button onClick={resetFilters} className="mt-6 px-8 py-3 bg-primary text-white font-black rounded-2xl shadow-lg shadow-primary/20 hover:scale-105 transition-transform">Reset Filters</button>
+                <h3 className="text-2xl font-serif font-black text-primary dark:text-white mb-2">No matching holdings</h3>
+                <p className="text-slate-500 dark:text-slate-400 max-w-md">Our library couldn't find any journals matching your current criteria. Try widening your search or resetting filters.</p>
+                <button onClick={resetFilters} className="mt-6 px-8 py-3 bg-primary text-white font-bold rounded-2xl shadow-xl shadow-primary/20 hover:bg-secondary transition-all">Reset Filters</button>
               </div>
             ) : (
               <Virtuoso
@@ -663,9 +677,9 @@ export default function LibraryPage() {
                 )}
                 components={{
                   Footer: () => loading ? (
-                    <div className="p-8 text-center">
-                      <RefreshCw className="animate-spin inline-block text-primary mr-2" size={16} />
-                      <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Loading more...</span>
+                    <div className="mx-4 mb-2 glass-neu-card p-4 flex items-center gap-4">
+                      <div className="skeleton h-5 w-1/3 rounded" />
+                      <div className="skeleton h-5 w-1/4 rounded" />
                     </div>
                   ) : null
                 }}
@@ -693,16 +707,16 @@ export default function LibraryPage() {
                 animate={{ x: 0, opacity: 1 }}
                 exit={{ x: 100, opacity: 0 }}
                 onClick={(e) => e.stopPropagation()}
-                className="w-full max-w-lg h-full bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-2xl flex flex-col overflow-hidden"
+                className="w-full max-w-lg h-full glass-neu-card flex flex-col overflow-hidden"
               >
                 <div className="p-8 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between shrink-0">
                   <div>
                     <h2 className="text-3xl font-serif font-black text-slate-900 dark:text-white">My Collection</h2>
-                    <p className="text-sm text-slate-500 font-medium">{savedJournals.length} Saved Journals</p>
+                    <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">{savedJournals.length} Saved Journals</p>
                   </div>
-                  <button 
+                  <button
                     onClick={() => setShowSavedPopup(false)}
-                    className="p-3 bg-slate-50 dark:bg-slate-800 text-slate-400 hover:text-primary rounded-2xl transition-all"
+                    className="p-3 neu-btn text-slate-400 hover:text-primary transition-all"
                   >
                     <X size={24} />
                   </button>
@@ -710,24 +724,24 @@ export default function LibraryPage() {
 
                 <div className="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar">
                   {savedJournals.length === 0 ? (
-                    <div className="h-full flex flex-col items-center justify-center text-center p-8">
-                      <div className="w-20 h-20 bg-slate-50 dark:bg-slate-800 rounded-full flex items-center justify-center text-slate-300 mb-6">
+                    <div className="h-full flex flex-col items-center justify-center text-center p-8 glass-neu-card">
+                      <div className="w-20 h-20 bg-slate-50 dark:bg-slate-900 rounded-full flex items-center justify-center text-slate-300 mb-6">
                         <Bookmark size={40} />
                       </div>
-                      <h3 className="text-xl font-serif font-black mb-2">No journals saved yet</h3>
-                      <p className="text-slate-500">Click the bookmark icon on any journal to add it to your collection.</p>
+                      <h3 className="text-xl font-serif font-black text-primary dark:text-white mb-2">No journals saved yet</h3>
+                      <p className="text-slate-500 dark:text-slate-400">Click the bookmark icon on any journal to add it to your collection.</p>
                     </div>
                   ) : (
                     savedJournals.map(journal => (
-                      <div key={`saved-${journal.id}`} className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-700/50 group flex items-start gap-4 hover:border-secondary transition-all">
-                        <div className={`w-10 h-10 shrink-0 rounded-xl flex flex-col items-center justify-center font-black shadow-sm ring-1 ${
+                      <div key={`saved-${journal.id}`} className="glass-neu-card p-4 group flex items-start gap-4 hover:border-secondary transition-all">
+                        <span className={`shrink-0 inline-flex items-center justify-center w-10 h-10 rounded-full font-black text-xs shadow-sm ring-1 ${
                           journal.quality_tier === 'Q1' ? 'bg-amber-400/10 text-amber-500 ring-amber-500/20' :
                           journal.quality_tier === 'Q2' ? 'bg-slate-400/10 text-slate-500 ring-slate-500/20' :
                           journal.quality_tier === 'Q3' ? 'bg-orange-400/10 text-orange-500 ring-orange-500/20' :
-                          'bg-slate-100 text-slate-400 ring-slate-200'
+                          'bg-slate-100 dark:bg-slate-900 text-slate-400 ring-slate-200 dark:ring-slate-700'
                         }`}>
-                          <span className="text-[10px] leading-none">{journal.quality_tier}</span>
-                        </div>
+                          {journal.quality_tier}
+                        </span>
                         <div className="flex-1 min-w-0">
                           <h4 className="text-sm font-black text-slate-900 dark:text-white truncate mb-1">{journal.name}</h4>
                           <div className="flex items-center gap-2 text-[10px] font-bold text-slate-400">
@@ -756,11 +770,11 @@ export default function LibraryPage() {
                   )}
                 </div>
 
-                <div className="p-8 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800 shrink-0">
-                   <button 
+                <div className="p-8 border-t border-slate-100 dark:border-slate-800 shrink-0">
+                   <button
                     onClick={exportToCSV}
                     disabled={savedJournals.length === 0}
-                    className="w-full py-4 bg-primary text-white font-black rounded-2xl shadow-lg shadow-primary/20 hover:scale-[1.02] transition-transform active:scale-[0.98] disabled:opacity-50 disabled:hover:scale-100"
+                    className="w-full py-4 bg-primary text-white font-bold rounded-2xl shadow-xl shadow-primary/20 hover:bg-secondary transition-all active:scale-[0.98] disabled:opacity-50 disabled:hover:bg-primary"
                    >
                     Export Collection (CSV)
                    </button>

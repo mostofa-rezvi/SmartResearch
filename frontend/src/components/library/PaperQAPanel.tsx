@@ -69,7 +69,7 @@ export default function PaperQAPanel({ itemId, title }: PaperQAPanelProps) {
   return (
     <div className="bg-white dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-700/50 p-5">
       <div className="flex items-center gap-2 mb-3">
-        <div className="p-2 bg-primary/10 text-primary rounded-lg">
+        <div className="p-2 bg-primary/10 text-primary dark:text-white rounded-lg">
           <MessageCircleQuestion size={16} />
         </div>
         <div className="min-w-0">
@@ -101,7 +101,7 @@ export default function PaperQAPanel({ itemId, title }: PaperQAPanelProps) {
       <div className="mt-4">
         {loading && (
           <div className="flex items-center gap-2 text-sm text-slate-400 italic">
-            <RefreshCw className="animate-spin text-primary" size={14} />
+            <RefreshCw className="animate-spin text-primary dark:text-white" size={14} />
             Reading the paper...
           </div>
         )}

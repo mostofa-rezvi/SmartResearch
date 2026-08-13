@@ -49,20 +49,20 @@ export function LibraryItemList({ refreshKey }: { refreshKey: number }) {
   );
 
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 space-y-5">
+    <div className="glass-neu-card p-6 space-y-5">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
-            <Inbox className="text-primary" size={20} />
+          <div className="w-10 h-10 neu-icon flex items-center justify-center">
+            <Inbox className="text-primary dark:text-white" size={20} />
           </div>
           <div>
             <h2 className="text-lg font-bold text-slate-900 dark:text-white">My Library</h2>
-            <p className="text-sm text-slate-500">{items.length} item{items.length === 1 ? "" : "s"} saved</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400">{items.length} item{items.length === 1 ? "" : "s"} saved</p>
           </div>
         </div>
         <button
           onClick={load}
-          className="p-2 text-slate-400 hover:text-primary hover:bg-primary/5 rounded-xl transition-all"
+          className="p-2 neu-btn text-slate-400 hover:text-primary transition-all"
           title="Refresh"
         >
           <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
@@ -76,7 +76,7 @@ export function LibraryItemList({ refreshKey }: { refreshKey: number }) {
           className={`px-3 py-1.5 rounded-lg text-xs font-black border transition-all ${
             filter === "all"
               ? "bg-primary text-white border-primary"
-              : "bg-slate-50 dark:bg-slate-800 text-slate-500 border-transparent hover:border-primary/30"
+              : "neu-btn text-slate-500 dark:text-slate-400 border-transparent"
           }`}
         >
           All ({items.length})
@@ -88,7 +88,7 @@ export function LibraryItemList({ refreshKey }: { refreshKey: number }) {
             className={`px-3 py-1.5 rounded-lg text-xs font-black border transition-all ${
               filter === t
                 ? "bg-primary text-white border-primary"
-                : "bg-slate-50 dark:bg-slate-800 text-slate-500 border-transparent hover:border-primary/30"
+                : "neu-btn text-slate-500 dark:text-slate-400 border-transparent"
             }`}
           >
             {ITEM_TYPE_META[t].label} ({counts[t] || 0})
@@ -102,7 +102,7 @@ export function LibraryItemList({ refreshKey }: { refreshKey: number }) {
 
       {loading && items.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-12 text-slate-400 gap-3">
-          <RefreshCw className="animate-spin text-primary" size={28} />
+          <RefreshCw className="animate-spin text-primary dark:text-white" size={28} />
           <p className="text-sm font-medium">Loading your library...</p>
         </div>
       ) : visible.length === 0 && !error ? (
@@ -124,7 +124,7 @@ export function LibraryItemList({ refreshKey }: { refreshKey: number }) {
             return (
               <div
                 key={item.id}
-                className={`bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-4 border border-slate-100 dark:border-slate-700/50 border-l-4 ${meta?.accent || "border-l-primary"} hover:shadow-sm transition-all`}
+                className={`glass-neu-card p-4 border-l-4 ${meta?.accent || "border-l-primary"} transition-all`}
               >
                 <div className="flex flex-wrap items-center gap-2 mb-1.5">
                   <span className={`text-[10px] font-black px-2 py-0.5 rounded-md border uppercase tracking-wider ${meta?.badge || ""}`}>
@@ -140,18 +140,18 @@ export function LibraryItemList({ refreshKey }: { refreshKey: number }) {
                 <h3 className="font-bold text-slate-900 dark:text-white text-sm leading-snug">{item.title}</h3>
 
                 {item.authors && (
-                  <p className="text-xs text-slate-500 mt-0.5 flex items-center gap-1">
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 flex items-center gap-1">
                     <Users size={11} className="shrink-0" /> {item.authors}
                   </p>
                 )}
                 {item.abstract && (
-                  <p className="text-xs text-slate-500 mt-1.5 line-clamp-3 leading-relaxed">{item.abstract}</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1.5 line-clamp-3 leading-relaxed">{item.abstract}</p>
                 )}
 
                 {item.tags && item.tags.length > 0 && (
                   <div className="flex flex-wrap gap-1.5 mt-2">
                     {item.tags.map((tag, ti) => (
-                      <span key={ti} className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-white dark:bg-slate-800 text-slate-500 border border-slate-100 dark:border-slate-700">
+                      <span key={ti} className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-100 dark:border-slate-700">
                         {tag}
                       </span>
                     ))}
@@ -164,7 +164,7 @@ export function LibraryItemList({ refreshKey }: { refreshKey: number }) {
                       href={item.file_url}
                       target="_blank"
                       rel="noreferrer"
-                      className="text-xs font-bold text-primary hover:underline flex items-center gap-1"
+                      className="text-xs font-bold text-primary dark:text-white hover:underline flex items-center gap-1"
                     >
                       <FileText size={12} /> PDF
                     </a>
@@ -174,7 +174,7 @@ export function LibraryItemList({ refreshKey }: { refreshKey: number }) {
                       href={`https://doi.org/${item.doi}`}
                       target="_blank"
                       rel="noreferrer"
-                      className="text-xs font-bold text-slate-500 hover:text-primary hover:underline flex items-center gap-1"
+                      className="text-xs font-bold text-slate-500 dark:text-slate-400 hover:text-primary hover:underline flex items-center gap-1"
                     >
                       <ExternalLink size={12} /> DOI
                     </a>

@@ -106,11 +106,11 @@ export function LibraryItemForm({ onCreated }: { onCreated: (item: LibraryItem) 
     <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 space-y-5">
       <div className="flex items-center gap-3">
         <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
-          <Plus className="text-primary" size={20} />
+          <Plus className="text-primary dark:text-white" size={20} />
         </div>
         <div>
           <h2 className="text-lg font-bold text-slate-900 dark:text-white">Add to Library</h2>
-          <p className="text-sm text-slate-500">Save a paper, dataset, note or literature review</p>
+          <p className="text-sm text-slate-500 dark:text-slate-400">Save a paper, dataset, note or literature review</p>
         </div>
       </div>
 
@@ -136,7 +136,7 @@ export function LibraryItemForm({ onCreated }: { onCreated: (item: LibraryItem) 
             value={title}
             onChange={e => setTitle(e.target.value)}
             placeholder="Enter a title..."
-            className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 outline-none focus:ring-2 focus:ring-primary/40"
+            className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 outline-none focus:ring-2 focus:ring-primary/40"
           />
         </div>
 
@@ -148,7 +148,7 @@ export function LibraryItemForm({ onCreated }: { onCreated: (item: LibraryItem) 
             onChange={e => setAbstract(e.target.value)}
             rows={4}
             placeholder="Optional abstract or notes..."
-            className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 outline-none focus:ring-2 focus:ring-primary/40 resize-y"
+            className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 outline-none focus:ring-2 focus:ring-primary/40 resize-y"
           />
         </div>
 
@@ -159,7 +159,7 @@ export function LibraryItemForm({ onCreated }: { onCreated: (item: LibraryItem) 
             value={authors}
             onChange={e => setAuthors(e.target.value)}
             placeholder="e.g. Jane Doe, John Smith"
-            className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 outline-none focus:ring-2 focus:ring-primary/40"
+            className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 outline-none focus:ring-2 focus:ring-primary/40"
           />
         </div>
 
@@ -170,7 +170,7 @@ export function LibraryItemForm({ onCreated }: { onCreated: (item: LibraryItem) 
             value={doi}
             onChange={e => setDoi(e.target.value)}
             placeholder="10.xxxx/xxxxx (optional)"
-            className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 outline-none focus:ring-2 focus:ring-primary/40"
+            className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 outline-none focus:ring-2 focus:ring-primary/40"
           />
         </div>
 
@@ -181,7 +181,7 @@ export function LibraryItemForm({ onCreated }: { onCreated: (item: LibraryItem) 
             value={tags}
             onChange={e => setTags(e.target.value)}
             placeholder="Comma-separated, e.g. nlp, transformers"
-            className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 outline-none focus:ring-2 focus:ring-primary/40"
+            className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 outline-none focus:ring-2 focus:ring-primary/40"
           />
         </div>
 
@@ -214,7 +214,7 @@ export function LibraryItemForm({ onCreated }: { onCreated: (item: LibraryItem) 
             <button
               type="button"
               onClick={() => fileRef.current?.click()}
-              className="w-full flex items-center justify-center gap-2 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl px-3 py-3 text-sm font-semibold text-slate-500 hover:border-primary/40 hover:text-primary transition-all"
+              className="w-full flex items-center justify-center gap-2 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl px-3 py-3 text-sm font-semibold text-slate-500 dark:text-slate-400 hover:border-primary/40 hover:text-primary transition-all"
             >
               <Upload size={16} /> Choose a PDF
             </button>

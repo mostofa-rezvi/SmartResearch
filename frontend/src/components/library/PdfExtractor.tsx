@@ -20,7 +20,7 @@ interface ExtractionResult {
 function StatChip({ label, value, icon }: { label: string; value: string | number; icon: React.ReactNode }) {
   return (
     <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-100 dark:bg-slate-800 rounded-xl">
-      <span className="text-slate-500">{icon}</span>
+      <span className="text-slate-500 dark:text-slate-400">{icon}</span>
       <span className="text-xs font-bold text-slate-700 dark:text-slate-300">{value}</span>
       <span className="text-[10px] text-slate-400 uppercase tracking-wider">{label}</span>
     </div>
@@ -101,7 +101,7 @@ export function PdfExtractor() {
         </div>
         <div>
           <h2 className="text-lg font-bold text-slate-900 dark:text-white">PDF Text Extractor</h2>
-          <p className="text-sm text-slate-500">Extract title, abstract &amp; full text from research PDFs</p>
+          <p className="text-sm text-slate-500 dark:text-slate-400">Extract title, abstract &amp; full text from research PDFs</p>
         </div>
       </div>
 
@@ -169,7 +169,7 @@ export function PdfExtractor() {
       {loading && (
         <div className="flex flex-col items-center py-8 gap-3">
           <Loader2 size={32} className="animate-spin text-rose-500" />
-          <p className="text-sm font-medium text-slate-500">Extracting text — this may take a moment for large PDFs...</p>
+          <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Extracting text — this may take a moment for large PDFs...</p>
         </div>
       )}
 

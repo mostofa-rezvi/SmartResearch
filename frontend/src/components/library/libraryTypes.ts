@@ -27,7 +27,7 @@ export type ItemType = (typeof ITEM_TYPE_ORDER)[number];
 export const ITEM_TYPE_META: Record<string, { label: string; badge: string; accent: string }> = {
   paper: {
     label: "Paper",
-    badge: "bg-primary/10 text-primary border-primary/20",
+    badge: "bg-primary/10 text-primary dark:text-white border-primary/20",
     accent: "border-l-primary",
   },
   dataset: {

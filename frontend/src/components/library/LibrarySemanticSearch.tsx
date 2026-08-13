@@ -47,7 +47,7 @@ export function LibrarySemanticSearch() {
         </div>
         <div>
           <h2 className="text-lg font-bold text-slate-900 dark:text-white">Semantic Search</h2>
-          <p className="text-sm text-slate-500">Search your library by meaning, not just keywords</p>
+          <p className="text-sm text-slate-500 dark:text-slate-400">Search your library by meaning, not just keywords</p>
         </div>
       </div>
 
@@ -58,7 +58,7 @@ export function LibrarySemanticSearch() {
             value={query}
             onChange={e => setQuery(e.target.value)}
             placeholder="e.g. transformer models for protein folding..."
-            className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl pl-9 pr-4 py-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500/40"
+            className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl pl-9 pr-4 py-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-violet-500/40"
           />
         </div>
         <button
@@ -89,14 +89,14 @@ export function LibrarySemanticSearch() {
               )}
               <div className="flex-1 min-w-0">
                 <h3 className="font-bold text-slate-900 dark:text-white text-sm">{r.title}</h3>
-                {r.authors && <p className="text-xs text-slate-500 mt-0.5">{r.authors}</p>}
+                {r.authors && <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{r.authors}</p>}
                 {r.abstract && (
-                  <p className="text-xs text-slate-500 mt-1 line-clamp-2">{r.abstract}</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">{r.abstract}</p>
                 )}
                 {r.tags && r.tags.length > 0 && (
                   <div className="flex flex-wrap gap-1.5 mt-2">
                     {r.tags.map((tag, ti) => (
-                      <span key={ti} className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-500">
+                      <span key={ti} className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
                         {tag}
                       </span>
                     ))}

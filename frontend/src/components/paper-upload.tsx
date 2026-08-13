@@ -19,7 +19,7 @@ export function PaperUpload({ onUpload }: PaperUploadProps) {
       <Upload className="w-8 h-8 text-slate-400" />
       <div className="text-center">
         <p className="text-sm font-medium">Click to upload a research paper</p>
-        <p className="text-xs text-slate-500">PDF, up to 10MB</p>
+        <p className="text-xs text-slate-500 dark:text-slate-400">PDF, up to 10MB</p>
       </div>
       <input
         type="file"
