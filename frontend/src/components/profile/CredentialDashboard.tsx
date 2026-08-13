@@ -60,17 +60,17 @@ const LEVEL_COLORS: Record<string, string> = {
 };
 
 const LEVEL_BG: Record<string, string> = {
-  bronze: "bg-amber-50 border-amber-200",
-  silver: "bg-slate-50 border-slate-200",
-  gold: "bg-yellow-50 border-yellow-200",
-  platinum: "bg-indigo-50 border-indigo-200",
+  bronze: "bg-amber-50 dark:bg-amber-900/30 border-amber-200 dark:border-amber-800/50",
+  silver: "bg-slate-50 dark:bg-slate-900/60 border-slate-200 dark:border-slate-700",
+  gold: "bg-yellow-50 dark:bg-yellow-900/30 border-yellow-200 dark:border-yellow-800/50",
+  platinum: "bg-indigo-50 dark:bg-indigo-900/30 border-indigo-200 dark:border-indigo-800/50",
 };
 
 const LEVEL_TEXT: Record<string, string> = {
-  bronze: "text-amber-700",
-  silver: "text-slate-600",
-  gold: "text-yellow-700",
-  platinum: "text-indigo-600",
+  bronze: "text-amber-700 dark:text-amber-300",
+  silver: "text-slate-600 dark:text-slate-300",
+  gold: "text-yellow-700 dark:text-yellow-300",
+  platinum: "text-indigo-600 dark:text-indigo-400",
 };
 
 const ACTION_LABELS: Record<string, string> = {
@@ -105,19 +105,19 @@ function AchievementCard({ ach }: { ach: Achievement }) {
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      className={`relative rounded-2xl border p-5 flex flex-col gap-3 transition-all ${
+      className={`relative p-5 flex flex-col gap-3 transition-all ${
         earned
-          ? `${LEVEL_BG[earned]} shadow-md`
-          : "bg-white border-slate-100 opacity-70"
+          ? `${LEVEL_BG[earned]} rounded-2xl border shadow-md`
+          : "glass-neu-card opacity-70"
       }`}
     >
       {/* Badge Icon */}
       <div className="flex items-start justify-between gap-3">
         <div
-          className={`w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shadow-inner ${
+          className={`w-12 h-12 flex items-center justify-center text-2xl ${
             earned
-              ? `bg-gradient-to-br ${LEVEL_COLORS[earned]} text-white`
-              : "bg-slate-100 grayscale"
+              ? `rounded-2xl shadow-inner bg-gradient-to-br ${LEVEL_COLORS[earned]} text-white`
+              : "neu-icon grayscale"
           }`}
         >
           {ach.icon}
@@ -130,15 +130,15 @@ function AchievementCard({ ach }: { ach: Achievement }) {
           </span>
         )}
         {!earned && (
-          <span className="text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full bg-slate-100 text-slate-400 flex items-center gap-1">
+          <span className="text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center gap-1">
             <Lock size={9} /> Locked
           </span>
         )}
       </div>
 
       <div>
-        <h4 className="font-bold text-sm text-slate-900">{ach.label}</h4>
-        <p className="text-xs text-slate-500 mt-0.5">{ach.description}</p>
+        <h4 className="font-bold text-sm text-slate-900 dark:text-white">{ach.label}</h4>
+        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{ach.description}</p>
       </div>
 
       {/* Progress bar */}
@@ -148,7 +148,7 @@ function AchievementCard({ ach }: { ach: Achievement }) {
             <span>{ach.current_count} / {ach.next_threshold.required} for {ach.next_threshold.level}</span>
             <span>{Math.min(100, Math.round((ach.current_count / ach.next_threshold.required) * 100))}%</span>
           </div>
-          <div className="h-1.5 rounded-full bg-slate-100 overflow-hidden">
+          <div className="h-1.5 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
             <div
               className={`h-full rounded-full bg-gradient-to-r ${
                 ach.next_threshold.level in LEVEL_COLORS
@@ -164,7 +164,7 @@ function AchievementCard({ ach }: { ach: Achievement }) {
       )}
 
       {!ach.next_threshold && earned === "platinum" && (
-        <div className="flex items-center gap-2 text-indigo-600 text-xs font-bold">
+        <div className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 text-xs font-bold">
           <CheckCircle2 size={14} />
           Maximum level achieved
         </div>
@@ -178,7 +178,7 @@ function AchievementCard({ ach }: { ach: Achievement }) {
             className={`flex-1 h-1 rounded-full transition-all ${
               i <= earnedIdx
                 ? `bg-gradient-to-r ${LEVEL_COLORS[lvl]}`
-                : "bg-slate-100"
+                : "bg-slate-100 dark:bg-slate-800"
             }`}
           />
         ))}
@@ -209,19 +209,19 @@ function AuditLogEntry({ entry, idx }: { entry: AuditEntry; idx: number }) {
 
       <button
         onClick={() => setExpanded(!expanded)}
-        className="w-full text-left bg-white border border-slate-100 rounded-2xl p-4 hover:border-primary/30 hover:shadow-sm transition-all"
+        className="w-full text-left glass-neu-card glass-neu-hover p-4 transition-all"
       >
         <div className="flex items-start justify-between gap-2">
           <div>
             <div className="flex items-center gap-2 mb-1">
               <ShieldCheck size={14} className="text-emerald-500 shrink-0" />
-              <span className="text-sm font-bold text-slate-800">
+              <span className="text-sm font-bold text-slate-800 dark:text-slate-200">
                 {ACTION_LABELS[entry.action] || entry.action.replace(/_/g, " ")}
               </span>
             </div>
             {changedLabels && (
-              <p className="text-xs text-slate-500 ml-5">
-                Changed: <span className="font-semibold text-slate-700">{changedLabels}</span>
+              <p className="text-xs text-slate-500 dark:text-slate-400 ml-5">
+                Changed: <span className="font-semibold text-slate-700 dark:text-slate-200">{changedLabels}</span>
               </p>
             )}
           </div>
@@ -252,7 +252,7 @@ function AuditLogEntry({ entry, idx }: { entry: AuditEntry; idx: number }) {
             exit={{ height: 0, opacity: 0 }}
             className="overflow-hidden"
           >
-            <div className="bg-slate-50 rounded-b-2xl border border-t-0 border-slate-100 px-4 pb-4 pt-3 space-y-2">
+            <div className="bg-slate-50 dark:bg-slate-900/60 rounded-b-2xl border border-t-0 border-slate-100 dark:border-slate-700 px-4 pb-4 pt-3 space-y-2">
               {entry.ip_address && (
                 <p className="text-[11px] text-slate-400 font-mono">
                   IP: {entry.ip_address}
@@ -260,14 +260,14 @@ function AuditLogEntry({ entry, idx }: { entry: AuditEntry; idx: number }) {
               )}
               {Object.keys(entry.new_values || {}).map((field) => (
                 <div key={field} className="text-xs">
-                  <span className="font-bold text-slate-500 uppercase tracking-wider text-[10px]">
+                  <span className="font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-[10px]">
                     {FIELD_LABELS[field] || field}
                   </span>
                   <div className="flex gap-2 mt-0.5 flex-wrap">
-                    <span className="line-through text-slate-400 bg-red-50 px-1.5 py-0.5 rounded text-[11px]">
+                    <span className="line-through text-slate-400 bg-red-50 dark:bg-red-900/30 px-1.5 py-0.5 rounded text-[11px]">
                       {String(entry.old_values?.[field] ?? "—").slice(0, 80)}
                     </span>
-                    <span className="text-slate-700 bg-green-50 px-1.5 py-0.5 rounded text-[11px]">
+                    <span className="text-slate-700 dark:text-slate-200 bg-green-50 dark:bg-green-900/30 px-1.5 py-0.5 rounded text-[11px]">
                       {String(entry.new_values?.[field] ?? "—").slice(0, 80)}
                     </span>
                   </div>
@@ -352,29 +352,29 @@ export default function CredentialDashboard() {
   const totalPages = Math.ceil(auditTotal / AUDIT_LIMIT);
 
   return (
-    <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
+    <div className="glass-neu-card overflow-hidden">
       {/* Header */}
-      <div className="bg-gradient-to-r from-primary/5 to-secondary/5 border-b border-slate-100 p-6">
+      <div className="bg-gradient-to-r from-primary/5 to-secondary/5 border-b border-slate-100 dark:border-slate-800 p-6">
         <div className="flex items-center justify-between flex-wrap gap-4">
           <div>
-            <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-              <Award className="text-primary" size={22} />
+            <h3 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <Award className="text-primary dark:text-white" size={22} />
               Researcher Credentials
             </h3>
-            <p className="text-sm text-slate-500 mt-1">
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
               Your verified academic achievements and profile history
             </p>
           </div>
           {!loading && (
             <div className="flex items-center gap-3">
-              <div className="bg-white rounded-2xl border border-slate-100 px-4 py-2 text-center shadow-sm">
-                <div className="text-2xl font-black text-primary">{earnedCount}</div>
+              <div className="glass-panel px-4 py-2 text-center">
+                <div className="text-2xl font-black text-primary dark:text-white">{earnedCount}</div>
                 <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                   Badges Earned
                 </div>
               </div>
-              <div className="bg-white rounded-2xl border border-slate-100 px-4 py-2 text-center shadow-sm">
-                <div className="text-2xl font-black text-slate-700">{auditTotal}</div>
+              <div className="glass-panel px-4 py-2 text-center">
+                <div className="text-2xl font-black text-slate-700 dark:text-slate-200">{auditTotal}</div>
                 <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                   Change Events
                 </div>
@@ -391,7 +391,7 @@ export default function CredentialDashboard() {
               onClick={() => setTab(t)}
               className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all ${
                 tab === t
-                  ? "bg-white shadow text-primary border border-primary/20"
+                  ? "bg-white dark:bg-slate-800 shadow text-primary dark:text-white border border-primary/20"
                   : "text-slate-400 hover:text-slate-700"
               }`}
             >
@@ -455,7 +455,7 @@ export default function CredentialDashboard() {
             ) : (
               <>
                 {/* Timeline */}
-                <div className="relative space-y-4 before:absolute before:left-[7px] before:top-4 before:bottom-4 before:w-0.5 before:bg-gradient-to-b before:from-primary/30 before:via-slate-200 before:to-transparent">
+                <div className="relative space-y-4 before:absolute before:left-[7px] before:top-4 before:bottom-4 before:w-0.5 before:bg-gradient-to-b before:from-primary/30 before:via-slate-200 dark:before:via-slate-700 before:to-transparent">
                   {auditLogs.map((entry, idx) => (
                     <AuditLogEntry key={entry.id} entry={entry} idx={idx} />
                   ))}
@@ -463,11 +463,11 @@ export default function CredentialDashboard() {
 
                 {/* Pagination */}
                 {totalPages > 1 && (
-                  <div className="flex items-center justify-between pt-4 border-t border-slate-100">
+                  <div className="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-800">
                     <button
                       onClick={() => handlePageChange(auditPage - 1)}
                       disabled={auditPage === 1}
-                      className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-50 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                      className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-bold text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                     >
                       <ChevronLeft size={16} /> Previous
                     </button>
@@ -477,7 +477,7 @@ export default function CredentialDashboard() {
                     <button
                       onClick={() => handlePageChange(auditPage + 1)}
                       disabled={auditPage === totalPages}
-                      className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-50 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                      className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-bold text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                     >
                       Next <ChevronRight size={16} />
                     </button>

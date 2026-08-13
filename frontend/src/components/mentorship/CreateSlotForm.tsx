@@ -58,13 +58,13 @@ export function CreateSlotForm({ onCreated }: CreateSlotFormProps) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="p-6 rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm space-y-4 max-w-2xl"
+      className="p-6 glass-neu-card space-y-4 max-w-2xl"
     >
       <div className="flex items-center gap-2">
-        <PlusCircle size={20} className="text-primary" />
+        <PlusCircle size={20} className="text-primary dark:text-white" />
         <h3 className="text-lg font-bold text-slate-900 dark:text-white">Offer a Mentorship Slot</h3>
       </div>
-      <p className="text-sm text-slate-500">
+      <p className="text-sm text-slate-500 dark:text-slate-400">
         Publish an open slot so mentees can discover and request your mentorship.
       </p>
 
@@ -85,7 +85,7 @@ export function CreateSlotForm({ onCreated }: CreateSlotFormProps) {
             value={domain}
             onChange={(e) => setDomain(e.target.value)}
             placeholder="e.g. Machine Learning"
-            className="w-full p-2 text-sm border rounded-lg dark:bg-slate-800 dark:border-slate-700 dark:text-white outline-none focus:border-primary"
+            className="w-full p-2 text-sm neu-inset dark:text-white outline-none focus:border-primary"
           />
         </div>
         <div>
@@ -97,7 +97,7 @@ export function CreateSlotForm({ onCreated }: CreateSlotFormProps) {
             min={1}
             value={capacity}
             onChange={(e) => setCapacity(Math.max(1, Number(e.target.value)))}
-            className="w-full p-2 text-sm border rounded-lg dark:bg-slate-800 dark:border-slate-700 dark:text-white outline-none focus:border-primary"
+            className="w-full p-2 text-sm neu-inset dark:text-white outline-none focus:border-primary"
           />
         </div>
       </div>
@@ -108,7 +108,7 @@ export function CreateSlotForm({ onCreated }: CreateSlotFormProps) {
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="e.g. Guidance on ML research careers"
-          className="w-full p-2 text-sm border rounded-lg dark:bg-slate-800 dark:border-slate-700 dark:text-white outline-none focus:border-primary"
+          className="w-full p-2 text-sm neu-inset dark:text-white outline-none focus:border-primary"
         />
       </div>
 
@@ -120,7 +120,7 @@ export function CreateSlotForm({ onCreated }: CreateSlotFormProps) {
           value={availability}
           onChange={(e) => setAvailability(e.target.value)}
           placeholder="e.g. Weekday evenings, 2 sessions/month"
-          className="w-full p-2 text-sm border rounded-lg dark:bg-slate-800 dark:border-slate-700 dark:text-white outline-none focus:border-primary"
+          className="w-full p-2 text-sm neu-inset dark:text-white outline-none focus:border-primary"
         />
       </div>
 
@@ -133,7 +133,7 @@ export function CreateSlotForm({ onCreated }: CreateSlotFormProps) {
           onChange={(e) => setDescription(e.target.value)}
           rows={3}
           placeholder="What can mentees expect from this mentorship?"
-          className="w-full p-2 text-sm border rounded-lg dark:bg-slate-800 dark:border-slate-700 dark:text-white outline-none focus:border-primary"
+          className="w-full p-2 text-sm neu-inset dark:text-white outline-none focus:border-primary"
         />
       </div>
 

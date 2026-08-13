@@ -45,7 +45,7 @@ export function MyMentorships() {
   if (loading) {
     return (
       <div className="flex justify-center p-10">
-        <Loader2 className="animate-spin h-7 w-7 text-primary" />
+        <Loader2 className="animate-spin h-7 w-7 text-primary dark:text-white" />
       </div>
     );
   }
@@ -54,7 +54,7 @@ export function MyMentorships() {
 
   if (accepted.length === 0) {
     return (
-      <div className="p-8 text-center bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-100 dark:border-slate-800 text-slate-500">
+      <div className="p-8 text-center glass-neu-card text-slate-500 dark:text-slate-400">
         No active mentorships yet. Once a request is accepted, you can schedule sessions here.
       </div>
     );
@@ -71,7 +71,7 @@ export function MyMentorships() {
         return (
           <div
             key={m.id}
-            className="p-5 rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm"
+            className="p-5 glass-neu-card"
           >
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-600">

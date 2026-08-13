@@ -109,7 +109,7 @@ export function SessionsPanel({ mentorshipId }: SessionsPanelProps) {
             type="datetime-local"
             value={scheduledAt}
             onChange={(e) => setScheduledAt(e.target.value)}
-            className="w-full p-2 text-sm border rounded-lg dark:bg-slate-800 dark:border-slate-700 dark:text-white outline-none focus:border-primary"
+            className="w-full p-2 text-sm neu-inset dark:text-white outline-none focus:border-primary"
           />
         </div>
         <div className="flex-1">
@@ -118,7 +118,7 @@ export function SessionsPanel({ mentorshipId }: SessionsPanelProps) {
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             placeholder="Agenda / topic"
-            className="w-full p-2 text-sm border rounded-lg dark:bg-slate-800 dark:border-slate-700 dark:text-white outline-none focus:border-primary"
+            className="w-full p-2 text-sm neu-inset dark:text-white outline-none focus:border-primary"
           />
         </div>
         <button
@@ -134,7 +134,7 @@ export function SessionsPanel({ mentorshipId }: SessionsPanelProps) {
       {/* Sessions list */}
       {loading ? (
         <div className="flex justify-center p-4">
-          <Loader2 className="animate-spin h-5 w-5 text-primary" />
+          <Loader2 className="animate-spin h-5 w-5 text-primary dark:text-white" />
         </div>
       ) : sessions.length === 0 ? (
         <p className="text-sm text-slate-400">No sessions scheduled yet.</p>
@@ -145,7 +145,7 @@ export function SessionsPanel({ mentorshipId }: SessionsPanelProps) {
             return (
               <li
                 key={s.id}
-                className="flex items-center justify-between gap-3 p-3 rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800"
+                className="flex items-center justify-between gap-3 p-3 glass-panel"
               >
                 <div className="flex items-start gap-2 min-w-0">
                   {done ? (
@@ -160,7 +160,7 @@ export function SessionsPanel({ mentorshipId }: SessionsPanelProps) {
                         ? new Date(s.scheduled_at).toLocaleString()
                         : "Time to be decided"}
                     </p>
-                    {s.notes && <p className="text-xs text-slate-500 mt-0.5 truncate">{s.notes}</p>}
+                    {s.notes && <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 truncate">{s.notes}</p>}
                   </div>
                 </div>
                 {done ? (
@@ -169,7 +169,7 @@ export function SessionsPanel({ mentorshipId }: SessionsPanelProps) {
                   <button
                     onClick={() => handleComplete(s.id)}
                     disabled={completingId === s.id}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-emerald-700 border border-emerald-200 dark:border-emerald-500/30 rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-500/10 disabled:opacity-50 shrink-0"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/30 rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-500/10 disabled:opacity-50 shrink-0"
                   >
                     {completingId === s.id ? (
                       <Loader2 size={13} className="animate-spin" />

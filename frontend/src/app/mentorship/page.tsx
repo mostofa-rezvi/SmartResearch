@@ -21,7 +21,7 @@ export default function MentorshipPage() {
   const [tab, setTab] = useState<Tab>("recommended");
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#020617]">
+    <div className="min-h-screen app-bg">
       <Navbar />
 
       <div className="pt-32 pb-20 px-6 max-w-6xl mx-auto">
@@ -29,7 +29,7 @@ export default function MentorshipPage() {
           <h1 className="text-4xl md:text-5xl font-serif font-black mb-4 text-primary dark:text-white">
             Mentorship
           </h1>
-          <p className="text-slate-500 max-w-2xl text-lg">
+          <p className="text-slate-500 dark:text-slate-400 max-w-2xl text-lg">
             Find mentors matched to your interests, browse open slots, offer your own guidance, and
             manage sessions.
           </p>
@@ -43,8 +43,8 @@ export default function MentorshipPage() {
               onClick={() => setTab(t.key)}
               className={`inline-flex items-center gap-2 px-4 py-2.5 text-sm font-bold rounded-t-lg border-b-2 -mb-px transition-colors ${
                 tab === t.key
-                  ? "border-primary text-primary"
-                  : "border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
+                  ? "border-primary text-primary dark:text-white"
+                  : "border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300"
               }`}
             >
               {t.icon}

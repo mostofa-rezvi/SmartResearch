@@ -65,7 +65,7 @@ export function OpenSlots() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Filter by domain (e.g. Machine Learning)"
-            className="w-full pl-9 pr-3 py-2 text-sm border rounded-lg dark:bg-slate-800 dark:border-slate-700 dark:text-white outline-none focus:border-primary"
+            className="w-full pl-9 pr-3 py-2 text-sm neu-inset dark:text-white outline-none focus:border-primary"
           />
         </div>
         <button
@@ -82,7 +82,7 @@ export function OpenSlots() {
               setDomain("");
               load("");
             }}
-            className="px-4 py-2 text-sm font-bold text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg"
+            className="px-4 py-2 neu-btn text-sm font-bold text-slate-500 dark:text-slate-400"
           >
             Clear
           </button>
@@ -91,10 +91,10 @@ export function OpenSlots() {
 
       {loading ? (
         <div className="flex justify-center p-10">
-          <Loader2 className="animate-spin h-7 w-7 text-primary" />
+          <Loader2 className="animate-spin h-7 w-7 text-primary dark:text-white" />
         </div>
       ) : slots.length === 0 ? (
-        <div className="p-8 text-center bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-100 dark:border-slate-800 text-slate-500">
+        <div className="p-8 text-center glass-neu-card text-slate-500 dark:text-slate-400">
           No open slots{domain ? ` for "${domain}"` : ""} right now.
         </div>
       ) : (
@@ -104,7 +104,7 @@ export function OpenSlots() {
             return (
               <div
                 key={slot.id}
-                className="p-5 rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm"
+                className="p-5 glass-neu-card"
               >
                 <div className="flex items-start gap-3">
                   {slot.mentor_avatar ? (
@@ -126,13 +126,13 @@ export function OpenSlots() {
                       <TrustTierBadge tier={slot.trust_tier} />
                     </div>
                     <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">{slot.title}</p>
-                    <span className="inline-block mt-1 text-xs px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500">
+                    <span className="inline-block mt-1 text-xs px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
                       {slot.domain}
                     </span>
                   </div>
                 </div>
 
-                <div className="mt-4 flex flex-wrap items-center gap-4 text-xs text-slate-500">
+                <div className="mt-4 flex flex-wrap items-center gap-4 text-xs text-slate-500 dark:text-slate-400">
                   <span className="inline-flex items-center gap-1.5">
                     <Users size={14} />
                     <span className={full ? "text-red-500 font-semibold" : "font-semibold"}>

@@ -130,10 +130,10 @@ export default function EditInterestsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+      <div className="min-h-screen app-bg flex items-center justify-center">
         <div className="text-center space-y-4">
-          <Loader2 className="animate-spin text-primary mx-auto" size={48} />
-          <p className="text-slate-400 font-bold text-sm">Loading Calibration Protocol...</p>
+          <Loader2 className="animate-spin text-primary dark:text-white mx-auto" size={48} />
+          <p className="text-slate-400 dark:text-slate-500 font-bold text-sm">Loading Calibration Protocol...</p>
         </div>
       </div>
     );
@@ -155,7 +155,7 @@ export default function EditInterestsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 pb-20">
+    <div className="min-h-screen app-bg pb-20">
       <Navbar />
 
       <div className="max-w-6xl mx-auto px-6 pt-32">
@@ -164,17 +164,17 @@ export default function EditInterestsPage() {
           <div>
             <button 
               onClick={() => router.back()}
-              className="flex items-center gap-2 text-slate-400 hover:text-slate-600 font-bold text-sm mb-4 transition-colors"
+              className="flex items-center gap-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 font-bold text-sm mb-4 transition-colors"
             >
               <ArrowLeft size={16} /> Back to Profile
             </button>
             <div className="flex items-center gap-3">
-              <Sparkles className="text-secondary" size={28} />
-              <h1 className="text-3xl md:text-4xl font-serif font-black text-primary">
+              <Sparkles className="text-secondary dark:text-rose-300" size={28} />
+              <h1 className="text-3xl md:text-4xl font-serif font-black text-primary dark:text-white">
                 Recalibrate Research Interests
               </h1>
             </div>
-            <p className="text-slate-500 text-sm mt-1 max-w-2xl">
+            <p className="text-slate-500 dark:text-slate-400 text-sm mt-1 max-w-2xl">
               Modify your core focus, collaboration preferences, and publication goals. Your recommendations in the Discovery feed will be updated dynamically.
             </p>
           </div>
@@ -182,7 +182,7 @@ export default function EditInterestsPage() {
           <div className="flex items-center gap-3 shrink-0">
             <button
               onClick={() => router.back()}
-              className="px-5 py-2.5 bg-white border border-slate-200 text-slate-600 font-bold rounded-xl text-sm hover:bg-slate-50 transition-all"
+              className="px-5 py-2.5 neu-btn text-slate-600 dark:text-slate-300 font-bold text-sm transition-all"
             >
               Cancel
             </button>
@@ -208,16 +208,16 @@ export default function EditInterestsPage() {
           <motion.div 
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-8 p-4 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-2xl flex items-center gap-3 text-sm font-bold shadow-sm"
+            className="mb-8 p-4 bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800/50 text-emerald-700 dark:text-emerald-300 rounded-2xl flex items-center gap-3 text-sm font-bold shadow-sm"
           >
-            <CheckCircle2 size={18} className="text-emerald-500 shrink-0" />
+            <CheckCircle2 size={18} className="text-emerald-500 dark:text-emerald-400 shrink-0" />
             {successMsg}
           </motion.div>
         )}
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 items-start">
           {/* Left Sidebar Navigation */}
-          <div className="lg:col-span-1 bg-white p-4 rounded-3xl border border-slate-100 shadow-xl space-y-1">
+          <div className="lg:col-span-1 glass-neu-card p-4 space-y-1">
             <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 px-4 py-3 mb-2">
               Parameters
             </h3>
@@ -232,7 +232,7 @@ export default function EditInterestsPage() {
                   className={`w-full flex items-center justify-between px-4 py-3.5 rounded-2xl text-left font-bold text-xs transition-all ${
                     isActive
                     ? 'bg-primary text-white shadow-md shadow-primary/10'
-                    : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700'
+                    : 'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-700 dark:hover:text-slate-200'
                   }`}
                 >
                   <div className="flex items-center gap-3">
@@ -242,7 +242,7 @@ export default function EditInterestsPage() {
                     <span>{SECTION_LABELS[sec]}</span>
                   </div>
                   <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${
-                    isActive ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'
+                    isActive ? 'bg-white/20 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
                   }`}>
                     {count}/{total}
                   </span>
@@ -252,14 +252,14 @@ export default function EditInterestsPage() {
           </div>
 
           {/* Right Form panel */}
-          <div className="lg:col-span-3 bg-white p-8 md:p-10 rounded-[32px] border border-slate-100 shadow-xl">
+          <div className="lg:col-span-3 glass-neu-card p-8 md:p-10">
             <form onSubmit={handleSubmit} className="space-y-10">
-              <header className="border-b border-slate-100 pb-6 flex items-center justify-between">
+              <header className="border-b border-slate-100 dark:border-slate-700 pb-6 flex items-center justify-between">
                 <div>
-                  <span className="text-[10px] font-black text-secondary uppercase tracking-[0.2em] bg-secondary/5 px-3 py-1 rounded">
+                  <span className="text-[10px] font-black text-secondary dark:text-rose-300 uppercase tracking-[0.2em] bg-secondary/5 px-3 py-1 rounded">
                     {SECTION_LABELS[activeSection]}
                   </span>
-                  <h2 className="text-xl font-bold text-slate-900 mt-2">
+                  <h2 className="text-xl font-bold text-slate-900 dark:text-white mt-2">
                     Configure {SECTION_LABELS[activeSection]}
                   </h2>
                 </div>
@@ -268,7 +268,7 @@ export default function EditInterestsPage() {
               <div className="space-y-8">
                 {sectionQuestions.map((q, qIdx) => (
                   <div key={q.id} className="space-y-4">
-                    <label className="block text-base font-bold text-slate-800 font-serif">
+                    <label className="block text-base font-bold text-slate-800 dark:text-slate-200 font-serif">
                       <span className="text-slate-400 mr-2 font-sans text-sm font-black">
                         Q{qIdx + 1}.
                       </span>
@@ -287,7 +287,7 @@ export default function EditInterestsPage() {
                               className={`p-4 rounded-2xl text-left text-xs font-bold transition-all border ${
                                 isSelected
                                 ? 'bg-primary text-white border-primary shadow-lg shadow-primary/10'
-                                : 'bg-slate-50 hover:bg-slate-100 text-slate-600 border-transparent'
+                                : 'bg-slate-50 dark:bg-slate-900/60 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 border-transparent'
                               }`}
                             >
                               {option}
@@ -309,7 +309,7 @@ export default function EditInterestsPage() {
                               className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all border ${
                                 isSelected
                                 ? 'bg-secondary text-white border-secondary shadow-md shadow-secondary/15'
-                                : 'bg-slate-50 hover:bg-slate-100 text-slate-600 border-transparent'
+                                : 'bg-slate-50 dark:bg-slate-900/60 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 border-transparent'
                               }`}
                             >
                               {option}
@@ -324,14 +324,14 @@ export default function EditInterestsPage() {
                         value={answers[q.id] || ""}
                         onChange={(e) => handleFreeText(q.id, e.target.value)}
                         placeholder="Elaborate your research context, skills, or dynamic..."
-                        className="w-full bg-slate-50 border border-transparent rounded-2xl p-5 text-sm font-medium outline-none focus:bg-white focus:border-slate-200 focus:ring-4 focus:ring-primary/5 transition-all min-h-[120px]"
+                        className="w-full neu-inset p-5 text-sm font-medium outline-none focus:ring-4 focus:ring-primary/5 transition-all min-h-[120px]"
                       />
                     )}
                   </div>
                 ))}
               </div>
 
-              <div className="border-t border-slate-100 pt-8 flex items-center justify-between">
+              <div className="border-t border-slate-100 dark:border-slate-700 pt-8 flex items-center justify-between">
                 <button
                   type="button"
                   onClick={() => {
@@ -339,7 +339,7 @@ export default function EditInterestsPage() {
                     if (idx > 0) setActiveSection(SECTIONS[idx - 1]);
                   }}
                   disabled={SECTIONS.indexOf(activeSection) === 0}
-                  className="px-5 py-2.5 bg-slate-50 hover:bg-slate-100 text-slate-600 font-bold rounded-xl text-xs transition-all disabled:opacity-0"
+                  className="px-5 py-2.5 neu-btn text-slate-600 dark:text-slate-300 font-bold text-xs transition-all disabled:opacity-0"
                 >
                   Previous Section
                 </button>

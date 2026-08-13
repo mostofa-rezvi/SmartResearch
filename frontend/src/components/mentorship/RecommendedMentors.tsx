@@ -78,14 +78,14 @@ export function RecommendedMentors() {
   if (loading) {
     return (
       <div className="flex justify-center p-10">
-        <Loader2 className="animate-spin h-7 w-7 text-primary" />
+        <Loader2 className="animate-spin h-7 w-7 text-primary dark:text-white" />
       </div>
     );
   }
 
   if (items.length === 0) {
     return (
-      <div className="p-8 text-center bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-100 dark:border-slate-800 text-slate-500">
+      <div className="p-8 text-center glass-neu-card text-slate-500 dark:text-slate-400">
         No mentor recommendations yet. Check back after completing your profile.
       </div>
     );
@@ -100,7 +100,7 @@ export function RecommendedMentors() {
           return (
             <div
               key={rec.slot_id}
-              className="p-5 rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm hover:shadow-md transition-shadow"
+              className="p-5 glass-neu-card glass-neu-hover"
             >
               <div className="flex items-start gap-4">
                 <div className="shrink-0">
@@ -127,7 +127,7 @@ export function RecommendedMentors() {
                   <p className="text-xs text-slate-400 mt-0.5">{rec.domain}</p>
                 </div>
                 <div className="shrink-0 text-right">
-                  <div className="inline-flex items-center gap-1 bg-primary/10 text-primary px-2.5 py-1 rounded-full text-xs font-black">
+                  <div className="inline-flex items-center gap-1 bg-primary/10 text-primary dark:text-white px-2.5 py-1 rounded-full text-xs font-black">
                     <Sparkles size={12} />
                     {Math.round(rec.match_score)}% match
                   </div>
@@ -142,7 +142,7 @@ export function RecommendedMentors() {
                 ) : openFor === rec.slot_id ? (
                   <div className="space-y-2">
                     <textarea
-                      className="w-full p-2 text-sm border rounded-lg dark:bg-slate-800 dark:border-slate-700 dark:text-white"
+                      className="w-full p-2 text-sm neu-inset dark:text-white"
                       rows={3}
                       placeholder={`Hi ${rec.mentor_name}, I'd love your mentorship on ${rec.domain}...`}
                       value={message}
@@ -166,7 +166,7 @@ export function RecommendedMentors() {
                           setOpenFor(null);
                           setMessage("");
                         }}
-                        className="px-4 py-2 text-sm font-bold text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg"
+                        className="px-4 py-2 neu-btn text-sm font-bold text-slate-500 dark:text-slate-400"
                       >
                         Cancel
                       </button>

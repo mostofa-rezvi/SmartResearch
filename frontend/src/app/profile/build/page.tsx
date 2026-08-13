@@ -42,7 +42,7 @@ export default function ProfileBuilderPage() {
           <textarea
             value={bio}
             onChange={(e) => setBio(e.target.value)}
-            className="w-full p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800"
+            className="w-full p-4 neu-inset"
             rows={4}
             placeholder="Tell us about your research background..."
           />
@@ -58,7 +58,7 @@ export default function ProfileBuilderPage() {
             onChange={(e) => setNewSkill(e.target.value)}
             onKeyDown={handleAddSkill}
             placeholder="Type a skill and press Enter"
-            className="w-full p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800"
+            className="w-full p-4 neu-inset"
           />
           <div className="pt-2">
             <SkillsTag skills={skills} onRemove={handleRemoveSkill} />
@@ -68,7 +68,7 @@ export default function ProfileBuilderPage() {
         <div className="space-y-2">
           <label className="text-sm font-medium">Upload Featured Paper</label>
           <PaperUpload onUpload={(file) => setPaper(file)} />
-          {paper && <p className="text-sm text-emerald-600 mt-2">Selected: {paper.name}</p>}
+          {paper && <p className="text-sm text-emerald-600 dark:text-emerald-400 mt-2">Selected: {paper.name}</p>}
         </div>
 
         <button type="submit" className="w-full py-4 bg-primary text-white font-bold rounded-2xl">

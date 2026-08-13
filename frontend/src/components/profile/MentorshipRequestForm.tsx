@@ -45,7 +45,7 @@ export function MentorshipRequestForm({ mentorId }: MentorshipRequestFormProps) 
 
   if (submitted) {
     return (
-      <div className="p-4 bg-green-50 border border-green-200 rounded-lg text-green-700">
+      <div className="p-4 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800/50 rounded-lg text-green-700 dark:text-green-300">
         Mentorship request submitted successfully. Waiting for response.
       </div>
     );
@@ -55,7 +55,7 @@ export function MentorshipRequestForm({ mentorId }: MentorshipRequestFormProps) 
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
         <h3 className="text-lg font-medium">Request Mentorship</h3>
-        <p className="text-sm text-gray-500 mb-2">Send a message to propose a mentorship arrangement.</p>
+        <p className="text-sm text-gray-500 dark:text-slate-400 mb-2">Send a message to propose a mentorship arrangement.</p>
         {errorMsg && <p className="text-red-600 text-sm mb-2">{errorMsg}</p>}
         <textarea
           className="w-full p-2 border rounded-md"

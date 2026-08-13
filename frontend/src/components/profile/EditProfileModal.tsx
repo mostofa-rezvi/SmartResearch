@@ -126,17 +126,17 @@ export default function EditProfileModal({ isOpen, onClose, profile, onUpdate }:
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.95, opacity: 0, y: 20 }}
             onClick={(e) => e.stopPropagation()}
-            className="bg-white w-full max-w-4xl rounded-[40px] shadow-2xl overflow-hidden relative border border-slate-100 flex flex-col max-h-[90vh]"
+            className="glass-neu-card w-full max-w-4xl overflow-hidden relative flex flex-col max-h-[90vh]"
           >
             {/* Header */}
-            <div className="px-8 py-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+            <div className="px-8 py-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-900/60">
               <div>
-                <h2 className="text-2xl font-serif font-black text-primary">Edit Academic Profile</h2>
-                <p className="text-sm text-slate-500">Update your researcher identity and interests</p>
+                <h2 className="text-2xl font-serif font-black text-primary dark:text-white">Edit Academic Profile</h2>
+                <p className="text-sm text-slate-500 dark:text-slate-400">Update your researcher identity and interests</p>
               </div>
               <button 
                 onClick={onClose}
-                className="p-2 hover:bg-white rounded-full transition-colors text-slate-400 hover:text-slate-600 border border-transparent hover:border-slate-200"
+                className="p-2 hover:bg-white dark:hover:bg-slate-700 rounded-full transition-colors text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 border border-transparent hover:border-slate-200 dark:hover:border-slate-600"
               >
                 <X size={20} />
               </button>
@@ -166,7 +166,7 @@ export default function EditProfileModal({ isOpen, onClose, profile, onUpdate }:
                 {/* Form Section */}
                 <div className="md:col-span-8 space-y-6">
                   {error && (
-                    <div className="p-3 bg-red-50 border border-red-100 text-red-600 text-sm rounded-xl font-medium">
+                    <div className="p-3 bg-red-50 dark:bg-red-900/30 border border-red-100 dark:border-red-800/50 text-red-600 dark:text-red-400 text-sm rounded-xl font-medium">
                       {error}
                     </div>
                   )}
@@ -178,7 +178,7 @@ export default function EditProfileModal({ isOpen, onClose, profile, onUpdate }:
                         <User className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                         <input
                           {...register("name", { required: "Name is required" })}
-                          className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-slate-900 font-medium"
+                          className="w-full pl-12 pr-4 py-3.5 neu-inset focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-slate-900 dark:text-white font-medium"
                           placeholder="Dr. Jane Doe"
                         />
                       </div>
@@ -191,7 +191,7 @@ export default function EditProfileModal({ isOpen, onClose, profile, onUpdate }:
                         <Building className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                         <input
                           {...register("institution")}
-                          className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-slate-900 font-medium"
+                          className="w-full pl-12 pr-4 py-3.5 neu-inset focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-slate-900 dark:text-white font-medium"
                           placeholder="e.g., Stanford University"
                           disabled // For now, maybe update this later via a search select
                         />
@@ -206,7 +206,7 @@ export default function EditProfileModal({ isOpen, onClose, profile, onUpdate }:
                         <textarea
                           {...register("bio")}
                           rows={3}
-                          className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-slate-900 font-medium resize-none"
+                          className="w-full pl-12 pr-4 py-3.5 neu-inset focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-slate-900 dark:text-white font-medium resize-none"
                           placeholder="Briefly describe your research focus..."
                         />
                       </div>
@@ -218,7 +218,7 @@ export default function EditProfileModal({ isOpen, onClose, profile, onUpdate }:
                         <Hash className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                         <input
                           {...register("interests")}
-                          className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-slate-900 font-medium"
+                          className="w-full pl-12 pr-4 py-3.5 neu-inset focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-slate-900 dark:text-white font-medium"
                           placeholder="AI, Ethics, Psychology..."
                         />
                       </div>
@@ -229,7 +229,7 @@ export default function EditProfileModal({ isOpen, onClose, profile, onUpdate }:
                         <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-1.5 block ml-1">Personal Website</label>
                         <input
                           {...register("personal_website")}
-                          className="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-slate-900 font-medium text-sm"
+                          className="w-full px-4 py-3.5 neu-inset focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-slate-900 dark:text-white font-medium text-sm"
                           placeholder="https://..."
                         />
                       </div>
@@ -237,7 +237,7 @@ export default function EditProfileModal({ isOpen, onClose, profile, onUpdate }:
                         <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-1.5 block ml-1">LinkedIn</label>
                         <input
                           {...register("linkedin_url")}
-                          className="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-slate-900 font-medium text-sm"
+                          className="w-full px-4 py-3.5 neu-inset focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-slate-900 dark:text-white font-medium text-sm"
                           placeholder="LinkedIn Profile"
                         />
                       </div>
@@ -248,7 +248,7 @@ export default function EditProfileModal({ isOpen, onClose, profile, onUpdate }:
                         <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-1.5 block ml-1">Google Scholar</label>
                         <input
                           {...register("google_scholar_url")}
-                          className="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-slate-900 font-medium text-sm"
+                          className="w-full px-4 py-3.5 neu-inset focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-slate-900 dark:text-white font-medium text-sm"
                           placeholder="Scholar URL"
                         />
                       </div>
@@ -256,7 +256,7 @@ export default function EditProfileModal({ isOpen, onClose, profile, onUpdate }:
                         <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-1.5 block ml-1">ResearchGate</label>
                         <input
                           {...register("researchgate_url")}
-                          className="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-slate-900 font-medium text-sm"
+                          className="w-full px-4 py-3.5 neu-inset focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-slate-900 dark:text-white font-medium text-sm"
                           placeholder="ResearchGate URL"
                         />
                       </div>
@@ -266,7 +266,7 @@ export default function EditProfileModal({ isOpen, onClose, profile, onUpdate }:
                       <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-1.5 block ml-1">Educational Status</label>
                       <select
                         {...register("educational_status")}
-                        className="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-slate-900 font-medium appearance-none"
+                        className="w-full px-4 py-3.5 neu-inset focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-slate-900 dark:text-white font-medium appearance-none"
                       >
                         <option value="">Select status...</option>
                         <option value="undergraduate">Undergraduate Student</option>
@@ -281,11 +281,11 @@ export default function EditProfileModal({ isOpen, onClose, profile, onUpdate }:
               </div>
 
               {/* Footer Actions */}
-              <div className="mt-10 pt-6 border-t border-slate-100 flex justify-end gap-4">
+              <div className="mt-10 pt-6 border-t border-slate-100 dark:border-slate-800 flex justify-end gap-4">
                 <button
                   type="button"
                   onClick={onClose}
-                  className="px-6 py-3 text-slate-500 font-bold hover:text-slate-700 transition-colors"
+                  className="px-6 py-3 text-slate-500 dark:text-slate-400 font-bold hover:text-slate-700 transition-colors"
                 >
                   Cancel
                 </button>
