@@ -18,6 +18,10 @@ export const API = {
     login: `${API_BASE}/api/v1/auth/login`,
     verifyOtp: `${API_BASE}/api/v1/auth/verify-otp`,
     resendOtp: `${API_BASE}/api/v1/auth/resend-otp`,
+    verifyRegistration: `${API_BASE}/api/v1/auth/verify-registration`,
+    resendRegistrationOtp: `${API_BASE}/api/v1/auth/resend-registration-otp`,
+    forgotPassword: `${API_BASE}/api/v1/auth/forgot-password`,
+    resetPassword: `${API_BASE}/api/v1/auth/reset-password`,
     refresh: `${API_BASE}/api/v1/auth/refresh`,
     verifyEmail: `${API_BASE}/api/v1/auth/verify-email`,
     onboardingComplete: `${API_BASE}/api/v1/auth/onboarding/complete`,
@@ -102,6 +106,7 @@ export const API = {
     setTrustTier: (id: string) => `${API_BASE}/api/v1/admin/users/${id}/trust-tier`,
     verifyInstitution: (id: string) => `${API_BASE}/api/v1/admin/users/${id}/verify-institution`,
     trustRankRefresh: `${API_BASE}/api/v1/admin/trustrank/refresh`,
+    backfill: `${API_BASE}/api/v1/admin/backfill`,
   },
   // Researchers domain (seeded from OpenAlex)
   researchers: {

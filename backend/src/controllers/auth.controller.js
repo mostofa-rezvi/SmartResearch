@@ -19,6 +19,8 @@ const PASSWORD_MIN_LENGTH = 8;
 const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
 const VERIFICATION_TOKEN_EXPIRY_HOURS = 24;
 const AUTH_CODE_TTL_SECONDS = 60; // 1 minute single-use auth code
+const REGISTER_OTP_TTL_SECONDS = 15 * 60; // 15 minutes to confirm a new account
+const RESET_OTP_TTL_SECONDS = 15 * 60;    // 15 minutes to reset a password
 
 // Allowed redirect origins (T1 fix)
 const ALLOWED_REDIRECT_ORIGINS = (process.env.FRONTEND_URL || 'http://localhost:3000')
@@ -64,6 +66,41 @@ async function sendLoginOtp(user) {
           `<p>It expires in ${config.otp?.expiryMinutes || 5} minutes. If you did not try to sign in, you can ignore this email.</p>`,
   }).catch((err) => logger.error({ email: user.email, error: err.message }, 'Failed to send login OTP email'));
   logger.info(`[Auth] Login OTP issued for user ${user.id}`);
+  return otp;
+}
+
+/** Generate a 6-digit account-verification OTP, store it in Redis, and email it. */
+async function sendRegisterOtp(user) {
+  const otp = String(crypto.randomInt(100000, 1000000));
+  const redis = getRedisClient();
+  await redis.set(`register_otp:${user.id}`, otp, 'EX', REGISTER_OTP_TTL_SECONDS);
+  await redis.set(`register_otp_email:${user.email}`, String(user.id), 'EX', REGISTER_OTP_TTL_SECONDS);
+  sendEmail({
+    to: user.email,
+    subject: 'Verify your ResearchBridge account',
+    text: `Welcome to ResearchBridge! Your verification code is ${otp}. It expires in 15 minutes.`,
+    html: `<p>Welcome to ResearchBridge! Confirm your email with the code below:</p>` +
+          `<p style="font-size:26px;font-weight:800;letter-spacing:6px;color:#0A192F">${otp}</p>` +
+          `<p>This code expires in 15 minutes. If you didn't create an account, you can ignore this email.</p>`,
+  }).catch((err) => logger.error({ email: user.email, error: err.message }, 'Failed to send registration OTP email'));
+  logger.info(`[Auth] Registration OTP issued for user ${user.id}`);
+  return otp;
+}
+
+/** Generate a 6-digit password-reset OTP, store it in Redis (keyed by email), and email it. */
+async function sendResetOtp(user) {
+  const otp = String(crypto.randomInt(100000, 1000000));
+  const redis = getRedisClient();
+  await redis.set(`reset_otp:${user.email}`, otp, 'EX', RESET_OTP_TTL_SECONDS);
+  sendEmail({
+    to: user.email,
+    subject: 'Reset your ResearchBridge password',
+    text: `Your ResearchBridge password reset code is ${otp}. It expires in 15 minutes.`,
+    html: `<p>We received a request to reset your ResearchBridge password. Use the code below:</p>` +
+          `<p style="font-size:26px;font-weight:800;letter-spacing:6px;color:#0A192F">${otp}</p>` +
+          `<p>This code expires in 15 minutes. If you didn't request a reset, you can safely ignore this email — your password won't change.</p>`,
+  }).catch((err) => logger.error({ email: user.email, error: err.message }, 'Failed to send password reset OTP email'));
+  logger.info(`[Auth] Password reset OTP issued for user ${user.id}`);
   return otp;
 }
 
@@ -151,21 +188,18 @@ class AuthController {
         bio: '',
       }).catch((e) => logger.warn(`[register] profile.created emit failed: ${e.message}`));
 
-      // Store verification token expiry in Redis (since schema doesn't have the column yet)
+      // Store verification token expiry in Redis (kept for the legacy /verify link flow)
       const redis = getRedisClient();
       await redis.set(`verify_token:${verificationToken}`, user.id, 'EX', VERIFICATION_TOKEN_EXPIRY_HOURS * 60 * 60);
 
-      // Send verification email (Async - do not await to prevent blocking the response)
-      const verifyUrl = `${ALLOWED_REDIRECT_ORIGINS[0]}/verify?token=${verificationToken}`;
-      sendEmail({
-        to: email,
-        subject: 'Verify your ResearchBridge account',
-        text: `Please verify your account by clicking this link: ${verifyUrl}`,
-        html: `<p>Please verify your account by clicking this link: <a href="${verifyUrl}">Verify Account</a></p>`,
-      }).catch(err => logger.error({ email, error: err.message }, 'Failed to send verification email in background'));
+      // Email a 6-digit verification code (OTP) the user enters to confirm the account.
+      const otp = await sendRegisterOtp({ id: user.id, email });
 
+      const payload = { ...user, otp_required: true, email };
+      // Dev convenience only — never expose the code in production
+      if (config.env !== 'production') payload.dev_otp = otp;
 
-      res.status(201).json(envelope(user, { message: 'Registration successful. Please check your email to verify your account.' }));
+      res.status(201).json(envelope(payload, { message: 'Registration successful. Enter the verification code we emailed to activate your account.' }));
     } catch (err) {
       next(err);
     }
@@ -251,6 +285,144 @@ class AuthController {
       const payload = { message: 'A new verification code was sent.' };
       if (config.env !== 'production') payload.dev_otp = otp;
       res.json(envelope(payload));
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  /**
+   * POST /api/v1/auth/verify-registration — confirm a new account with the emailed
+   * OTP. Marks the account verified, upgrades trust tier, and signs the user in.
+   */
+  async verifyRegistration(req, res, next) {
+    const { email, otp } = req.body;
+    if (!email || !otp) {
+      return res.status(400).json(errorEnvelope('Email and verification code are required', 400));
+    }
+    try {
+      const redis = getRedisClient();
+      const userId = await redis.get(`register_otp_email:${email}`);
+      if (!userId) {
+        return res.status(401).json(errorEnvelope('Code expired or not requested. Please register again or resend the code.', 401));
+      }
+      const stored = await redis.get(`register_otp:${userId}`);
+      if (!stored || stored !== String(otp).trim()) {
+        return res.status(401).json(errorEnvelope('Invalid verification code.', 401));
+      }
+
+      // Mark verified + upgrade trust tier (mirrors the /verify-email link flow).
+      const result = await db.query(
+        `UPDATE users
+            SET is_verified = true,
+                verification_token = NULL,
+                institution_verified = is_institutional,
+                trust_tier = CASE
+                  WHEN role IN ('professor','invited_user') THEN 'professor'
+                  WHEN is_institutional THEN 'verified'
+                  ELSE 'basic'
+                END
+          WHERE id = $1
+          RETURNING id`,
+        [userId]
+      );
+      if (result.rowCount === 0) {
+        return res.status(400).json(errorEnvelope('Account not found. Please register again.', 400));
+      }
+
+      // Single-use — clear the codes.
+      await redis.del(`register_otp:${userId}`);
+      await redis.del(`register_otp_email:${email}`);
+
+      const session = await issueSession(res, userId);
+      res.json(envelope(session, { message: 'Account verified! Welcome to ResearchBridge.' }));
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  /**
+   * POST /api/v1/auth/resend-registration-otp — re-issue an account-verification
+   * code. Does not reveal whether an account exists.
+   */
+  async resendRegistrationOtp(req, res, next) {
+    const { email } = req.body;
+    if (!email) return res.status(400).json(errorEnvelope('Email is required', 400));
+    try {
+      const result = await db.query('SELECT id, email, is_verified FROM users WHERE email = $1', [email]);
+      const user = result.rows[0];
+      // Only unverified accounts get a fresh code; response is always generic.
+      if (user && !user.is_verified) {
+        const otp = await sendRegisterOtp(user);
+        const payload = { message: 'A new verification code was sent.' };
+        if (config.env !== 'production') payload.dev_otp = otp;
+        return res.json(envelope(payload));
+      }
+      res.json(envelope({ message: 'If the account exists and is unverified, a new code was sent.' }));
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  /**
+   * POST /api/v1/auth/forgot-password — begin a password reset. Emails a 6-digit
+   * OTP if the account exists. Always returns a generic success (no account
+   * enumeration).
+   */
+  async forgotPassword(req, res, next) {
+    const { email } = req.body;
+    if (!email) return res.status(400).json(errorEnvelope('Email is required', 400));
+    try {
+      const result = await db.query('SELECT id, email FROM users WHERE email = $1', [email]);
+      const user = result.rows[0];
+      const payload = { message: 'If an account exists for that email, a reset code has been sent.' };
+      if (user) {
+        const otp = await sendResetOtp(user);
+        if (config.env !== 'production') payload.dev_otp = otp;
+      }
+      res.json(envelope(payload));
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  /**
+   * POST /api/v1/auth/reset-password — complete a password reset with the emailed
+   * OTP and a new password. Invalidates the code on success.
+   */
+  async resetPassword(req, res, next) {
+    const { email, otp, password } = req.body;
+    if (!email || !otp || !password) {
+      return res.status(400).json(errorEnvelope('Email, code, and new password are required', 400));
+    }
+    if (password.length < PASSWORD_MIN_LENGTH) {
+      return res.status(400).json(errorEnvelope(`Password must be at least ${PASSWORD_MIN_LENGTH} characters long.`, 400));
+    }
+    if (!PASSWORD_REGEX.test(password)) {
+      return res.status(400).json(errorEnvelope('Password must contain at least one uppercase letter, one lowercase letter, and one digit.', 400));
+    }
+    try {
+      const redis = getRedisClient();
+      const stored = await redis.get(`reset_otp:${email}`);
+      if (!stored) {
+        return res.status(401).json(errorEnvelope('Reset code expired or not requested. Please start again.', 401));
+      }
+      if (stored !== String(otp).trim()) {
+        return res.status(401).json(errorEnvelope('Invalid reset code.', 401));
+      }
+
+      const hashedPassword = await hashPassword(password);
+      const result = await db.query(
+        'UPDATE users SET password = $1, updated_at = NOW() WHERE email = $2 RETURNING id',
+        [hashedPassword, email]
+      );
+      if (result.rowCount === 0) {
+        return res.status(400).json(errorEnvelope('Account not found.', 400));
+      }
+
+      // Single-use — invalidate the code.
+      await redis.del(`reset_otp:${email}`);
+
+      res.json(envelope({}, { message: 'Password reset successfully. You can now sign in with your new password.' }));
     } catch (err) {
       next(err);
     }

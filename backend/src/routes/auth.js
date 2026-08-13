@@ -40,6 +40,22 @@ router.post('/verify-otp', authController.verifyOtp);
 // @desc    Re-issue a login one-time code
 router.post('/resend-otp', authController.resendOtp);
 
+// @route   POST /api/v1/auth/verify-registration
+// @desc    Confirm a new account with the emailed OTP and sign the user in
+router.post('/verify-registration', authController.verifyRegistration);
+
+// @route   POST /api/v1/auth/resend-registration-otp
+// @desc    Re-issue an account-verification code
+router.post('/resend-registration-otp', authController.resendRegistrationOtp);
+
+// @route   POST /api/v1/auth/forgot-password
+// @desc    Begin a password reset — email a one-time code
+router.post('/forgot-password', authController.forgotPassword);
+
+// @route   POST /api/v1/auth/reset-password
+// @desc    Complete a password reset with the emailed code + new password
+router.post('/reset-password', authController.resetPassword);
+
 // @route   POST /api/v1/auth/refresh
 // @desc    Refresh access token using refresh token cookie
 router.post('/refresh', authController.refresh);
