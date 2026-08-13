@@ -46,7 +46,7 @@ const SectionHeader = ({
 }) => (
   <div className="flex items-center justify-between mb-4">
     <div className="flex items-center gap-2 text-slate-900 dark:text-white font-bold font-serif text-lg">
-      <span className="text-primary">{icon}</span>
+      <span className="text-primary dark:text-white">{icon}</span>
       {title}
     </div>
     <span className="text-xs font-semibold text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full">
@@ -91,7 +91,7 @@ export function UnifiedFeed() {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center p-16 text-slate-400">
-        <Loader2 className="animate-spin mb-3 text-primary" size={28} />
+        <Loader2 className="animate-spin mb-3 text-primary dark:text-white" size={28} />
         <p className="text-sm">Building your unified discovery feed...</p>
       </div>
     );
@@ -100,7 +100,7 @@ export function UnifiedFeed() {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       {/* Collaborators */}
-      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-5">
+      <div className="glass-neu-card p-5">
         <SectionHeader
           icon={<Users size={18} />}
           title="Collaborators"
@@ -125,7 +125,7 @@ export function UnifiedFeed() {
                         {c.name}
                       </h4>
                       {typeof c.similarityScore === "number" && (
-                        <span className="inline-flex items-center gap-0.5 text-[10px] font-black text-primary bg-primary/10 px-1.5 py-0.5 rounded-full shrink-0">
+                        <span className="inline-flex items-center gap-0.5 text-[10px] font-black text-primary dark:text-white bg-primary/10 px-1.5 py-0.5 rounded-full shrink-0">
                           <Sparkles size={9} />
                           {Math.round(c.similarityScore)}%
                         </span>
@@ -145,7 +145,7 @@ export function UnifiedFeed() {
       </div>
 
       {/* Papers */}
-      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-5">
+      <div className="glass-neu-card p-5">
         <SectionHeader icon={<FileText size={18} />} title="Papers" count={data.papers.length} />
         {data.papers.length === 0 ? (
           <EmptyState label="No paper recommendations yet." />
@@ -160,10 +160,10 @@ export function UnifiedFeed() {
                   {p.title}
                 </h4>
                 {p.abstract && (
-                  <p className="text-xs text-slate-500 mt-1 line-clamp-3">{p.abstract}</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-3">{p.abstract}</p>
                 )}
                 {typeof p._score === "number" && (
-                  <span className="inline-block mt-2 text-[10px] font-bold text-secondary bg-secondary/10 px-1.5 py-0.5 rounded-full">
+                  <span className="inline-block mt-2 text-[10px] font-bold text-secondary dark:text-rose-300 bg-secondary/10 px-1.5 py-0.5 rounded-full">
                     relevance {p._score.toFixed(2)}
                   </span>
                 )}
@@ -174,7 +174,7 @@ export function UnifiedFeed() {
       </div>
 
       {/* Open Projects */}
-      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-5">
+      <div className="glass-neu-card p-5">
         <SectionHeader
           icon={<FolderKanban size={18} />}
           title="Open Projects"
@@ -194,13 +194,13 @@ export function UnifiedFeed() {
                     {pr.name}
                   </h4>
                   {pr.status && (
-                    <span className="text-[10px] font-bold uppercase text-emerald-600 bg-emerald-500/10 px-1.5 py-0.5 rounded-full shrink-0">
+                    <span className="text-[10px] font-bold uppercase text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded-full shrink-0">
                       {pr.status}
                     </span>
                   )}
                 </div>
                 {pr.description && (
-                  <p className="text-xs text-slate-500 mt-1 line-clamp-3">{pr.description}</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-3">{pr.description}</p>
                 )}
                 {typeof pr.member_count === "number" && (
                   <p className="text-xs text-slate-400 flex items-center gap-1 mt-2">

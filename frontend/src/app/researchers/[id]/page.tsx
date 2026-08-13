@@ -101,7 +101,7 @@ export default function ResearcherProfilePage() {
         <Navbar />
         <div className="pt-32 flex flex-col items-center justify-center space-y-4">
           <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-          <p className="text-slate-500 font-bold animate-pulse">Loading scholar profile...</p>
+          <p className="text-slate-500 dark:text-slate-400 font-bold animate-pulse">Loading scholar profile...</p>
         </div>
       </div>
     );
@@ -113,7 +113,7 @@ export default function ResearcherProfilePage() {
         <Navbar />
         <div className="pt-32 text-center">
           <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Scholar not found</h2>
-          <p className="text-slate-500 mt-2">The researcher you are looking for does not exist in our database.</p>
+          <p className="text-slate-500 dark:text-slate-400 mt-2">The researcher you are looking for does not exist in our database.</p>
         </div>
       </div>
     );
@@ -143,7 +143,7 @@ export default function ResearcherProfilePage() {
                     {researcher.avatar_url ? (
                       <img src={researcher.avatar_url} alt={researcher.name} className="w-full h-full object-cover" />
                     ) : (
-                      <User size={64} className="text-primary/40" />
+                      <User size={64} className="text-primary/40 dark:text-white/40" />
                     )}
                   </div>
                 </div>
@@ -153,7 +153,7 @@ export default function ResearcherProfilePage() {
                 </h1>
                 
                 <p className="flex items-center justify-center gap-2 text-slate-500 dark:text-slate-400 font-medium text-sm mb-6">
-                  <MapPin size={16} className="text-primary" />
+                  <MapPin size={16} className="text-primary dark:text-white" />
                   {researcher.institution || "Independent Scholar"}
                   {researcher.country_code && (
                     <span className="text-[10px] bg-slate-100 dark:bg-slate-700 px-2 py-0.5 rounded-full uppercase font-bold tracking-widest">
@@ -186,13 +186,13 @@ export default function ResearcherProfilePage() {
 
             <div className="bg-white dark:bg-slate-800 rounded-[2.5rem] p-8 border border-slate-100 dark:border-slate-700">
               <h3 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
-                <Layers size={14} className="text-primary" /> Core Expertise
+                <Layers size={14} className="text-primary dark:text-white" /> Core Expertise
               </h3>
               <div className="flex flex-wrap gap-2">
                 {researcher.research_domains.map((domain) => (
                   <span
                     key={domain}
-                    className="px-4 py-2 bg-primary/5 dark:bg-primary/10 text-primary rounded-xl text-xs font-black border border-primary/10 uppercase tracking-wider"
+                    className="px-4 py-2 bg-primary/5 dark:bg-primary/10 text-primary dark:text-white rounded-xl text-xs font-black border border-primary/10 uppercase tracking-wider"
                   >
                     {domain}
                   </span>
@@ -206,7 +206,7 @@ export default function ResearcherProfilePage() {
             {/* Biography */}
             <div className="bg-white dark:bg-slate-800 rounded-[2.5rem] p-10 border border-slate-100 dark:border-slate-700 shadow-sm">
               <h3 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
-                <FileText size={16} className="text-primary" /> Scholar Biography
+                <FileText size={16} className="text-primary dark:text-white" /> Scholar Biography
               </h3>
               <div className="prose dark:prose-invert max-w-none">
                 <p className="text-slate-600 dark:text-slate-300 text-lg leading-relaxed font-serif italic">
@@ -216,7 +216,7 @@ export default function ResearcherProfilePage() {
                   Their research has been cited over {researcher.citation_count?.toLocaleString()} times, 
                   demonstrating a sustained and profound impact on global scientific discourse.
                 </p>
-                <div className="flex items-center gap-2 mt-6 text-primary font-bold text-sm">
+                <div className="flex items-center gap-2 mt-6 text-primary dark:text-white font-bold text-sm">
                   <Sparkles size={16} /> Verified Academic Status · Senior Researcher
                 </div>
               </div>
@@ -226,7 +226,7 @@ export default function ResearcherProfilePage() {
             <div className="bg-white dark:bg-slate-800 rounded-[2.5rem] p-10 border border-slate-100 dark:border-slate-700 shadow-sm">
               <div className="flex items-center justify-between mb-8">
                 <h3 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2">
-                  <BookOpen size={16} className="text-primary" /> Key Research Items
+                  <BookOpen size={16} className="text-primary dark:text-white" /> Key Research Items
                 </h3>
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest bg-slate-50 dark:bg-slate-900 px-3 py-1 rounded-full">
                   {totalWorks} total items
@@ -249,11 +249,11 @@ export default function ResearcherProfilePage() {
                           {work.title}
                         </h4>
                         <div className="flex items-center gap-4">
-                          <div className="flex items-center gap-1.5 text-xs text-slate-500 font-medium">
+                          <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 font-medium">
                             <Globe size={14} className="text-slate-400" /> {work.journal}
                           </div>
                           <div className="w-1 h-1 bg-slate-300 rounded-full" />
-                          <div className="text-xs text-slate-500 font-bold uppercase tracking-widest">
+                          <div className="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest">
                             {work.publication_year}
                           </div>
                           <div className="w-1 h-1 bg-slate-300 rounded-full" />
@@ -281,9 +281,9 @@ export default function ResearcherProfilePage() {
                   {hasMoreWorks && !loadingWorks && (
                     <button
                       onClick={loadMore}
-                      className="w-full py-4 mt-4 bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-700 rounded-[2rem] text-sm font-bold text-slate-500 hover:text-primary hover:bg-white dark:hover:bg-slate-800 transition-all flex items-center justify-center gap-2"
+                      className="w-full py-4 mt-4 bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-700 rounded-[2rem] text-sm font-bold text-slate-500 dark:text-slate-400 hover:text-primary hover:bg-white dark:hover:bg-slate-800 transition-all flex items-center justify-center gap-2"
                     >
-                      <Sparkles size={16} className="text-primary" /> Load More Research Items
+                      <Sparkles size={16} className="text-primary dark:text-white" /> Load More Research Items
                     </button>
                   )}
                 </div>

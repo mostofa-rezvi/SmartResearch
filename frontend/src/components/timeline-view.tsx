@@ -3,7 +3,7 @@ import { Flag } from "lucide-react";
 
 export function TimelineView() {
   return (
-    <div className="bg-white dark:bg-slate-800 p-6 rounded-[32px] border border-slate-100 dark:border-slate-700 shadow-sm mb-8 overflow-hidden relative">
+    <div className="glass-neu-card p-6 mb-8 overflow-hidden relative">
       <h3 className="font-bold text-slate-900 dark:text-white mb-6">Milestone Timeline</h3>
       
       <div className="relative h-2 bg-slate-100 dark:bg-slate-700 rounded-full w-full">

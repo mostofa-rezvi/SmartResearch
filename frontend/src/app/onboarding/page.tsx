@@ -120,8 +120,8 @@ export default function OnboardingPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex items-center justify-center">
-        <Loader2 className="animate-spin text-primary" size={48} />
+      <div className="min-h-screen app-bg flex items-center justify-center">
+        <Loader2 className="animate-spin text-primary dark:text-white" size={48} />
       </div>
     );
   }
@@ -135,7 +135,7 @@ export default function OnboardingPage() {
   const canContinue = !currentQuestion.is_required || (answers[currentQuestion.id] && (Array.isArray(answers[currentQuestion.id]) ? answers[currentQuestion.id].length > 0 : true));
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex flex-col items-center justify-center p-6 overflow-hidden">
+    <div className="min-h-screen app-bg flex flex-col items-center justify-center p-6 overflow-hidden">
       {/* Background Decor */}
       <div className="absolute top-0 left-0 w-full h-1 bg-slate-200 dark:bg-slate-800">
         <motion.div 
@@ -147,8 +147,8 @@ export default function OnboardingPage() {
 
       <div className="max-w-2xl w-full relative z-10">
         <div className="flex justify-between items-center mb-12">
-          <div className="flex items-center gap-2 text-primary font-serif">
-            <Sparkles className="text-secondary" size={24} />
+          <div className="flex items-center gap-2 text-primary dark:text-white font-serif">
+            <Sparkles className="text-secondary dark:text-rose-300" size={24} />
             <span className="font-black text-2xl tracking-tighter uppercase italic">Calibrating Lab</span>
           </div>
           <div className="text-xs font-black text-slate-400 uppercase tracking-widest bg-white dark:bg-slate-800 px-4 py-2 rounded-full border border-slate-100 dark:border-slate-700">
@@ -166,12 +166,12 @@ export default function OnboardingPage() {
             className="space-y-10"
           >
             <header className="space-y-4">
-              <div className="flex items-center gap-2 text-secondary font-black text-[10px] uppercase tracking-[0.2em] bg-secondary/5 w-fit px-3 py-1 rounded">
+              <div className="flex items-center gap-2 text-secondary dark:text-rose-300 font-black text-[10px] uppercase tracking-[0.2em] bg-secondary/5 w-fit px-3 py-1 rounded">
                 {SECTION_ICONS[currentQuestion.section]} {SECTION_LABELS[currentQuestion.section]}
               </div>
               <h1 className="text-4xl md:text-5xl font-serif font-black text-slate-900 dark:text-white leading-[1.1] tracking-tight">
                 {currentQuestion.question_text.split('?')[0]}
-                <span className="text-secondary italic">?</span>
+                <span className="text-secondary dark:text-rose-300 italic">?</span>
               </h1>
             </header>
 
@@ -182,10 +182,10 @@ export default function OnboardingPage() {
                     <button
                       key={option}
                       onClick={() => handleAnswer(option)}
-                      className={`p-6 rounded-3xl text-left font-bold transition-all border ${
+                      className={`p-6 text-left font-bold transition-all ${
                         answers[currentQuestion.id] === option
-                        ? 'bg-primary text-white border-primary shadow-xl shadow-primary/20 scale-[1.02]'
-                        : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-100 dark:border-slate-700 hover:border-primary/50'
+                        ? 'rounded-3xl border bg-primary text-white border-primary shadow-xl shadow-primary/20 scale-[1.02]'
+                        : 'glass-neu-card glass-neu-hover text-slate-600 dark:text-slate-400'
                       }`}
                     >
                       {option}
@@ -202,10 +202,10 @@ export default function OnboardingPage() {
                       <button
                         key={option}
                         onClick={() => toggleMultiChoice(option)}
-                        className={`px-6 py-3 rounded-2xl text-sm font-bold transition-all border ${
+                        className={`px-6 py-3 text-sm font-bold transition-all ${
                           isSelected
-                          ? 'bg-secondary text-white border-secondary shadow-lg shadow-secondary/20'
-                          : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-100 dark:border-slate-700 hover:border-secondary/50'
+                          ? 'rounded-2xl border bg-secondary text-white border-secondary shadow-lg shadow-secondary/20'
+                          : 'glass-neu-card glass-neu-hover text-slate-600 dark:text-slate-400'
                         }`}
                       >
                         {option}
@@ -220,7 +220,7 @@ export default function OnboardingPage() {
                   value={answers[currentQuestion.id] || ""}
                   onChange={(e) => handleAnswer(e.target.value)}
                   placeholder="Elaborate your thoughts..."
-                  className="w-full bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-3xl p-8 text-lg font-medium outline-none focus:ring-4 focus:ring-primary/10 transition-all min-h-[200px]"
+                  className="w-full neu-inset p-8 text-lg font-medium outline-none focus:ring-4 focus:ring-primary/10 transition-all min-h-[200px]"
                 />
               )}
             </div>
@@ -229,7 +229,7 @@ export default function OnboardingPage() {
               <button 
                 onClick={prevStep}
                 disabled={currentQuestionIndex === 0}
-                className="flex items-center gap-2 text-slate-400 font-bold hover:text-slate-600 transition-all disabled:opacity-0"
+                className="flex items-center gap-2 text-slate-400 font-bold hover:text-slate-600 dark:hover:text-slate-300 transition-all disabled:opacity-0"
               >
                 <ArrowLeft size={18} /> Previous
               </button>

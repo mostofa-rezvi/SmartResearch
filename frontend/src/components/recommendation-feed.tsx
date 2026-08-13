@@ -210,7 +210,7 @@ export function RecommendationFeed({ filters }: RecommendationFeedProps) {
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center p-20 text-slate-400">
-        <Loader2 className="animate-spin mb-4 text-primary" size={32} />
+        <Loader2 className="animate-spin mb-4 text-primary dark:text-white" size={32} />
         <p>Analyzing your interests to find the best collaborators...</p>
       </div>
     );
@@ -243,16 +243,16 @@ export function RecommendationFeed({ filters }: RecommendationFeedProps) {
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                 }}
                 disabled={currentPage === 1}
-                className="px-5 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-sm font-bold text-slate-700 dark:text-slate-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors shadow-sm"
+                className="px-5 py-2.5 neu-btn text-sm font-bold text-slate-700 dark:text-slate-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 Previous
               </button>
-              <div className="flex items-center gap-3 bg-slate-100 dark:bg-slate-800 p-1.5 rounded-xl">
+              <div className="flex items-center gap-3 neu-inset p-1.5">
                 <div className="text-sm font-bold text-slate-500 dark:text-slate-400 px-3 py-1">
                   Page {currentPage} of {totalPages}
                 </div>
                 <div className="w-px h-6 bg-slate-200 dark:bg-slate-700"></div>
-                <form 
+                <form
                   onSubmit={(e) => {
                     e.preventDefault();
                     const formData = new FormData(e.currentTarget as HTMLFormElement);
@@ -265,17 +265,17 @@ export function RecommendationFeed({ filters }: RecommendationFeedProps) {
                   }}
                   className="flex items-center gap-1.5"
                 >
-                  <input 
-                    type="number" 
+                  <input
+                    type="number"
                     name="pageJump"
-                    min={1} 
+                    min={1}
                     max={totalPages}
                     placeholder="Go..."
-                    className="w-16 px-2 py-1 text-sm text-center bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:border-primary transition-colors text-slate-700 dark:text-slate-300 placeholder:text-slate-400 font-medium"
+                    className="w-16 px-2 py-1 text-sm text-center bg-transparent border-none outline-none text-slate-700 dark:text-slate-300 placeholder:text-slate-400 font-medium"
                   />
-                  <button 
+                  <button
                     type="submit"
-                    className="px-3 py-1 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 rounded-lg text-sm font-bold transition-colors shadow-sm"
+                    className="px-3 py-1 neu-btn text-slate-600 dark:text-slate-300 text-sm font-bold transition-colors"
                   >
                     Go
                   </button>
@@ -287,7 +287,7 @@ export function RecommendationFeed({ filters }: RecommendationFeedProps) {
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                 }}
                 disabled={currentPage === totalPages}
-                className="px-5 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-sm font-bold text-slate-700 dark:text-slate-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors shadow-sm"
+                className="px-5 py-2.5 neu-btn text-sm font-bold text-slate-700 dark:text-slate-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 Next
               </button>
@@ -295,8 +295,8 @@ export function RecommendationFeed({ filters }: RecommendationFeedProps) {
           )}
         </>
       ) : (
-        <div className="card flex flex-col items-center text-center p-12 dark:bg-slate-800 dark:border-slate-700">
-          <div className="w-14 h-14 rounded-2xl bg-primary-50 text-primary flex items-center justify-center mb-4">
+        <div className="glass-neu-card flex flex-col items-center text-center p-12">
+          <div className="w-14 h-14 neu-icon text-primary dark:text-white flex items-center justify-center mb-4">
             <UserPlus size={24} />
           </div>
           <h3 className="text-h4 text-ink-900 dark:text-white mb-1.5">No collaborators match these filters</h3>
@@ -308,7 +308,7 @@ export function RecommendationFeed({ filters }: RecommendationFeedProps) {
       {isModalOpen && selectedResearcher && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in-0 duration-200">
           {/* Modal Container */}
-          <div className="relative w-full max-w-3xl max-h-[85vh] flex flex-col bg-white dark:bg-slate-950 rounded-[32px] border border-slate-100 dark:border-slate-800 shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+          <div className="relative w-full max-w-3xl max-h-[85vh] flex flex-col glass-neu-card overflow-hidden animate-in zoom-in-95 duration-200">
             
             {/* Modal Header */}
             <div className="p-6 md:p-8 border-b border-slate-100 dark:border-slate-900 flex justify-between items-start gap-4">
@@ -321,7 +321,7 @@ export function RecommendationFeed({ filters }: RecommendationFeedProps) {
                     <h2 className="text-xl md:text-2xl font-bold font-serif text-slate-900 dark:text-white">
                       {selectedResearcher.name}
                     </h2>
-                    <span className="bg-primary/10 text-primary px-3 py-0.5 rounded-full text-xs font-black uppercase tracking-wider border border-primary/20">
+                    <span className="bg-primary/10 text-primary dark:text-white px-3 py-0.5 rounded-full text-xs font-black uppercase tracking-wider border border-primary/20">
                       {selectedResearcher.similarityScore}% Match
                     </span>
                   </div>
@@ -346,8 +346,8 @@ export function RecommendationFeed({ filters }: RecommendationFeedProps) {
             <div className="flex-1 overflow-y-auto p-6 md:p-8 space-y-8">
               {/* Stats Grid */}
               <div className="grid grid-cols-3 gap-4">
-                <div className="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 text-center">
-                  <div className="flex justify-center mb-1.5 text-primary">
+                <div className="glass-neu-card p-4 text-center">
+                  <div className="flex justify-center mb-1.5 text-primary dark:text-white">
                     <BookOpen size={20} />
                   </div>
                   <div className="text-lg md:text-xl font-bold text-slate-800 dark:text-white">
@@ -357,8 +357,8 @@ export function RecommendationFeed({ filters }: RecommendationFeedProps) {
                     Publications
                   </div>
                 </div>
-                <div className="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 text-center">
-                  <div className="flex justify-center mb-1.5 text-secondary">
+                <div className="glass-neu-card p-4 text-center">
+                  <div className="flex justify-center mb-1.5 text-secondary dark:text-rose-300">
                     <Award size={20} />
                   </div>
                   <div className="text-lg md:text-xl font-bold text-slate-800 dark:text-white">
@@ -368,7 +368,7 @@ export function RecommendationFeed({ filters }: RecommendationFeedProps) {
                     Citations
                   </div>
                 </div>
-                <div className="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 text-center">
+                <div className="glass-neu-card p-4 text-center">
                   <div className="flex justify-center mb-1.5 text-emerald-500">
                     <GraduationCap size={20} />
                   </div>
@@ -401,21 +401,21 @@ export function RecommendationFeed({ filters }: RecommendationFeedProps) {
               {/* Publications List */}
               <div className="space-y-4">
                 <div className="flex items-center gap-2 text-slate-800 dark:text-white font-bold text-lg font-serif">
-                  <FileText size={20} className="text-primary" />
+                  <FileText size={20} className="text-primary dark:text-white" />
                   <span>Publications & Works</span>
                 </div>
                 
                 {isLoadingPapers ? (
                   <div className="flex flex-col items-center justify-center py-12 text-slate-400">
-                    <Loader2 className="animate-spin mb-3 text-primary" size={24} />
+                    <Loader2 className="animate-spin mb-3 text-primary dark:text-white" size={24} />
                     <p className="text-xs">Fetching research papers...</p>
                   </div>
                 ) : papers.length > 0 ? (
                   <div className="space-y-4">
                     {papers.map((paper: any, idx: number) => (
-                      <div 
-                        key={idx} 
-                        className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl p-5 hover:border-primary/20 dark:hover:border-primary/20 hover:shadow-md transition-all group/paper"
+                      <div
+                        key={idx}
+                        className="glass-neu-card glass-neu-hover p-5 transition-all group/paper"
                       >
                         <div className="flex justify-between items-start gap-4 mb-2">
                           <h4 className="font-bold text-slate-900 dark:text-white group-hover/paper:text-primary transition-colors text-sm md:text-base leading-snug">
@@ -432,7 +432,7 @@ export function RecommendationFeed({ filters }: RecommendationFeedProps) {
                               href={paper.landing_page_url} 
                               target="_blank" 
                               rel="noopener noreferrer" 
-                              className="p-1.5 bg-slate-50 hover:bg-primary/10 dark:bg-slate-800 text-slate-400 hover:text-primary rounded-lg transition-all shrink-0"
+                              className="p-1.5 neu-btn hover:bg-primary/10 text-slate-400 hover:text-primary transition-all shrink-0"
                               onClick={() => trackPaperEvent(paper, 'view')}
                             >
                               <ExternalLink size={14} />
@@ -446,7 +446,7 @@ export function RecommendationFeed({ filters }: RecommendationFeedProps) {
                           {paper.citation_count > 0 && (
                             <>
                               <span>•</span>
-                              <span className="font-semibold text-secondary">{paper.citation_count} Citations</span>
+                              <span className="font-semibold text-secondary dark:text-rose-300">{paper.citation_count} Citations</span>
                             </>
                           )}
                         </div>
@@ -454,7 +454,7 @@ export function RecommendationFeed({ filters }: RecommendationFeedProps) {
                     ))}
                   </div>
                 ) : (
-                  <div className="p-8 text-center bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-100 dark:border-slate-800 text-slate-400">
+                  <div className="glass-neu-card p-8 text-center text-slate-400">
                     <p className="text-sm">No recorded publications found for this researcher.</p>
                   </div>
                 )}
@@ -463,9 +463,9 @@ export function RecommendationFeed({ filters }: RecommendationFeedProps) {
 
             {/* Modal Footer */}
             <div className="p-6 border-t border-slate-100 dark:border-slate-900 bg-slate-50 dark:bg-slate-950 flex justify-end gap-3">
-              <button 
+              <button
                 onClick={() => setIsModalOpen(false)}
-                className="px-6 py-2.5 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 font-bold rounded-xl text-sm transition-all"
+                className="px-6 py-2.5 neu-btn text-slate-700 dark:text-slate-300 font-bold text-sm transition-all"
               >
                 Close
               </button>
@@ -488,7 +488,7 @@ export function RecommendationFeed({ filters }: RecommendationFeedProps) {
                 }
                 if (connStatus === 'loading') {
                   return (
-                    <button disabled className="px-6 py-2.5 bg-primary/10 text-primary font-bold rounded-xl text-sm flex items-center gap-2 cursor-wait">
+                    <button disabled className="px-6 py-2.5 bg-primary/10 text-primary dark:text-white font-bold rounded-xl text-sm flex items-center gap-2 cursor-wait">
                       <Loader2 size={16} className="animate-spin" /> Sending...
                     </button>
                   );

@@ -2,6 +2,7 @@
 
 import React, { Suspense } from "react";
 import Navbar from "@/components/Navbar";
+import AppPageHeader from "@/components/app/AppPageHeader";
 import { SearchBar } from "@/components/search-bar";
 import { FilterSidebar } from "@/components/filter-sidebar";
 import { RecommendationFeed } from "@/components/recommendation-feed";
@@ -79,28 +80,32 @@ export default function DiscoveryPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#020617]">
+    <div className="min-h-screen app-bg">
       <Navbar />
-      
+
       <div className="pt-32 pb-20 px-6 max-w-7xl mx-auto">
-        <div className="mb-12 flex flex-col items-center justify-center text-center">
-          <h1 className="text-4xl md:text-5xl font-serif font-black mb-6 text-primary dark:text-white">Discovery Dashboard</h1>
-          <p className="text-slate-500 max-w-2xl mb-10 text-lg">
-            Find peers, discover trending research, and build your collaborative network.
-          </p>
+        <AppPageHeader
+          eyebrow="Semantic Discovery Engine"
+          title="Discovery"
+          accent="Feed"
+          subtitle="Find peers, discover trending research, and build your collaborative network."
+        />
+
+        <div className="mb-14 w-full max-w-2xl">
           <SearchBar />
         </div>
 
         {/* Unified discovery feed — collaborators, papers & open projects (Module 2) */}
         <section className="mb-14">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold font-serif text-slate-900 dark:text-white">
-              Your Discovery Feed
-            </h2>
-          </div>
+          <h2 className="text-2xl font-serif font-black text-slate-900 dark:text-white mb-6">
+            Your Discovery Feed
+          </h2>
           <UnifiedFeed />
         </section>
 
+        <h2 className="text-2xl font-serif font-black text-slate-900 dark:text-white mb-6">
+          Recommended for You
+        </h2>
         <div className="flex flex-col md:flex-row gap-8 items-start">
           <FilterSidebar 
             selectedDomains={selectedDomains}

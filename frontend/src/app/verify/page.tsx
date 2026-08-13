@@ -55,7 +55,7 @@ function VerifyContent() {
       >
         {status === "loading" && (
           <div className="flex flex-col items-center">
-            <Loader2 className="w-16 h-16 text-primary animate-spin mb-6" />
+            <Loader2 className="w-16 h-16 text-primary dark:text-white animate-spin mb-6" />
             <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Verifying...</h2>
             <p className="text-slate-600 dark:text-slate-400">Please wait while we confirm your email.</p>
           </div>
@@ -74,7 +74,7 @@ function VerifyContent() {
 
         {status === "error" && (
           <div className="flex flex-col items-center">
-            <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center text-red-600 mb-6">
+            <div className="w-20 h-20 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center text-red-600 dark:text-red-300 mb-6">
               <XCircle size={40} />
             </div>
             <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">Verification Error</h2>

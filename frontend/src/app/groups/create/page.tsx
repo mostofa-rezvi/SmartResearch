@@ -55,7 +55,7 @@ export default function CreateGroupPage() {
       <Navbar />
       
       <main className="pt-32 pb-20 px-6 max-w-2xl mx-auto">
-        <Link href="/groups" className="inline-flex items-center gap-2 text-slate-500 hover:text-primary transition-colors mb-8 text-sm font-medium">
+        <Link href="/groups" className="inline-flex items-center gap-2 text-slate-500 dark:text-slate-400 hover:text-primary transition-colors mb-8 text-sm font-medium">
           <ArrowLeft size={16} /> Back to Groups
         </Link>
 
@@ -121,23 +121,23 @@ export default function CreateGroupPage() {
                     type="button"
                     onClick={() => setType('public')}
                     className={`p-4 rounded-2xl border flex flex-col gap-2 text-left transition-all ${
-                      type === 'public' ? 'bg-primary/5 border-primary ring-1 ring-primary' : 'bg-transparent border-slate-200'
+                      type === 'public' ? 'bg-primary/5 border-primary ring-1 ring-primary' : 'bg-transparent border-slate-200 dark:border-slate-700'
                     }`}
                   >
-                    <Globe size={20} className={type === 'public' ? 'text-primary' : 'text-slate-400'} />
+                    <Globe size={20} className={type === 'public' ? 'text-primary dark:text-white' : 'text-slate-400'} />
                     <span className="font-bold text-sm">Public</span>
-                    <span className="text-[10px] text-slate-500 uppercase tracking-tight">Open to all researchers</span>
+                    <span className="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-tight">Open to all researchers</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => setType('private')}
                     className={`p-4 rounded-2xl border flex flex-col gap-2 text-left transition-all ${
-                      type === 'private' ? 'bg-primary/5 border-primary ring-1 ring-primary' : 'bg-transparent border-slate-200'
+                      type === 'private' ? 'bg-primary/5 border-primary ring-1 ring-primary' : 'bg-transparent border-slate-200 dark:border-slate-700'
                     }`}
                   >
-                    <Lock size={20} className={type === 'private' ? 'text-primary' : 'text-slate-400'} />
+                    <Lock size={20} className={type === 'private' ? 'text-primary dark:text-white' : 'text-slate-400'} />
                     <span className="font-bold text-sm">Private</span>
-                    <span className="text-[10px] text-slate-500 uppercase tracking-tight">Requires invitation</span>
+                    <span className="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-tight">Requires invitation</span>
                   </button>
                 </div>
               </div>

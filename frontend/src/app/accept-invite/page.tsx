@@ -74,15 +74,15 @@ function AcceptInviteContent() {
   };
 
   if (loading) {
-    return <div className="flex flex-col items-center pt-20"><Loader2 className="animate-spin w-10 h-10 text-primary" /><p className="mt-4 italic text-slate-500">Validating your credentials...</p></div>;
+    return <div className="flex flex-col items-center pt-20"><Loader2 className="animate-spin w-10 h-10 text-primary dark:text-white" /><p className="mt-4 italic text-slate-500 dark:text-slate-400">Validating your credentials...</p></div>;
   }
 
   if (error) {
     return (
-      <div className="max-w-md mx-auto mt-20 p-8 bg-white dark:bg-slate-800 rounded-3xl shadow-xl text-center border border-red-100">
-        <h2 className="text-xl font-bold text-red-600 mb-4">Invitation Error</h2>
-        <p className="text-slate-600 mb-6">{error}</p>
-        <button onClick={() => router.push("/")} className="text-primary font-bold">Return Home</button>
+      <div className="max-w-md mx-auto mt-20 p-8 bg-white dark:bg-slate-800 rounded-3xl shadow-xl text-center border border-red-100 dark:border-red-800/50">
+        <h2 className="text-xl font-bold text-red-600 dark:text-red-400 mb-4">Invitation Error</h2>
+        <p className="text-slate-600 dark:text-slate-300 mb-6">{error}</p>
+        <button onClick={() => router.push("/")} className="text-primary dark:text-white font-bold">Return Home</button>
       </div>
     );
   }
@@ -94,11 +94,11 @@ function AcceptInviteContent() {
       className="max-w-3xl mx-auto mt-10 p-8 md:p-12 bg-white dark:bg-slate-800 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-700"
     >
       <div className="flex flex-col md:flex-row items-center gap-8 mb-10 pb-10 border-b border-slate-100 dark:border-slate-700">
-        <div className="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center text-primary shrink-0 transition-transform hover:rotate-12 duration-500">
+        <div className="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center text-primary dark:text-white shrink-0 transition-transform hover:rotate-12 duration-500">
           <GraduationCap size={48} />
         </div>
         <div>
-          <span className="text-xs font-bold uppercase tracking-widest text-primary bg-primary/5 px-3 py-1 rounded-full mb-3 inline-block">Exclusive Academic Invite</span>
+          <span className="text-xs font-bold uppercase tracking-widest text-primary dark:text-white bg-primary/5 px-3 py-1 rounded-full mb-3 inline-block">Exclusive Academic Invite</span>
           <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2 underline decoration-accent decoration-4">Welcome, {inviteData.invitee_name}</h1>
           <p className="text-slate-600 dark:text-slate-400">You have been invited to ResearchBridge by our Super Admin community. Complete your profile to activate your professional account.</p>
         </div>
@@ -113,7 +113,7 @@ function AcceptInviteContent() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 focus:ring-2 focus:ring-primary outline-none"
+              className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-primary outline-none"
               placeholder="••••••••"
             />
           </div>
@@ -124,7 +124,7 @@ function AcceptInviteContent() {
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 focus:ring-2 focus:ring-primary outline-none"
+              className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-primary outline-none"
               placeholder="e.g. Professor of Neuroscience"
             />
           </div>
@@ -137,7 +137,7 @@ function AcceptInviteContent() {
               value={bio}
               onChange={(e) => setBio(e.target.value)}
               rows={5}
-              className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 focus:ring-2 focus:ring-primary outline-none resize-none"
+              className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-primary outline-none resize-none"
               placeholder="Tell us about your research focus, lab, or academic trajectory..."
             />
           </div>

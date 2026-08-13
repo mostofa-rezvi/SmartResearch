@@ -22,7 +22,7 @@ export function FilterSidebar({
   const TIERS = ["Bronze", "Silver", "Gold"];
 
   return (
-    <aside className="w-64 shrink-0 bg-slate-50 dark:bg-slate-900/50 p-6 rounded-[32px] border border-slate-100 dark:border-slate-800 space-y-8 h-fit sticky top-24">
+    <aside className="w-64 shrink-0 glass-neu-card p-6 space-y-8 h-fit sticky top-24">
       <div>
         <h3 className="text-sm font-bold uppercase tracking-widest text-slate-400 mb-4">Domains</h3>
         <div className="space-y-3">
@@ -58,9 +58,9 @@ export function FilterSidebar({
               key={t}
               onClick={() => onTierChange(t === selectedTier ? null : t)}
               className={`px-4 py-2 text-sm font-bold rounded-xl border text-left transition-all ${
-                selectedTier === t 
-                  ? 'bg-primary/10 border-primary text-primary' 
-                  : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-slate-300'
+                selectedTier === t
+                  ? 'bg-primary/10 border-primary text-primary dark:text-white'
+                  : 'neu-btn text-slate-600 dark:text-slate-400'
               }`}
             >
               {t} Tier
@@ -76,7 +76,7 @@ export function FilterSidebar({
           value={institutionSearch}
           onChange={(e) => onInstitutionChange(e.target.value)}
           placeholder="Filter by university..." 
-          className="w-full px-4 py-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:border-primary"
+          className="w-full px-4 py-2 neu-inset text-sm focus:outline-none"
         />
       </div>
     </aside>

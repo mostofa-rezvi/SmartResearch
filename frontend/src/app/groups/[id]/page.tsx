@@ -97,7 +97,7 @@ function ReactionPicker({ onReact, userReaction }: { onReact: (type: string) => 
         onMouseEnter={() => setOpen(true)}
         onClick={() => setOpen(!open)}
         className={`flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-full transition-all ${
-          userReaction ? "bg-primary/10 text-primary ring-1 ring-primary/20 shadow-sm" : "text-slate-400 hover:text-primary hover:bg-primary/5"
+          userReaction ? "bg-primary/10 text-primary dark:text-white ring-1 ring-primary/20 shadow-sm" : "text-slate-400 hover:text-primary hover:bg-primary/5"
         }`}
       >
         <span>{current ? current.label : "React"}</span>
@@ -129,7 +129,7 @@ function ReactionPicker({ onReact, userReaction }: { onReact: (type: string) => 
                   className={`flex flex-col items-center gap-0.5 p-2.5 rounded-xl transition-all hover:bg-primary/5 group/react ${userReaction === r.type ? "bg-primary/10 ring-1 ring-primary/20" : "hover:scale-110"}`}
                 >
                   <span className="text-2xl group-hover/react:scale-110 transition-transform">{r.emoji}</span>
-                  <span className="text-[9px] font-bold text-slate-500 group-hover/react:text-primary">{r.label}</span>
+                  <span className="text-[9px] font-bold text-slate-500 dark:text-slate-400 group-hover/react:text-primary">{r.label}</span>
                 </button>
               ))}
             </motion.div>
@@ -213,7 +213,7 @@ function CommentItem({ comment, token, currentUserId, groupRole, onDelete, onUpd
               className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-2 text-xs outline-none min-h-[60px] text-slate-700 dark:text-slate-200"
             />
             <div className="flex justify-end gap-2">
-              <button onClick={() => setIsEditing(false)} className="text-[10px] text-slate-400 hover:text-slate-600">Cancel</button>
+              <button onClick={() => setIsEditing(false)} className="text-[10px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">Cancel</button>
               <button onClick={handleUpdate} disabled={submitting} className="text-[10px] bg-primary text-white px-3 py-1 rounded-lg font-bold shadow-sm shadow-primary/20">
                 {submitting ? "..." : "Save"}
               </button>
@@ -366,7 +366,7 @@ function PostComposer({ groupId, token, user, onPosted }: { groupId: string; tok
         <Avatar name={user?.name || "You"} />
         <button
           onClick={() => setExpanded(true)}
-          className="flex-1 text-left bg-slate-50 dark:bg-slate-900/50 rounded-2xl px-4 py-3 text-sm text-slate-400 italic hover:bg-slate-100 transition-all"
+          className="flex-1 text-left bg-slate-50 dark:bg-slate-900/50 rounded-2xl px-4 py-3 text-sm text-slate-400 italic hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
         >
           ✨ Share a thought or question with the group...
         </button>
@@ -384,7 +384,7 @@ function PostComposer({ groupId, token, user, onPosted }: { groupId: string; tok
                     initial={{ y: 0, opacity: 1 }}
                     animate={{ y: -60, opacity: 0 }}
                     transition={{ duration: 1.2, ease: "easeOut" }}
-                    className="absolute bottom-16 text-primary/40 font-mono text-lg font-bold select-none"
+                    className="absolute bottom-16 text-primary/40 dark:text-white/40 font-mono text-lg font-bold select-none"
                     style={{ left: `${fc.x}%` }}
                   >
                     {fc.char}
@@ -395,7 +395,7 @@ function PostComposer({ groupId, token, user, onPosted }: { groupId: string; tok
               <div className="flex gap-2">
                 {(["Thought", "Question"] as const).map(t => (
                   <button key={t} onClick={() => setType(t)}
-                    className={`px-3 py-1 rounded-full text-xs font-bold transition-all ${type === t ? "bg-primary text-white" : "bg-slate-100 text-slate-500 hover:bg-slate-200"}`}
+                    className={`px-3 py-1 rounded-full text-xs font-bold transition-all ${type === t ? "bg-primary text-white" : "bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700"}`}
                   >{t}</button>
                 ))}
               </div>
@@ -413,7 +413,7 @@ function PostComposer({ groupId, token, user, onPosted }: { groupId: string; tok
               </div>
 
               <div className="flex justify-between items-center">
-                <button onClick={() => setExpanded(false)} className="text-xs text-slate-400 hover:text-slate-600 flex items-center gap-1"><X size={12} /> Cancel</button>
+                <button onClick={() => setExpanded(false)} className="text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 flex items-center gap-1"><X size={12} /> Cancel</button>
                 <button onClick={handleSubmit} disabled={submitting || content.length < 10}
                   className="bg-primary text-white px-5 py-2 rounded-xl text-sm font-bold disabled:opacity-50 hover:bg-primary/90 transition-all flex items-center gap-2"
                 >
@@ -473,7 +473,7 @@ function MemberCard({ member, currentUserId, currentUserRole, onRoleUpdate, toke
         <div className="flex items-center gap-2 mb-1">
           <h4 className="font-bold text-slate-900 dark:text-white truncate text-base leading-tight">{member.name || "Anonymous"}</h4>
           {member.group_role === "admin" && <ShieldCheck size={16} className="text-amber-500 shrink-0" />}
-          {member.group_role === "contributor" && <Award size={16} className="text-primary shrink-0" />}
+          {member.group_role === "contributor" && <Award size={16} className="text-primary dark:text-white shrink-0" />}
         </div>
         <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest truncate">
           {member.researcher_type || "Researcher"} • {member.institution || "Independent"}
@@ -488,7 +488,7 @@ function MemberCard({ member, currentUserId, currentUserRole, onRoleUpdate, toke
             </button>
             <button 
               onClick={() => onRequestAction?.(member.id, 'reject')}
-              className="bg-slate-100 text-slate-500 text-[10px] font-black px-3 py-1 rounded-lg hover:bg-rose-50 hover:text-rose-600 transition-all"
+              className="bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-[10px] font-black px-3 py-1 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-900/30 hover:text-rose-600 dark:hover:text-rose-400 transition-all"
             >
               REJECT
             </button>
@@ -526,7 +526,7 @@ function MemberCard({ member, currentUserId, currentUserRole, onRoleUpdate, toke
                         disabled={loading}
                         className="w-full text-left px-4 py-4 text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors flex items-center gap-3 rounded-2xl group/item"
                       >
-                        <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary group-hover/item:bg-primary group-hover/item:text-white transition-all">
+                        <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary dark:text-white group-hover/item:bg-primary group-hover/item:text-white transition-all">
                           <Award size={18} />
                         </div>
                         <span>Promote to Contributor</span>
@@ -536,9 +536,9 @@ function MemberCard({ member, currentUserId, currentUserRole, onRoleUpdate, toke
                       <button 
                         onClick={() => handleRoleChange("member")}
                         disabled={loading}
-                        className="w-full text-left px-4 py-4 text-xs font-bold text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-colors flex items-center gap-3 rounded-2xl group/item"
+                        className="w-full text-left px-4 py-4 text-xs font-bold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-colors flex items-center gap-3 rounded-2xl group/item"
                       >
-                        <div className="w-10 h-10 rounded-xl bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center text-rose-600 group-hover/item:bg-rose-600 group-hover/item:text-white transition-all">
+                        <div className="w-10 h-10 rounded-xl bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center text-rose-600 dark:text-rose-300 group-hover/item:bg-rose-600 group-hover/item:text-white transition-all">
                           <UserMinus size={18} />
                         </div>
                         <span>Remove from Contributor</span>
@@ -573,7 +573,7 @@ function MemberSection({ title, icon, members, description, currentUserId, curre
           <h3 className="font-bold text-slate-900 dark:text-white text-sm">{title}</h3>
           <p className="text-[10px] text-slate-400 font-medium">{description}</p>
         </div>
-        <div className="ml-auto text-[10px] font-bold bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded-lg text-slate-500">
+        <div className="ml-auto text-[10px] font-bold bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded-lg text-slate-500 dark:text-slate-400">
           {members.length}
         </div>
       </div>
@@ -725,7 +725,7 @@ function PostCard({ post, token, onUpdate, onDelete, currentUserId, groupRole }:
         <div className="flex flex-col items-end gap-2">
           <div className="flex items-center gap-2">
             <span className={`text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-lg ${
-              post.type === "Question" ? "bg-blue-50 text-blue-600 border border-blue-100" : "bg-purple-50 text-purple-600 border border-purple-100"
+              post.type === "Question" ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 border border-blue-100 dark:border-blue-800/50" : "bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-300 border border-purple-100 dark:border-purple-800/50"
             }`}>
               {post.type}
             </span>
@@ -734,7 +734,7 @@ function PostCard({ post, token, onUpdate, onDelete, currentUserId, groupRole }:
             {(canEdit || canDelete) && (
               <div className="flex items-center gap-1 border-l border-slate-100 dark:border-slate-700 pl-2 ml-1">
                 {canEdit && (
-                  <button onClick={() => setIsEditing(!isEditing)} className={`p-1 transition-colors ${isEditing ? "text-primary" : "text-slate-400 hover:text-primary"}`}>
+                  <button onClick={() => setIsEditing(!isEditing)} className={`p-1 transition-colors ${isEditing ? "text-primary dark:text-white" : "text-slate-400 hover:text-primary"}`}>
                     <Edit size={12} />
                   </button>
                 )}
@@ -774,7 +774,7 @@ function PostCard({ post, token, onUpdate, onDelete, currentUserId, groupRole }:
                 placeholder="Edit your post..."
               />
               <div className="flex justify-end gap-2">
-                <button onClick={() => setIsEditing(false)} className="px-3 py-1 text-[10px] font-bold text-slate-500 hover:text-slate-700 transition-colors">Cancel</button>
+                <button onClick={() => setIsEditing(false)} className="px-3 py-1 text-[10px] font-bold text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition-colors">Cancel</button>
                 <button onClick={handleUpdate} className="px-4 py-1.5 text-[10px] font-bold bg-primary text-white rounded-lg shadow-sm shadow-primary/20 hover:bg-primary/90 transition-colors">Save Changes</button>
               </div>
             </div>
@@ -804,19 +804,19 @@ function PostCard({ post, token, onUpdate, onDelete, currentUserId, groupRole }:
           <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-900 px-3 py-1.5 rounded-xl border border-slate-100 dark:border-slate-700">
             <div className="flex items-center gap-1.5">
               <button onClick={() => handleVote(1)}
-                className={`p-1 rounded-lg transition-all ${post.user_vote === 1 ? "text-emerald-500 bg-emerald-50" : "text-slate-400 hover:text-emerald-500"}`}
+                className={`p-1 rounded-lg transition-all ${post.user_vote === 1 ? "text-emerald-500 bg-emerald-50 dark:bg-emerald-900/30" : "text-slate-400 hover:text-emerald-500"}`}
               >
                 <ThumbsUp size={14} />
               </button>
-              <span className="text-[10px] font-black text-emerald-600/80">{post.upvotes || 0}</span>
+              <span className="text-[10px] font-black text-emerald-600/80 dark:text-emerald-400">{post.upvotes || 0}</span>
             </div>
 
             <div className="w-[1px] h-3 bg-slate-200 dark:bg-slate-700 mx-1" />
 
             <div className="flex items-center gap-1.5">
-              <span className="text-[10px] font-black text-rose-600/80">{post.downvotes || 0}</span>
+              <span className="text-[10px] font-black text-rose-600/80 dark:text-rose-400">{post.downvotes || 0}</span>
               <button onClick={() => handleVote(-1)}
-                className={`p-1 rounded-lg transition-all ${post.user_vote === -1 ? "text-rose-500 bg-rose-50" : "text-slate-400 hover:text-rose-500"}`}
+                className={`p-1 rounded-lg transition-all ${post.user_vote === -1 ? "text-rose-500 bg-rose-50 dark:bg-rose-900/30" : "text-slate-400 hover:text-rose-500"}`}
               >
                 <ThumbsDown size={14} />
               </button>
@@ -827,14 +827,14 @@ function PostCard({ post, token, onUpdate, onDelete, currentUserId, groupRole }:
         {/* 3. Comment Section on Right */}
         <button 
           onClick={() => setShowComments(!showComments)}
-          className={`group flex items-center gap-2 px-4 py-2 rounded-2xl transition-all ${showComments ? "bg-primary/5 text-primary" : "hover:bg-slate-50 dark:hover:bg-slate-900 text-slate-500"}`}
+          className={`group flex items-center gap-2 px-4 py-2 rounded-2xl transition-all ${showComments ? "bg-primary/5 text-primary dark:text-white" : "hover:bg-slate-50 dark:hover:bg-slate-900 text-slate-500 dark:text-slate-400"}`}
         >
-          <MessageSquare size={16} className={showComments ? "text-primary" : "text-slate-400 group-hover:text-primary transition-colors"} />
-          <span className={`text-xs font-bold transition-colors ${showComments ? "text-primary" : "group-hover:text-slate-900 dark:group-hover:text-white"}`}>
+          <MessageSquare size={16} className={showComments ? "text-primary dark:text-white" : "text-slate-400 group-hover:text-primary transition-colors"} />
+          <span className={`text-xs font-bold transition-colors ${showComments ? "text-primary dark:text-white" : "group-hover:text-slate-900 dark:group-hover:text-white"}`}>
             {post.comment_count || 0} Comments
           </span>
           <motion.div animate={{ rotate: showComments ? 180 : 0 }}>
-            <ChevronDown size={14} className={showComments ? "text-primary" : "text-slate-300"} />
+            <ChevronDown size={14} className={showComments ? "text-primary dark:text-white" : "text-slate-300"} />
           </motion.div>
         </button>
       </div>
@@ -902,7 +902,7 @@ function PostCard({ post, token, onUpdate, onDelete, currentUserId, groupRole }:
                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Deep Link</p>
                 <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-900/50 p-2 rounded-2xl border border-slate-100 dark:border-slate-700">
                   <div className="flex-1 overflow-hidden">
-                    <p className="text-xs text-slate-500 truncate px-2 font-mono">{postUrl}</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 truncate px-2 font-mono">{postUrl}</p>
                   </div>
                   <button 
                     onClick={copyToClipboard}
@@ -1106,8 +1106,8 @@ export default function GroupDetailPage() {
   if (!group) return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex items-center justify-center">
       <div className="text-center">
-        <p className="text-slate-500 mb-4">Group not found</p>
-        <Link href="/groups" className="text-primary font-bold hover:underline">← Back to Groups</Link>
+        <p className="text-slate-500 dark:text-slate-400 mb-4">Group not found</p>
+        <Link href="/groups" className="text-primary dark:text-white font-bold hover:underline">← Back to Groups</Link>
       </div>
     </div>
   );
@@ -1119,12 +1119,12 @@ export default function GroupDetailPage() {
 
         {/* Sidebar */}
         <div className="lg:col-span-1 space-y-4">
-          <Link href="/groups" className="inline-flex items-center gap-2 text-slate-500 hover:text-primary transition-colors text-sm font-medium">
+          <Link href="/groups" className="inline-flex items-center gap-2 text-slate-500 dark:text-slate-400 hover:text-primary transition-colors text-sm font-medium">
             <ArrowLeft size={16} /> All Groups
           </Link>
 
           <div className="bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-xl">
-            <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center text-primary mb-4">
+            <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center text-primary dark:text-white mb-4">
               <Users size={32} />
             </div>
             <h1 className="text-xl font-bold mb-1 text-slate-900 dark:text-white">{group.name}</h1>
@@ -1132,7 +1132,7 @@ export default function GroupDetailPage() {
               {group.type === "public" ? <Globe size={10} /> : <Lock size={10} />}
               {group.type} • {group.focus_area}
             </div>
-            <p className="text-sm text-slate-500 mb-5">{group.description}</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mb-5">{group.description}</p>
             
             {!membership?.is_member ? (
               <button onClick={handleJoin} disabled={joining}
@@ -1142,12 +1142,12 @@ export default function GroupDetailPage() {
               </button>
             ) : (
               <div className="mb-3 space-y-2">
-                <div className="bg-emerald-50 text-emerald-600 text-center py-2 rounded-xl text-sm font-bold border border-emerald-200">
+                <div className="bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-300 text-center py-2 rounded-xl text-sm font-bold border border-emerald-200 dark:border-emerald-800/50">
                   <span className="flex items-center justify-center gap-1.5"><Check size={16} /> Joined as {membership.role === "admin" ? "Admin" : "Member"}</span>
                 </div>
                 {membership.role !== "admin" && (
                   <button onClick={handleLeave} disabled={leaving}
-                    className="w-full bg-slate-100 text-rose-500 py-2 rounded-xl font-bold text-sm hover:bg-rose-50 transition-all disabled:opacity-60 flex items-center justify-center gap-1.5"
+                    className="w-full bg-slate-100 dark:bg-slate-800 text-rose-500 py-2 rounded-xl font-bold text-sm hover:bg-rose-50 dark:hover:bg-rose-900/30 transition-all disabled:opacity-60 flex items-center justify-center gap-1.5"
                   >
                     <LogOut size={16} /> {leaving ? "Leaving..." : "Leave Group"}
                   </button>
@@ -1157,7 +1157,7 @@ export default function GroupDetailPage() {
 
             <div className="relative">
               <button onClick={copyInviteLink}
-                className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 py-2 rounded-xl font-bold text-sm hover:bg-slate-100 transition-all flex items-center justify-center gap-1.5"
+                className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 py-2 rounded-xl font-bold text-sm hover:bg-slate-100 dark:hover:bg-slate-800 transition-all flex items-center justify-center gap-1.5"
               >
                 <Copy size={16} /> Invite Link
               </button>
@@ -1187,7 +1187,7 @@ export default function GroupDetailPage() {
                   alert("You must be an approved member to view the feed.");
                 }
               }}
-              className={`px-6 py-2 rounded-xl text-sm font-bold transition-all relative ${activeTab === "feed" ? "text-primary" : "text-slate-500 hover:text-slate-700"} ${membership?.status !== 'approved' ? "opacity-50 cursor-not-allowed" : ""}`}
+              className={`px-6 py-2 rounded-xl text-sm font-bold transition-all relative ${activeTab === "feed" ? "text-primary dark:text-white" : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300"} ${membership?.status !== 'approved' ? "opacity-50 cursor-not-allowed" : ""}`}
             >
               {activeTab === "feed" && <motion.div layoutId="activeTab" className="absolute inset-0 bg-primary/10 rounded-xl" />}
               <span className="relative z-10 flex items-center gap-2">
@@ -1197,7 +1197,7 @@ export default function GroupDetailPage() {
             </button>
             <button
               onClick={() => setActiveTab("members")}
-              className={`px-6 py-2 rounded-xl text-sm font-bold transition-all relative ${activeTab === "members" ? "text-primary" : "text-slate-500 hover:text-slate-700"}`}
+              className={`px-6 py-2 rounded-xl text-sm font-bold transition-all relative ${activeTab === "members" ? "text-primary dark:text-white" : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300"}`}
             >
               {activeTab === "members" && <motion.div layoutId="activeTab" className="absolute inset-0 bg-primary/10 rounded-xl" />}
               <span className="relative z-10 flex items-center gap-2"><Users size={16} /> Members</span>
@@ -1234,7 +1234,7 @@ export default function GroupDetailPage() {
                     <Lock size={32} className="text-slate-300" />
                   </div>
                   <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Members-Only Content</h2>
-                  <p className="text-sm text-slate-500 max-w-sm mx-auto mb-8">
+                  <p className="text-sm text-slate-500 dark:text-slate-400 max-w-sm mx-auto mb-8">
                     The research feed is exclusively available to approved community members. Join the group to see and participate in discussions.
                   </p>
                   {(!membership || membership.status === null) && (
@@ -1317,7 +1317,7 @@ export default function GroupDetailPage() {
                   {/* Contributor Section */}
                   <MemberSection 
                     title="Contributors" 
-                    icon={<Award className="text-primary" size={20} />}
+                    icon={<Award className="text-primary dark:text-white" size={20} />}
                     members={filteredMembers.filter(m => m.group_role === "contributor" && m.status === 'approved')}
                     description="Top-tier researchers and active collaborators."
                     currentUserId={user?.id ? parseInt(user.id) : null}
@@ -1360,8 +1360,8 @@ export default function GroupDetailPage() {
                 <Lock size={20} className="text-slate-400" />
               </div>
               <h3 className="font-bold text-slate-900 dark:text-white mb-2 text-sm">Join the Conversation</h3>
-              <p className="text-xs text-slate-500 mb-4">You need to log in and join this group to post a thought or question.</p>
-              <Link href="/login" className="inline-block w-full bg-primary/10 text-primary font-bold text-xs py-2 rounded-xl hover:bg-primary/20 transition-colors">
+              <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">You need to log in and join this group to post a thought or question.</p>
+              <Link href="/login" className="inline-block w-full bg-primary/10 text-primary dark:text-white font-bold text-xs py-2 rounded-xl hover:bg-primary/20 transition-colors">
                 Sign In
               </Link>
             </div>

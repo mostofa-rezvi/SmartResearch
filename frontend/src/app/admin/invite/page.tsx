@@ -17,12 +17,12 @@ export default function SuperAdminInvitePage() {
 
   if (!isSuperAdmin) {
     return (
-      <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex items-center justify-center p-6">
+      <div className="min-h-screen app-bg flex items-center justify-center p-6">
         <div className="text-center max-w-md">
           <ShieldAlert className="w-16 h-16 text-red-500 mx-auto mb-4" />
           <h1 className="text-2xl font-bold mb-2">Restricted Access</h1>
-          <p className="text-slate-600 mb-6">This section is exclusively for Super Admin members.</p>
-          <Link href="/" className="text-primary font-bold hover:underline">Return to safety</Link>
+          <p className="text-slate-600 dark:text-slate-300 mb-6">This section is exclusively for Super Admin members.</p>
+          <Link href="/" className="text-primary dark:text-white font-bold hover:underline">Return to safety</Link>
         </div>
       </div>
     );
@@ -60,18 +60,18 @@ export default function SuperAdminInvitePage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
+    <div className="min-h-screen app-bg">
       <Navbar />
       
       <main className="pt-32 pb-20 px-6 max-w-2xl mx-auto">
-        <Link href="/" className="inline-flex items-center gap-2 text-slate-500 hover:text-primary transition-colors mb-8 text-sm font-medium">
+        <Link href="/" className="inline-flex items-center gap-2 text-slate-500 dark:text-slate-400 hover:text-primary transition-colors mb-8 text-sm font-medium">
           <ArrowLeft size={16} /> Back to Dashboard
         </Link>
 
         <motion.div 
           initial={{ opacity: 0, scale: 0.98 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-700 overflow-hidden"
+          className="glass-neu-card overflow-hidden"
         >
           <div className="bg-primary p-8 text-white">
             <h1 className="text-3xl font-bold flex items-center gap-3">
@@ -86,7 +86,7 @@ export default function SuperAdminInvitePage() {
           <form onSubmit={handleInvite} className="p-8 space-y-6">
             {message && (
               <div className={`p-4 rounded-xl text-sm font-medium border flex items-center gap-3 ${
-                message.type === 'error' ? "bg-red-50 text-red-600 border-red-100" : "bg-emerald-50 text-emerald-600 border-emerald-100"
+                message.type === 'error' ? "bg-red-50 text-red-600 border-red-100 dark:bg-red-900/30 dark:text-red-300 dark:border-red-800/50" : "bg-emerald-50 text-emerald-600 border-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-300 dark:border-emerald-800/50"
               }`}>
                 {message.type === 'error' ? <ShieldAlert size={18} /> : <CheckCircle2 size={18} />}
                 {message.text}
@@ -103,7 +103,7 @@ export default function SuperAdminInvitePage() {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     required
-                    className="w-full pl-12 pr-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-primary outline-none transition-all"
+                    className="w-full pl-12 pr-4 py-3 neu-inset focus:ring-2 focus:ring-primary outline-none transition-all"
                     placeholder="Prof. Julian Barnes"
                   />
                 </div>
@@ -118,7 +118,7 @@ export default function SuperAdminInvitePage() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    className="w-full pl-12 pr-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-primary outline-none transition-all"
+                    className="w-full pl-12 pr-4 py-3 neu-inset focus:ring-2 focus:ring-primary outline-none transition-all"
                     placeholder="j.barnes@university.edu"
                   />
                 </div>

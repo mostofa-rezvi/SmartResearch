@@ -79,16 +79,16 @@ export default function PublicSearchPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#020617] flex flex-col">
+    <div className="min-h-screen app-bg flex flex-col">
       <Navbar />
       
       <main className="pt-32 pb-20 px-6 flex-1">
         <div className="max-w-4xl mx-auto">
           <header className="mb-16 text-center">
             <h1 className="text-5xl md:text-6xl font-serif font-black text-primary dark:text-white mb-6">
-               The <span className="text-secondary italic">DOI Engine</span>
+               The <span className="text-secondary dark:text-rose-300 italic">DOI Engine</span>
             </h1>
-            <p className="text-slate-500 text-lg italic max-w-2xl mx-auto">"Instant lookup and contextual discovery across 250 million records."</p>
+            <p className="text-slate-500 dark:text-slate-400 text-lg italic max-w-2xl mx-auto">"Instant lookup and contextual discovery across 250 million records."</p>
           </header>
 
           <form onSubmit={handleSearch} className="relative mb-12 group">
@@ -100,7 +100,7 @@ export default function PublicSearchPage() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Paste DOI (10.1037/0003-066X.59.1.29)..."
-              className="w-full pl-16 pr-44 py-7 rounded-[32px] bg-white dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.12)] focus:border-secondary transition-all outline-none text-xl font-medium"
+              className="w-full pl-16 pr-44 py-7 neu-inset focus:border-secondary transition-all outline-none text-xl font-medium"
             />
             <button 
               type="submit"
@@ -140,11 +140,11 @@ export default function PublicSearchPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                className="bg-white dark:bg-slate-800 rounded-[2.5rem] border border-slate-200 dark:border-slate-700 shadow-xl overflow-hidden mb-12"
+                className="glass-neu-card overflow-hidden mb-12"
               >
                 <div className="p-8 md:p-10 border-b border-slate-100 dark:border-slate-700">
                   <div className="flex flex-wrap items-center gap-3 mb-6">
-                    <span className="px-3 py-1 bg-primary/10 text-primary font-black text-xs uppercase tracking-widest rounded-lg flex items-center gap-1">
+                    <span className="px-3 py-1 bg-primary/10 text-primary dark:text-white font-black text-xs uppercase tracking-widest rounded-lg flex items-center gap-1">
                       <FileType size={14} /> Publication
                     </span>
                     {result.is_open_access && (
@@ -161,19 +161,19 @@ export default function PublicSearchPage() {
                     {result.title}
                   </h2>
 
-                  <div className="flex flex-wrap items-center gap-6 text-sm text-slate-500 font-medium">
+                  <div className="flex flex-wrap items-center gap-6 text-sm text-slate-500 dark:text-slate-400 font-medium">
                     {result.journal && (
                       <div className="flex items-center gap-2">
-                        <FileText size={16} className="text-primary" />
+                        <FileText size={16} className="text-primary dark:text-white" />
                         <span className="font-bold text-slate-700 dark:text-slate-300">{result.journal}</span>
                       </div>
                     )}
                     <div className="flex items-center gap-2">
-                      <Calendar size={16} className="text-primary" />
+                      <Calendar size={16} className="text-primary dark:text-white" />
                       <span>{result.publication_date || result.publication_year}</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Users size={16} className="text-primary" />
+                      <Users size={16} className="text-primary dark:text-white" />
                       <span>{result.authors?.length || 0} Authors</span>
                     </div>
                   </div>
@@ -199,12 +199,12 @@ export default function PublicSearchPage() {
                               <div key={idx} className="flex flex-col">
                                 <span className="font-bold text-slate-800 dark:text-slate-200">{author.name}</span>
                                 {author.institutions && author.institutions.length > 0 && (
-                                  <span className="text-xs text-slate-500">{author.institutions.join(", ")}</span>
+                                  <span className="text-xs text-slate-500 dark:text-slate-400">{author.institutions.join(", ")}</span>
                                 )}
                               </div>
                             ))}
                             {result.authors.length > 5 && (
-                              <p className="text-xs font-bold text-primary italic">+ {result.authors.length - 5} more authors</p>
+                              <p className="text-xs font-bold text-primary dark:text-white italic">+ {result.authors.length - 5} more authors</p>
                             )}
                           </div>
                         </div>
@@ -212,8 +212,8 @@ export default function PublicSearchPage() {
                     </div>
 
                     <div className="space-y-6">
-                       <div className="p-6 bg-white dark:bg-slate-800 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-sm text-center">
-                          <h4 className="text-4xl font-black text-primary mb-1">{result.citation_count}</h4>
+                       <div className="p-6 glass-neu-card text-center">
+                          <h4 className="text-4xl font-black text-primary dark:text-white mb-1">{result.citation_count}</h4>
                           <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Citations</p>
                        </div>
 
@@ -234,7 +234,7 @@ export default function PublicSearchPage() {
                            <h4 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-3">Key Concepts</h4>
                            <div className="flex flex-wrap gap-2">
                              {result.concepts.slice(0, 8).map(concept => (
-                               <span key={concept.display_name} className="px-3 py-1 bg-primary/5 text-primary text-xs font-bold rounded-lg border border-primary/10">
+                               <span key={concept.display_name} className="px-3 py-1 bg-primary/5 text-primary dark:text-white text-xs font-bold rounded-lg border border-primary/10">
                                  {concept.display_name}
                                </span>
                              ))}
@@ -254,12 +254,12 @@ export default function PublicSearchPage() {
                   <h3 className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">Supported Identifiers</h3>
                   <div className="flex flex-wrap gap-3">
                      {['DOI'].map(id => (
-                        <span key={id} className="px-4 py-2 bg-white dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700 text-xs font-bold text-slate-500">{id}</span>
+                        <span key={id} className="px-4 py-2 neu-btn text-xs font-bold text-slate-500 dark:text-slate-400">{id}</span>
                      ))}
                   </div>
                </div>
                <div className="p-8 rounded-3xl bg-secondary/5 border border-secondary/10">
-                  <h4 className="text-sm font-black text-secondary uppercase tracking-widest mb-4">Pro Tip</h4>
+                  <h4 className="text-sm font-black text-secondary dark:text-rose-300 uppercase tracking-widest mb-4">Pro Tip</h4>
                   <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed italic">
                       "Searching by DOI allows ResearchBridge to instantly resolve publication metadata, including abstracts, citations, and Open Access PDF availability."
                   </p>

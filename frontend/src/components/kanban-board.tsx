@@ -6,7 +6,7 @@ import { useProjectMilestones, Milestone } from "@/hooks/useProjectMilestones";
 import { motion, AnimatePresence } from "framer-motion";
 
 const SkeletonCard = () => (
-  <div className="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-100 dark:border-slate-700 animate-pulse space-y-3 shadow-sm">
+  <div className="glass-neu-card p-4 animate-pulse space-y-3">
     <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-3/4"></div>
     <div className="h-3 bg-slate-100 dark:bg-slate-700/50 rounded w-1/2"></div>
     <div className="flex justify-between items-center pt-2">
@@ -116,16 +116,16 @@ export function KanbanBoard({ projectId = "1" }: { projectId?: string }) {
             key={col.id}
             onDragOver={(e) => e.preventDefault()}
             onDrop={(e) => handleDrop(e, col.id)}
-            className="w-80 shrink-0 bg-slate-50 dark:bg-slate-900/50 p-4 rounded-[24px] border border-slate-100 dark:border-slate-800 flex flex-col h-[600px] transition-all"
+            className="w-80 shrink-0 glass-neu-card p-4 flex flex-col h-[600px] transition-all"
           >
             <div className="flex items-center justify-between mb-4 px-2">
               <h3 className="font-bold text-slate-900 dark:text-white flex items-center gap-2">
                 {col.title}{" "}
-                <span className="bg-slate-200 dark:bg-slate-800 text-slate-500 text-xs px-2 py-0.5 rounded-full">
+                <span className="bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-xs px-2 py-0.5 rounded-full">
                   {isLoading ? "..." : col.tasks.length}
                 </span>
               </h3>
-              <button className="text-slate-400 hover:text-primary">
+              <button className="p-1.5 neu-btn text-slate-400 hover:text-primary transition-all">
                 <MoreHorizontal size={18} />
               </button>
             </div>
@@ -145,14 +145,14 @@ export function KanbanBoard({ projectId = "1" }: { projectId?: string }) {
                     key={task.id}
                     draggable
                     onDragStart={(e) => handleDragStart(e, task.id)}
-                    className="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 cursor-grab active:cursor-grabbing hover:border-primary/30 transition-all hover:shadow-md"
+                    className="glass-neu-card glass-neu-hover p-4 cursor-grab active:cursor-grabbing transition-all"
                   >
                     <p className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">
                       {task.title}
                     </p>
                     <div className="flex items-center justify-between">
                       <div className="flex -space-x-2">
-                        <div className="w-6 h-6 rounded-full bg-primary/20 border-2 border-white dark:border-slate-800 flex items-center justify-center text-[10px] font-bold text-primary">
+                        <div className="w-6 h-6 rounded-full bg-primary/20 border-2 border-white dark:border-slate-800 flex items-center justify-center text-[10px] font-bold text-primary dark:text-white">
                           {getInitials(task.description || "User")}
                         </div>
                       </div>
@@ -166,13 +166,13 @@ export function KanbanBoard({ projectId = "1" }: { projectId?: string }) {
             </div>
 
             {isAddingMilestone === col.id ? (
-              <div className="mt-4 p-2 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 space-y-2">
+              <div className="mt-4 p-2 glass-neu-card space-y-2">
                 <input
                   type="text"
                   placeholder="Enter milestone title..."
                   value={newMilestoneTitle}
                   onChange={(e) => setNewMilestoneTitle(e.target.value)}
-                  className="w-full text-xs p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg outline-none text-slate-900 dark:text-white"
+                  className="w-full text-xs p-2 neu-inset outline-none text-slate-900 dark:text-white"
                   onKeyDown={(e) => {
                     if (e.key === "Enter") handleCreateMilestone(col.id);
                     if (e.key === "Escape") setIsAddingMilestone(null);
@@ -200,7 +200,7 @@ export function KanbanBoard({ projectId = "1" }: { projectId?: string }) {
                   setIsAddingMilestone(col.id);
                   setNewMilestoneTitle("");
                 }}
-                className="mt-4 flex items-center justify-center gap-2 text-sm font-bold text-slate-500 hover:text-primary hover:bg-slate-100 dark:hover:bg-slate-850 py-3 rounded-xl transition-all"
+                className="mt-4 flex items-center justify-center gap-2 text-sm font-bold text-slate-500 dark:text-slate-400 hover:text-primary neu-btn py-3 transition-all"
               >
                 <Plus size={16} /> Add Task
               </button>

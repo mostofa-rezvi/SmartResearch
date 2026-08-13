@@ -68,17 +68,17 @@ export function SearchBar() {
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => query.trim() && suggestions.length > 0 && setIsOpen(true)}
           placeholder="Search researchers, papers, topics..."
-          className="w-full pl-12 pr-12 py-3 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 focus:ring-2 focus:ring-primary outline-none transition-all"
+          className="w-full pl-12 pr-12 py-3 neu-inset focus:ring-2 focus:ring-primary outline-none transition-all"
         />
-        {isLoading && <Loader2 className="absolute right-4 text-primary animate-spin" size={18} />}
+        {isLoading && <Loader2 className="absolute right-4 text-primary dark:text-white animate-spin" size={18} />}
       </div>
 
       {isOpen && suggestions.length > 0 && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl shadow-xl z-50 max-h-80 overflow-y-auto">
+        <div className="absolute top-full left-0 right-0 mt-2 glass-neu-card z-50 max-h-80 overflow-y-auto">
           {suggestions.map((s, i) => (
             <div key={i} className="px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer border-b last:border-0 border-slate-100 dark:border-slate-800 flex flex-col">
               <span className="font-medium text-sm text-slate-900 dark:text-white">{s.title}</span>
-              <span className="text-xs text-slate-500">{s.type}</span>
+              <span className="text-xs text-slate-500 dark:text-slate-400">{s.type}</span>
             </div>
           ))}
         </div>

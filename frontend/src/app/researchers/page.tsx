@@ -6,9 +6,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Users, Search, Globe, BookOpen, TrendingUp, ExternalLink,
   ChevronLeft, ChevronRight, Wifi, WifiOff, RefreshCw, Award,
-  Database, Zap
+  Database
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
+import AppPageHeader from "@/components/app/AppPageHeader";
 import { API } from "@/config/api";
 
 // ─── Types & Constants ─────────────────────────────────────────────────────────
@@ -56,7 +57,7 @@ function shuffleArray<T>(array: T[]): T[] {
 function getCitationBadge(citations: number) {
   if (citations >= 10000) return { label: "Highly Cited", color: "bg-secondary text-white" };
   if (citations >= 1000) return { label: "Well Cited", color: "bg-accent/20 text-accent" };
-  return { label: `${citations} citations`, color: "bg-slate-100 text-slate-500" };
+  return { label: `${citations} citations`, color: "bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400" };
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -250,59 +251,53 @@ export default function ResearchersPage() {
   }, [debouncedQuery, domain, source]);
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
+    <div className="min-h-screen app-bg">
       <Navbar />
 
       <main className="pt-28 pb-20 px-6 max-w-7xl mx-auto">
         {/* Header */}
-        <header className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
-          <div>
-            <span className="mono-academic text-xs font-black tracking-[0.2em] text-secondary mb-2 block uppercase flex items-center gap-2">
-              <Zap size={14} className="fill-secondary" /> Persistent Discovery Engine · Verified Data
-            </span>
-            <h1 className="text-4xl md:text-5xl font-serif font-black text-primary dark:text-white mb-3">
-              Global <span className="text-secondary italic">Researchers</span>
-            </h1>
-            <p className="text-slate-500 max-w-xl font-medium">
-              Explore a curated pool of {allResearchers.length.toLocaleString()} scholars. Your discovery order is preserved throughout your session for a professional browsing experience.
-            </p>
-          </div>
-
-          {backgroundSyncing && (
-            <div className="flex items-center gap-2 px-4 py-2 bg-primary/5 text-primary rounded-full text-[10px] font-black uppercase tracking-widest animate-pulse border border-primary/10">
-              <RefreshCw size={12} className="animate-spin" /> Syncing Global Pool...
-            </div>
-          )}
-        </header>
+        <AppPageHeader
+          eyebrow="Global Expert Directory"
+          title="Researchers"
+          accent="Directory"
+          subtitle={`Explore a curated pool of ${allResearchers.length.toLocaleString()} scholars. Your discovery order is preserved throughout your session for a professional browsing experience.`}
+          actions={
+            backgroundSyncing ? (
+              <div className="flex items-center gap-2 px-4 py-2 bg-primary/5 text-primary dark:text-white rounded-full text-[10px] font-black uppercase tracking-widest animate-pulse border border-primary/10">
+                <RefreshCw size={12} className="animate-spin" /> Syncing Global Pool...
+              </div>
+            ) : undefined
+          }
+        />
 
         {/* Controls */}
         <div className="flex flex-col md:flex-row gap-4 mb-8">
-          <div className="flex-1 flex items-center gap-3 bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl px-4 py-3 shadow-sm">
+          <div className="flex-1 flex items-center gap-3 neu-inset px-4 py-3">
             <Search size={18} className="text-slate-400 shrink-0" />
             <input
               type="text"
               placeholder="Search by name or institution..."
               value={query}
               onChange={e => setQuery(e.target.value)}
-              className="flex-1 bg-transparent border-none outline-none text-sm font-medium"
+              className="flex-1 bg-transparent border-none outline-none text-sm font-medium text-slate-900 dark:text-white placeholder-slate-400"
             />
           </div>
 
           <select
             value={domain}
             onChange={e => setDomain(e.target.value)}
-            className="px-4 py-3 rounded-2xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 text-sm font-medium outline-none shadow-sm cursor-pointer"
+            className="px-4 py-3 neu-inset text-sm font-medium text-slate-900 dark:text-white outline-none cursor-pointer"
           >
             {DOMAIN_OPTIONS.map(d => (
               <option key={d} value={d}>{d}</option>
             ))}
           </select>
 
-          <div className="flex items-center gap-2 bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl px-4 py-3 shadow-sm">
+          <div className="flex items-center gap-2 neu-inset px-4 py-3">
             <button
               onClick={() => { setSource("live"); syncResearchers(true); }}
               className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                source === "live" ? "bg-primary text-white shadow" : "text-slate-500 hover:bg-slate-50"
+                source === "live" ? "bg-primary text-white shadow" : "text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700"
               }`}
             >
               <Wifi size={13} /> Live
@@ -310,7 +305,7 @@ export default function ResearchersPage() {
             <button
               onClick={() => { setSource("db"); syncResearchers(true); }}
               className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                source === "db" ? "bg-primary text-white shadow" : "text-slate-500 hover:bg-slate-50"
+                source === "db" ? "bg-primary text-white shadow" : "text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700"
               }`}
             >
               <Database size={13} /> Local
@@ -320,7 +315,7 @@ export default function ResearchersPage() {
           <button
             onClick={() => { sessionStorage.removeItem(SESSION_SHUFFLE_KEY); syncResearchers(true); }}
             disabled={loading || backgroundSyncing}
-            className="p-3 rounded-2xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 text-slate-400 hover:text-primary transition-all shadow-sm disabled:opacity-50"
+            className="p-3 neu-btn text-slate-400 hover:text-primary transition-all disabled:opacity-50"
             title="Refresh Pool & Re-shuffle"
           >
             <RefreshCw size={18} className={loading ? "animate-spin" : ""} />
@@ -329,13 +324,13 @@ export default function ResearchersPage() {
 
         {/* Status Bar */}
         <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-4 text-sm text-slate-500 font-medium">
+          <div className="flex items-center gap-4 text-sm text-slate-500 dark:text-slate-400 font-medium">
              {loading ? (
                <span className="flex items-center gap-2"><RefreshCw size={14} className="animate-spin" /> Preparing engine...</span>
              ) : (
                <>
                  <span>Showing <span className="font-black text-slate-900 dark:text-white">{filteredOrder.length.toLocaleString()}</span> scholars</span>
-                 <span className="w-1 h-1 bg-slate-300 rounded-full" />
+                 <span className="w-1 h-1 bg-slate-300 dark:bg-slate-600 rounded-full" />
                  <span className="text-[10px] uppercase tracking-wider">Session Seed Locked</span>
                </>
              )}
@@ -344,30 +339,52 @@ export default function ResearchersPage() {
 
         {/* Error state */}
         {error && (
-          <div className="bg-red-50 border border-red-100 rounded-2xl p-6 mb-6 text-center">
-            <WifiOff size={32} className="text-red-300 mx-auto mb-2" />
-            <p className="text-red-600 font-bold mb-1">Sync Problem</p>
-            <p className="text-red-400 text-sm">{error}</p>
+          <div className="bg-red-50 dark:bg-red-900/30 border border-red-100 dark:border-red-800/50 rounded-3xl shadow-xl p-8 mb-6 text-center">
+            <WifiOff size={32} className="text-red-300 dark:text-red-400 mx-auto mb-2" />
+            <p className="text-red-600 dark:text-red-400 font-bold mb-1">Sync Problem</p>
+            <p className="text-red-400 dark:text-red-300 text-sm">{error}</p>
           </div>
         )}
 
         {/* Grid */}
         <AnimatePresence mode="popLayout">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {loading ? (
-              Array.from({ length: 6 }).map((_, i) => (
-                <div key={`skel-${i}`} className="bg-white dark:bg-slate-800 rounded-3xl p-7 animate-pulse border border-slate-100 dark:border-slate-700">
-                  <div className="w-14 h-14 bg-slate-100 dark:bg-slate-700 rounded-2xl mb-4" />
-                  <div className="h-5 bg-slate-100 dark:bg-slate-700 rounded w-3/4 mb-2" />
-                  <div className="h-4 bg-slate-100 dark:bg-slate-700 rounded w-1/2" />
+          {loading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={`skel-${i}`} className="glass-neu-card p-7">
+                  <div className="flex items-start justify-between mb-5">
+                    <div className="skeleton w-14 h-14 rounded-2xl" />
+                    <div className="skeleton h-5 w-20 rounded-full" />
+                  </div>
+                  <div className="skeleton h-5 w-3/4 rounded mb-2" />
+                  <div className="skeleton h-4 w-1/2 rounded mb-5" />
+                  <div className="flex gap-1.5 mb-5">
+                    <div className="skeleton h-5 w-16 rounded-full" />
+                    <div className="skeleton h-5 w-14 rounded-full" />
+                  </div>
+                  <div className="skeleton h-16 w-full rounded-xl" />
                 </div>
-              ))
-            ) : (
-              displayResearchers.map((r, idx) => {
+              ))}
+            </div>
+          ) : displayResearchers.length === 0 ? (
+            <div className="text-center py-24 glass-neu-card">
+              <div className="w-16 h-16 neu-icon flex items-center justify-center text-primary dark:text-white mx-auto mb-5">
+                <Users size={28} />
+              </div>
+              <h3 className="text-xl font-serif font-black text-slate-900 dark:text-white mb-2">No researchers found</h3>
+              <p className="text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
+                {debouncedQuery || domain !== "All Domains"
+                  ? "Try adjusting your search term or domain filter."
+                  : "The discovery pool is empty right now — try refreshing the sync."}
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {displayResearchers.map((r, idx) => {
                 const badge = getCitationBadge(r.citation_count);
                 const initials = r.name.split(" ").map(n => n[0]).slice(0, 2).join("");
-                const cleanId = typeof r.openalex_id === 'string' && r.openalex_id.startsWith('http') 
-                  ? r.openalex_id.split('/').pop() 
+                const cleanId = typeof r.openalex_id === 'string' && r.openalex_id.startsWith('http')
+                  ? r.openalex_id.split('/').pop()
                   : (r.openalex_id || r.id);
 
                 return (
@@ -377,7 +394,7 @@ export default function ResearchersPage() {
                     initial={{ opacity: 0, y: 12 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.98 }}
-                    className="bg-white dark:bg-slate-800 rounded-3xl p-7 border border-slate-100 dark:border-slate-700 shadow-xl hover:shadow-primary/10 transition-all group flex flex-col cursor-pointer"
+                    className="glass-neu-card glass-neu-hover p-7 transition-all group flex flex-col cursor-pointer"
                     onClick={() => { if (cleanId) router.push(`/researchers/${cleanId}`); }}
                   >
                     <div className="flex items-start justify-between mb-5">
@@ -393,14 +410,14 @@ export default function ResearchersPage() {
                       {r.name}
                     </h3>
                     {r.institution && (
-                      <p className="text-xs text-slate-500 font-medium mb-1 flex items-center gap-1">
-                        <Award size={11} className="text-secondary shrink-0" /> {r.institution}
+                      <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mb-1 flex items-center gap-1">
+                        <Award size={11} className="text-secondary dark:text-rose-300 shrink-0" /> {r.institution}
                       </p>
                     )}
 
                     <div className="flex flex-wrap gap-1.5 mb-5 mt-3">
                       {r.research_domains.slice(0, 2).map((d, di) => (
-                        <span key={di} className="text-[9px] font-black bg-slate-100 dark:bg-slate-700 text-slate-500 px-2 py-1 rounded uppercase tracking-wider">
+                        <span key={di} className="text-[9px] font-black bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 px-2.5 py-1 rounded-full uppercase tracking-wider">
                           {d}
                         </span>
                       ))}
@@ -422,9 +439,9 @@ export default function ResearchersPage() {
                     </div>
                   </motion.div>
                 );
-              })
-            )}
-          </div>
+              })}
+            </div>
+          )}
         </AnimatePresence>
 
         {/* Pagination */}
@@ -433,7 +450,7 @@ export default function ResearchersPage() {
             <button
               onClick={() => { setPage(p => Math.max(1, p - 1)); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
               disabled={page === 1}
-              className="p-3 rounded-2xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 shadow-sm disabled:opacity-40 hover:bg-slate-50 transition-all"
+              className="p-3 neu-btn disabled:opacity-40 transition-all"
             >
               <ChevronLeft size={20} />
             </button>
@@ -450,7 +467,7 @@ export default function ResearchersPage() {
                     key={pageNum}
                     onClick={() => { setPage(pageNum); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                     className={`w-10 h-10 rounded-xl text-xs font-black transition-all ${
-                      page === pageNum ? "bg-primary text-white shadow-lg shadow-primary/20" : "bg-white dark:bg-slate-800 text-slate-400 hover:bg-slate-50"
+                      page === pageNum ? "bg-primary text-white shadow-lg shadow-primary/20" : "neu-btn text-slate-400"
                     }`}
                   >
                     {pageNum}
@@ -461,7 +478,7 @@ export default function ResearchersPage() {
             <button
               onClick={() => { setPage(p => Math.min(totalPages, p + 1)); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
               disabled={page === totalPages}
-              className="p-3 rounded-2xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 shadow-sm disabled:opacity-40 hover:bg-slate-50 transition-all"
+              className="p-3 neu-btn disabled:opacity-40 transition-all"
             >
               <ChevronRight size={20} />
             </button>

@@ -59,7 +59,7 @@ export default function WorkspaceDashboard() {
   const selected = projects?.find((p) => String(p.id) === projectId);
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#020617] flex flex-col">
+    <div className="min-h-screen app-bg flex flex-col">
       <Navbar />
 
       <div className="fixed top-0 right-0 z-50 p-4 mr-20 flex items-center gap-4">
@@ -69,7 +69,7 @@ export default function WorkspaceDashboard() {
       <main className="flex-1 pt-32 pb-20 px-6 max-w-[1400px] w-full mx-auto flex flex-col">
         <header className="mb-10">
           <div className="flex items-center gap-3 mb-3 flex-wrap">
-            <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border border-primary/20">
+            <span className="bg-primary/10 text-primary dark:text-white px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border border-primary/20">
               Workspace
             </span>
             {/* Project selector */}
@@ -77,7 +77,7 @@ export default function WorkspaceDashboard() {
               <select
                 value={projectId ?? ""}
                 onChange={(e) => setProjectId(e.target.value)}
-                className="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 text-sm font-bold focus:ring-2 focus:ring-primary outline-none"
+                className="px-3 py-1.5 neu-inset text-sm font-bold focus:ring-2 focus:ring-primary outline-none"
               >
                 {projects.map((p) => (
                   <option key={p.id} value={p.id}>{p.name}</option>
@@ -90,7 +90,7 @@ export default function WorkspaceDashboard() {
           <h1 className="text-4xl font-serif font-black text-slate-900 dark:text-white mb-2">
             {selected?.name || "Your Workspace"}
           </h1>
-          <p className="text-slate-500 font-medium">
+          <p className="text-slate-500 dark:text-slate-400 font-medium">
             {selected?.description || "Collaborative workspace and task tracking"}
           </p>
         </header>
@@ -111,7 +111,7 @@ export default function WorkspaceDashboard() {
                   <select
                     value={milestoneId ?? ""}
                     onChange={(e) => setMilestoneId(Number(e.target.value))}
-                    className="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 text-sm font-bold focus:ring-2 focus:ring-primary outline-none"
+                    className="px-3 py-1.5 neu-inset text-sm font-bold focus:ring-2 focus:ring-primary outline-none"
                   >
                     {milestones.map((m) => (
                       <option key={m.id} value={m.id}>{m.title}</option>

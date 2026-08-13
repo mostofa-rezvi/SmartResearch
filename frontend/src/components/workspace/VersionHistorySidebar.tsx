@@ -147,17 +147,17 @@ export default function VersionHistorySidebar({
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ type: "spring", damping: 20, stiffness: 200 }}
-            className="fixed right-0 top-0 bottom-0 w-full max-w-[500px] bg-white dark:bg-slate-900 z-50 shadow-2xl border-l border-slate-200 dark:border-slate-800 flex flex-col"
+            className="fixed right-0 top-0 bottom-0 w-full max-w-[500px] glass-neu-card rounded-none z-50 flex flex-col"
           >
             {/* Header */}
             <div className="p-6 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-900/50">
               <div className="flex items-center gap-2">
-                <History className="text-primary" size={20} />
+                <History className="text-primary dark:text-white" size={20} />
                 <h2 className="text-lg font-bold text-slate-900 dark:text-white">Version History</h2>
               </div>
               <button
                 onClick={onClose}
-                className="p-1.5 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600 transition-colors"
+                className="p-1.5 neu-btn text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
               >
                 <X size={18} />
               </button>
@@ -183,7 +183,7 @@ export default function VersionHistorySidebar({
                     value={versionName}
                     onChange={(e) => setVersionName(e.target.value)}
                     placeholder="e.g. Draft before feedback, Milestone 1..."
-                    className="flex-1 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-primary/50 text-slate-800 dark:text-slate-100"
+                    className="flex-1 neu-inset px-4 py-2.5 text-sm outline-none text-slate-800 dark:text-slate-100"
                   />
                   <button
                     type="submit"
@@ -205,10 +205,10 @@ export default function VersionHistorySidebar({
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800 p-4 space-y-3"
+                  className="glass-neu-card p-4 space-y-3"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-primary flex items-center gap-1">
+                    <span className="text-xs font-bold text-primary dark:text-white flex items-center gap-1">
                       <FileText size={14} /> Previewing Snapshot
                     </span>
                     <button
@@ -221,7 +221,7 @@ export default function VersionHistorySidebar({
                   <h4 className="font-bold text-sm text-slate-800 dark:text-slate-200">
                     {selectedVersion.version_name}
                   </h4>
-                  <div className="max-h-[160px] overflow-y-auto border border-slate-200/50 dark:border-slate-800/50 rounded-xl p-3 bg-white dark:bg-slate-900 text-xs text-slate-500 font-serif leading-relaxed">
+                  <div className="max-h-[160px] overflow-y-auto neu-inset p-3 text-xs text-slate-500 dark:text-slate-400 font-serif leading-relaxed">
                     {getCleanPreview(selectedVersion.preview_text)}
                   </div>
                   <div className="flex gap-2 pt-1">
@@ -262,10 +262,10 @@ export default function VersionHistorySidebar({
                     {versions.map((ver) => (
                       <div
                         key={ver.id}
-                        className={`border rounded-2xl p-4 flex flex-col gap-2 transition-all cursor-pointer ${
+                        className={`p-4 flex flex-col gap-2 transition-all cursor-pointer glass-neu-hover ${
                           selectedVersion?.id === ver.id
-                            ? "bg-primary/5 border-primary/30"
-                            : "bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700"
+                            ? "glass-neu-card border-primary/30"
+                            : "glass-neu-card"
                         }`}
                         onClick={() => setSelectedVersion(ver)}
                       >
@@ -277,7 +277,7 @@ export default function VersionHistorySidebar({
                         </div>
                         
                         <div className="flex items-center justify-between text-[11px] text-slate-400 flex-wrap gap-2">
-                          <span className="flex items-center gap-1 font-medium text-slate-500">
+                          <span className="flex items-center gap-1 font-medium text-slate-500 dark:text-slate-400">
                             <User size={12} /> {ver.creator_name || ver.created_name || "Platform user"}
                           </span>
                           <span className="flex items-center gap-1">
@@ -295,7 +295,7 @@ export default function VersionHistorySidebar({
                         <div className="flex items-center justify-end pt-1 border-t border-slate-50 dark:border-slate-800/50 mt-1">
                           <button
                             type="button"
-                            className="text-[10px] font-bold text-primary flex items-center gap-1 hover:underline"
+                            className="text-[10px] font-bold text-primary dark:text-white flex items-center gap-1 hover:underline"
                           >
                             <Eye size={12} /> View Snapshot Preview
                           </button>

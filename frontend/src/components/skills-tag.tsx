@@ -11,7 +11,7 @@ export function SkillsTag({ skills, onRemove }: SkillsTagProps) {
       {skills.map((skill) => (
         <span
           key={skill}
-          className="inline-flex items-center px-2 py-1 rounded-md text-sm font-medium bg-primary/10 text-primary"
+          className="inline-flex items-center px-2 py-1 rounded-md text-sm font-medium bg-primary/10 text-primary dark:text-white"
         >
           {skill}
           <button
@@ -24,7 +24,7 @@ export function SkillsTag({ skills, onRemove }: SkillsTagProps) {
         </span>
       ))}
       {skills.length === 0 && (
-        <span className="text-sm text-slate-500 italic">No skills added yet.</span>
+        <span className="text-sm text-slate-500 dark:text-slate-400 italic">No skills added yet.</span>
       )}
     </div>
   );
