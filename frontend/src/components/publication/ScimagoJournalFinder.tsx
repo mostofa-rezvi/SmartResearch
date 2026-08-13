@@ -113,14 +113,14 @@ export function ScimagoJournalFinder() {
   };
 
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 space-y-5">
+    <div className="glass-neu-card p-6 space-y-5">
       <div className="flex items-center gap-3">
         <div className="w-10 h-10 bg-emerald-500/10 rounded-xl flex items-center justify-center">
           <BookOpen className="text-emerald-500" size={20} />
         </div>
         <div>
           <h2 className="text-lg font-bold text-slate-900 dark:text-white">Scimago Journal Finder</h2>
-          <p className="text-sm text-slate-500">Find target journals ranked by SJR impact score</p>
+          <p className="text-sm text-slate-500 dark:text-slate-400">Find target journals ranked by SJR impact score</p>
         </div>
       </div>
 
@@ -129,14 +129,14 @@ export function ScimagoJournalFinder() {
         <button
           type="button"
           onClick={() => setAbstractMode(false)}
-          className={`px-3 py-1.5 rounded-lg transition-all ${!abstractMode ? "bg-white dark:bg-slate-900 text-emerald-600 shadow-sm" : "text-slate-500"}`}
+          className={`px-3 py-1.5 rounded-lg transition-all ${!abstractMode ? "bg-white dark:bg-slate-900 text-emerald-600 shadow-sm" : "text-slate-500 dark:text-slate-400"}`}
         >
           Keyword
         </button>
         <button
           type="button"
           onClick={() => setAbstractMode(true)}
-          className={`px-3 py-1.5 rounded-lg transition-all ${abstractMode ? "bg-white dark:bg-slate-900 text-emerald-600 shadow-sm" : "text-slate-500"}`}
+          className={`px-3 py-1.5 rounded-lg transition-all ${abstractMode ? "bg-white dark:bg-slate-900 text-emerald-600 shadow-sm" : "text-slate-500 dark:text-slate-400"}`}
         >
           Match by Abstract
         </button>
@@ -151,7 +151,7 @@ export function ScimagoJournalFinder() {
               value={query}
               onChange={e => setQuery(e.target.value)}
               placeholder="Search by title, subject area, or publisher..."
-              className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl pl-9 pr-4 py-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+              className="w-full neu-inset pl-9 pr-4 py-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
             />
           </div>
           <button
@@ -170,7 +170,7 @@ export function ScimagoJournalFinder() {
             onChange={e => setAbstract(e.target.value)}
             placeholder="Paste your manuscript abstract — we'll semantically match journals whose scope fits your work…"
             rows={4}
-            className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 resize-y"
+            className="w-full neu-inset px-4 py-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 resize-y"
           />
           <button
             type="submit"
@@ -206,7 +206,7 @@ export function ScimagoJournalFinder() {
           {journals.map((j, i) => (
             <div
               key={`${j.issn}-${i}`}
-              className="flex items-start gap-4 p-4 border border-slate-100 dark:border-slate-800 rounded-2xl hover:border-emerald-200 dark:hover:border-emerald-900/50 hover:bg-emerald-50/30 dark:hover:bg-emerald-900/10 transition-all group"
+              className="glass-neu-card glass-neu-hover flex items-start gap-4 p-4 hover:border-emerald-200 dark:hover:border-emerald-900/50 hover:bg-emerald-50/30 dark:hover:bg-emerald-900/10 transition-all group"
             >
               {/* SJR Badge */}
               <div className="text-center w-14 shrink-0">
@@ -234,7 +234,7 @@ export function ScimagoJournalFinder() {
                     </span>
                   )}
                 </div>
-                <div className="flex flex-wrap gap-x-4 gap-y-0.5 text-xs text-slate-500">
+                <div className="flex flex-wrap gap-x-4 gap-y-0.5 text-xs text-slate-500 dark:text-slate-400">
                   <span>{j.subject}</span>
                   <span>H-Index: {j.h_index}</span>
                   <span>{j.country}</span>

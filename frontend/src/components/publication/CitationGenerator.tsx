@@ -104,14 +104,14 @@ export function CitationGenerator() {
   };
 
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 space-y-6">
+    <div className="glass-neu-card p-6 space-y-6">
       <div className="flex items-center gap-3">
         <div className="w-10 h-10 bg-indigo-500/10 rounded-xl flex items-center justify-center">
           <Quote className="text-indigo-500" size={20} />
         </div>
         <div>
           <h2 className="text-lg font-bold text-slate-900 dark:text-white">Citation Generator</h2>
-          <p className="text-sm text-slate-500">AI-powered citation formatting</p>
+          <p className="text-sm text-slate-500 dark:text-slate-400">AI-powered citation formatting</p>
         </div>
       </div>
 
@@ -124,7 +124,7 @@ export function CitationGenerator() {
             className={`px-4 py-1.5 rounded-xl text-sm font-bold transition-all ${
               format === f
                 ? "bg-indigo-500 text-white shadow-sm"
-                : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700"
+                : "neu-btn text-slate-600 dark:text-slate-400"
             }`}
           >
             {FORMAT_LABELS[f]}
@@ -135,64 +135,64 @@ export function CitationGenerator() {
       {/* Form */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="sm:col-span-2">
-          <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Paper Title *</label>
+          <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">Paper Title *</label>
           <input
             value={form.title}
             onChange={e => handleChange("title", e.target.value)}
             placeholder="e.g. Attention Is All You Need"
-            className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
+            className="w-full neu-inset px-4 py-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none"
           />
         </div>
 
         <div className="sm:col-span-2">
-          <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Authors * <span className="normal-case font-normal">(comma-separated)</span></label>
+          <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">Authors * <span className="normal-case font-normal">(comma-separated)</span></label>
           <input
             value={form.authors}
             onChange={e => handleChange("authors", e.target.value)}
             placeholder="e.g. Vaswani, Ashish, Shazeer, Noam, Parmar, Niki"
-            className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
+            className="w-full neu-inset px-4 py-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none"
           />
         </div>
 
         <div>
-          <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Journal / Conference</label>
+          <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">Journal / Conference</label>
           <input
             value={form.journal}
             onChange={e => handleChange("journal", e.target.value)}
             placeholder="e.g. Advances in Neural Information Processing Systems"
-            className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
+            className="w-full neu-inset px-4 py-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none"
           />
         </div>
 
         <div>
-          <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">DOI</label>
+          <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">DOI</label>
           <input
             value={form.doi}
             onChange={e => handleChange("doi", e.target.value)}
             placeholder="e.g. 10.48550/arXiv.1706.03762"
-            className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
+            className="w-full neu-inset px-4 py-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none"
           />
         </div>
 
         <div>
-          <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Year</label>
+          <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">Year</label>
           <input
             type="number"
             value={form.year}
             onChange={e => handleChange("year", e.target.value)}
             placeholder="e.g. 2017"
             min="1900" max="2099"
-            className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
+            className="w-full neu-inset px-4 py-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none"
           />
         </div>
 
         <div>
-          <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Pages</label>
+          <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">Pages</label>
           <input
             value={form.pages}
             onChange={e => handleChange("pages", e.target.value)}
             placeholder="e.g. 6000–6010"
-            className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
+            className="w-full neu-inset px-4 py-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none"
           />
         </div>
       </div>
@@ -219,10 +219,10 @@ export function CitationGenerator() {
       {citation && (
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Generated Citation</span>
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Generated Citation</span>
             <button
               onClick={copy}
-              className="flex items-center gap-1.5 text-xs font-bold text-indigo-500 hover:text-indigo-700 transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 neu-btn text-xs font-bold text-indigo-500 hover:text-indigo-700 transition-colors"
             >
               {copied ? <><Check size={13} /> Copied!</> : <><Copy size={13} /> Copy</>}
             </button>

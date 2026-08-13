@@ -162,7 +162,7 @@ function PaperCard({
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      className="group relative bg-white dark:bg-slate-800/60 rounded-2xl border border-slate-100 dark:border-slate-700/50 p-5 hover:border-primary/30 hover:shadow-lg transition-all"
+      className="group relative glass-neu-card glass-neu-hover p-5 transition-all"
     >
       {/* Top row */}
       <div className="flex items-start gap-3">
@@ -184,7 +184,7 @@ function PaperCard({
               </span>
             )}
             {paper.type && (
-              <span className="inline-flex items-center gap-1 text-[9px] font-black text-primary/60 bg-primary/5 px-2 py-0.5 rounded uppercase">
+              <span className="inline-flex items-center gap-1 text-[9px] font-black text-primary/60 dark:text-white/60 bg-primary/5 px-2 py-0.5 rounded uppercase">
                 <FileText size={8} /> {paper.type}
               </span>
             )}
@@ -220,7 +220,7 @@ function PaperCard({
               </p>
               <button
                 onClick={() => setExpanded(e => !e)}
-                className="mt-1 flex items-center gap-1 text-[10px] font-bold text-primary/70 hover:text-primary transition-colors"
+                className="mt-1 flex items-center gap-1 text-[10px] font-bold text-primary/70 dark:text-white/70 hover:text-primary transition-colors"
               >
                 {expanded ? <><ChevronUp size={10} /> Less</> : <><ChevronDown size={10} /> Read abstract</>}
               </button>
@@ -292,14 +292,14 @@ function SavedPapersPanel({
       <div className="flex items-center justify-between p-6 border-b border-slate-100 dark:border-slate-800 shrink-0">
         <div>
           <h3 className="text-xl font-black text-slate-900 dark:text-white flex items-center gap-2">
-            <BookMarked size={20} className="text-secondary" />
+            <BookMarked size={20} className="text-secondary dark:text-rose-300" />
             Saved Papers
           </h3>
-          <p className="text-xs text-slate-500 mt-0.5">{papers.length} paper{papers.length !== 1 ? "s" : ""} saved</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{papers.length} paper{papers.length !== 1 ? "s" : ""} saved</p>
         </div>
         <button
           onClick={onClose}
-          className="px-4 py-2 text-xs font-bold text-primary bg-primary/5 rounded-xl hover:bg-primary/10 transition-colors"
+          className="px-4 py-2 text-xs font-bold text-primary dark:text-white bg-primary/5 rounded-xl hover:bg-primary/10 transition-colors"
         >
           ← Back
         </button>
@@ -312,12 +312,12 @@ function SavedPapersPanel({
             <div className="w-16 h-16 bg-slate-50 dark:bg-slate-800 rounded-full flex items-center justify-center text-slate-300 mb-4">
               <Bookmark size={28} />
             </div>
-            <p className="text-sm font-bold text-slate-500">No papers saved yet</p>
+            <p className="text-sm font-bold text-slate-500 dark:text-slate-400">No papers saved yet</p>
             <p className="text-xs text-slate-400 mt-1">Click the bookmark icon on any paper</p>
           </div>
         ) : (
           papers.map(p => (
-            <div key={p.id} className="flex items-start gap-3 p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-700/50 group hover:border-secondary/30 transition-all">
+            <div key={p.id} className="flex items-start gap-3 p-3 glass-neu-card glass-neu-hover group">
               <div className="flex-1 min-w-0">
                 <p className="text-xs font-bold text-slate-800 dark:text-white line-clamp-2 mb-1">
                   {getPaperUrl(p) ? (
@@ -561,7 +561,7 @@ export default function JournalPapersModal({ journal, onClose }: Props) {
         exit={{ x: "100%", opacity: 0 }}
         transition={{ type: "spring", damping: 28, stiffness: 280 }}
         onClick={e => e.stopPropagation()}
-        className="fixed top-0 right-0 h-full w-full md:w-2/3 z-[201] flex flex-col bg-[#F8FAFC] dark:bg-[#0F172A] shadow-2xl"
+        className="fixed top-0 right-0 h-full w-full md:w-2/3 z-[201] flex flex-col glass-neu-card"
         style={{ borderRadius: "2rem 0 0 2rem" }}
       >
         <AnimatePresence mode="wait">
@@ -603,14 +603,14 @@ export default function JournalPapersModal({ journal, onClose }: Props) {
                           <Globe size={8} /> Open Access
                         </span>
                       )}
-                      <span className="text-[9px] font-black text-primary/60 bg-primary/5 px-2 py-0.5 rounded uppercase">
+                      <span className="text-[9px] font-black text-primary/60 dark:text-white/60 bg-primary/5 px-2 py-0.5 rounded uppercase">
                         {journal.quality_tier}
                       </span>
                     </div>
                     <h2 className="text-xl font-serif font-black text-slate-900 dark:text-white leading-tight line-clamp-2">
                       {journal.name}
                     </h2>
-                    <p className="text-xs text-slate-500 mt-1 font-medium">
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-medium">
                       {loading ? "Searching archives..." : `${totalCount.toLocaleString()} papers found`}
                     </p>
                   </div>
@@ -619,7 +619,7 @@ export default function JournalPapersModal({ journal, onClose }: Props) {
                     {/* Saved counter */}
                     <button
                       onClick={() => setShowSaved(true)}
-                      className="relative flex items-center gap-2 px-3 py-2 bg-secondary/10 text-secondary rounded-xl hover:bg-secondary/20 transition-colors text-xs font-bold"
+                      className="relative flex items-center gap-2 px-3 py-2 bg-secondary/10 text-secondary dark:text-rose-300 rounded-xl hover:bg-secondary/20 transition-colors text-xs font-bold"
                     >
                       <BookMarked size={14} />
                       <span>{savedPapers.length}</span>
@@ -633,7 +633,7 @@ export default function JournalPapersModal({ journal, onClose }: Props) {
                     {/* Close */}
                     <button
                       onClick={onClose}
-                      className="p-2.5 bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-primary hover:bg-primary/5 rounded-xl transition-all"
+                      className="p-2.5 neu-btn text-slate-500 dark:text-slate-400 hover:text-primary hover:bg-primary/5 transition-all"
                       aria-label="Close"
                     >
                       <X size={18} />
@@ -652,7 +652,7 @@ export default function JournalPapersModal({ journal, onClose }: Props) {
                     placeholder="Search papers by title, author, or keyword..."
                     value={searchQuery}
                     onChange={e => setSearchQuery(e.target.value)}
-                    className="w-full pl-11 pr-10 py-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 rounded-xl outline-none focus:ring-4 focus:ring-primary/10 transition-all text-sm font-medium"
+                    className="w-full pl-11 pr-10 py-3 neu-inset outline-none focus:ring-4 focus:ring-primary/10 transition-all text-sm font-medium"
                   />
                   {searchQuery && (
                     <button
@@ -677,7 +677,7 @@ export default function JournalPapersModal({ journal, onClose }: Props) {
                         onClick={() => setYearFilter(f => f === yr ? "" : yr)}
                         className={`px-2.5 py-1 rounded-lg text-[10px] font-black transition-all ${yearFilter === yr
                             ? "bg-primary text-white shadow-md shadow-primary/20"
-                            : "bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-primary hover:bg-primary/5"
+                            : "neu-btn text-slate-500 dark:text-slate-400 hover:text-primary hover:bg-primary/5"
                           }`}
                       >
                         {yr}
@@ -692,7 +692,7 @@ export default function JournalPapersModal({ journal, onClose }: Props) {
 
                   {/* OA toggle */}
                   <label className="flex items-center gap-1.5 cursor-pointer ml-auto">
-                    <span className="text-[10px] font-bold text-slate-500">OA only</span>
+                    <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400">OA only</span>
                     <div className="relative">
                       <input type="checkbox" className="sr-only" checked={oaOnly} onChange={() => setOaOnly(v => !v)} />
                       <div className={`w-8 h-4 rounded-full transition-colors ${oaOnly ? "bg-emerald-500" : "bg-slate-200 dark:bg-slate-700"}`}>
@@ -706,7 +706,7 @@ export default function JournalPapersModal({ journal, onClose }: Props) {
                     <select
                       value={sort}
                       onChange={e => setSort(e.target.value as SortOption)}
-                      className="appearance-none pl-7 pr-4 py-1.5 bg-slate-100 dark:bg-slate-800 text-[10px] font-black text-slate-600 dark:text-slate-300 rounded-lg border-none outline-none cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                      className="appearance-none pl-7 pr-4 py-1.5 neu-inset text-[10px] font-black text-slate-600 dark:text-slate-300 outline-none cursor-pointer"
                     >
                       {(Object.entries(sortLabels) as [SortOption, string][]).map(([v, l]) => (
                         <option key={v} value={v}>{l}</option>
@@ -731,7 +731,7 @@ export default function JournalPapersModal({ journal, onClose }: Props) {
                     <p className="text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">{error}</p>
                     <button
                       onClick={() => fetchPapers(1, true)}
-                      className="mt-3 px-4 py-2 bg-primary/10 text-primary text-xs font-bold rounded-xl hover:bg-primary/20 transition-colors"
+                      className="mt-3 px-4 py-2 bg-primary/10 text-primary dark:text-white text-xs font-bold rounded-xl hover:bg-primary/20 transition-colors"
                     >
                       Retry
                     </button>

@@ -430,7 +430,7 @@ export function PublicationChecklist({ setActiveTab }: { setActiveTab: (tab: 'ch
       <div className="lg:col-span-5 space-y-6">
         
         {/* Manuscript Upload Panel */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 space-y-5">
+        <div className="glass-neu-card p-6 space-y-5">
           <h3 className="font-bold text-slate-900 dark:text-white text-base">Manuscript File (PDF)</h3>
           
           {!manuscript ? (
@@ -476,7 +476,7 @@ export function PublicationChecklist({ setActiveTab }: { setActiveTab: (tab: 'ch
               )}
             </div>
           ) : (
-            <div className="border border-slate-100 dark:border-slate-800 rounded-xl p-4 bg-slate-50 dark:bg-slate-900/50 space-y-4">
+            <div className="glass-neu-card p-4 space-y-4">
               <div className="flex items-start gap-3 justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-emerald-500/10 rounded-xl flex items-center justify-center text-emerald-500 shrink-0">
@@ -489,9 +489,9 @@ export function PublicationChecklist({ setActiveTab }: { setActiveTab: (tab: 'ch
                     <p className="text-xs text-slate-400">{manuscript.page_count} pages · {manuscript.word_count} words</p>
                   </div>
                 </div>
-                <button 
+                <button
                   onClick={clearAnalysis}
-                  className="p-1 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+                  className="p-1 neu-btn text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
                 >
                   <X size={16} />
                 </button>
@@ -499,11 +499,11 @@ export function PublicationChecklist({ setActiveTab }: { setActiveTab: (tab: 'ch
 
               {/* Word stats mini-badge */}
               <div className="grid grid-cols-2 gap-2 text-center text-xs">
-                <div className="bg-white dark:bg-slate-800 border border-slate-150 dark:border-slate-850 p-2 rounded-lg">
+                <div className="glass-neu-card p-2">
                   <div className="font-bold text-slate-700 dark:text-slate-350">{manuscript.word_count}</div>
                   <div className="text-[9px] uppercase tracking-wider text-slate-400">Word Count</div>
                 </div>
-                <div className="bg-white dark:bg-slate-800 border border-slate-150 dark:border-slate-850 p-2 rounded-lg">
+                <div className="glass-neu-card p-2">
                   <div className="font-bold text-slate-700 dark:text-slate-350">{manuscript.char_count}</div>
                   <div className="text-[9px] uppercase tracking-wider text-slate-400">Char Count</div>
                 </div>
@@ -512,7 +512,7 @@ export function PublicationChecklist({ setActiveTab }: { setActiveTab: (tab: 'ch
           )}
 
           {uploadError && (
-            <div className="flex items-start gap-2 text-xs text-red-600 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/40 p-3 rounded-xl">
+            <div className="flex items-start gap-2 text-xs text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/40 p-3 rounded-xl">
               <AlertTriangle size={14} className="shrink-0 mt-0.5" />
               <span>{uploadError}</span>
             </div>
@@ -521,7 +521,7 @@ export function PublicationChecklist({ setActiveTab }: { setActiveTab: (tab: 'ch
 
         {/* Structural Analysis Checklist */}
         {manuscript && (
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 space-y-4">
+          <div className="glass-neu-card p-6 space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="font-bold text-slate-900 dark:text-white text-base">Section Detection</h3>
               <span className="text-xs font-bold text-amber-500 bg-amber-500/10 px-2 py-0.5 rounded">
@@ -558,23 +558,23 @@ export function PublicationChecklist({ setActiveTab }: { setActiveTab: (tab: 'ch
         )}
 
         {/* Templates Download section */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 space-y-4">
+        <div className="glass-neu-card p-6 space-y-4">
           <h3 className="font-bold text-slate-900 dark:text-white text-base">Academic Paper Templates</h3>
           <p className="text-xs text-slate-400">Download formatted journal templates to speed up manuscript writing.</p>
           
           <div className="space-y-2.5">
             {TEMPLATES.map(t => (
-              <div 
-                key={t.id} 
-                className="flex items-center justify-between p-3 border border-slate-100 dark:border-slate-800 rounded-xl hover:border-amber-500/40 hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-all group"
+              <div
+                key={t.id}
+                className="flex items-center justify-between p-3 glass-neu-card glass-neu-hover hover:border-amber-500/40 transition-all group"
               >
                 <div>
                   <p className="text-xs font-bold text-slate-800 dark:text-slate-200">{t.name}</p>
-                  <p className="text-[10px] text-slate-400">{t.publisher} · <span className="font-mono text-slate-500">{t.format}</span></p>
+                  <p className="text-[10px] text-slate-400">{t.publisher} · <span className="font-mono text-slate-500 dark:text-slate-400">{t.format}</span></p>
                 </div>
                 <button
                   onClick={() => downloadTemplateFile(t)}
-                  className="p-2 bg-slate-100 dark:bg-slate-800 hover:bg-amber-500 hover:text-white dark:hover:bg-amber-500 dark:text-slate-350 dark:hover:text-white rounded-lg text-slate-500 transition-all flex items-center justify-center"
+                  className="p-2 neu-btn hover:bg-amber-500 hover:text-white dark:hover:bg-amber-500 dark:text-slate-350 dark:hover:text-white text-slate-500 transition-all flex items-center justify-center"
                   title="Download Template"
                 >
                   <Download size={13} />
@@ -589,20 +589,20 @@ export function PublicationChecklist({ setActiveTab }: { setActiveTab: (tab: 'ch
       {/* RIGHT COLUMN: READINESS CHECKLIST */}
       <div className="lg:col-span-7 space-y-6">
         
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 space-y-6">
+        <div className="glass-neu-card p-6 space-y-6">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-amber-500/10 rounded-xl flex items-center justify-center">
               <CheckCircle2 className="text-amber-500" size={20} />
             </div>
             <div>
               <h2 className="text-lg font-bold text-slate-900 dark:text-white">Publication Readiness Checklist</h2>
-              <p className="text-sm text-slate-500">Track and evaluate items required for successful submission</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400">Track and evaluate items required for successful submission</p>
             </div>
           </div>
 
           {/* Progress bar */}
-          <div className="space-y-2 bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-850 p-4 rounded-xl">
-            <div className="flex justify-between text-xs font-black text-slate-500">
+          <div className="space-y-2 glass-neu-card p-4">
+            <div className="flex justify-between text-xs font-black text-slate-500 dark:text-slate-400">
               <span className="uppercase tracking-wider">{completedCount}/{items.length} completed</span>
               <span>{progress}%</span>
             </div>
@@ -705,7 +705,7 @@ export function PublicationChecklist({ setActiveTab }: { setActiveTab: (tab: 'ch
                         </span>
                       )}
                       
-                      <span className={`text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded shrink-0 ${categoryColors[item.category] || 'bg-slate-100 text-slate-500'}`}>
+                      <span className={`text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded shrink-0 ${categoryColors[item.category] || 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'}`}>
                         {item.category}
                       </span>
                     </div>

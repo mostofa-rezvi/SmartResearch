@@ -27,18 +27,18 @@ export default function PublicationPage() {
           <FlaskConical className="text-amber-500" size={28} />
           Publication Assistant
         </h1>
-        <p className="text-slate-500 mt-1">Your complete toolkit from draft to submission</p>
+        <p className="text-slate-500 dark:text-slate-400 mt-1">Your complete toolkit from draft to submission</p>
       </div>
 
       {/* Tab Navigation */}
-      <div className="flex gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-2xl max-w-md">
+      <div className="flex gap-1 neu-inset p-1 max-w-md">
         {TABS.map(tab => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-sm font-bold transition-all cursor-pointer ${
+            className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 text-sm font-bold transition-all cursor-pointer ${
               activeTab === tab.id
-                ? 'bg-white dark:bg-slate-900 text-amber-500 shadow-sm'
+                ? 'neu-btn text-amber-500'
                 : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
             }`}
           >

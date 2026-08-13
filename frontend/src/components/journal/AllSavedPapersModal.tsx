@@ -213,23 +213,23 @@ export default function AllSavedPapersModal({ onClose, onRefreshCount }: Props) 
         exit={{ x: "100%", opacity: 0 }}
         transition={{ type: "spring", damping: 28, stiffness: 280 }}
         onClick={e => e.stopPropagation()}
-        className="relative h-full w-full md:w-2/3 bg-[#F8FAFC] dark:bg-[#0F172A] shadow-2xl flex flex-col z-[201]"
+        className="relative h-full w-full md:w-2/3 glass-neu-card shadow-2xl flex flex-col z-[201]"
         style={{ borderRadius: "2rem 0 0 2rem" }}
       >
         {/* Header */}
-        <div className="shrink-0 p-6 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 rounded-tl-[2rem] flex items-center justify-between">
+        <div className="shrink-0 p-6 border-b border-slate-100 dark:border-slate-800 rounded-tl-[2rem] flex items-center justify-between">
           <div>
             <h3 className="text-xl font-serif font-black text-slate-900 dark:text-white flex items-center gap-2">
-              <Bookmark size={20} className="text-primary" />
+              <Bookmark size={20} className="text-primary dark:text-white" />
               Saved Papers Library
             </h3>
-            <p className="text-xs text-slate-500 mt-0.5 font-medium">
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 font-medium">
               {savedItems.length} paper{savedItems.length !== 1 ? "s" : ""} saved across all journals
             </p>
           </div>
           <button
             onClick={onClose}
-            className="p-2.5 bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-primary hover:bg-primary/5 rounded-xl transition-all"
+            className="p-2.5 neu-btn text-slate-500 dark:text-slate-400 hover:text-primary transition-all"
             aria-label="Close"
           >
             <X size={18} />
@@ -248,9 +248,9 @@ export default function AllSavedPapersModal({ onClose, onRefreshCount }: Props) 
             </div>
           ) : (
             savedItems.map(({ paper: p, journalKey }) => (
-              <div 
-                key={p.id} 
-                className="flex items-start gap-4 p-4 bg-white dark:bg-slate-800/60 rounded-2xl border border-slate-100 dark:border-slate-700/50 group hover:border-primary/30 hover:shadow-lg transition-all"
+              <div
+                key={p.id}
+                className="flex items-start gap-4 p-4 glass-neu-card glass-neu-hover group transition-all"
               >
                 <div className="flex-1 min-w-0">
                   {/* Title */}
@@ -272,7 +272,7 @@ export default function AllSavedPapersModal({ onClose, onRefreshCount }: Props) 
                   {/* Badges / Source info */}
                   <div className="flex flex-wrap items-center gap-2 text-[9px] font-black text-slate-400">
                     {p.primary_location?.source?.display_name && (
-                      <span className="bg-slate-100 dark:bg-slate-900 px-2 py-0.5 rounded text-primary/70">
+                      <span className="bg-slate-100 dark:bg-slate-900 px-2 py-0.5 rounded text-primary/70 dark:text-white/70">
                         {p.primary_location.source.display_name}
                       </span>
                     )}

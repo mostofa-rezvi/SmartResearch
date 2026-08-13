@@ -108,46 +108,46 @@ export function WritingFeedback() {
   };
 
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 space-y-6">
+    <div className="glass-neu-card p-6 space-y-6">
       <div className="flex items-center gap-3">
         <div className="w-10 h-10 bg-violet-500/10 rounded-xl flex items-center justify-center">
           <Sparkles className="text-violet-500" size={20} />
         </div>
         <div>
           <h2 className="text-lg font-bold text-slate-900 dark:text-white">AI Writing Feedback</h2>
-          <p className="text-sm text-slate-500">Get structured peer-review style AI feedback</p>
+          <p className="text-sm text-slate-500 dark:text-slate-400">Get structured peer-review style AI feedback</p>
         </div>
       </div>
 
       <div className="space-y-4">
         <div>
-          <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Paper Title <span className="normal-case font-normal">(optional)</span></label>
+          <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">Paper Title <span className="normal-case font-normal">(optional)</span></label>
           <input
             value={title}
             onChange={e => setTitle(e.target.value)}
             placeholder="Your paper title..."
-            className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500/40"
+            className="w-full neu-inset px-4 py-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-violet-500/40"
           />
         </div>
 
         <div>
-          <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Research Area <span className="normal-case font-normal">(optional)</span></label>
+          <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">Research Area <span className="normal-case font-normal">(optional)</span></label>
           <input
             value={researchArea}
             onChange={e => setResearchArea(e.target.value)}
             placeholder="e.g. Machine Learning, Bioinformatics, Physics..."
-            className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500/40"
+            className="w-full neu-inset px-4 py-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-violet-500/40"
           />
         </div>
 
         <div>
-          <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Abstract *</label>
+          <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">Abstract *</label>
           <textarea
             value={abstract}
             onChange={e => { setAbstract(e.target.value); setError(null); }}
             rows={7}
             placeholder="Paste your abstract here (minimum 50 characters)..."
-            className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500/40 resize-none"
+            className="w-full neu-inset px-4 py-3 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-violet-500/40 resize-none"
           />
           <p className="text-xs text-slate-400 mt-1 text-right">{abstract.length} characters</p>
         </div>
@@ -189,7 +189,7 @@ export function WritingFeedback() {
           {/* Dimension Scores */}
           <div className="space-y-4">
             {feedback.items.map(item => (
-              <div key={item.dimension} className="border border-slate-100 dark:border-slate-800 rounded-2xl p-4 space-y-3">
+              <div key={item.dimension} className="glass-neu-card p-4 space-y-3">
                 <div className="flex items-center justify-between">
                   <h4 className="font-bold text-slate-800 dark:text-white text-sm">{item.dimension}</h4>
                   <span className={`text-xs font-black px-2.5 py-1 rounded-lg ${SCORE_COLOR(item.score)}`}>
