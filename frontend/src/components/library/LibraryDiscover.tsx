@@ -28,6 +28,8 @@ export function LibraryDiscover() {
   const [type, setType] = useState<string>("");
   const [items, setItems] = useState<DiscoverItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [downloadingId, setDownloadingId] = useState<string | number | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -52,21 +54,35 @@ export function LibraryDiscover() {
 
   const download = async (id: string | number, title: string) => {
     // The stored PDF isn't a public URL — stream it through the authenticated backend.
-    const res = await fetchWithAuth(API.library.downloadItem(id));
-    if (!res.ok) return;
-    const blob = await res.blob();
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${title.replace(/[^a-z0-9._-]+/gi, "_")}.pdf`;
-    a.click();
-    URL.revokeObjectURL(url);
+    // Wrap everything: a dropped connection makes fetch reject with a network
+    // TypeError ("Failed to fetch"), which would otherwise bubble up as an
+    // unhandled promise rejection instead of failing gracefully here.
+    setDownloadingId(id);
+    setError(null);
+    try {
+      const res = await fetchWithAuth(API.library.downloadItem(id));
+      if (!res.ok) {
+        setError("Download failed — the file may no longer be available.");
+        return;
+      }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${title.replace(/[^a-z0-9._-]+/gi, "_")}.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      setError("Couldn't reach the server. Check your connection and try again.");
+    } finally {
+      setDownloadingId(null);
+    }
   };
 
   return (
-    <div className="bg-white dark:bg-slate-900/50 rounded-3xl border border-slate-200 dark:border-slate-800 p-6">
+    <div className="glass-neu-card p-6">
       <div className="flex items-center gap-2 mb-4">
-        <Sparkles size={18} className="text-primary" />
+        <Sparkles size={18} className="text-primary dark:text-white" />
         <h3 className="font-black text-slate-900 dark:text-white">Discover shared research</h3>
       </div>
 
@@ -77,13 +93,13 @@ export function LibraryDiscover() {
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="Semantic search across everyone's uploads…"
-            className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-white/10 focus:ring-2 focus:ring-primary outline-none text-sm"
+            className="w-full pl-9 pr-3 py-2.5 neu-inset focus:ring-2 focus:ring-primary outline-none text-sm"
           />
         </div>
         <select
           value={type}
           onChange={(e) => setType(e.target.value)}
-          className="px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-white/10 text-sm outline-none"
+          className="px-3 py-2.5 neu-inset text-sm outline-none"
         >
           <option value="">All types</option>
           {ITEM_TYPE_ORDER.map((t) => (
@@ -95,6 +111,12 @@ export function LibraryDiscover() {
         </button>
       </form>
 
+      {error && (
+        <div className="mb-4 px-3 py-2 rounded-xl text-sm bg-red-50 text-red-700 border border-red-200 dark:bg-red-500/10 dark:text-red-300 dark:border-red-500/30">
+          {error}
+        </div>
+      )}
+
       <div className="space-y-3">
         {loading && <div className="h-16 rounded-xl bg-slate-100 dark:bg-slate-800 animate-pulse" />}
         {!loading && items.length === 0 && (
@@ -103,7 +125,7 @@ export function LibraryDiscover() {
         {items.map((it) => {
           const meta = ITEM_TYPE_META[it.item_type] || ITEM_TYPE_META.paper;
           return (
-            <div key={it.id} className={`bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-100 dark:border-slate-700 border-l-4 ${meta.accent} shadow-sm`}>
+            <div key={it.id} className={`glass-neu-card p-4 border-l-4 ${meta.accent}`}>
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <div className="flex items-center gap-2 mb-1 flex-wrap">
@@ -113,7 +135,7 @@ export function LibraryDiscover() {
                     )}
                   </div>
                   <h4 className="font-bold text-slate-900 dark:text-white truncate">{it.title}</h4>
-                  {it.abstract && <p className="text-xs text-slate-500 mt-1 line-clamp-2">{it.abstract}</p>}
+                  {it.abstract && <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">{it.abstract}</p>}
                   <div className="flex items-center gap-1.5 mt-2 text-[11px] text-slate-400">
                     <User size={12} /> {it.owner_name || "Unknown"}
                     {it.authors ? <span className="truncate">· {it.authors}</span> : null}
@@ -122,9 +144,10 @@ export function LibraryDiscover() {
                 {it.file_url && (
                   <button
                     onClick={() => download(it.id, it.title)}
-                    className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-lg text-xs font-bold text-slate-700 dark:text-slate-200"
+                    disabled={downloadingId === it.id}
+                    className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 neu-btn text-xs font-bold text-slate-700 dark:text-slate-200 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    <Download size={13} /> PDF
+                    <Download size={13} /> {downloadingId === it.id ? "…" : "PDF"}
                   </button>
                 )}
               </div>
