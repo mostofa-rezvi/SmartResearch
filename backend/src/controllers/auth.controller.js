@@ -34,17 +34,25 @@ const isAllowedRedirect = (url) => {
 // ── OTP (two-factor login) helpers ──────────────────────────────────────────────
 const OTP_EXPIRY_SECONDS = (config.otp?.expiryMinutes || 5) * 60;
 
+/**
+ * Cookie options for the refresh token. In production the web app and API are
+ * usually on different subdomains, so the cookie must be SameSite=None+Secure to
+ * survive cross-site requests; in dev they share the `localhost` site so 'lax'
+ * (which doesn't require HTTPS) is enough.
+ */
+const refreshCookieOptions = () => ({
+  httpOnly: true,
+  secure: config.env === 'production',
+  sameSite: config.env === 'production' ? 'none' : 'lax',
+  maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+});
+
 /** Issue an access token, store+cookie a refresh token, and return the session payload. */
 async function issueSession(res, userId) {
   const accessToken = generateAccessToken(userId);
   const refreshToken = generateRefreshToken(userId);
   await storeRefreshToken(refreshToken, userId);
-  res.cookie('refreshToken', refreshToken, {
-    httpOnly: true,
-    secure: config.env === 'production',
-    sameSite: 'lax',
-    maxAge: 7 * 24 * 60 * 60 * 1000,
-  });
+  res.cookie('refreshToken', refreshToken, refreshCookieOptions());
   const result = await db.query(
     'SELECT id, name, email, role, onboarding_completed, researcher_type FROM users WHERE id = $1',
     [userId]
@@ -456,12 +464,7 @@ class AuthController {
 
       await storeRefreshToken(newRefreshToken, userId);
 
-      res.cookie('refreshToken', newRefreshToken, {
-        httpOnly: true,
-        secure: config.env === 'production',
-        sameSite: 'lax',
-        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-      });
+      res.cookie('refreshToken', newRefreshToken, refreshCookieOptions());
 
       res.json(envelope({ accessToken: newAccessToken }));
     } catch (err) {
@@ -585,12 +588,7 @@ class AuthController {
 
       await storeRefreshToken(refreshToken, userId);
 
-      res.cookie('refreshToken', refreshToken, {
-        httpOnly: true,
-        secure: config.env === 'production',
-        sameSite: 'lax',
-        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-      });
+      res.cookie('refreshToken', refreshToken, refreshCookieOptions());
 
       // Get user info
       const result = await db.query('SELECT id, name, email, role, onboarding_completed, researcher_type FROM users WHERE id = $1', [userId]);

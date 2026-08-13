@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { Search, Loader2 } from "lucide-react";
+import { getStoredToken } from "@/context/authStorage";
 
 
 export function SearchBar() {
@@ -28,7 +29,7 @@ export function SearchBar() {
     const fetchSuggestions = async () => {
       setIsLoading(true);
       try {
-        const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+        const token = getStoredToken();
         const res = await fetch(`/api/search/suggestions?q=${encodeURIComponent(debouncedQuery)}`, {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         });

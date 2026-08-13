@@ -5,6 +5,7 @@ import { Bell, Check, CheckCheck, X, User2 } from "lucide-react";
 import { io } from "socket.io-client";
 import { API, API_BASE } from "@/config/api";
 import { useAuth, useApi } from "@/context/AuthContext";
+import { getStoredToken } from "@/context/authStorage";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -88,7 +89,7 @@ export function NotificationBell() {
   // the authenticated user's room on connect (see backend notification.service.js).
   useEffect(() => {
     if (!token) return;
-    const authToken = typeof window !== "undefined" ? localStorage.getItem("token") : token;
+    const authToken = getStoredToken() ?? token;
 
     const socket = io(API_BASE, {
       transports: ["websocket"],

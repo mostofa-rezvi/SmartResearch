@@ -4,6 +4,7 @@ import React, { createContext, useEffect, useState, useMemo } from "react";
 import * as Y from "yjs";
 import { SocketYjsProvider, YjsStatus } from "@/lib/socket-yjs-provider";
 import { useAuth } from "@/context/AuthContext";
+import { getStoredToken } from "@/context/authStorage";
 
 export interface YjsContextType {
   doc: Y.Doc;
@@ -33,7 +34,7 @@ export const YjsProvider = ({ documentId, children }: { documentId: string; chil
   const [provider, setProvider] = useState<SocketYjsProvider | null>(null);
 
   useEffect(() => {
-    const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+    const token = getStoredToken();
     const socketUrl =
       process.env.NEXT_PUBLIC_SOCKET_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 

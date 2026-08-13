@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import { API } from "@/config/api";
+import { getStoredToken } from "@/context/authStorage";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Award,
@@ -297,7 +298,7 @@ export default function CredentialDashboard() {
 
   const fetchVerify = useCallback(async () => {
     try {
-      const token = localStorage.getItem("token");
+      const token = getStoredToken();
       const res = await fetch(API.profiles.verifyAuditLog, { headers: { Authorization: `Bearer ${token}` } });
       if (res.ok) setVerify((await res.json()).data);
     } catch {
@@ -307,7 +308,7 @@ export default function CredentialDashboard() {
 
   const fetchAchievements = useCallback(async () => {
     try {
-      const token = localStorage.getItem("token");
+      const token = getStoredToken();
       const res = await fetch(API.profiles.achievements, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -321,7 +322,7 @@ export default function CredentialDashboard() {
 
   const fetchAuditLog = useCallback(async (page: number) => {
     try {
-      const token = localStorage.getItem("token");
+      const token = getStoredToken();
       const res = await fetch(`${API.profiles.auditLog}?page=${page}&limit=${AUDIT_LIMIT}`, {
         headers: { Authorization: `Bearer ${token}` },
       });

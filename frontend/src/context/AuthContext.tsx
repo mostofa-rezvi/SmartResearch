@@ -1,6 +1,14 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo, useRef } from "react";
+import {
+  getStoredToken,
+  getStoredUser,
+  setStoredToken,
+  setStoredUser,
+  clearStoredAuth,
+  getTokenExpiryMs,
+} from "./authStorage";
 
 type User = {
   id: string;
@@ -37,13 +45,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => { userRef.current = user; }, [user]);
 
   useEffect(() => {
-    // Load auth data from localStorage on mount
-    const savedToken = localStorage.getItem("token");
-    const savedUser = localStorage.getItem("user");
+    // Restore the session from sessionStorage on mount. sessionStorage is scoped
+    // to the tab and cleared when it closes, which is what gives us "log out on
+    // tab/browser close". `clearStoredAuth` also removes any credential left in
+    // localStorage by the previous (persistent) build.
+    const savedToken = getStoredToken();
+    const savedUser = getStoredUser();
 
     if (savedToken && savedUser) {
       setToken(savedToken);
       setUser(JSON.parse(savedUser));
+    } else if (typeof window !== "undefined" && (localStorage.getItem("token") || localStorage.getItem("user"))) {
+      // Legacy cleanup: an old localStorage token would otherwise keep the user
+      // "logged in" across tab closes, defeating the new session model.
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
     }
     setIsLoading(false);
   }, []);
@@ -51,15 +67,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = useCallback((newToken: string, newUser: User) => {
     setToken(newToken);
     setUser(newUser);
-    localStorage.setItem("token", newToken);
-    localStorage.setItem("user", JSON.stringify(newUser));
+    setStoredToken(newToken);
+    setStoredUser(JSON.stringify(newUser));
   }, []);
 
   const logout = useCallback(() => {
     setToken(null);
     setUser(null);
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
+    clearStoredAuth();
     window.location.href = "/login";
   }, []);
 
@@ -68,7 +83,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (current) {
       const updatedUser = { ...current, onboarding_completed: true };
       setUser(updatedUser);
-      localStorage.setItem("user", JSON.stringify(updatedUser));
+      setStoredUser(JSON.stringify(updatedUser));
     }
   }, []);
 
@@ -77,14 +92,48 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (current) {
       const updatedUser = { ...current, ...updates };
       setUser(updatedUser);
-      localStorage.setItem("user", JSON.stringify(updatedUser));
+      setStoredUser(JSON.stringify(updatedUser));
     }
   }, []);
 
   const updateToken = useCallback((newToken: string) => {
     setToken(newToken);
-    localStorage.setItem("token", newToken);
+    setStoredToken(newToken);
   }, []);
+
+  // Keep the session alive while the tab is open: proactively refresh the
+  // short-lived (15 min) access token ~1 minute before it expires so an active
+  // user is never bounced to the login screen mid-session.
+  useEffect(() => {
+    if (!token) return;
+    const expMs = getTokenExpiryMs(token);
+    const delay = expMs
+      ? Math.max(expMs - Date.now() - 60_000, 5_000) // refresh 1 min before expiry
+      : 13 * 60_000;                                  // fallback if exp is unreadable
+    const timer = window.setTimeout(() => {
+      refreshTokenDeduplicated(logout, updateToken);
+    }, delay);
+    return () => window.clearTimeout(timer);
+  }, [token, logout, updateToken]);
+
+  // Timers are frozen while the machine sleeps or the tab is backgrounded, so
+  // also refresh when the tab regains focus if the token is at/near expiry.
+  useEffect(() => {
+    const refreshIfStale = () => {
+      const current = getStoredToken();
+      if (!current) return;
+      const expMs = getTokenExpiryMs(current);
+      if (!expMs || expMs - Date.now() < 2 * 60_000) {
+        refreshTokenDeduplicated(logout, updateToken);
+      }
+    };
+    window.addEventListener("focus", refreshIfStale);
+    document.addEventListener("visibilitychange", refreshIfStale);
+    return () => {
+      window.removeEventListener("focus", refreshIfStale);
+      document.removeEventListener("visibilitychange", refreshIfStale);
+    };
+  }, [logout, updateToken]);
 
   const isAdmin = user?.role === 'admin' || user?.role === 'super_admin';
   const isSuperAdmin = user?.role === 'super_admin';
@@ -151,8 +200,8 @@ export function useApi() {
   // identity would re-fire those effects every render and hammer the API.
   const fetchWithAuth = useCallback(async (input: RequestInfo | URL, init?: RequestInit) => {
     let currentToken = token;
-    if (!currentToken && typeof window !== "undefined") {
-      currentToken = localStorage.getItem("token");
+    if (!currentToken) {
+      currentToken = getStoredToken();
     }
 
     const headers = new Headers(init?.headers);
