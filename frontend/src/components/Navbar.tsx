@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState, useRef, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { NotificationBell } from "@/components/NotificationBell";
+import ThemeToggle from "@/components/ThemeToggle";
 
 export default function Navbar() {
   const { user, isAdmin, logout } = useAuth();
@@ -59,31 +60,30 @@ export default function Navbar() {
         )}
       </AnimatePresence>
 
-      <nav className="fixed top-0 left-0 right-0 z-50 glass-morphism h-20 flex items-center px-6 md:px-12 justify-between">
+      <nav className="fixed top-0 left-0 right-0 z-50 glass-skeuo-card h-20 flex items-center px-6 md:px-12 justify-between border-b border-white/20 dark:border-white/10 shadow-lg">
         <div className="flex items-center gap-8">
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="relative w-10 h-10 flex items-center justify-center">
-              <div className="absolute inset-0 bg-primary rounded-xl rotate-3 group-hover:rotate-6 transition-transform" />
-              <div className="absolute inset-0 bg-secondary rounded-xl -rotate-3 group-hover:-rotate-6 transition-transform opacity-80" />
-              <div className="relative z-10 w-8 h-8 bg-white rounded-lg flex items-center justify-center overflow-hidden">
-                <div className="w-4 h-0.5 bg-primary absolute top-3" />
-                <div className="w-5 h-4 border-2 border-primary rounded-t-full mt-2" />
-              </div>
+          <Link href="/" className="flex items-center gap-3.5 group">
+            <div className="relative w-10 h-10 flex items-center justify-center p-1 rounded-xl bg-white/80 dark:bg-slate-800/80 shadow-md border border-white/40 dark:border-white/10 group-hover:scale-105 transition-transform duration-300">
+              <img
+                src="/logo-icon.png"
+                alt="SmartResearch Logo"
+                className="w-8 h-8 object-contain drop-shadow"
+              />
             </div>
-            <span className="text-2xl font-serif font-black tracking-tight text-primary">
+            <span className="text-2xl font-serif font-black tracking-tight text-primary dark:text-white">
               ResearchBridge
             </span>
           </Link>
 
           {/* Essential Navigation */}
           {user && (
-            <div className="hidden lg:flex items-center gap-7 text-[15px] font-semibold text-ink-600">
-              <Link href="/library" className="hover:text-primary transition-colors">Library</Link>
-              <Link href="/discovery" className="hover:text-primary transition-colors">Discovery</Link>
-              <Link href="/researchers" className="hover:text-primary transition-colors">Researchers</Link>
-              <Link href="/community" className="hover:text-primary transition-colors">Community</Link>
-              <Link href="/groups" className="hover:text-primary transition-colors">Groups</Link>
-              <Link href="/assistant" className="hover:text-primary transition-colors">AI Assistant</Link>
+            <div className="hidden lg:flex items-center gap-7 text-[15px] font-semibold text-ink-600 dark:text-ink-500">
+              <Link href="/library" className="hover:text-primary dark:hover:text-white transition-colors">Library</Link>
+              <Link href="/discovery" className="hover:text-primary dark:hover:text-white transition-colors">Discovery</Link>
+              <Link href="/researchers" className="hover:text-primary dark:hover:text-white transition-colors">Researchers</Link>
+              <Link href="/community" className="hover:text-primary dark:hover:text-white transition-colors">Community</Link>
+              <Link href="/groups" className="hover:text-primary dark:hover:text-white transition-colors">Groups</Link>
+              <Link href="/assistant" className="hover:text-primary dark:hover:text-white transition-colors">AI Assistant</Link>
             </div>
           )}
         </div>
@@ -116,9 +116,12 @@ export default function Navbar() {
 
           <div className="w-px h-6 bg-ink-200 hidden md:block" />
 
+          {/* Light / Dark mode toggle — always visible */}
+          <ThemeToggle />
+
           {user ? (
             <div className="flex items-center gap-6">
-              <Link href="/search" className="focus-ring text-sm font-bold text-primary px-4 py-2 bg-primary-50 rounded-md hover:bg-primary-100 transition-colors">
+              <Link href="/search" className="focus-ring text-sm font-bold text-primary dark:text-white px-4 py-2 bg-primary-50 dark:bg-white/10 rounded-md hover:bg-primary-100 dark:hover:bg-white/20 transition-colors">
                 DOI
               </Link>
               {/* Notification Bell */}
@@ -140,7 +143,7 @@ export default function Navbar() {
               <Link href="/login" className="btn btn-ghost">
                 Log in
               </Link>
-              <Link href="/register" className="btn btn-primary rounded-full">
+              <Link href="/register" className="skeuo-button-primary px-6 py-2.5 rounded-full text-white font-bold text-sm shadow-md">
                 Join the Lab
               </Link>
             </div>

@@ -171,12 +171,12 @@ export function NotificationBell() {
               {unreadCount > 0 && (
                 <button
                   onClick={markAllRead}
-                  className="flex items-center gap-1.5 text-xs text-primary font-bold hover:text-primary/80 transition-colors"
+                  className="flex items-center gap-1.5 text-xs text-primary dark:text-white font-bold hover:text-primary/80 transition-colors"
                 >
                   <CheckCheck size={13} /> Mark all read
                 </button>
               )}
-              <button onClick={() => setOpen(false)} className="p-1 text-slate-400 hover:text-slate-600 rounded-lg">
+              <button onClick={() => setOpen(false)} className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 rounded-lg">
                 <X size={14} />
               </button>
             </div>
@@ -226,7 +226,7 @@ export function NotificationBell() {
             <Link
               href="/notifications"
               onClick={() => setOpen(false)}
-              className="block text-center text-xs font-bold text-primary hover:text-primary/80 transition-colors"
+              className="block text-center text-xs font-bold text-primary dark:text-white hover:text-primary/80 transition-colors"
             >
               View all notifications →
             </Link>

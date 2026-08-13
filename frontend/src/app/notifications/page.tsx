@@ -75,24 +75,24 @@ export default function NotificationsPage() {
   const unread = notifications.filter(n => !n.is_read).length;
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
+    <div className="min-h-screen app-bg">
       <Navbar />
       <main className="pt-28 pb-20 px-4 max-w-2xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-3xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
-              <Bell className="text-primary" size={28} />
+              <Bell className="text-primary dark:text-white" size={28} />
               Notifications
             </h1>
             {unread > 0 && (
-              <p className="text-slate-500 mt-1 text-sm">{unread} unread</p>
+              <p className="text-slate-500 dark:text-slate-400 mt-1 text-sm">{unread} unread</p>
             )}
           </div>
           {unread > 0 && (
             <button
               onClick={markAllRead}
-              className="flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary font-bold text-sm rounded-xl hover:bg-primary/20 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary dark:text-white font-bold text-sm rounded-xl hover:bg-primary/20 transition-colors"
             >
               <CheckCheck size={16} /> Mark all read
             </button>
@@ -108,7 +108,7 @@ export default function NotificationsPage() {
           <div className="text-center py-20">
             <Bell size={48} className="mx-auto mb-4 text-slate-300 dark:text-slate-700" />
             <h2 className="text-xl font-bold text-slate-700 dark:text-slate-300 mb-2">All caught up!</h2>
-            <p className="text-slate-500">You have no notifications yet. Connect with researchers to get started.</p>
+            <p className="text-slate-500 dark:text-slate-400">You have no notifications yet. Connect with researchers to get started.</p>
           </div>
         ) : (
           <div className="space-y-2">
@@ -116,15 +116,15 @@ export default function NotificationsPage() {
               <div
                 key={n.id}
                 onClick={() => !n.is_read && markRead(n.id)}
-                className={`flex gap-4 p-5 rounded-2xl border transition-all cursor-pointer group ${
+                className={`flex gap-4 p-5 glass-neu-card glass-neu-hover transition-all cursor-pointer group ${
                   n.is_read
-                    ? "bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800 opacity-70 hover:opacity-100"
-                    : "bg-white dark:bg-slate-900 border-indigo-100 dark:border-indigo-900/40 shadow-sm"
+                    ? "opacity-70 hover:opacity-100"
+                    : "ring-1 ring-primary/20"
                 }`}
               >
                 {/* Icon */}
-                <div className={`w-12 h-12 shrink-0 flex items-center justify-center text-2xl rounded-2xl ${
-                  n.is_read ? "bg-slate-100 dark:bg-slate-800" : "bg-indigo-50 dark:bg-indigo-900/30"
+                <div className={`w-12 h-12 shrink-0 flex items-center justify-center text-2xl neu-icon ${
+                  n.is_read ? "" : "ring-2 ring-primary/20"
                 }`}>
                   {TYPE_ICONS[n.type] || "🔔"}
                 </div>
