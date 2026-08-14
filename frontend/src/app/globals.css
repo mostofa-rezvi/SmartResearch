@@ -97,10 +97,13 @@
   --color-card: #FFFFFF;
   --color-card-foreground: #0F172A;
 
-  /* ---- Elevation (box-shadow) ---- */
-  --shadow-elev-1: 0 1px 2px 0 rgba(10, 25, 47, 0.05), 0 1px 3px 0 rgba(10, 25, 47, 0.06);
-  --shadow-elev-2: 0 4px 12px -2px rgba(10, 25, 47, 0.08), 0 2px 6px -2px rgba(10, 25, 47, 0.06);
-  --shadow-elev-3: 0 24px 48px -12px rgba(10, 25, 47, 0.18), 0 8px 16px -8px rgba(10, 25, 47, 0.10);
+  /* ---- Elevation (box-shadow) — minimal, borders do the separating ---- */
+  --shadow-elev-1: 0 1px 2px 0 rgba(15, 23, 42, 0.04);
+  --shadow-elev-2: 0 1px 3px 0 rgba(15, 23, 42, 0.08), 0 1px 2px -1px rgba(15, 23, 42, 0.05);
+  --shadow-elev-3: 0 8px 24px -6px rgba(15, 23, 42, 0.12), 0 2px 6px -2px rgba(15, 23, 42, 0.07);
+
+  /* ---- Interactive accent: professional academic blue (focus, links, active) ---- */
+  --color-brand-blue: #2563EB;
 
   /* ---- Motion ---- */
   --ease-standard: cubic-bezier(0.2, 0, 0, 1);
@@ -112,27 +115,27 @@
 
 :root {
   color-scheme: light;
-  --background: #FDFCFB; /* Premium Off-White */
+  --background: #FAFBFC; /* near-white app canvas */
   --foreground: #0F172A;
   --primary: #0A192F;
   --secondary: #991B1B;
   --accent: #F59E0B;
-  --border: #E2E8F0;
-  --input: #E2E8F0;
-  --ring: #0A192F;
+  --border: #E5E9EF;
+  --input: #E5E9EF;
+  --ring: #2563EB; /* professional blue focus */
   --card: #FFFFFF;
 
   --font-serif: var(--font-fraunces), Georgia, serif;
   --font-sans: var(--font-outfit), var(--font-inter), system-ui, sans-serif;
   --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
 
-  /* Radius scale — namespaced so it does NOT override Tailwind's rounded-* utilities.
-     Used by component primitives (.btn / .card / .input) below. */
-  --r-sm: 0.5rem;   /* 8px  — chips, small controls */
-  --r-md: 0.75rem;  /* 12px — buttons, inputs */
-  --r-lg: 1rem;     /* 16px — cards */
-  --r-xl: 1.5rem;   /* 24px — panels, feature cards */
-  --r-2xl: 2rem;    /* 32px — hero / marketing surfaces */
+  /* Radius scale — moderate, restrained. Namespaced so it does NOT override
+     Tailwind's rounded-* utilities. Used by component primitives + surfaces. */
+  --r-sm: 0.375rem;  /* 6px  — chips, small controls */
+  --r-md: 0.5rem;    /* 8px  — buttons, inputs */
+  --r-lg: 0.625rem;  /* 10px — nested panels */
+  --r-xl: 0.75rem;   /* 12px — cards */
+  --r-2xl: 1rem;     /* 16px — larger surfaces */
 }
 
 /* ============================================================================
@@ -155,7 +158,7 @@
   --accent: #F7AA2A;
   --border: #223047;
   --input: #223047;
-  --ring: #F59E0B;
+  --ring: #60A5FA; /* professional blue focus (lifted for dark) */
   --card: #111C30; /* elevated surface, lighter than bg */
 
   /* Semantic role colors (Tailwind @theme tokens) */
@@ -208,10 +211,10 @@
   --color-error: #F87171;
   --color-info: #7389B4;
 
-  /* Elevation: deepen shadows so cards read on a dark canvas. */
-  --shadow-elev-1: 0 1px 2px 0 rgba(0, 0, 0, 0.4), 0 1px 3px 0 rgba(0, 0, 0, 0.5);
-  --shadow-elev-2: 0 4px 12px -2px rgba(0, 0, 0, 0.5), 0 2px 6px -2px rgba(0, 0, 0, 0.4);
-  --shadow-elev-3: 0 24px 48px -12px rgba(0, 0, 0, 0.7), 0 8px 16px -8px rgba(0, 0, 0, 0.5);
+  /* Elevation: minimal on dark too — borders separate surfaces. */
+  --shadow-elev-1: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
+  --shadow-elev-2: 0 1px 3px 0 rgba(0, 0, 0, 0.5);
+  --shadow-elev-3: 0 8px 24px -6px rgba(0, 0, 0, 0.6);
 }
 
 /* ============================================================================
@@ -222,80 +225,40 @@
    ========================================================================== */
 
 .glass-skeuo-card {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.85) 0%, rgba(245, 247, 250, 0.65) 100%);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.9);
-  box-shadow: 
-    0 12px 32px -6px rgba(10, 25, 47, 0.08),
-    0 2px 6px -2px rgba(10, 25, 47, 0.04),
-    inset 0 1px 1px 0 rgba(255, 255, 255, 0.95),
-    inset 0 -1px 2px 0 rgba(10, 25, 47, 0.06);
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-elev-1);
 }
-
 .dark .glass-skeuo-card {
-  background: linear-gradient(135deg, rgba(10, 25, 47, 0.85) 0%, rgba(2, 6, 23, 0.75) 100%);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  box-shadow: 
-    0 14px 44px -8px rgba(0, 0, 0, 0.65),
-    inset 0 1px 1px 0 rgba(255, 255, 255, 0.18),
-    inset 0 -1px 2px 0 rgba(0, 0, 0, 0.6);
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-elev-1);
 }
 
 .skeuo-button-primary {
-  background: #000000;
+  background: var(--color-primary-800);
   color: #FFFFFF;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 
-    0 4px 16px 0 rgba(0, 0, 0, 0.3),
-    inset 0 1px 1px 0 rgba(255, 255, 255, 0.3);
-  transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+  border: 1px solid var(--color-primary-800);
+  box-shadow: var(--shadow-elev-1);
+  transition: background-color var(--duration-fast) var(--ease-standard);
 }
-
-.skeuo-button-primary:hover {
-  background: #1A1A1A;
-  box-shadow: 
-    0 6px 22px 0 rgba(0, 0, 0, 0.4),
-    inset 0 1px 1px 0 rgba(255, 255, 255, 0.4);
-  transform: translateY(-1px);
-}
+.skeuo-button-primary:hover { background: var(--color-primary-700); }
 
 .skeuo-button-secondary {
-  background: #FFFFFF;
-  color: #000000;
-  border: 1px solid rgba(0, 0, 0, 0.2);
-  box-shadow: 
-    0 4px 16px 0 rgba(0, 0, 0, 0.08),
-    inset 0 1px 1px 0 rgba(255, 255, 255, 1);
-  transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+  background: var(--color-card);
+  color: var(--color-ink-800);
+  border: 1px solid var(--color-border);
+  transition: background-color var(--duration-fast) var(--ease-standard);
 }
-
-.skeuo-button-secondary:hover {
-  background: #F8FAFC;
-  box-shadow: 
-    0 6px 22px 0 rgba(0, 0, 0, 0.12),
-    inset 0 1px 1px 0 rgba(255, 255, 255, 1);
-  transform: translateY(-1px);
-}
+.skeuo-button-secondary:hover { background: var(--color-ink-50); }
 
 .skeuo-pill {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(240, 243, 248, 0.85) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.95);
-  box-shadow: 
-    0 2px 8px rgba(10, 25, 47, 0.06),
-    inset 0 1px 1px rgba(255, 255, 255, 1),
-    inset 0 -1px 2px rgba(10, 25, 47, 0.08);
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
 }
-
 .dark .skeuo-pill {
-  background: linear-gradient(180deg, rgba(30, 41, 59, 0.85) 0%, rgba(15, 23, 42, 0.95) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  box-shadow:
-    0 2px 10px rgba(0, 0, 0, 0.4),
-    inset 0 1px 1px rgba(255, 255, 255, 0.18),
-    inset 0 -1px 2px rgba(0, 0, 0, 0.6);
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
 }
 
 /* ============================================================================
@@ -306,148 +269,101 @@
    `.app-bg` on the page wrapper.
    ========================================================================== */
 
-/* Page canvas — a soft, slightly-tinted base so raised shadows read. */
-.app-bg {
-  background:
-    radial-gradient(1100px 560px at 15% -8%, rgba(10, 25, 47, 0.05), transparent 60%),
-    radial-gradient(900px 520px at 100% 0%, rgba(245, 158, 11, 0.05), transparent 55%),
-    #E9EDF3;
-}
-.dark .app-bg {
-  background:
-    radial-gradient(1100px 560px at 15% -8%, rgba(99, 130, 200, 0.10), transparent 60%),
-    radial-gradient(900px 520px at 100% 0%, rgba(245, 158, 11, 0.06), transparent 55%),
-    #0A1120;
+/* Page canvas — clean near-white (light) / deep charcoal-navy (dark). Flat. */
+.app-bg { background: #F6F7F9; }
+.dark .app-bg { background: #0A0F1A; }
+
+/* App shell: on desktop, offset ALL authenticated page content to the right of
+   the fixed 16rem sidebar. The `has-app-shell` class is toggled on <body> by
+   <Navbar> only when a user is signed in, so marketing/auth pages stay full
+   width. Body padding shifts in-flow content but not the viewport-fixed
+   sidebar/topbar. */
+@media (min-width: 1024px) {
+  body.has-app-shell { padding-left: 16rem; }
 }
 
-/* Primary surface: glass + neumorphic raise. */
+/* Primary surface — clean bordered card, minimal elevation. */
 .glass-neu-card {
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.82), rgba(233, 237, 243, 0.55));
-  backdrop-filter: blur(16px) saturate(1.35);
-  -webkit-backdrop-filter: blur(16px) saturate(1.35);
-  border: 1px solid rgba(255, 255, 255, 0.75);
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
   border-radius: var(--r-xl);
-  box-shadow:
-    10px 10px 26px rgba(15, 23, 42, 0.09),
-    -8px -8px 20px rgba(255, 255, 255, 0.9),
-    inset 0 1px 1px rgba(255, 255, 255, 0.95),
-    inset 0 -1px 2px rgba(15, 23, 42, 0.03);
+  box-shadow: var(--shadow-elev-1);
   transition: box-shadow var(--duration-base) var(--ease-standard),
+              border-color var(--duration-base) var(--ease-standard),
               transform var(--duration-base) var(--ease-standard);
 }
 .dark .glass-neu-card {
-  background: linear-gradient(145deg, rgba(30, 41, 59, 0.68), rgba(15, 23, 42, 0.5));
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow:
-    12px 12px 28px rgba(0, 0, 0, 0.5),
-    -6px -6px 18px rgba(255, 255, 255, 0.025),
-    inset 0 1px 1px rgba(255, 255, 255, 0.06),
-    inset 0 -1px 2px rgba(0, 0, 0, 0.45);
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-elev-1);
 }
 
-/* Optional lift on hover for interactive cards. */
+/* Subtle, restrained hover for interactive cards (no big lift). */
 .glass-neu-hover:hover {
-  transform: translateY(-3px);
-  box-shadow:
-    16px 18px 36px rgba(15, 23, 42, 0.12),
-    -10px -10px 24px rgba(255, 255, 255, 0.95),
-    inset 0 1px 1px rgba(255, 255, 255, 0.95),
-    inset 0 -1px 2px rgba(15, 23, 42, 0.03);
+  border-color: var(--color-primary-300);
+  box-shadow: var(--shadow-elev-2);
+  transform: translateY(-1px);
 }
 .dark .glass-neu-hover:hover {
-  box-shadow:
-    18px 20px 40px rgba(0, 0, 0, 0.6),
-    -8px -8px 22px rgba(255, 255, 255, 0.04),
-    inset 0 1px 1px rgba(255, 255, 255, 0.07),
-    inset 0 -1px 2px rgba(0, 0, 0, 0.5);
+  border-color: var(--color-primary-300);
+  box-shadow: var(--shadow-elev-2);
 }
 
-/* Softer nested/secondary panel (lighter blur, flatter). */
+/* Softer nested/secondary panel — a very light gray inset surface. */
 .glass-panel {
-  background: rgba(255, 255, 255, 0.55);
-  backdrop-filter: blur(12px) saturate(1.2);
-  -webkit-backdrop-filter: blur(12px) saturate(1.2);
-  border: 1px solid rgba(255, 255, 255, 0.6);
+  background: var(--color-ink-50);
+  border: 1px solid var(--color-border);
   border-radius: var(--r-lg);
-  box-shadow: 0 6px 20px rgba(15, 23, 42, 0.06), inset 0 1px 1px rgba(255, 255, 255, 0.8);
 }
 .dark .glass-panel {
-  background: rgba(15, 23, 42, 0.45);
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.05);
+  background: var(--color-ink-50);
+  border: 1px solid var(--color-border);
 }
 
-/* Debossed well — inputs, search fields, code/preview surfaces. */
+/* Input / search well — clean field with a blue focus ring. */
 .neu-inset {
-  background: rgba(224, 229, 238, 0.55);
-  border: 1px solid rgba(255, 255, 255, 0.55);
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
   border-radius: var(--r-md);
-  box-shadow:
-    inset 5px 5px 12px rgba(15, 23, 42, 0.09),
-    inset -5px -5px 12px rgba(255, 255, 255, 0.9);
-  transition: box-shadow var(--duration-fast) var(--ease-standard);
+  transition: border-color var(--duration-fast) var(--ease-standard),
+              box-shadow var(--duration-fast) var(--ease-standard);
 }
 .dark .neu-inset {
-  background: rgba(2, 6, 23, 0.45);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  box-shadow:
-    inset 5px 5px 12px rgba(0, 0, 0, 0.55),
-    inset -4px -4px 10px rgba(255, 255, 255, 0.03);
+  background: var(--color-ink-50);
+  border: 1px solid var(--color-border);
 }
 .neu-inset:focus-within {
-  box-shadow:
-    inset 5px 5px 12px rgba(15, 23, 42, 0.09),
-    inset -5px -5px 12px rgba(255, 255, 255, 0.9),
-    0 0 0 2px var(--color-accent-500);
+  border-color: var(--color-ring);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-ring) 20%, transparent);
 }
 
-/* Extruded icon tile. */
+/* Icon tile — flat, tinted surface. */
 .neu-icon {
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.92), rgba(233, 237, 243, 0.7));
+  background: var(--color-primary-50);
+  border: 1px solid var(--color-border);
   border-radius: var(--r-md);
-  box-shadow:
-    5px 5px 12px rgba(15, 23, 42, 0.08),
-    -5px -5px 12px rgba(255, 255, 255, 0.92),
-    inset 0 1px 1px rgba(255, 255, 255, 0.95);
 }
 .dark .neu-icon {
-  background: linear-gradient(145deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.7));
-  box-shadow:
-    6px 6px 14px rgba(0, 0, 0, 0.5),
-    -4px -4px 10px rgba(255, 255, 255, 0.03),
-    inset 0 1px 1px rgba(255, 255, 255, 0.06);
+  background: var(--color-primary-50);
+  border: 1px solid var(--color-border);
 }
 
-/* Raised neumorphic button (for secondary/ghost controls). */
+/* Secondary / ghost button — clean bordered control. */
 .neu-btn {
-  border: 1px solid rgba(255, 255, 255, 0.6);
+  border: 1px solid var(--color-border);
   border-radius: var(--r-md);
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.85), rgba(233, 237, 243, 0.6));
-  box-shadow:
-    6px 6px 14px rgba(15, 23, 42, 0.1),
-    -6px -6px 14px rgba(255, 255, 255, 0.9);
-  transition: box-shadow var(--duration-fast) var(--ease-standard),
-              transform var(--duration-fast) var(--ease-standard);
+  background: var(--color-card);
+  transition: background-color var(--duration-fast) var(--ease-standard),
+              border-color var(--duration-fast) var(--ease-standard);
 }
-.neu-btn:hover { transform: translateY(-1px); }
-.neu-btn:active {
-  transform: translateY(0);
-  box-shadow:
-    inset 4px 4px 10px rgba(15, 23, 42, 0.12),
-    inset -4px -4px 10px rgba(255, 255, 255, 0.9);
-}
+.neu-btn:hover { background: var(--color-ink-50); border-color: var(--color-ink-300); }
+.neu-btn:active { background: var(--color-ink-100); }
 .dark .neu-btn {
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  background: linear-gradient(145deg, rgba(30, 41, 59, 0.85), rgba(15, 23, 42, 0.6));
-  box-shadow:
-    6px 6px 14px rgba(0, 0, 0, 0.5),
-    -4px -4px 12px rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--color-border);
+  background: var(--color-card);
 }
-.dark .neu-btn:active {
-  box-shadow:
-    inset 4px 4px 10px rgba(0, 0, 0, 0.6),
-    inset -4px -4px 10px rgba(255, 255, 255, 0.03);
-}
+.dark .neu-btn:hover { background: var(--color-ink-100); border-color: var(--color-ink-300); }
+.dark .neu-btn:active { background: var(--color-ink-100); }
 
 body {
   background-color: var(--background);
@@ -560,11 +476,11 @@ h1, h2, h3, h4, h5, h6 {
 .input:focus-visible,
 .chip:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 2px var(--background), 0 0 0 4px var(--color-accent-500);
-  border-color: var(--color-accent-500);
+  box-shadow: 0 0 0 2px var(--background), 0 0 0 4px var(--color-ring);
+  border-color: var(--color-ring);
 }
 :where(a, button, input, textarea, select, [tabindex]):focus-visible {
-  outline: 2px solid var(--color-accent-500);
+  outline: 2px solid var(--color-ring);
   outline-offset: 2px;
   border-radius: 4px;
 }
@@ -714,15 +630,15 @@ h1, h2, h3, h4, h5, h6 {
    SURFACES & DECORATION
    ========================================================================== */
 .glass-morphism {
-  background: rgba(253, 252, 251, 0.72);
-  backdrop-filter: blur(12px) saturate(1.4);
-  -webkit-backdrop-filter: blur(12px) saturate(1.4);
-  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--color-border);
 }
 
 .dark .glass-morphism {
-  background: rgba(6, 15, 30, 0.72);
-  border-bottom: 1px solid rgba(30, 41, 59, 0.8);
+  background: rgba(10, 15, 26, 0.85);
+  border-bottom: 1px solid var(--color-border);
 }
 
 /* Subtle radial grid — navy, on-brand (was indigo). */

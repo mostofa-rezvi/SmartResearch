@@ -3,6 +3,7 @@ import { Fraunces, Outfit, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
 import { ThemeProvider, themeInitScript } from "@/context/ThemeContext";
+import GlobalPreloader from "@/components/GlobalPreloader";
 
 const fraunces = Fraunces({
   variable: "--font-fraunces",
@@ -51,6 +52,7 @@ export default function RootLayout({
       <body suppressHydrationWarning className="min-h-full flex flex-col">
         <ThemeProvider>
           <AuthProvider>
+            <GlobalPreloader />
             {children}
           </AuthProvider>
         </ThemeProvider>
