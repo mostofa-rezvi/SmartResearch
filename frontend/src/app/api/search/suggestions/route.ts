@@ -47,10 +47,47 @@ export async function GET(request: NextRequest) {
     const body = await res.json();
     const hits: any[] = body?.data || [];
 
-    const suggestions = hits.slice(0, 6).map((hit) => ({
-      title: hit.name || hit.title || String(hit.id),
-      type: INDEX_TO_TYPE[hit._index] || "Result",
-    }));
+    const parseTags = (t: unknown): string[] => {
+      if (Array.isArray(t)) return t as string[];
+      if (typeof t === "string") {
+        try {
+          const p = JSON.parse(t);
+          return Array.isArray(p) ? p : [];
+        } catch {
+          return [];
+        }
+      }
+      return [];
+    };
+
+    const mapped = hits
+      .map((hit) => ({
+        id: hit.id ?? hit._id ?? null,
+        title: String(hit.name || hit.title || "").trim(),
+        subtitle: String(
+          hit.institution || hit.author || hit.authors || hit.category || hit.owner_name || ""
+        ).trim(),
+        type: INDEX_TO_TYPE[hit._index] || "Result",
+        index: hit._index || "",
+        // Extra fields for the paper preview (present only on `papers` hits).
+        abstract: String(hit.abstract || "").trim(),
+        authors: String(hit.authors || "").trim(),
+        doi: String(hit.doi || "").trim(),
+        tags: parseTags(hit.tags),
+      }))
+      // Drop empty / single-character junk titles.
+      .filter((s) => s.title.replace(/[^a-z0-9]/gi, "").length >= 2);
+
+    // De-duplicate by type + normalized title.
+    const seen = new Set<string>();
+    const suggestions = mapped
+      .filter((s) => {
+        const key = `${s.type}:${s.title.toLowerCase()}`;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      })
+      .slice(0, 8);
 
     return NextResponse.json({ suggestions });
   } catch {

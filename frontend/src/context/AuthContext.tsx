@@ -9,6 +9,7 @@ import {
   clearStoredAuth,
   getTokenExpiryMs,
 } from "./authStorage";
+import { beginTask } from "@/lib/preloader";
 
 type User = {
   id: string;
@@ -192,39 +193,55 @@ async function refreshTokenDeduplicated(logout: () => void, updateToken: (t: str
   return refreshingPromise;
 }
 
+// Extends the standard fetch init with a flag to opt a request out of the
+// global preloader overlay — for surfaces that render their own inline loading
+// state (e.g. the AI Assistant chat, which shows a "Thinking…" bubble).
+export type FetchWithAuthInit = RequestInit & { skipPreloader?: boolean };
+
 export function useApi() {
   const { token, updateToken, logout } = useAuth();
 
   // Memoized so its identity is stable across renders. Components put
   // `fetchWithAuth` in effect/useCallback dependency arrays; an unstable
   // identity would re-fire those effects every render and hammer the API.
-  const fetchWithAuth = useCallback(async (input: RequestInfo | URL, init?: RequestInit) => {
+  const fetchWithAuth = useCallback(async (input: RequestInfo | URL, init?: FetchWithAuthInit) => {
     let currentToken = token;
     if (!currentToken) {
       currentToken = getStoredToken();
     }
 
-    const headers = new Headers(init?.headers);
+    const { skipPreloader, ...fetchInit } = init || {};
+
+    const headers = new Headers(fetchInit.headers);
     if (currentToken && !headers.has("Authorization")) {
       headers.set("Authorization", `Bearer ${currentToken}`);
     }
 
     const requestInit: RequestInit = {
-      ...init,
+      ...fetchInit,
       headers,
-      credentials: init?.credentials || 'include',
+      credentials: fetchInit.credentials || 'include',
     };
-    let response = await fetch(input, requestInit);
 
-    if (response.status === 401) {
-      const newToken = await refreshTokenDeduplicated(logout, updateToken);
-      if (newToken) {
-        headers.set("Authorization", `Bearer ${newToken}`);
-        response = await fetch(input, { ...init, headers, credentials: init?.credentials || 'include' });
+    // Feed the global preloader: any authed load still running after ~0.7s
+    // (a tab, a popup, a list) shows the animated logo overlay automatically.
+    // Callers with their own inline loader can pass `skipPreloader` to bypass it.
+    const endTask = skipPreloader ? null : beginTask();
+    try {
+      let response = await fetch(input, requestInit);
+
+      if (response.status === 401) {
+        const newToken = await refreshTokenDeduplicated(logout, updateToken);
+        if (newToken) {
+          headers.set("Authorization", `Bearer ${newToken}`);
+          response = await fetch(input, { ...fetchInit, headers, credentials: fetchInit.credentials || 'include' });
+        }
       }
-    }
 
-    return response;
+      return response;
+    } finally {
+      endTask?.();
+    }
   }, [token, updateToken, logout]);
 
   return { fetchWithAuth };

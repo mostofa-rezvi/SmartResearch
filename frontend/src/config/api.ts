@@ -129,6 +129,8 @@ export const API = {
   // Projects & Kanban domain
   projects: {
     list: `${API_BASE}/api/v1/projects`,
+    create: `${API_BASE}/api/v1/projects`,
+    invite: (projectId: string | number) => `${API_BASE}/api/v1/projects/${projectId}/invite`,
     listMilestones: (projectId: string) => `${API_BASE}/api/v1/projects/${projectId}/milestones`,
     createMilestone: (projectId: string) => `${API_BASE}/api/v1/projects/${projectId}/milestones`,
     updateMilestoneStatus: (milestoneId: string) => `${API_BASE}/api/v1/projects/milestones/${milestoneId}/status`,
