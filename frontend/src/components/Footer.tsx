@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { useAuth } from "@/context/AuthContext";
 import {
   BookOpen,
   GraduationCap,
@@ -18,6 +19,7 @@ import {
 } from "lucide-react";
 
 export default function Footer() {
+  const { user } = useAuth();
   const [newsletterEmail, setNewsletterEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);
 
@@ -136,7 +138,8 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Navigation Column 1: Ecosystem */}
+          {/* Platform Apps — link to authenticated features, so only shown when signed in. */}
+          {user && (
           <div className="lg:col-span-2 space-y-4">
             <h4 className="mono-academic font-black text-primary dark:text-slate-300 uppercase text-xs tracking-[0.2em]">
               Platform Apps
@@ -174,6 +177,7 @@ export default function Footer() {
               </li>
             </ul>
           </div>
+          )}
 
           {/* Navigation Column 2: Resources & About */}
           <div className="lg:col-span-3 space-y-4">

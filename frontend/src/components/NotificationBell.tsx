@@ -8,34 +8,9 @@ import { useAuth, useApi } from "@/context/AuthContext";
 import { getStoredToken } from "@/context/authStorage";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { notifMeta, notificationLink, type AppNotification } from "@/lib/notifications";
 
-interface Notification {
-  id: number;
-  type: string;
-  title: string;
-  body: string | null;
-  meta: Record<string, any>;
-  is_read: boolean;
-  created_at: string;
-}
-
-const TYPE_COLORS: Record<string, string> = {
-  connection_request:  "bg-indigo-500/10 text-indigo-500",
-  connection_accepted: "bg-emerald-500/10 text-emerald-500",
-  mentorship_accepted: "bg-amber-500/10 text-amber-500",
-  mentorship_rejected: "bg-red-500/10 text-red-500",
-  forum_reply:         "bg-purple-500/10 text-purple-500",
-  match:               "bg-blue-500/10 text-blue-500",
-};
-
-const TYPE_ICONS: Record<string, string> = {
-  connection_request:  "🤝",
-  connection_accepted: "✅",
-  mentorship_accepted: "🎓",
-  mentorship_rejected: "❌",
-  forum_reply:         "💬",
-  match:               "🔍",
-};
+type Notification = AppNotification;
 
 function timeAgo(dateStr: string) {
   const diff = Date.now() - new Date(dateStr).getTime();
@@ -143,6 +118,12 @@ export function NotificationBell() {
     } catch { /* silent */ }
   };
 
+  const openNotification = (n: Notification) => {
+    if (!n.is_read) markOneRead(n.id);
+    setOpen(false);
+    router.push(notificationLink(n));
+  };
+
   if (!token) return null;
 
   return (
@@ -199,11 +180,11 @@ export function NotificationBell() {
                 <div
                   key={n.id}
                   className={`group flex gap-3 px-5 py-4 border-b border-slate-50 dark:border-slate-800/50 hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors cursor-pointer ${!n.is_read ? "bg-indigo-50/50 dark:bg-indigo-900/10" : ""}`}
-                  onClick={() => !n.is_read && markOneRead(n.id)}
+                  onClick={() => openNotification(n)}
                 >
                   {/* Icon */}
-                  <span className={`w-9 h-9 shrink-0 flex items-center justify-center text-lg rounded-xl ${TYPE_COLORS[n.type] || "bg-slate-100 dark:bg-slate-800"}`}>
-                    {TYPE_ICONS[n.type] || "🔔"}
+                  <span className={`w-9 h-9 shrink-0 flex items-center justify-center text-lg rounded-xl ${notifMeta(n.type).color}`}>
+                    {notifMeta(n.type).icon}
                   </span>
                   {/* Content */}
                   <div className="flex-1 min-w-0">
