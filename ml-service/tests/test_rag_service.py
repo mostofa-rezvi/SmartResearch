@@ -109,6 +109,68 @@ def test_chat_degrades_when_llm_raises(monkeypatch):
     assert len(data["sources"]) >= 1
 
 
+def test_chat_greeting_skips_retrieval(monkeypatch):
+    """A greeting is answered conversationally — no retrieval, no sources, not degraded."""
+    monkeypatch.setattr(rag_service, "HF_AVAILABLE", True)
+    # If retrieval/synthesis ran, these mocks would be hit; they must NOT be.
+    with patch.object(rag_service, "get_model", side_effect=AssertionError("no embed")), \
+         patch.object(rag_service, "_get_es", side_effect=AssertionError("no ES")), \
+         patch.object(rag_service, "_hf_chat_sync", side_effect=AssertionError("no LLM")):
+        resp = client.post("/rag/chat", json={"query": "hello"})
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["degraded"] is False
+    assert data["sources"] == []
+    assert len(data["followups"]) == 3
+    assert "Research Assistant" in data["answer"]
+
+
+def test_chat_capability_question_is_conversational(monkeypatch):
+    monkeypatch.setattr(rag_service, "HF_AVAILABLE", True)
+    with patch.object(rag_service, "get_model", side_effect=AssertionError("no embed")), \
+         patch.object(rag_service, "_hf_chat_sync", side_effect=AssertionError("no LLM")):
+        resp = client.post("/rag/chat", json={"query": "what can you do?"})
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["sources"] == []
+    assert data["degraded"] is False
+
+
+def test_chat_surfaces_knowledge_base(monkeypatch):
+    """A question with no corpus hits still gets grounded by knowledge-base sources."""
+    monkeypatch.setattr(rag_service, "HF_AVAILABLE", True)
+    # Force KB to be (re)embedded with the fake model for this test.
+    monkeypatch.setattr(rag_service, "_kb_ready", False)
+    monkeypatch.setattr(rag_service, "_kb_vectors", None)
+    plan_json = '{"expanded_query":"current trends in ai","entity_types":["paper"],"followups":["a?","b?","c?"]}'
+    synth = "Recent AI research centers on foundation models and RAG [1]."
+    with patch.object(rag_service, "get_model", return_value=_fake_model()), \
+         patch.object(rag_service, "_get_es", return_value=_es_empty()), \
+         patch.object(rag_service, "_hf_chat_sync", side_effect=[plan_json, synth]):
+        resp = client.post("/rag/chat", json={"query": "what are the current trends in AI research?"})
+    assert resp.status_code == 200
+    data = resp.json()
+    # Even with an empty ES corpus, the knowledge base supplies grounded sources.
+    assert len(data["sources"]) >= 1
+    types = {s["type"] for s in data["sources"]}
+    assert types & {"guide", "concept"}
+    kb = next(s for s in data["sources"] if s["type"] in ("guide", "concept"))
+    assert set(kb) >= {"id", "type", "title", "snippet", "score"}
+
+
+def test_chat_real_question_still_retrieves(monkeypatch):
+    """A genuine research question must NOT be short-circuited by the small-talk gate."""
+    monkeypatch.setattr(rag_service, "HF_AVAILABLE", True)
+    plan_json = '{"expanded_query":"low resource nlp","entity_types":["paper"],"followups":["a?","b?","c?"]}'
+    synth = "Researchers focus on low-resource NLP [1]."
+    with patch.object(rag_service, "get_model", return_value=_fake_model()), \
+         patch.object(rag_service, "_get_es", return_value=_es_with_hits()), \
+         patch.object(rag_service, "_hf_chat_sync", side_effect=[plan_json, synth]):
+        resp = client.post("/rag/chat", json={"query": "who works on low-resource NLP?"})
+    assert resp.status_code == 200
+    assert len(resp.json()["sources"]) >= 1
+
+
 # ── /rag/summarize ────────────────────────────────────────────────────────────────
 
 _DOCS = [

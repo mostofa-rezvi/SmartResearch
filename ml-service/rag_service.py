@@ -37,6 +37,7 @@ from pydantic import BaseModel
 from ml_model import get_model
 # Imported for reuse; referenced as module-level names so tests can monkeypatch them.
 from llm_service import _hf_chat_sync, is_hf_available, HF_AVAILABLE, HF_LLM_MODEL  # noqa: F401
+from knowledge_base import KB_DOCUMENTS
 
 logger = logging.getLogger(__name__)
 
@@ -62,6 +63,120 @@ _STOPWORDS = {
     "these", "those", "such", "also", "can", "may", "not", "of", "in",
     "on", "to", "an", "is", "as", "by", "we", "it", "at", "be", "or",
 }
+
+# ── Small talk / greeting detection ──────────────────────────────────────────────
+# Conversational openers ("hi", "thanks", "who are you") should NOT trigger
+# retrieval — otherwise the assistant pulls in unrelated sources and answers
+# "the provided sources do not contain an answer". These are answered directly.
+_GREETING_WORDS = {
+    "hi", "hii", "hey", "heya", "helo", "hello", "hiya", "howdy", "hola",
+    "yo", "sup", "greetings", "hallo", "gday", "wassup",
+}
+_GREETING_PHRASES = {
+    "good morning", "good afternoon", "good evening", "good day", "good night",
+    "hows it going", "how are you", "how are you doing", "how is it going",
+    "how do you do", "whats up", "what is up", "nice to meet you", "morning",
+}
+_THANKS_WORDS = {"thanks", "thank", "thankyou", "thx", "ty", "cheers", "appreciate"}
+_BYE_WORDS = {"bye", "goodbye", "cya", "later", "farewell", "adios"}
+# Filler that may accompany a greeting without turning it into a real question.
+_GREETING_FILLER = {
+    "there", "how", "are", "you", "doing", "is", "it", "going", "today",
+    "good", "morning", "afternoon", "evening", "night", "day", "assistant",
+    "ai", "bot", "again", "ok", "okay", "well", "hope", "please", "just",
+    "so", "hey", "a", "the", "im", "me", "my",
+}
+_HELP_PHRASES = {
+    "help", "what can you do", "what do you do", "who are you", "what is this",
+    "what are you", "how do you work", "how can you help", "what can you help with",
+    "what can i ask", "what can i do here",
+}
+
+_STARTER_FOLLOWUPS = [
+    "Who works on low-resource NLP?",
+    "Summarize recent work on graph neural networks",
+    "What are people discussing about reproducibility?",
+]
+_GREETING_TEXT = (
+    "Hello! 👋 I'm your AI Research Assistant. Ask me about papers, researchers, "
+    "or what the community is discussing, and I'll find grounded, cited answers "
+    "for you. What would you like to explore?"
+)
+_CAPABILITY_TEXT = (
+    "Hi! I'm your AI Research Assistant. I can help you:\n"
+    "• Find papers and summarize research on a topic\n"
+    "• Discover researchers and experts in a field\n"
+    "• See what the community is discussing\n\n"
+    "Try asking something like \"Who works on low-resource NLP?\" or "
+    "\"Summarize recent work on graph neural networks.\""
+)
+_THANKS_TEXT = (
+    "You're welcome! Happy to help with your research anytime. "
+    "What would you like to explore next?"
+)
+_BYE_TEXT = "Goodbye! Come back anytime you need to dig into research. 👋"
+
+# ── Research-only scope gate ──────────────────────────────────────────────────────
+# The assistant answers RESEARCH questions only. Everything is retrieved from a
+# research corpus (papers + researchers + posts) plus a curated research knowledge
+# base, so relevance is a reliable topic signal: on-topic research queries land the
+# top source at ~0.75–0.90 while off-topic chit-chat (cooking, sports, …) tops out
+# near ~0.55 because nothing in the corpus is close. Below this floor we decline
+# politely instead of letting the LLM ramble over weak, unrelated sources.
+_RESEARCH_SCOPE_FLOOR = float(os.getenv("RAG_SCOPE_FLOOR", "0.60"))
+_OFF_TOPIC_TEXT = (
+    "I'm the ResearchBridge AI Research Assistant, so I can only help with "
+    "research-related questions — finding papers, discovering researchers and "
+    "experts, summarizing a body of work, understanding a concept, or navigating "
+    "the platform. I couldn't find anything in the research knowledge base that "
+    "matches that question. Try asking something like \"Who works on low-resource "
+    "NLP?\" or \"Summarize recent work on graph neural networks.\""
+)
+
+
+def _smalltalk_answer(query: str) -> Optional[Dict[str, Any]]:
+    """Detect greetings / thanks / capability questions and answer them directly.
+
+    Returns a ``{"answer", "followups"}`` dict for conversational messages, or
+    ``None`` when the query is a genuine research question that should go through
+    the full plan → retrieve → synthesize pipeline.
+    """
+    q = (query or "").strip().lower()
+    if not q:
+        return None
+    tokens = re.findall(r"[a-z']+", q)
+    if not tokens:
+        return None
+    token_set = set(tokens)
+    compact = " ".join(tokens)
+
+    # Capability / identity questions ("what can you do", "who are you", "help").
+    if compact in _HELP_PHRASES or (
+        len(tokens) <= 6
+        and "you" in token_set
+        and ("what" in token_set or "how" in token_set)
+        and ("do" in token_set or "help" in token_set or "work" in token_set)
+    ):
+        return {"answer": _CAPABILITY_TEXT, "followups": list(_STARTER_FOLLOWUPS)}
+
+    def _only_filler(extra: set) -> bool:
+        return all(t in extra or t in _GREETING_FILLER for t in tokens)
+
+    # Greetings: an exact phrase, or a greeting word with only filler around it.
+    if compact in _GREETING_PHRASES or (
+        (token_set & _GREETING_WORDS) and _only_filler(_GREETING_WORDS)
+    ):
+        return {"answer": _GREETING_TEXT, "followups": list(_STARTER_FOLLOWUPS)}
+
+    # Thanks.
+    if (token_set & _THANKS_WORDS) and _only_filler(_THANKS_WORDS):
+        return {"answer": _THANKS_TEXT, "followups": list(_STARTER_FOLLOWUPS)}
+
+    # Farewell.
+    if (token_set & _BYE_WORDS) and _only_filler(_BYE_WORDS):
+        return {"answer": _BYE_TEXT, "followups": []}
+
+    return None
 
 
 # ── Request models ──────────────────────────────────────────────────────────────
@@ -208,6 +323,74 @@ def _retrieve(query_vector: Optional[List[float]], entity_types: List[str], k: i
     return sources[:k]
 
 
+# ── Knowledge base (platform docs) retrieval ─────────────────────────────────────
+
+# Raw cosine a KB doc must clear to count as relevant. Tuned against real SBERT
+# embeddings: on-topic platform/research queries score ~0.25–0.85 while off-topic
+# chit-chat tops out near ~0.16, so 0.22 separates them with margin.
+_KB_MIN_SCORE = 0.22
+_kb_vectors: Optional[np.ndarray] = None
+_kb_ready = False
+
+
+def _ensure_kb_embeddings() -> Optional[np.ndarray]:
+    """Embed the knowledge-base docs once (lazily) and cache the matrix.
+
+    Uses the same SBERT model as content search so KB and content live in the
+    same vector space. Any failure degrades to "no KB" rather than raising.
+    """
+    global _kb_vectors, _kb_ready
+    if _kb_ready:
+        return _kb_vectors
+    _kb_ready = True
+    try:
+        texts = [f"{d['title']}. {d['content']}" for d in KB_DOCUMENTS]
+        _kb_vectors = np.asarray(get_model().encode(texts), dtype=float)
+        if _kb_vectors.ndim == 1:  # single doc → make 2-D
+            _kb_vectors = _kb_vectors.reshape(1, -1)
+    except Exception as e:  # pragma: no cover - model load rarely fails here
+        logger.warning(f"[RAG] KB embedding failed: {e}")
+        _kb_vectors = None
+    return _kb_vectors
+
+
+def _retrieve_kb(query_vector: Optional[List[float]], k: int = 4,
+                 min_score: float = _KB_MIN_SCORE) -> List[Dict[str, Any]]:
+    """Cosine-rank the knowledge base; return up to k docs above threshold.
+
+    Each doc keeps its own type (``guide`` for platform how-to, ``concept`` for
+    research knowledge) so the assistant can both explain platform features and
+    answer domain questions even when the indexed corpus is thin. Independent of
+    Elasticsearch, so it works even when ES is down. The raw cosine must clear
+    ``min_score`` (keeps irrelevant queries from pulling docs in); the reported
+    ``score`` is normalized to 0–1 to sort fairly against ES cosine scores.
+    """
+    if not query_vector or not KB_DOCUMENTS:
+        return []
+    vecs = _ensure_kb_embeddings()
+    if vecs is None or len(vecs) == 0:
+        return []
+    q = np.asarray(query_vector, dtype=float)
+    q = q / (np.linalg.norm(q) + 1e-9)
+    mat = vecs / (np.linalg.norm(vecs, axis=1, keepdims=True) + 1e-9)
+    scores = mat @ q
+    order = np.argsort(-scores)[:k]
+    out: List[Dict[str, Any]] = []
+    for i in order:
+        cos = float(scores[int(i)])
+        if cos < min_score:
+            continue
+        d = KB_DOCUMENTS[int(i)]
+        out.append({
+            "id": str(d["id"]),
+            "type": d.get("type", "guide"),
+            "title": d["title"],
+            "snippet": _snippet(d["title"], d["content"]),
+            "score": (1.0 + cos) / 2.0,  # normalize to match ES cosine scoring
+        })
+    return out
+
+
 # ── /rag/chat — agentic RAG ──────────────────────────────────────────────────────
 
 def _heuristic_entity_types(query: str) -> List[str]:
@@ -222,13 +405,95 @@ def _heuristic_entity_types(query: str) -> List[str]:
     return types or list(_DEFAULT_ENTITY_TYPES)
 
 
+_QUESTION_STEMS = re.compile(
+    r"^(what(?:'s| is| are)?|whats|who(?:'s| is| are)?|how(?: do| can| does)?|why|when|where|"
+    r"which|can you|could you|please|tell me|give me|show me|find|list|explain|describe|"
+    r"summarize|is|are|do|does)\b[\s,:]*", re.I)
+_LEAD_FILLER = re.compile(r"^(me\s+)?(about|on|the|a|an|some|any|for|of|to)\b\s*", re.I)
+_QUALIFIER = re.compile(
+    r"^(best|top|good|better|recent|latest|newest|most|more|popular|key|main|important|"
+    r"notable|influential|seminal|relevant|famous|great|useful|interesting|leading)\b\s*", re.I)
+_RESEARCH_NOUN_LEAD = re.compile(
+    r"^(papers?|research|studies|study|works?|articles?|publications?|literature)\b\s*", re.I)
+_RESEARCH_NOUN_TRAIL = re.compile(
+    r"\s*\b(papers?|research|studies|study|works?|articles?|publications?|literature)$", re.I)
+_TRAIL_PREP = re.compile(r"\s+\b(in|on|of|for|about|to|with|and|the|a|an)$", re.I)
+
+_PLATFORM_FOLLOWUPS = [
+    "What can the AI assistant help me with?",
+    "How do I find researchers to collaborate with?",
+    "How do I organize papers in my library?",
+]
+
+
+def _clean_topic(query: str) -> str:
+    """Reduce a question to a short topic phrase for natural follow-up prompts."""
+    t = (query or "").strip().rstrip("?.! ")
+    prev = None
+    while t and t != prev:  # peel stacked stems like "what are the best ... papers"
+        prev = t
+        t = _QUESTION_STEMS.sub("", t).strip()
+        t = _LEAD_FILLER.sub("", t).strip()
+        t = _QUALIFIER.sub("", t).strip()
+        t = _RESEARCH_NOUN_LEAD.sub("", t).strip()
+        t = _RESEARCH_NOUN_TRAIL.sub("", t).strip()
+        t = _TRAIL_PREP.sub("", t).strip()
+    t = t or (query or "").strip().rstrip("?")
+    return t if len(t) <= 64 else t[:63].rstrip() + "…"
+
+
+def _short_title(title: str, limit: int = 52) -> str:
+    t = (title or "").strip()
+    return t if len(t) <= limit else t[: limit - 1].rstrip() + "…"
+
+
 def _heuristic_followups(query: str) -> List[str]:
-    base = query.strip().rstrip("?")
+    topic = _clean_topic(query)
     return [
-        f"Can you tell me more about {base}?",
-        "What are the most relevant papers on this topic?",
-        "Who are the key researchers in this area?",
+        f"What are the most influential papers on {topic}?",
+        f"Who are the leading researchers in {topic}?",
+        f"What are the open challenges in {topic}?",
     ]
+
+
+def _usable_title(source: Dict[str, Any]) -> bool:
+    t = (source.get("title") or "").strip().lower()
+    return bool(t) and t != "(untitled)"
+
+
+def _build_followups(query: str, sources: List[Dict[str, Any]],
+                     plan_followups: Optional[List[str]]) -> List[str]:
+    """Compose natural, real-world follow-up questions.
+
+    Prefers prompts anchored to the ACTUAL retrieved papers/researchers so the
+    suggestions read like genuine next questions; falls back to platform prompts
+    for how-to answers, then to the planner's or heuristic topic prompts.
+    """
+    papers = [s for s in sources if s.get("type") == "paper" and _usable_title(s)]
+    researchers = [s for s in sources if s.get("type") == "researcher" and _usable_title(s)]
+    guides = [s for s in sources if s.get("type") == "guide"]
+
+    outs: List[str] = []
+    if papers:
+        outs.append(f"Summarize the key contributions of “{_short_title(papers[0]['title'])}”.")
+    if researchers:
+        outs.append(f"What has {_short_title(researchers[0]['title'], 40)} published recently?")
+    if len(outs) < 3 and len(papers) > 1:
+        outs.append(f"How does “{_short_title(papers[1]['title'])}” compare to related work?")
+    elif papers and len(outs) < 3:
+        outs.append(f"What are the best papers on {_clean_topic(query)}?")
+
+    if not outs and guides:
+        outs = list(_PLATFORM_FOLLOWUPS)
+
+    # Top up (dedup, preserve order) from the planner's suggestions then heuristics.
+    for f in list(plan_followups or []) + _heuristic_followups(query):
+        if len(outs) >= 3:
+            break
+        f = (f or "").strip()
+        if f and f not in outs:
+            outs.append(f)
+    return outs[:3]
 
 
 def _heuristic_plan(query: str) -> Dict[str, Any]:
@@ -289,24 +554,50 @@ def _extractive_answer(sources: List[Dict[str, Any]]) -> str:
     return "Based on the most relevant sources I found:\n" + "\n".join(parts)
 
 
+_ASSISTANT_PERSONA = (
+    "You are ResearchBridge's AI Research Assistant. ResearchBridge is a collaborative "
+    "research platform for discovering papers, connecting with researchers, managing a "
+    "personal library, collaborating in teams, and publishing. Sources tagged (guide) are "
+    "first-party documentation about the platform; (concept) sources are curated research "
+    "knowledge (AI/ML concepts and research methodology); (paper), (researcher), and (post) "
+    "sources are content from the platform's corpus."
+)
+
+
 async def _synthesize(query: str, sources: List[Dict[str, Any]]) -> str:
-    """Step 3 — one LLM call answering grounded ONLY in the numbered sources."""
+    """Step 3 — one LLM call answering grounded in the numbered sources."""
     if sources:
         system = (
-            "You are a research assistant. Answer the user's question using ONLY the numbered "
-            "sources provided. Cite the sources you use inline with [n] matching their numbers. "
-            "If the sources do not contain the answer, say so honestly. Be concise and factual — "
-            "do not invent facts or citations."
+            f"{_ASSISTANT_PERSONA}\n\n"
+            "The numbered sources below ARE your knowledge base — they were retrieved for this "
+            "exact question. Answer using them, following these rules:\n"
+            "1. Lead with the answer. Do NOT open with disclaimers. If a source's topic matches "
+            "the question, that source IS the answer — never say you 'couldn't find' something "
+            "that is clearly present in the sources.\n"
+            "2. Be specific and name names. For a person, give their name, institution, and the "
+            "relevant research interests. For a paper, give its title and what it contributes.\n"
+            "3. Cite every claim inline with [n] matching the source numbers.\n"
+            "4. For recommendation questions ('best papers on X', 'who works on Y'), recommend the "
+            "most relevant sources BY NAME and briefly say why each fits — treat the sources as the "
+            "candidate set, even on a partial match.\n"
+            "5. Use (guide) sources to explain platform features and how-tos.\n"
+            "6. Only if NONE of the sources relate to the question at all should you say you "
+            "couldn't find a close match, then suggest a refinement.\n"
+            "7. If the question is not about research, science, academia, or this platform, "
+            "politely reply that you only help with research topics.\n"
+            "Never invent papers, people, or citations. Be concise, confident, and factual."
         )
         user = (
             f"Question: {query}\n\nSources:\n{_format_sources_block(sources)}\n\n"
-            "Answer with inline [n] citations:"
+            "Answer directly, citing sources inline with [n]:"
         )
     else:
         system = (
-            "You are a research assistant. No sources were found in the knowledge base for the "
-            "user's question. Tell the user honestly that you found no relevant information. "
-            "Do not fabricate an answer."
+            f"{_ASSISTANT_PERSONA} No sources were found in the corpus for the user's question. "
+            "Answer helpfully from what you know about the platform: if it's a how-to or feature "
+            "question, explain the relevant ResearchBridge feature; otherwise tell the user you "
+            "found no matching content and suggest how they might refine their search. Do not "
+            "fabricate specific papers, people, or citations."
         )
         user = f"Question: {query}"
     return await _llm(system, user, temperature=0.3, max_tokens=800)
@@ -317,6 +608,18 @@ async def rag_chat(req: ChatRequest) -> Dict[str, Any]:
     """Agentic RAG: plan → retrieve → synthesize, degrading to extractive on LLM/ES failure."""
     degraded = False
 
+    # 0. SMALL TALK — greetings / thanks / "what can you do" get a direct,
+    #    conversational reply and skip retrieval entirely (no spurious sources).
+    smalltalk = _smalltalk_answer(req.query)
+    if smalltalk is not None:
+        return {
+            "answer": smalltalk["answer"],
+            "sources": [],
+            "followups": smalltalk["followups"],
+            "used_entity_types": [],
+            "degraded": False,
+        }
+
     # 1. PLAN
     plan = await _plan(req.query, req.history)
 
@@ -324,14 +627,33 @@ async def rag_chat(req: ChatRequest) -> Dict[str, Any]:
     requested = [e for e in (req.entity_types or []) if e in _INDEX_CONFIG]
     entity_types = requested or plan["entity_types"] or list(_DEFAULT_ENTITY_TYPES)
 
-    # 2. RETRIEVE
+    # 2. RETRIEVE — content (ES) + relevant platform knowledge-base docs.
     try:
         query_vector = _embed(plan["expanded_query"])
     except Exception as e:
         logger.warning(f"[RAG] embedding failed: {e}")
         query_vector = None
-    sources = _retrieve(query_vector, entity_types, req.top_k)
+    content_sources = _retrieve(query_vector, entity_types, req.top_k)
+    kb_sources = _retrieve_kb(query_vector)
+    # Merge content + knowledge base, rank by (normalized) score, and cap. The KB
+    # backstops a thin corpus so real questions still get grounded, cited answers.
+    merged = content_sources + kb_sources
+    merged.sort(key=lambda s: s.get("score", 0.0), reverse=True)
+    sources = merged[: max(req.top_k, 6)]
     used_entity_types = sorted({s["type"] for s in sources}) or entity_types
+
+    # 2b. RESEARCH-SCOPE GATE — if nothing in the research corpus/KB is close, the
+    #     question is off-topic (or has no match). Decline politely instead of
+    #     letting the LLM ramble over weak, unrelated sources.
+    top_score = sources[0]["score"] if sources else 0.0
+    if top_score < _RESEARCH_SCOPE_FLOOR:
+        return {
+            "answer": _OFF_TOPIC_TEXT,
+            "sources": [],
+            "followups": list(_STARTER_FOLLOWUPS),
+            "used_entity_types": [],
+            "degraded": False,
+        }
 
     # 3. SYNTHESIZE (with graceful degrade)
     answer: Optional[str] = None
@@ -345,8 +667,8 @@ async def rag_chat(req: ChatRequest) -> Dict[str, Any]:
         answer = _extractive_answer(sources)
         degraded = True
 
-    # 4. FOLLOW-UPS
-    followups = (plan.get("followups") or _heuristic_followups(req.query))[:3]
+    # 4. FOLLOW-UPS — anchored to the real retrieved sources when possible.
+    followups = _build_followups(req.query, sources, plan.get("followups"))
 
     return {
         "answer": answer,

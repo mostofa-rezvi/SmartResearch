@@ -24,18 +24,34 @@ from typing import Optional, Literal
 
 logger = logging.getLogger(__name__)
 
-# ── Hugging Face client setup ───────────────────────────────────────────────────
+# ── LLM provider setup ──────────────────────────────────────────────────────────
+# Default provider is a LOCAL Ollama server (OpenAI-compatible API) so the app
+# needs no cloud token or key. Set LLM_PROVIDER=hf to use the Hugging Face router.
+def get_llm_provider() -> str:
+    return os.getenv("LLM_PROVIDER", "ollama").strip().lower()
+
+def get_ollama_base() -> str:
+    return os.getenv("OLLAMA_BASE_URL", "http://localhost:11434/v1").rstrip("/")
+
+def get_ollama_model() -> str:
+    return os.getenv("OLLAMA_MODEL", "llama3.2:3b")
+
 def get_hf_token() -> str:
     return os.getenv("HF_API_TOKEN", "")
 
 def get_hf_model() -> str:
     return os.getenv("HF_LLM_MODEL", "meta-llama/Llama-3.1-8B-Instruct")
 
+def get_active_model() -> str:
+    return get_ollama_model() if get_llm_provider() == "ollama" else get_hf_model()
+
 def is_hf_available() -> bool:
-    return bool(get_hf_token())
+    """True when an LLM backend is usable: local Ollama (no token) or HF with a token.
+    Name kept for import stability across the service."""
+    return get_llm_provider() == "ollama" or bool(get_hf_token())
 
 HF_API_TOKEN = get_hf_token()
-HF_LLM_MODEL = get_hf_model()
+HF_LLM_MODEL = get_active_model()   # label used in `generated_by`
 HF_CHAT_URL = "https://router.huggingface.co/v1/chat/completions"
 HF_AVAILABLE = is_hf_available()
 
@@ -85,9 +101,19 @@ class FeedbackResponse(BaseModel):
 # ── Helper: call Hugging Face chat completions ──────────────────────────────────
 
 def _hf_chat_sync(system: str, user: str, temperature: float = 0.4, max_tokens: int = 1024) -> str:
-    """Blocking POST to the HF router (OpenAI-compatible). Returns the assistant text."""
-    token = get_hf_token()
-    model = get_hf_model()
+    """Blocking POST to an OpenAI-compatible chat endpoint (local Ollama or the HF
+    router). Returns the assistant text. Name kept for import stability."""
+    provider = get_llm_provider()
+    if provider == "ollama":
+        url = f"{get_ollama_base()}/chat/completions"
+        model = get_ollama_model()
+        headers = {"Content-Type": "application/json"}
+        timeout = 180  # local CPU inference is slower than a hosted API
+    else:
+        url = HF_CHAT_URL
+        model = get_hf_model()
+        headers = {"Authorization": f"Bearer {get_hf_token()}", "Content-Type": "application/json"}
+        timeout = 55
     payload = {
         "model": model,
         "messages": [
@@ -96,14 +122,11 @@ def _hf_chat_sync(system: str, user: str, temperature: float = 0.4, max_tokens: 
         ],
         "temperature": temperature,
         "max_tokens": max_tokens,
+        "stream": False,
     }
-    headers = {
-        "Authorization": f"Bearer {token}",
-        "Content-Type": "application/json",
-    }
-    resp = requests.post(HF_CHAT_URL, headers=headers, json=payload, timeout=55)
+    resp = requests.post(url, headers=headers, json=payload, timeout=timeout)
     if resp.status_code != 200:
-        raise RuntimeError(f"HF API {resp.status_code}: {resp.text[:300]}")
+        raise RuntimeError(f"{provider} LLM API {resp.status_code}: {resp.text[:300]}")
     data = resp.json()
     return data["choices"][0]["message"]["content"].strip()
 
