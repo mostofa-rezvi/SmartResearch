@@ -90,7 +90,15 @@ router.get('/openalex-sync', async (req, res) => {
     const url = `https://api.openalex.org/authors?filter=${encodeURIComponent(filter)}&per-page=${per_page}&page=${page}&mailto=research@researchbridge.app`;
 
     const response = await fetch(url);
-    if (!response.ok) throw new Error(`OpenAlex API responded with ${response.status}`);
+    if (!response.ok) {
+      console.warn(`OpenAlex sync rate limited or error (${response.status}). Returning empty fallback list.`);
+      return res.json(envelope([], null, {
+        total: 0,
+        page: parseInt(page),
+        per_page: parseInt(per_page),
+        warning: `OpenAlex API status ${response.status}`
+      }));
+    }
     const data = await response.json();
 
     const researchers = (data.results || []).map(author => ({
@@ -109,18 +117,20 @@ router.get('/openalex-sync', async (req, res) => {
     }));
 
     const responseBody = envelope(researchers, null, {
-      total: data.meta?.count,
+      total: data.meta?.count || researchers.length,
       page: parseInt(page),
       per_page: parseInt(per_page)
     });
 
     // 3. Save to Cache (1 hour)
-    await redis.setex(cacheKey, 3600, JSON.stringify(responseBody));
+    try {
+      await redis.setex(cacheKey, 3600, JSON.stringify(responseBody));
+    } catch (e) {}
 
     res.json(responseBody);
   } catch (err) {
     console.error('OpenAlex proxy error:', err.message);
-    res.status(502).json(envelope(null, { error: `OpenAlex API error: ${err.message}` }));
+    res.json(envelope([], null, { total: 0, page: parseInt(page), per_page: parseInt(per_page), warning: err.message }));
   }
 });
 
@@ -187,27 +197,53 @@ router.get('/:id', async (req, res) => {
 router.get('/:id/works', async (req, res) => {
   const { id } = req.params;
   const cleanId = extractOpenAlexId(id);
+  const { page = 1, per_page = 10 } = req.query;
+
+  const cacheKey = `openalex:works:${cleanId}:${page}:${per_page}`;
+  const redis = getRedisClient();
 
   try {
+    // 1. Check Redis Cache
+    try {
+      const cached = await redis.get(cacheKey);
+      if (cached) {
+        return res.json(JSON.parse(cached));
+      }
+    } catch (e) {
+      // Ignore redis cache lookup error
+    }
+
     let openalexId;
     if (!isNaN(cleanId)) {
-      // 1. Get researcher to find openalex_id
+      // Get researcher to find openalex_id
       const result = await db.query('SELECT openalex_id FROM researchers WHERE id = $1', [parseInt(cleanId)]);
       if (!result.rows.length) return res.status(404).json(envelope(null, { error: 'Researcher not found' }));
       openalexId = result.rows[0].openalex_id;
     } else {
-      // It is already an OpenAlex ID (or we assume so)
       openalexId = `https://openalex.org/${cleanId}`;
     }
 
-    if (!openalexId) return res.json(envelope([]));
+    if (!openalexId) {
+      return res.json({ ...envelope([]), meta: { total: 0, page: parseInt(page), per_page: parseInt(per_page), has_more: false } });
+    }
 
     // 2. Fetch works from OpenAlex with pagination support
-    const { page = 1, per_page = 10 } = req.query;
     const url = `https://api.openalex.org/works?filter=author.id:${openalexId}&page=${page}&per-page=${per_page}&mailto=research@researchbridge.app`;
     
     const response = await fetch(url);
-    if (!response.ok) throw new Error(`OpenAlex API responded with ${response.status}`);
+    if (!response.ok) {
+      console.warn(`OpenAlex API works warning (${response.status}) for ${openalexId}`);
+      return res.json({
+        ...envelope([]),
+        meta: {
+          total: 0,
+          page: parseInt(page),
+          per_page: parseInt(per_page),
+          has_more: false,
+          warning: `OpenAlex API status ${response.status}`
+        }
+      });
+    }
     const data = await response.json();
 
     const works = (data.results || []).map(work => ({
@@ -221,19 +257,29 @@ router.get('/:id/works', async (req, res) => {
       landing_page_url: work.primary_location?.landing_page_url || work.doi
     }));
 
-    res.json({
+    const responseBody = {
       ...envelope(works),
       meta: {
-        total: data.meta.count,
+        total: data.meta?.count || works.length,
         page: parseInt(page),
         per_page: parseInt(per_page),
-        has_more: data.meta.count > (parseInt(page) * parseInt(per_page))
+        has_more: (data.meta?.count || 0) > (parseInt(page) * parseInt(per_page))
       }
-    });
+    };
+
+    try {
+      await redis.setex(cacheKey, 3600, JSON.stringify(responseBody));
+    } catch (e) {}
+
+    res.json(responseBody);
   } catch (err) {
     console.error('Works fetch error:', err.message);
-    res.status(500).json(envelope(null, { error: 'Server error' }));
+    res.json({
+      ...envelope([]),
+      meta: { total: 0, page: parseInt(page), per_page: parseInt(per_page), has_more: false, error: err.message }
+    });
   }
 });
+
 
 module.exports = router;

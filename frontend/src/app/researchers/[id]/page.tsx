@@ -72,18 +72,21 @@ export default function ResearcherProfilePage() {
       const res = await fetch(`${API.researchers.works(String(id))}?page=${page}&per_page=10`);
       const data = await res.json();
       
-      if (data.success) {
+      if (data.success && Array.isArray(data.data)) {
         if (reset) {
           setWorks(data.data);
         } else {
-          setWorks(prev => [...prev, ...data.data]);
+          setWorks(prev => [...(Array.isArray(prev) ? prev : []), ...data.data]);
         }
-        setHasMoreWorks(data.meta.has_more);
-        setTotalWorks(data.meta.total);
+        setHasMoreWorks(!!data.meta?.has_more);
+        setTotalWorks(data.meta?.total || 0);
         setWorksPage(page);
+      } else if (reset) {
+        setWorks([]);
       }
     } catch (err) {
-      console.error("Failed to fetch works");
+      console.error("Failed to fetch works", err);
+      if (reset) setWorks([]);
     } finally {
       setLoadingWorks(false);
     }
@@ -233,7 +236,7 @@ export default function ResearcherProfilePage() {
                 </span>
               </div>
 
-              {works.length > 0 ? (
+              {Array.isArray(works) && works.length > 0 ? (
                 <div className="space-y-4">
                   {works.map((work) => (
                     <motion.a
