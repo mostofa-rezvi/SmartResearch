@@ -48,6 +48,16 @@ services:
     ports:
       - "8000:8000"
     env_file: .env
+    environment:
+      # All LLM work goes to the Ollama server running on the host machine.
+      - LLM_PROVIDER=ollama
+      - OLLAMA_MODEL=llama3.2:3b
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434/v1
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      # Mount source so llm_service.py changes apply without an image rebuild.
+      - ./ml-service:/app
     networks:
       - research-bridge-net
     depends_on:
@@ -150,7 +160,9 @@ services:
 
 networks:
   research-bridge-net:
-    driver: bridge
+    # Use the pre-existing shared network so rb-ml resolves redis/elasticsearch/postgres.
+    external: true
+    name: research-bridge-net
 
 volumes:
   pgdata:
