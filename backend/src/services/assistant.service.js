@@ -53,7 +53,7 @@ class AssistantService {
       const res = await axios.post(
         `${ML_SERVICE_URL}/rag/chat`,
         { query, history },
-        { timeout: 60000 }
+        { timeout: 150000 }
       );
       const data = res.data || {};
       answer = data.answer || '';
@@ -194,7 +194,7 @@ class AssistantService {
       const res = await axios.post(
         `${ML_SERVICE_URL}/rag/summarize`,
         { documents, scope_label: scopeLabel },
-        { timeout: 90000 }
+        { timeout: 180000 }
       );
       summary = res.data || {};
       if (typeof summary.doc_count !== 'number') summary.doc_count = documents.length;
@@ -251,7 +251,7 @@ class AssistantService {
       const ml = await axios.post(
         `${ML_SERVICE_URL}/rag/paper-qa`,
         { question, title: item.title || '', text },
-        { timeout: 60000 }
+        { timeout: 150000 }
       );
       const data = ml.data || {};
       return {

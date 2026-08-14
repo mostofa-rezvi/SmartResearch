@@ -11,6 +11,7 @@ const { envelope, errorEnvelope } = require('../utils/responseEnvelope');
 const logger = require('../utils/logger');
 const eventBus = require('../services/eventBus.service');
 const trustService = require('../services/trust.service');
+const { checkAndAwardAchievements } = require('../services/audit.service');
 
 // Using centralized db pool from config
 
@@ -33,6 +34,24 @@ const isAllowedRedirect = (url) => {
 
 // ── OTP (two-factor login) helpers ──────────────────────────────────────────────
 const OTP_EXPIRY_SECONDS = (config.otp?.expiryMinutes || 5) * 60;
+
+// Demo accounts get a fixed, predictable login OTP in non-production so the
+// collaboration flows can be exercised across several accounts without checking
+// email. NEVER active in production. Any @demo.researchbridge.test address (plus
+// any explicitly listed in DEMO_OTP_EMAILS) always receives DEMO_OTP_CODE.
+const FIXED_OTP_CODE = process.env.DEMO_OTP_CODE || '123456';
+const DEMO_OTP_DOMAINS = ['@demo.researchbridge.test'];
+const DEMO_OTP_EMAILS = new Set(
+  (process.env.DEMO_OTP_EMAILS || 'admin@researchbridge.app')
+    .split(',').map((s) => s.trim().toLowerCase()).filter(Boolean)
+);
+function fixedLoginOtp(email) {
+  if (config.env === 'production') return null;
+  const e = String(email || '').toLowerCase();
+  if (DEMO_OTP_EMAILS.has(e)) return FIXED_OTP_CODE;
+  if (DEMO_OTP_DOMAINS.some((d) => e.endsWith(d))) return FIXED_OTP_CODE;
+  return null;
+}
 
 /**
  * Cookie options for the refresh token. In production the web app and API are
@@ -62,7 +81,7 @@ async function issueSession(res, userId) {
 
 /** Generate a 6-digit login OTP, store it in Redis (keyed by id + email), and email it. */
 async function sendLoginOtp(user) {
-  const otp = String(crypto.randomInt(100000, 1000000));
+  const otp = fixedLoginOtp(user.email) || String(crypto.randomInt(100000, 1000000));
   const redis = getRedisClient();
   await redis.set(`login_otp:${user.id}`, otp, 'EX', OTP_EXPIRY_SECONDS);
   await redis.set(`login_otp_email:${user.email}`, String(user.id), 'EX', OTP_EXPIRY_SECONDS);
@@ -620,13 +639,48 @@ class AuthController {
         );
       }
 
-      // Update user status
-      await db.query(
-        'UPDATE users SET onboarding_completed = true, updated_at = NOW() WHERE id = $1',
+      // Derive research interests from the saved answers so the profile,
+      // recommendations, and the profile-completeness achievement all reflect
+      // them (they read users.research_interests, not onboarding_answers).
+      const interestsResult = await db.query(
+        `SELECT a.answer_data
+           FROM onboarding_answers a
+           JOIN onboarding_questions q ON a.question_id = q.id
+          WHERE a.user_id = $1 AND q.section IN ('focus', 'identity', 'publication')`,
         [userId]
       );
-      
+
+      const interests = [];
+      for (const row of interestsResult.rows) {
+        let ans = row.answer_data;
+        try { ans = JSON.parse(row.answer_data); } catch (e) { /* keep raw */ }
+        if (Array.isArray(ans)) {
+          ans.forEach((v) => { if (v) interests.push(v); });
+        } else if (ans) {
+          interests.push(ans);
+        }
+      }
+      const uniqueInterests = [...new Set(interests)];
+
+      // Update user status + derived interests
+      await db.query(
+        `UPDATE users
+            SET onboarding_completed = true,
+                research_interests = $2,
+                updated_at = NOW()
+          WHERE id = $1`,
+        [userId, JSON.stringify({ interests: uniqueInterests })]
+      );
+
       await db.query('COMMIT');
+
+      // Re-evaluate achievements (profile completeness may have changed now that
+      // research_interests is populated). Non-fatal.
+      try {
+        await checkAndAwardAchievements(userId);
+      } catch (achErr) {
+        logger.warn(`[completeOnboarding] achievement recheck failed: ${achErr.message}`);
+      }
 
       // Clear recommendation cache in Redis to trigger dynamic update
       try {

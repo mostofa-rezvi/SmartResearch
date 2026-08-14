@@ -86,10 +86,28 @@ class ProjectService {
     }
 
     // Add member
-    await db.query(
-      'INSERT INTO project_members (project_id, user_id, role) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING',
+    const ins = await db.query(
+      'INSERT INTO project_members (project_id, user_id, role) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING RETURNING user_id',
       [projectId, targetUserId, role]
     );
+
+    // Notify the invited user (only on a genuinely new membership).
+    if (ins.rows.length) {
+      try {
+        const proj = await db.query('SELECT name FROM projects WHERE id = $1', [projectId]);
+        const inviter = await db.query('SELECT name FROM users WHERE id = $1', [adminId]);
+        const notificationService = require('./notification.service');
+        await notificationService.notify(
+          targetUserId,
+          'team_invite',
+          `You were added to “${proj.rows[0]?.name || 'a research team'}”`,
+          `${inviter.rows[0]?.name || 'A teammate'} added you to the team. Open it to start collaborating.`,
+          { project_id: projectId, from_user_id: adminId }
+        );
+      } catch (e) {
+        logger.warn(`[Project] team_invite notify failed: ${e.message}`);
+      }
+    }
     return { success: true };
   }
 

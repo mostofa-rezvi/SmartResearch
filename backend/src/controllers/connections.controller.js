@@ -29,24 +29,34 @@ exports.sendRequest = async (req, res) => {
       [requesterId, recipient_id]
     );
 
+    let connection;
     if (existing.rows.length > 0) {
-      const existingStatus = existing.rows[0].status;
-      if (existingStatus === 'accepted') {
+      const existingRow = existing.rows[0];
+      if (existingRow.status === 'accepted') {
         return res.status(409).json({ success: false, message: 'Already connected' });
       }
-      if (existingStatus === 'pending') {
+      if (existingRow.status === 'pending') {
         return res.status(409).json({ success: false, message: 'Connection request already pending' });
       }
+      // A previously rejected request can be re-sent: reopen the existing row as
+      // pending (pointed in the current requester's direction) instead of a new
+      // INSERT, which would violate UNIQUE(requester_id, recipient_id).
+      const reopened = await db.query(
+        `UPDATE connections
+            SET requester_id = $2, recipient_id = $3, message = $4, status = 'pending', updated_at = NOW()
+          WHERE id = $1 RETURNING *`,
+        [existingRow.id, requesterId, recipient_id, message || null]
+      );
+      connection = reopened.rows[0];
+    } else {
+      const result = await db.query(
+        `INSERT INTO connections (requester_id, recipient_id, message, status)
+         VALUES ($1, $2, $3, 'pending')
+         RETURNING *`,
+        [requesterId, recipient_id, message || null]
+      );
+      connection = result.rows[0];
     }
-
-    // Create connection request
-    const result = await db.query(
-      `INSERT INTO connections (requester_id, recipient_id, message, status)
-       VALUES ($1, $2, $3, 'pending')
-       RETURNING *`,
-      [requesterId, recipient_id, message || null]
-    );
-    const connection = result.rows[0];
 
     // Fetch recipient info for notification
     const recipientRes = await db.query('SELECT name, email FROM users WHERE id = $1', [recipient_id]);

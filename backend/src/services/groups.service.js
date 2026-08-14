@@ -54,6 +54,21 @@ class GroupService {
     eventBus.emitEvent('event.behaviour', { type: 'community.group.request_join', userId, groupId, timestamp: new Date().toISOString() });
     logger.info({ userId, groupId }, 'User requested to join group');
 
+    // Notify the group owner of the pending request.
+    try {
+      const requester = await db.query('SELECT name FROM users WHERE id = $1', [userId]);
+      const notificationService = require('./notification.service');
+      await notificationService.notify(
+        group.creator_id,
+        'group_join_request',
+        `New request to join “${group.name}”`,
+        `${requester.rows[0]?.name || 'A researcher'} asked to join your group.`,
+        { group_id: groupId, from_user_id: userId }
+      );
+    } catch (e) {
+      logger.warn(`[Groups] group_join_request notify failed: ${e.message}`);
+    }
+
     return { message: 'Join request sent. Waiting for admin approval.' };
   }
   async getGroupById(groupId) {
@@ -146,8 +161,17 @@ class GroupService {
         [targetUserId, groupId]
       );
       if (result.rows.length === 0) throw new Error('Request not found or already processed');
-      
+
       eventBus.emitEvent('event.behaviour', { type: 'community.group.request_approved', adminId, userId: targetUserId, groupId, timestamp: new Date().toISOString() });
+      try {
+        const g = await db.query('SELECT name FROM groups WHERE id = $1', [groupId]);
+        const notificationService = require('./notification.service');
+        await notificationService.notify(
+          targetUserId, 'group_request_approved',
+          `You're now a member of “${g.rows[0]?.name || 'the group'}”`,
+          'Your request to join was approved.', { group_id: groupId }
+        );
+      } catch (e) { logger.warn(`[Groups] group_request_approved notify failed: ${e.message}`); }
       return result.rows[0];
     } else if (action === 'reject') {
       const result = await db.query(
@@ -155,8 +179,17 @@ class GroupService {
         [targetUserId, groupId]
       );
       if (result.rows.length === 0) throw new Error('Request not found or already processed');
-      
+
       eventBus.emitEvent('event.behaviour', { type: 'community.group.request_rejected', adminId, userId: targetUserId, groupId, timestamp: new Date().toISOString() });
+      try {
+        const g = await db.query('SELECT name FROM groups WHERE id = $1', [groupId]);
+        const notificationService = require('./notification.service');
+        await notificationService.notify(
+          targetUserId, 'group_request_rejected',
+          `Your request to join “${g.rows[0]?.name || 'the group'}” was declined`,
+          null, { group_id: groupId }
+        );
+      } catch (e) { logger.warn(`[Groups] group_request_rejected notify failed: ${e.message}`); }
       return { message: 'Request rejected' };
     } else {
       const err = new Error('Invalid action');
