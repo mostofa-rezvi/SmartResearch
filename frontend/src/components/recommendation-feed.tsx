@@ -11,6 +11,7 @@ interface RecommendationFeedProps {
     domains: string[];
     tier: string | null;
     institution: string;
+    search?: string;
   };
 }
 
@@ -196,6 +197,18 @@ export function RecommendationFeed({ filters }: RecommendationFeedProps) {
     if (filters?.institution) {
       const search = filters.institution.toLowerCase().trim();
       if (search && !rec.institution.toLowerCase().includes(search)) return false;
+    }
+
+    // 4. Free-text search — matches name, institution, or research interests.
+    if (filters?.search) {
+      const q = filters.search.toLowerCase().trim();
+      if (q) {
+        const haystack = [rec.name, rec.institution, ...(rec.interests || [])]
+          .filter(Boolean)
+          .join(" ")
+          .toLowerCase();
+        if (!haystack.includes(q)) return false;
+      }
     }
 
     return true;

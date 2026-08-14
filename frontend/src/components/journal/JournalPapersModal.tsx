@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { OPENALEX_BASE, OPENALEX_EMAIL, API } from "@/config/api";
 import { useApi, useAuth } from "@/context/AuthContext";
+import { beginTask } from "@/lib/preloader";
 
 
 // ---------- Types ----------
@@ -454,6 +455,10 @@ export default function JournalPapersModal({ journal, onClose }: Props) {
     isReset ? setLoading(true) : setLoadingMore(true);
     setError(null);
 
+    // Drive the global preloader for the initial load (a fresh popup / filter
+    // change). Infinite-scroll "load more" appends silently — no full overlay.
+    const endTask = isReset ? beginTask() : null;
+
     try {
       const filters: string[] = [`primary_location.source.issn:${formattedIssn}`];
       if (oaOnly) filters.push("is_oa:true");
@@ -489,6 +494,7 @@ export default function JournalPapersModal({ journal, onClose }: Props) {
     } finally {
       setLoading(false);
       setLoadingMore(false);
+      endTask?.();
     }
   }, [journal.issn, debouncedSearch, oaOnly, yearFilter, sort]);
 

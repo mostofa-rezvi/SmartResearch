@@ -11,10 +11,10 @@ interface QuestionCardProps {
   idx: number;
 }
 
-import { useRouter } from "next/navigation";
+import { useAppRouter } from "@/lib/useAppRouter";
 
 export const QuestionCard: React.FC<QuestionCardProps> = ({ post, onVote, idx }) => {
-  const router = useRouter();
+  const router = useAppRouter();
 
   const handleCardClick = (e: React.MouseEvent) => {
     // Don't navigate if clicking a button, link, or the author area
