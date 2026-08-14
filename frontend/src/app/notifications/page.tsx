@@ -1,38 +1,14 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Bell, Check, CheckCheck } from "lucide-react";
+import { Bell, CheckCheck } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { API } from "@/config/api";
 import { useApi, useAuth } from "@/context/AuthContext";
 import Navbar from "@/components/Navbar";
+import { notifMeta, notificationLink, type AppNotification } from "@/lib/notifications";
 
-interface Notification {
-  id: number;
-  type: string;
-  title: string;
-  body: string | null;
-  meta: Record<string, any>;
-  is_read: boolean;
-  created_at: string;
-}
-
-const TYPE_ICONS: Record<string, string> = {
-  connection_request:  "🤝",
-  connection_accepted: "✅",
-  mentorship_accepted: "🎓",
-  mentorship_rejected: "❌",
-  forum_reply:         "💬",
-  match:               "🔍",
-};
-
-const TYPE_LABELS: Record<string, string> = {
-  connection_request:  "Connection Request",
-  connection_accepted: "Connection Accepted",
-  mentorship_accepted: "Mentorship Accepted",
-  mentorship_rejected: "Mentorship Update",
-  forum_reply:         "Forum Reply",
-  match:               "New Match",
-};
+type Notification = AppNotification;
 
 function timeAgo(dateStr: string) {
   const diff = Date.now() - new Date(dateStr).getTime();
@@ -47,6 +23,7 @@ function timeAgo(dateStr: string) {
 export default function NotificationsPage() {
   const { token } = useAuth();
   const { fetchWithAuth } = useApi();
+  const router = useRouter();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -70,6 +47,11 @@ export default function NotificationsPage() {
   const markAllRead = async () => {
     await fetchWithAuth(API.notifications.markAllRead, { method: "POST" });
     setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
+  };
+
+  const openNotification = (n: Notification) => {
+    if (!n.is_read) markRead(n.id);
+    router.push(notificationLink(n));
   };
 
   const unread = notifications.filter(n => !n.is_read).length;
@@ -115,7 +97,7 @@ export default function NotificationsPage() {
             {notifications.map(n => (
               <div
                 key={n.id}
-                onClick={() => !n.is_read && markRead(n.id)}
+                onClick={() => openNotification(n)}
                 className={`flex gap-4 p-5 glass-neu-card glass-neu-hover transition-all cursor-pointer group ${
                   n.is_read
                     ? "opacity-70 hover:opacity-100"
@@ -126,7 +108,7 @@ export default function NotificationsPage() {
                 <div className={`w-12 h-12 shrink-0 flex items-center justify-center text-2xl neu-icon ${
                   n.is_read ? "" : "ring-2 ring-primary/20"
                 }`}>
-                  {TYPE_ICONS[n.type] || "🔔"}
+                  {notifMeta(n.type).icon}
                 </div>
 
                 {/* Content */}
@@ -134,7 +116,7 @@ export default function NotificationsPage() {
                   <div className="flex items-start justify-between gap-2">
                     <div>
                       <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-0.5 block">
-                        {TYPE_LABELS[n.type] || n.type}
+                        {notifMeta(n.type).label}
                       </span>
                       <p className={`font-semibold text-sm leading-snug ${n.is_read ? "text-slate-600 dark:text-slate-400" : "text-slate-900 dark:text-white"}`}>
                         {n.title}

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useAppRouter } from "@/lib/useAppRouter";
 import { motion } from "framer-motion";
 import { Users, Globe, Lock, ArrowLeft, Info, Hash } from "lucide-react";
 import Link from "next/link";
@@ -16,7 +16,7 @@ export default function CreateGroupPage() {
   const [type, setType] = useState<'public' | 'private'>('public');
   const [isLoading, setIsLoading] = useState(false);
   const { token, logout } = useAuth();
-  const router = useRouter();
+  const router = useAppRouter();
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();

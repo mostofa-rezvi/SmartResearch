@@ -8,7 +8,8 @@ import Link from "next/link";
 import { ArrowLeft, Calendar, User, Clock, Share2, Tag, BookOpen } from "lucide-react";
 import { API } from "@/config/api";
 import { useAuth } from "@/context/AuthContext";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
+import { useAppRouter } from "@/lib/useAppRouter";
 import ReactMarkdown from "react-markdown";
 
 interface Blog {
@@ -137,7 +138,7 @@ We benchmarked traditional SQL/Elasticsearch BM25 keyword matching against HNSW 
 export default function BlogDetail() {
   const params = useParams();
   const id = params.id as string;
-  const router = useRouter();
+  const router = useAppRouter();
   const { token } = useAuth();
   
   const [blog, setBlog] = useState<Blog | null>(null);

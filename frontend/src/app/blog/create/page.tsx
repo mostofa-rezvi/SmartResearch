@@ -3,13 +3,13 @@
 import { useState } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { useRouter } from "next/navigation";
+import { useAppRouter } from "@/lib/useAppRouter";
 import { useAuth } from "@/context/AuthContext";
 import { API } from "@/config/api";
 import { Send, Image as ImageIcon } from "lucide-react";
 
 export default function CreateBlogPage() {
-  const router = useRouter();
+  const router = useAppRouter();
   const { user, token } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");

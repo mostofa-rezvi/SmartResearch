@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 import { Search as SearchIcon, FileText, User, ChevronRight, Hash, Send, AlertTriangle, ExternalLink, Calendar, Users, FileType, CheckCircle2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { API } from "@/config/api";
@@ -268,8 +267,6 @@ export default function PublicSearchPage() {
           )}
         </div>
       </main>
-
-      <Footer />
     </div>
   );
 }

@@ -11,6 +11,7 @@ import Link from "next/link";
 import EditProfileModal from "@/components/profile/EditProfileModal";
 import CredentialDashboard from "@/components/profile/CredentialDashboard";
 import TrustBadge from "@/components/profile/TrustBadge";
+import ConnectButton from "@/components/connections/ConnectButton";
 
 export default function ProfilePage() {
   const { id } = useParams();
@@ -104,12 +105,18 @@ export default function ProfilePage() {
               >
                 <Settings size={18} /> Edit Profile
               </button>
-              <Link 
+              <Link
                 href="/profile/edit-interests"
                 className="px-6 py-2.5 bg-primary/10 text-primary dark:text-white font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-primary/20 transition-all border border-primary/20 text-xs w-full text-center"
               >
                 <Microscope size={16} /> Edit Interests
               </Link>
+            </div>
+          )}
+
+          {!isOwnProfile && (
+            <div className="shrink-0 w-full md:w-52">
+              <ConnectButton targetUserId={String(id)} />
             </div>
           )}
         </div>

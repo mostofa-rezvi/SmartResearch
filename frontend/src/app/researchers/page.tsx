@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { useRouter } from "next/navigation";
+import { useAppRouter } from "@/lib/useAppRouter";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Users, Search, Globe, BookOpen, TrendingUp, ExternalLink,
@@ -62,7 +62,7 @@ function getCitationBadge(citations: number) {
 
 // ─── Component ────────────────────────────────────────────────────────────────
 export default function ResearchersPage() {
-  const router = useRouter();
+  const router = useAppRouter();
   
   // Core Data Pool (The Source of Truth)
   const [allResearchers, setAllResearchers] = useState<Researcher[]>([]);

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useAppRouter } from "@/lib/useAppRouter";
 import { useAuth, useApi } from "@/context/AuthContext";
 import { API } from "@/config/api";
 import Navbar from "@/components/Navbar";
@@ -37,10 +37,17 @@ const SECTION_LABELS: Record<string, string> = {
   community: "Community Pulse",
 };
 
-const SECTIONS = ['identity', 'focus', 'collaboration', 'publication', 'community'];
+// Fallbacks so a newly-added section (one not in the maps above) still renders
+// a readable tab instead of being dropped entirely.
+const sectionLabel = (section: string) =>
+  SECTION_LABELS[section] ||
+  section.replace(/[_-]+/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+
+const sectionIcon = (section: string) =>
+  SECTION_ICONS[section] || <Sparkles size={16} />;
 
 export default function EditInterestsPage() {
-  const router = useRouter();
+  const router = useAppRouter();
   const { user, token, completeOnboarding } = useAuth();
   const { fetchWithAuth } = useApi();
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -49,6 +56,23 @@ export default function EditInterestsPage() {
   const [saving, setSaving] = useState(false);
   const [activeSection, setActiveSection] = useState("identity");
   const [successMsg, setSuccessMsg] = useState("");
+
+  // Sections are derived from the questions the API returns (already ordered by
+  // sort_order), so any section added in the DB shows up as a tab automatically.
+  const sections = React.useMemo(() => {
+    const ordered: string[] = [];
+    questions.forEach((q) => {
+      if (!ordered.includes(q.section)) ordered.push(q.section);
+    });
+    return ordered;
+  }, [questions]);
+
+  // Keep the active tab pointing at a section that actually exists.
+  useEffect(() => {
+    if (sections.length > 0 && !sections.includes(activeSection)) {
+      setActiveSection(sections[0]);
+    }
+  }, [sections, activeSection]);
 
   useEffect(() => {
     if (!token) return;
@@ -217,11 +241,11 @@ export default function EditInterestsPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 items-start">
           {/* Left Sidebar Navigation */}
-          <div className="lg:col-span-1 glass-neu-card p-4 space-y-1">
+          <div className="lg:col-span-1 glass-neu-card p-4 space-y-1 lg:sticky lg:top-28">
             <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 px-4 py-3 mb-2">
               Parameters
             </h3>
-            {SECTIONS.map(sec => {
+            {sections.map(sec => {
               const isActive = activeSection === sec;
               const count = getCompletedCount(sec);
               const total = questions.filter(q => q.section === sec).length;
@@ -237,9 +261,9 @@ export default function EditInterestsPage() {
                 >
                   <div className="flex items-center gap-3">
                     <span className={isActive ? 'text-white' : 'text-slate-400'}>
-                      {SECTION_ICONS[sec]}
+                      {sectionIcon(sec)}
                     </span>
-                    <span>{SECTION_LABELS[sec]}</span>
+                    <span>{sectionLabel(sec)}</span>
                   </div>
                   <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${
                     isActive ? 'bg-white/20 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
@@ -257,10 +281,10 @@ export default function EditInterestsPage() {
               <header className="border-b border-slate-100 dark:border-slate-700 pb-6 flex items-center justify-between">
                 <div>
                   <span className="text-[10px] font-black text-secondary dark:text-rose-300 uppercase tracking-[0.2em] bg-secondary/5 px-3 py-1 rounded">
-                    {SECTION_LABELS[activeSection]}
+                    {sectionLabel(activeSection)}
                   </span>
                   <h2 className="text-xl font-bold text-slate-900 dark:text-white mt-2">
-                    Configure {SECTION_LABELS[activeSection]}
+                    Configure {sectionLabel(activeSection)}
                   </h2>
                 </div>
               </header>
@@ -335,10 +359,10 @@ export default function EditInterestsPage() {
                 <button
                   type="button"
                   onClick={() => {
-                    const idx = SECTIONS.indexOf(activeSection);
-                    if (idx > 0) setActiveSection(SECTIONS[idx - 1]);
+                    const idx = sections.indexOf(activeSection);
+                    if (idx > 0) setActiveSection(sections[idx - 1]);
                   }}
-                  disabled={SECTIONS.indexOf(activeSection) === 0}
+                  disabled={sections.indexOf(activeSection) <= 0}
                   className="px-5 py-2.5 neu-btn text-slate-600 dark:text-slate-300 font-bold text-xs transition-all disabled:opacity-0"
                 >
                   Previous Section
@@ -347,16 +371,16 @@ export default function EditInterestsPage() {
                 <button
                   type="button"
                   onClick={() => {
-                    const idx = SECTIONS.indexOf(activeSection);
-                    if (idx < SECTIONS.length - 1) {
-                      setActiveSection(SECTIONS[idx + 1]);
+                    const idx = sections.indexOf(activeSection);
+                    if (idx < sections.length - 1) {
+                      setActiveSection(sections[idx + 1]);
                     } else {
                       handleSubmit({ preventDefault: () => {} } as any);
                     }
                   }}
                   className="px-6 py-2.5 bg-slate-900 text-white font-bold rounded-xl text-xs hover:bg-slate-800 transition-all flex items-center gap-1"
                 >
-                  {SECTIONS.indexOf(activeSection) === SECTIONS.length - 1 ? (
+                  {sections.indexOf(activeSection) === sections.length - 1 ? (
                     <>
                       Save Changes <Save size={14} />
                     </>

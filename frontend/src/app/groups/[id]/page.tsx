@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
+import { useAppRouter } from "@/lib/useAppRouter";
 import { useAuth } from "@/context/AuthContext";
 import Navbar from "@/components/Navbar";
 import { API } from "@/config/api";
@@ -925,7 +926,7 @@ function PostCard({ post, token, onUpdate, onDelete, currentUserId, groupRole }:
 export default function GroupDetailPage() {
   const { id } = useParams();
   const { user, token, logout } = useAuth();
-  const router = useRouter();
+  const router = useAppRouter();
   const [group, setGroup] = useState<any>(null);
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);

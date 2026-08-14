@@ -15,6 +15,7 @@
  */
 
 import React, { useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import { useAuth, useApi } from "@/context/AuthContext";
 import { API } from "@/config/api";
@@ -769,11 +770,23 @@ const SECTIONS: SectionDef[] = [
 
 export default function AdminPanelPage() {
   const { user, isLoading, isSuperAdmin } = useAuth();
+  const router = useRouter();
   const [tab, setTab] = useState<string>("overview");
 
   const isStaff = !!user && (user.role === "admin" || user.role === "super_admin");
 
-  if (isLoading) return <div className="min-h-screen app-bg" />;
+  // The session is tab-scoped (sessionStorage), so reaching this deliberately
+  // unlinked URL in a fresh tab — a bookmark, a pasted link — has no session to
+  // restore. Send unauthenticated visitors to log in and come back here instead
+  // of dead-ending them on the 404 guard. Logged-in non-admins still get the 404
+  // below, which keeps the panel's existence hidden from ordinary users.
+  useEffect(() => {
+    if (!isLoading && !user) {
+      router.replace("/staff/2024/25/login");
+    }
+  }, [isLoading, user, router]);
+
+  if (isLoading || !user) return <div className="min-h-screen app-bg" />;
   if (!isStaff) return <NotFound />;
 
   const visible = SECTIONS.filter((s) => !s.superOnly || isSuperAdmin);

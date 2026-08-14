@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useAppRouter } from "@/lib/useAppRouter";
 import { ShieldAlert, CheckCircle, XCircle, Globe, Activity, Eye, Trash2, ShieldCheck, MailPlus, TerminalSquare, BarChart3, Users, Link2, GraduationCap, FolderOpen, TrendingUp, Download, BookOpen, Award, Bookmark } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { useAuth } from "@/context/AuthContext";
@@ -14,7 +14,7 @@ import TrustManagement from "@/components/admin/TrustManagement";
 export default function AdminDashboardPage() {
   const { user, token, isSuperAdmin, isAdmin } = useAuth();
   const { fetchWithAuth } = useApi();
-  const router = useRouter();
+  const router = useAppRouter();
 
   const [activeTab, setActiveTab] = useState<'moderation' | 'analytics' | 'trust'>('moderation');
   const [stats, setStats] = useState<any>({ totalUsers: 0, pendingFlags: 0, activeHubs: [] });
