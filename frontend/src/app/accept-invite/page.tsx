@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState, useEffect, Suspense } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { useAppRouter } from "@/lib/useAppRouter";
 import { motion } from "framer-motion";
 import { BookOpen, Lock, AtSign, Loader2, CheckCircle2, ShieldCheck, GraduationCap } from "lucide-react";
 import Navbar from "@/components/Navbar";
@@ -9,7 +10,7 @@ import { API } from "@/config/api";
 
 function AcceptInviteContent() {
   const searchParams = useSearchParams();
-  const router = useRouter();
+  const router = useAppRouter();
   const token = searchParams.get("token");
   const [inviteData, setInviteData] = useState<any>(null);
   const [loading, setLoading] = useState(true);

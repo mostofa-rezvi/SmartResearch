@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, Suspense } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { useAppRouter } from "@/lib/useAppRouter";
 
 function VerifyEmailRedirect() {
-  const router = useRouter();
+  const router = useAppRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
 

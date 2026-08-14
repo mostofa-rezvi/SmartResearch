@@ -6,7 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useAppRouter } from "@/lib/useAppRouter";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   CheckCircle2,
@@ -72,7 +72,7 @@ const JournalQuartileMeter = dynamic(
 
 export default function Home() {
   const { user, isLoading } = useAuth();
-  const router = useRouter();
+  const router = useAppRouter();
   const [activeTab, setActiveTab] = useState<"discovery" | "lab" | "assistant" | "community">("discovery");
   const [activeFaq, setActiveFaq] = useState<number | null>(0);
 

@@ -14,12 +14,14 @@ import {
   Bell,
   MessageSquare,
   ArrowRight,
-  Plus
+  Plus,
+  Network,
+  FolderGit2,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { useAuth, useApi } from "@/context/AuthContext";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useAppRouter } from "@/lib/useAppRouter";
 import { API } from "@/config/api";
 
 interface DashboardData {
@@ -28,11 +30,22 @@ interface DashboardData {
     groups: number;
     impactScore: number;
     papersRead: number;
+    libraryItems?: number;
+    connections?: number;
+    teams?: number;
+    savedVersions?: number;
+  };
+  trend?: {
+    libraryItems?: number;
+    connections?: number;
+    teams?: number;
+    posts?: number;
   };
   recentActivity: Array<{
     type: string;
     title: string;
     time: string;
+    href?: string;
   }>;
   recommendations: Array<{
     id: number;
@@ -43,7 +56,7 @@ interface DashboardData {
 }
 
 const EMPTY_DASHBOARD: DashboardData = {
-  stats: { posts: 0, groups: 0, impactScore: 0, papersRead: 0 },
+  stats: { posts: 0, groups: 0, impactScore: 0, papersRead: 0, libraryItems: 0, connections: 0, teams: 0 },
   recentActivity: [],
   recommendations: [],
 };
@@ -51,7 +64,7 @@ const EMPTY_DASHBOARD: DashboardData = {
 export default function DashboardPage() {
   const { user, token, isLoading: authLoading } = useAuth();
   const { fetchWithAuth } = useApi();
-  const router = useRouter();
+  const router = useAppRouter();
   const [data, setData] = useState<DashboardData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
@@ -104,11 +117,12 @@ export default function DashboardPage() {
     </div>;
   }
 
+  const trend = data.trend || {};
   const stats = [
-    { label: "Community Posts", value: data.stats.posts.toString(), icon: <MessageSquare size={20} />, color: "text-blue-500", bg: "bg-blue-50 dark:bg-blue-900/30" },
-    { label: "Groups Joined", value: data.stats.groups.toString(), icon: <Users size={20} />, iconColor: "text-emerald-500", bg: "bg-emerald-50 dark:bg-emerald-900/30" },
-    { label: "Papers Read", value: data.stats.papersRead.toString(), icon: <BookOpen size={20} />, iconColor: "text-purple-500", bg: "bg-purple-50 dark:bg-purple-900/30" },
-    { label: "Impact Score", value: data.stats.impactScore.toString(), icon: <TrendingUp size={20} />, iconColor: "text-accent", bg: "bg-accent/10" },
+    { label: "Library Items", value: (data.stats.libraryItems ?? 0).toString(), icon: <BookOpen size={20} />, href: "/library", delta: trend.libraryItems },
+    { label: "Research Teams", value: (data.stats.teams ?? 0).toString(), icon: <FolderGit2 size={20} />, href: "/teams", delta: trend.teams },
+    { label: "Connections", value: (data.stats.connections ?? 0).toString(), icon: <Network size={20} />, href: "/researchers", delta: trend.connections },
+    { label: "Impact Score", value: (data.stats.impactScore ?? 0).toString(), icon: <TrendingUp size={20} />, href: `/profile/${user?.id}`, delta: undefined as number | undefined },
   ];
 
   const recentActivity = data.recentActivity || [];
@@ -118,42 +132,45 @@ export default function DashboardPage() {
     <div className="min-h-screen app-bg">
       <Navbar />
 
-      <main className="pt-32 pb-20 px-6 max-w-7xl mx-auto">
+      <main className="pt-24 pb-20 px-4 md:px-8 max-w-7xl mx-auto">
         {/* Header section */}
-        <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+        <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>
-            <span className="mono-academic text-xs font-black tracking-[0.2em] text-secondary dark:text-rose-300 mb-2 block uppercase">Project ResearchBridge</span>
-            <h1 className="text-4xl md:text-6xl font-serif font-black text-primary dark:text-white">
-              My Research <span className="text-secondary dark:text-rose-300 italic">Lab</span>
-            </h1>
-            <p className="text-slate-500 dark:text-slate-400 mt-2 font-medium">Continuing the journey from curiosity to contribution.</p>
+            <h1 className="text-xl md:text-2xl font-serif font-black text-ink-900">Dashboard</h1>
+            <p className="text-sm text-ink-500 mt-0.5">Welcome back, {user?.name?.split(" ")[0] || "researcher"} — here's your research at a glance.</p>
           </div>
-          <div className="flex items-center gap-3">
-            <button className="p-3 neu-btn text-slate-500 dark:text-slate-300 hover:text-primary transition-all">
-              <Bell size={22} />
-            </button>
-            <Link href="/discovery" className="flex items-center gap-2 bg-primary text-white px-6 py-3 rounded-2xl font-bold hover:bg-secondary transition-all shadow-xl hover:shadow-primary/20">
-              <Plus size={20} /> New Search
+          <div className="flex items-center gap-2.5">
+            <nav aria-label="Breadcrumb" className="hidden md:flex items-center gap-1.5 text-xs font-semibold text-ink-400">
+              <Link href="/dashboard" className="hover:text-primary transition-colors">Home</Link>
+              <ChevronRight size={13} />
+              <span className="text-ink-700">Dashboard</span>
+            </nav>
+            <Link href="/discovery" className="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-primary-700 transition-colors">
+              <Plus size={16} /> New Search
             </Link>
           </div>
         </header>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           {stats.map((stat, idx) => (
-            <motion.div
-              key={idx}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: idx * 0.1 }}
-              className="glass-neu-card glass-neu-hover p-6 cursor-pointer"
-            >
-              <div className="w-12 h-12 neu-icon flex items-center justify-center mb-4 text-primary dark:text-white">
-                {stat.icon}
+            <Link key={idx} href={stat.href} className="glass-neu-card glass-neu-hover p-6 block group">
+              <div className="flex items-start justify-between mb-4">
+                <div className="w-11 h-11 neu-icon flex items-center justify-center text-primary dark:text-white">
+                  {stat.icon}
+                </div>
+                {stat.delta ? (
+                  <span className="flex items-center gap-0.5 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded-full">
+                    <TrendingUp size={11} /> +{stat.delta}
+                  </span>
+                ) : null}
               </div>
               <div className="text-3xl font-black text-slate-900 dark:text-white mb-1">{stat.value}</div>
-              <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">{stat.label}</div>
-            </motion.div>
+              <div className="text-xs font-bold text-slate-400 uppercase tracking-wider group-hover:text-primary transition-colors">
+                {stat.label}
+                {stat.delta ? <span className="ml-1.5 normal-case tracking-normal text-emerald-600 dark:text-emerald-400 font-semibold">· {stat.delta} this week</span> : null}
+              </div>
+            </Link>
           ))}
         </div>
 
@@ -272,16 +289,29 @@ export default function DashboardPage() {
             {/* Recent Activity */}
             <div className="glass-neu-card p-8">
               <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-6">Recent Activity</h3>
-              <div className="space-y-6">
-                {recentActivity.map((activity, idx) => (
-                  <div key={idx} className="flex gap-4 items-start">
-                    <div className="w-2 h-2 rounded-full bg-primary mt-2" />
-                    <div>
-                      <p className="text-sm font-bold text-slate-900 dark:text-white leading-tight mb-1">{activity.title}</p>
-                      <p className="text-xs text-slate-500 dark:text-slate-400">{new Date(activity.time).toLocaleDateString()}</p>
-                    </div>
-                  </div>
-                ))}
+              <div className="space-y-5">
+                {recentActivity.map((activity, idx) => {
+                  const dot =
+                    activity.type === "library" ? "bg-amber-500" :
+                    activity.type === "team" ? "bg-primary" :
+                    activity.type === "connection" ? "bg-emerald-500" :
+                    activity.type === "version" ? "bg-violet-500" :
+                    activity.type === "post" ? "bg-blue-500" : "bg-slate-400";
+                  const Row: any = activity.href ? Link : "div";
+                  return (
+                    <Row
+                      key={idx}
+                      {...(activity.href ? { href: activity.href } : {})}
+                      className="flex gap-3 items-start group"
+                    >
+                      <div className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${dot}`} />
+                      <div className="min-w-0">
+                        <p className="text-sm font-semibold text-slate-900 dark:text-white leading-snug mb-0.5 line-clamp-2 group-hover:text-primary transition-colors">{activity.title}</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">{new Date(activity.time).toLocaleDateString()}</p>
+                      </div>
+                    </Row>
+                  );
+                })}
               </div>
               <button onClick={() => router.push(`/profile/${user?.id}`)} className="w-full mt-8 text-primary dark:text-white text-sm font-bold hover:underline">View History →</button>
             </div>

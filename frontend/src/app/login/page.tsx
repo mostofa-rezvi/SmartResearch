@@ -15,6 +15,15 @@ function LoginContent() {
   const message = searchParams.get("message");
   const auth = useAuth();
 
+  // Return the user to where they came from after signing in (e.g. the admin
+  // panel), falling back to the dashboard. Only allow same-site absolute paths
+  // so the `redirect` param can't be abused as an open redirect.
+  const redirectParam = searchParams.get("redirect");
+  const destination =
+    redirectParam && redirectParam.startsWith("/") && !redirectParam.startsWith("//")
+      ? redirectParam
+      : "/dashboard";
+
   const [step, setStep] = useState<1 | 2>(1);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -41,11 +50,18 @@ function LoginContent() {
       if (response.ok) {
         if (result.data?.otp_required) {
           setStep(2);
-          setSuccessMessage(result.data.message);
+          // In non-production the backend returns the code as `dev_otp` so local
+          // sign-in (e.g. the admin console) doesn't require a real inbox.
+          if (result.data.dev_otp) {
+            setOtp(String(result.data.dev_otp));
+            setSuccessMessage(`Dev mode — your code is ${result.data.dev_otp}. Press "Unlock Access" to continue.`);
+          } else {
+            setSuccessMessage(result.data.message);
+          }
         } else if (result.data?.accessToken) {
           auth.login(result.data.accessToken, result.data.user);
           setSuccessMessage("Authentication successful! Entering research lab...");
-          setTimeout(() => window.location.href = "/dashboard", 1200);
+          setTimeout(() => window.location.href = destination, 1200);
         }
       } else {
         setError(result.error?.message || result.data?.message || "Invalid credentials");
@@ -93,7 +109,7 @@ function LoginContent() {
       if (response.ok) {
         auth.login(result.data.accessToken, result.data.user);
         setSuccessMessage("Access granted! Redirecting to dashboard...");
-        setTimeout(() => window.location.href = "/dashboard", 1500);
+        setTimeout(() => window.location.href = destination, 1500);
       } else {
         setError(result.error?.message || "Invalid OTP");
       }

@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useEffect, useState, Suspense } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { useAppRouter } from "@/lib/useAppRouter";
 import { motion } from "framer-motion";
 import { CheckCircle2, XCircle, Loader2 } from "lucide-react";
 import Navbar from "@/components/Navbar";
@@ -9,7 +10,7 @@ import { API } from "@/config/api";
 
 function VerifyContent() {
   const searchParams = useSearchParams();
-  const router = useRouter();
+  const router = useAppRouter();
   const token = searchParams.get("token");
   const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
   const [message, setMessage] = useState("");

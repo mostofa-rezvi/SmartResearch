@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Mail, Lock, ArrowRight, CheckCircle2, AlertCircle, Eye, EyeOff, KeyRound, ShieldCheck } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useAppRouter } from "@/lib/useAppRouter";
 import Navbar from "@/components/Navbar";
 import AuthShowcase from "@/components/marketing/AuthShowcase";
 import { API } from "@/config/api";
@@ -12,7 +12,7 @@ import { API } from "@/config/api";
 type Step = "request" | "reset" | "done";
 
 export default function ForgotPasswordPage() {
-  const router = useRouter();
+  const router = useAppRouter();
   const [step, setStep] = useState<Step>("request");
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");

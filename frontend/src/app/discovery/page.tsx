@@ -54,6 +54,8 @@ export default function DiscoveryPage() {
   const [userMatchedDomains, setUserMatchedDomains] = React.useState<string[]>([]);
   const [selectedTier, setSelectedTier] = React.useState<string | null>(null);
   const [institutionSearch, setInstitutionSearch] = React.useState("");
+  const [query, setQuery] = React.useState("");
+  const searching = query.trim().length > 0;
 
   React.useEffect(() => {
     const fetchUserInterests = async () => {
@@ -92,19 +94,27 @@ export default function DiscoveryPage() {
         />
 
         <div className="mb-14 w-full max-w-2xl">
-          <SearchBar />
+          {/* Filters the collaborator list below; global autocomplete lives in the top bar. */}
+          <SearchBar suggestions={false} onQueryChange={setQuery} placeholder="Filter collaborators by name, institution, topic..." />
         </div>
 
-        {/* Unified discovery feed — collaborators, papers & open projects (Module 2) */}
-        <section className="mb-14">
-          <h2 className="text-2xl font-serif font-black text-slate-900 dark:text-white mb-6">
-            Your Discovery Feed
-          </h2>
-          <UnifiedFeed />
-        </section>
+        {/* Default view: the unified discovery feed. Hidden while searching so
+            the collaborator results take over. */}
+        {!searching && (
+          <section className="mb-14">
+            <h2 className="text-2xl font-serif font-black text-slate-900 dark:text-white mb-6">
+              Your Discovery Feed
+            </h2>
+            <UnifiedFeed />
+          </section>
+        )}
 
         <h2 className="text-2xl font-serif font-black text-slate-900 dark:text-white mb-6">
-          Recommended for You
+          {searching ? (
+            <>Recommended <span className="text-secondary dark:text-rose-300 italic">collaborators</span> for “{query}”</>
+          ) : (
+            "Recommended for You"
+          )}
         </h2>
         <div className="flex flex-col md:flex-row gap-8 items-start">
           <FilterSidebar 
@@ -122,7 +132,8 @@ export default function DiscoveryPage() {
               <RecommendationFeed filters={{
                 domains: selectedDomains,
                 tier: selectedTier,
-                institution: institutionSearch
+                institution: institutionSearch,
+                search: query,
               }} />
             </Suspense>
           </main>

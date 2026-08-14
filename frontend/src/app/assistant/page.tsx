@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Sparkles, Send, Plus, Trash2, RefreshCw, AlertTriangle,
   FileText, Users, MessageSquare, BookOpen, ArrowRight, Bot, User as UserIcon,
+  Compass,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { API } from "@/config/api";
@@ -45,6 +46,8 @@ const TYPE_META: Record<string, { label: string; icon: React.ReactNode; cls: str
   researcher: { label: "Researcher", icon: <Users size={11} />, cls: "bg-secondary-50 text-secondary dark:text-rose-300" },
   post: { label: "Post", icon: <MessageSquare size={11} />, cls: "bg-accent-50 text-accent-700" },
   journal: { label: "Journal", icon: <BookOpen size={11} />, cls: "bg-info-surface text-info" },
+  guide: { label: "Guide", icon: <Compass size={11} />, cls: "bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300" },
+  concept: { label: "Knowledge", icon: <BookOpen size={11} />, cls: "bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300" },
 };
 
 function SourceChip({ source }: { source: Source }) {
@@ -78,6 +81,7 @@ export default function AssistantPage() {
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
   const [loadingThread, setLoadingThread] = useState(false);
+  const [loadingSessions, setLoadingSessions] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -91,11 +95,13 @@ export default function AssistantPage() {
   // Load session list
   const loadSessions = useCallback(async () => {
     try {
-      const res = await fetchWithAuth(API.assistant.sessions);
+      const res = await fetchWithAuth(API.assistant.sessions, { skipPreloader: true });
       const json = await res.json();
       if (res.ok) setSessions((json.data as SessionSummary[]) || []);
     } catch {
       /* non-blocking */
+    } finally {
+      setLoadingSessions(false);
     }
   }, [fetchWithAuth]);
 
@@ -114,7 +120,7 @@ export default function AssistantPage() {
       setLoadingThread(true);
       setMessages([]);
       try {
-        const res = await fetchWithAuth(API.assistant.sessionMessages(id));
+        const res = await fetchWithAuth(API.assistant.sessionMessages(id), { skipPreloader: true });
         const json = await res.json();
         if (res.ok) {
           const msgs = (json.data as any[]) || [];
@@ -148,7 +154,7 @@ export default function AssistantPage() {
   const deleteSession = async (id: string | number, e: React.MouseEvent) => {
     e.stopPropagation();
     try {
-      const res = await fetchWithAuth(API.assistant.deleteSession(id), { method: "DELETE" });
+      const res = await fetchWithAuth(API.assistant.deleteSession(id), { method: "DELETE", skipPreloader: true });
       if (res.ok) {
         setSessions((prev) => prev.filter((s) => s.id !== id));
         if (activeSessionId === id) newChat();
@@ -175,6 +181,7 @@ export default function AssistantPage() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(body),
+          skipPreloader: true,
         });
         const json = await res.json();
         if (!res.ok) throw new Error(json?.message || "The assistant could not answer");
@@ -234,7 +241,22 @@ export default function AssistantPage() {
           </button>
 
           <div className="flex-1 overflow-y-auto space-y-1 custom-scrollbar">
-            {sessions.length === 0 ? (
+            {loadingSessions ? (
+              <div className="space-y-2 animate-pulse">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="flex items-center gap-2 px-3 py-2.5 rounded-xl"
+                  >
+                    <div className="w-3.5 h-3.5 rounded bg-slate-200 dark:bg-slate-700 shrink-0" />
+                    <div
+                      className="h-3 rounded bg-slate-200 dark:bg-slate-700"
+                      style={{ width: `${70 - i * 8}%` }}
+                    />
+                  </div>
+                ))}
+              </div>
+            ) : sessions.length === 0 ? (
               <p className="text-xs text-slate-400 dark:text-slate-500 text-center mt-8 px-4">
                 No conversations yet. Ask something to get started.
               </p>
@@ -395,18 +417,25 @@ export default function AssistantPage() {
                 ))}
 
                 {sending && (
-                  <div className="flex gap-3 justify-start">
+                  <motion.div
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="flex gap-3 justify-start"
+                  >
                     <div className="shrink-0 w-9 h-9 rounded-xl bg-primary/10 text-primary dark:text-white flex items-center justify-center">
                       <Bot size={16} />
                     </div>
-                    <div className="px-4 py-3 glass-neu-card">
+                    <div className="px-4 py-3 glass-neu-card flex items-center gap-2.5">
                       <div className="flex gap-1.5">
-                        <span className="w-2 h-2 bg-slate-300 dark:bg-slate-600 rounded-full animate-bounce [animation-delay:-0.3s]" />
-                        <span className="w-2 h-2 bg-slate-300 dark:bg-slate-600 rounded-full animate-bounce [animation-delay:-0.15s]" />
-                        <span className="w-2 h-2 bg-slate-300 dark:bg-slate-600 rounded-full animate-bounce" />
+                        <span className="w-2 h-2 bg-primary/60 dark:bg-slate-400 rounded-full animate-bounce [animation-delay:-0.3s]" />
+                        <span className="w-2 h-2 bg-primary/60 dark:bg-slate-400 rounded-full animate-bounce [animation-delay:-0.15s]" />
+                        <span className="w-2 h-2 bg-primary/60 dark:bg-slate-400 rounded-full animate-bounce" />
                       </div>
+                      <span className="text-xs font-medium text-slate-400 dark:text-slate-500 italic">
+                        Thinking…
+                      </span>
                     </div>
-                  </div>
+                  </motion.div>
                 )}
               </div>
             )}

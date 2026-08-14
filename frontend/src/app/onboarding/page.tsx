@@ -33,6 +33,15 @@ const SECTION_LABELS: Record<string, string> = {
   community: "Community Pulse",
 };
 
+// Fallbacks so a section added in the DB (not in the maps above) still renders.
+const sectionLabel = (section: string) =>
+  SECTION_LABELS[section] ||
+  (section
+    ? section.replace(/[_-]+/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
+    : "");
+
+const sectionIcon = (section: string) => SECTION_ICONS[section] || <Sparkles size={18} />;
+
 export default function OnboardingPage() {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -167,7 +176,7 @@ export default function OnboardingPage() {
           >
             <header className="space-y-4">
               <div className="flex items-center gap-2 text-secondary dark:text-rose-300 font-black text-[10px] uppercase tracking-[0.2em] bg-secondary/5 w-fit px-3 py-1 rounded">
-                {SECTION_ICONS[currentQuestion.section]} {SECTION_LABELS[currentQuestion.section]}
+                {sectionIcon(currentQuestion.section)} {sectionLabel(currentQuestion.section)}
               </div>
               <h1 className="text-4xl md:text-5xl font-serif font-black text-slate-900 dark:text-white leading-[1.1] tracking-tight">
                 {currentQuestion.question_text.split('?')[0]}
