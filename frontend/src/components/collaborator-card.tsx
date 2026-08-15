@@ -8,9 +8,10 @@ interface CollaboratorCardProps {
   similarityScore: number;
   publications: number;
   onClick?: () => void;
+  onConnect?: () => void;
 }
 
-export function CollaboratorCard({ id, name, institution, similarityScore, publications, onClick }: CollaboratorCardProps) {
+export function CollaboratorCard({ id, name, institution, similarityScore, publications, onClick, onConnect }: CollaboratorCardProps) {
   return (
     <div
       onClick={onClick}
@@ -43,7 +44,7 @@ export function CollaboratorCard({ id, name, institution, similarityScore, publi
       <button
         onClick={(e) => {
           e.stopPropagation();
-          // connect logic if any
+          onConnect?.();
         }}
         className="focus-ring w-full py-3 bg-ink-50 dark:bg-slate-900 hover:bg-primary hover:text-white text-ink-700 dark:text-slate-300 rounded-xl font-semibold transition-all flex items-center justify-center gap-2 group/btn"
       >

@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { CollaboratorCard } from "./collaborator-card";
+import CollaborationRequestModal from "./collaboration/CollaborationRequestModal";
 import { API } from "@/config/api";
 import { useAuth, useApi } from "@/context/AuthContext";
 import { 
@@ -37,6 +38,9 @@ export function RecommendationFeed({ filters }: RecommendationFeedProps) {
   // Connection state: { [userId]: 'none' | 'pending' | 'accepted' | 'loading' }
   const [connectionStates, setConnectionStates] = useState<Record<string, string>>({});
   const [connectToast, setConnectToast] = useState<string | null>(null);
+
+  // Card "Connect" → research-proposal modal (auto-creates a team on accept)
+  const [proposalTarget, setProposalTarget] = useState<any | null>(null);
 
   const trackPaperEvent = async (paper: any, action: 'view' | 'bookmark' | 'download') => {
     if (!token) return;
@@ -240,10 +244,11 @@ export function RecommendationFeed({ filters }: RecommendationFeedProps) {
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {paginatedRecommendations.map((rec, i) => (
-              <CollaboratorCard 
-                key={i} 
-                {...rec} 
+              <CollaboratorCard
+                key={i}
+                {...rec}
                 onClick={() => handleCardClick(rec)}
+                onConnect={() => setProposalTarget(rec)}
               />
             ))}
           </div>
@@ -315,6 +320,19 @@ export function RecommendationFeed({ filters }: RecommendationFeedProps) {
           <h3 className="text-h4 text-ink-900 dark:text-white mb-1.5">No collaborators match these filters</h3>
           <p className="text-caption text-ink-500 max-w-sm">Try widening your domains or clearing the institution and tier filters to see more researchers.</p>
         </div>
+      )}
+
+      {/* Collaboration proposal modal (card Connect button) */}
+      {proposalTarget && (
+        <CollaborationRequestModal
+          researcher={{
+            id: proposalTarget.id,
+            name: proposalTarget.name,
+            institution: proposalTarget.institution,
+            internalUserId: proposalTarget.internalUserId,
+          }}
+          onClose={() => setProposalTarget(null)}
+        />
       )}
 
       {/* Modal Backdrop */}

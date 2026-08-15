@@ -107,6 +107,7 @@ export const API = {
     verifyInstitution: (id: string) => `${API_BASE}/api/v1/admin/users/${id}/verify-institution`,
     trustRankRefresh: `${API_BASE}/api/v1/admin/trustrank/refresh`,
     backfill: `${API_BASE}/api/v1/admin/backfill`,
+    collaborations: `${API_BASE}/api/v1/admin/collaborations`,
   },
   // Researchers domain (seeded from OpenAlex)
   researchers: {
@@ -153,6 +154,14 @@ export const API = {
     respond: (id: string) => `${API_BASE}/api/v1/connections/${id}/respond`,
     remove: (id: string) => `${API_BASE}/api/v1/connections/${id}`,
     status: (recipientId: string) => `${API_BASE}/api/v1/connections/status/${recipientId}`,
+  },
+  // Collaborations domain — research-proposal requests from Discovery that
+  // auto-create a team on acceptance
+  collaborations: {
+    request: `${API_BASE}/api/v1/collaborations/request`,
+    list: `${API_BASE}/api/v1/collaborations`,
+    pending: `${API_BASE}/api/v1/collaborations/pending`,
+    respond: (id: string | number) => `${API_BASE}/api/v1/collaborations/${id}/respond`,
   },
   // Notifications domain
   notifications: {

@@ -20,9 +20,14 @@ import {
 import InviteMembersPanel from "@/components/workspace/InviteMembersPanel";
 
 interface Member { id: number; name: string; role: string }
+interface ExternalCollaborator {
+  id: number; researcher_id: string | null; name: string;
+  institution: string | null; added_at: string;
+}
 interface Team {
   id: number; name: string; description: string; status: string;
   creator_id: number; created_at: string; members: Member[];
+  external_collaborators?: ExternalCollaborator[];
 }
 interface Version {
   id: number; version_name: string; preview_text: string | null;
@@ -126,7 +131,12 @@ export default function TeamHubPage() {
                 <h1 className="text-2xl md:text-3xl font-serif font-black text-primary dark:text-white leading-tight">{team.name}</h1>
                 <p className="text-slate-500 dark:text-slate-400 text-sm mt-1 max-w-xl">{team.description || "No description yet."}</p>
                 <div className="flex items-center gap-3 mt-3 text-xs font-bold text-slate-400">
-                  <span className="flex items-center gap-1.5"><Users size={13} /> {team.members.length} members</span>
+                  <span className="flex items-center gap-1.5">
+                    <Users size={13} /> {team.members.length} members
+                    {(team.external_collaborators?.length ?? 0) > 0 && (
+                      <> · {team.external_collaborators!.length} collaborators</>
+                    )}
+                  </span>
                   <span className="w-1 h-1 bg-slate-300 rounded-full" />
                   <span>Created {timeAgo(team.created_at)}</span>
                 </div>
@@ -273,6 +283,38 @@ export default function TeamHubPage() {
                   </Link>
                 ))}
               </div>
+
+              {/* External collaborators — researchers without a platform account */}
+              {(team.external_collaborators?.length ?? 0) > 0 && (
+                <>
+                  <div className="flex items-center justify-between mt-7 mb-4">
+                    <h2 className="text-sm font-black uppercase tracking-widest text-slate-400 flex items-center gap-2">
+                      <UserPlus size={15} /> Collaborators
+                    </h2>
+                  </div>
+                  <div className="space-y-3">
+                    {team.external_collaborators!.map((c) => (
+                      <div key={c.id} className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-slate-400 to-slate-600 text-white flex items-center justify-center font-bold text-sm shrink-0">
+                          {c.name?.[0]?.toUpperCase() || "?"}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-bold text-slate-900 dark:text-white truncate">{c.name}</p>
+                          {c.institution && (
+                            <p className="text-[11px] text-slate-400 truncate">{c.institution}</p>
+                          )}
+                        </div>
+                        <span className="text-[10px] font-black uppercase text-sky-500 bg-sky-500/10 px-2 py-0.5 rounded-full shrink-0">
+                          External
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                  <p className="text-[11px] text-slate-400 mt-3">
+                    Added from Discovery — they don&apos;t have a platform account yet.
+                  </p>
+                </>
+              )}
             </div>
           </aside>
         </div>

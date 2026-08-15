@@ -52,7 +52,10 @@ function useNavSections(userId?: string, isAdmin?: boolean): NavSection[] {
   if (isAdmin) {
     sections.push({
       title: "Administration",
-      items: [{ href: "/admin/dashboard", label: "Admin", icon: ShieldCheck }],
+      items: [
+        { href: "/admin/dashboard", label: "Admin", icon: ShieldCheck },
+        { href: "/admin/collaborations", label: "Collaborations", icon: Users2 },
+      ],
     });
   }
   return sections;

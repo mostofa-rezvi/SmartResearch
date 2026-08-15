@@ -15,6 +15,7 @@ import { useAppRouter } from "@/lib/useAppRouter";
 import { API } from "@/config/api";
 import { Users, Plus, FileText, ArrowRight, Crown } from "lucide-react";
 import CreateTeamModal from "@/components/workspace/CreateTeamModal";
+import CollaborationRequestsPanel from "@/components/collaboration/CollaborationRequestsPanel";
 
 interface Team {
   id: number;
@@ -22,6 +23,7 @@ interface Team {
   description: string;
   role: string;
   member_count: number;
+  collaborator_count?: number;
 }
 
 export default function TeamsPage() {
@@ -60,6 +62,14 @@ export default function TeamsPage() {
             <Plus size={18} /> Create Team
           </button>
         </div>
+
+        {/* Incoming collaboration proposals (from Discovery "Connect") */}
+        <CollaborationRequestsPanel
+          onAccepted={async (projectId) => {
+            await mutate();
+            if (projectId) router.push(`/teams/${projectId}`);
+          }}
+        />
 
         {/* Grid */}
         {isLoading ? (
@@ -115,6 +125,9 @@ export default function TeamsPage() {
                 <div className="flex items-center justify-between mt-5 pt-4 border-t border-slate-100 dark:border-slate-700/60">
                   <span className="flex items-center gap-1.5 text-xs font-bold text-slate-500 dark:text-slate-400">
                     <Users size={14} /> {t.member_count} {Number(t.member_count) === 1 ? "member" : "members"}
+                    {Number(t.collaborator_count) > 0 && (
+                      <> · {t.collaborator_count} {Number(t.collaborator_count) === 1 ? "collaborator" : "collaborators"}</>
+                    )}
                   </span>
                   <span className="flex items-center gap-1 text-xs font-bold text-primary dark:text-white opacity-0 group-hover:opacity-100 transition-opacity">
                     Open <ArrowRight size={14} />

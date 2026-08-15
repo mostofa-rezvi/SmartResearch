@@ -49,7 +49,25 @@ class ProjectService {
        WHERE pm.user_id = $1
        ORDER BY p.created_at DESC
     `, [userId]);
-    return result.rows;
+    const rows = result.rows;
+
+    // Attach external (no-account) collaborator counts. Kept as a separate,
+    // failure-tolerant query so teams still list if the table is absent.
+    try {
+      const ids = rows.map(r => r.id);
+      if (ids.length) {
+        const counts = await db.query(
+          `SELECT project_id, COUNT(*) AS collaborator_count
+             FROM project_external_collaborators
+            WHERE project_id = ANY($1::int[])
+            GROUP BY project_id`, [ids]);
+        const byProject = Object.fromEntries(counts.rows.map(c => [c.project_id, Number(c.collaborator_count)]));
+        rows.forEach(r => { r.collaborator_count = byProject[r.id] || 0; });
+      }
+    } catch (e) {
+      logger.warn(`[Project] external collaborator counts unavailable: ${e.message}`);
+    }
+    return rows;
   }
 
   async getProject(projectId, userId) {
@@ -69,9 +87,25 @@ class ProjectService {
       WHERE pm.project_id = $1
     `, [projectId]);
     
+    // External collaborators (OpenAlex researchers without a platform account).
+    // Failure-tolerant so team pages still load if the table is absent.
+    let externalCollaborators = [];
+    try {
+      const extRes = await db.query(`
+        SELECT id, researcher_id, name, institution, added_at
+          FROM project_external_collaborators
+         WHERE project_id = $1
+         ORDER BY added_at ASC
+      `, [projectId]);
+      externalCollaborators = extRes.rows;
+    } catch (e) {
+      logger.warn(`[Project] external collaborators unavailable: ${e.message}`);
+    }
+
     return {
       ...projectRes.rows[0],
-      members: membersRes.rows
+      members: membersRes.rows,
+      external_collaborators: externalCollaborators
     };
   }
 

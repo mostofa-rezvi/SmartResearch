@@ -23,8 +23,9 @@ import {
   LayoutDashboard, Users, ShieldAlert, FileText, UserPlus, ScrollText, Settings2,
   Search, RefreshCw, BadgeCheck, XCircle, Check, X, Trash2, Ban, Mail, Database,
   TrendingUp, MessageSquare, BookOpen, Network, Layers, GraduationCap, Users2,
-  CheckCircle2, Loader2, AlertTriangle, ShieldCheck, Activity,
+  CheckCircle2, Loader2, AlertTriangle, ShieldCheck, Activity, Handshake, ExternalLink,
 } from "lucide-react";
+import Link from "next/link";
 
 /* ────────────────────────────── shared helpers ───────────────────────────── */
 
@@ -699,6 +700,98 @@ function AuditSection() {
   );
 }
 
+/* ────────────────────────────── Collaborations ───────────────────────────── */
+
+function CollaborationsSection() {
+  const { fetchWithAuth } = useApi();
+  const [rows, setRows] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [status, setStatus] = useState<string>("all");
+  const [page, setPage] = useState(0);
+  const PAGE = 15;
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    try {
+      const url = status === "all" ? API.admin.collaborations : `${API.admin.collaborations}?status=${status}`;
+      const json = await readJson(await fetchWithAuth(url));
+      setRows(json.data || []);
+      setPage(0);
+    } finally { setLoading(false); }
+  }, [fetchWithAuth, status]);
+  useEffect(() => { load(); }, [load]);
+
+  const statusCls = (s: string) =>
+    s === "accepted" ? "text-emerald-600 dark:text-emerald-300 bg-emerald-500/10" :
+    s === "declined" ? "text-red-500 bg-red-500/10" :
+    "text-amber-600 dark:text-amber-300 bg-amber-500/10";
+
+  return (
+    <div>
+      <SectionHead title="Research Collaborations" subtitle="Proposals sent from Discovery and the teams auto-created on acceptance."
+        actions={
+          <div className="flex items-center gap-2">
+            {["all", "pending", "accepted", "declined"].map((s) => (
+              <button key={s} onClick={() => setStatus(s)}
+                className={cx("px-3 py-2 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all",
+                  status === s ? "bg-primary text-white shadow-lg shadow-primary/20" : "neu-btn text-slate-500 dark:text-slate-400")}>
+                {s}
+              </button>
+            ))}
+            <button onClick={load} className="px-4 py-2.5 neu-btn text-sm font-bold text-primary dark:text-white flex items-center gap-2"><RefreshCw size={15} /> Refresh</button>
+          </div>
+        } />
+      {!loading && rows.length === 0 ? (
+        <EmptyState icon={<Handshake size={24} />} title="No collaboration requests"
+          text={status !== "all" ? `No proposals with status “${status}”.` : "Proposals sent from Discovery's Connect button will appear here."} />
+      ) : (
+        <div className="glass-neu-card overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm min-w-[860px]">
+              <thead>
+                <tr className="text-[10px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100 dark:border-slate-700">
+                  <th className="p-5">Proposal</th><th className="p-5">Requester</th><th className="p-5">Recipient</th><th className="p-5">Status</th><th className="p-5">Team</th><th className="p-5">Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                {loading ? (
+                  <tr><td colSpan={6} className="p-8"><div className="skeleton h-10 w-full rounded" /></td></tr>
+                ) : rows.slice(page * PAGE, page * PAGE + PAGE).map((c) => (
+                  <tr key={c.id} className="border-b border-slate-50 dark:border-slate-700/40">
+                    <td className="p-5 max-w-[260px]">
+                      <p className="font-bold text-slate-900 dark:text-white line-clamp-1">{c.proposal_title}</p>
+                      {c.proposal_message && <p className="text-xs text-slate-400 line-clamp-1">{c.proposal_message}</p>}
+                    </td>
+                    <td className="p-5 text-slate-500 dark:text-slate-400 font-medium whitespace-nowrap">{c.requester_name}</td>
+                    <td className="p-5">
+                      <span className="font-semibold text-slate-700 dark:text-slate-300">{c.recipient_name}</span>
+                      {c.external_recipient && (
+                        <span className="ml-2 text-[10px] font-black uppercase tracking-widest text-sky-500 bg-sky-500/10 px-2 py-0.5 rounded-full">External</span>
+                      )}
+                    </td>
+                    <td className="p-5">
+                      <span className={cx("text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full", statusCls(c.status))}>{c.status}</span>
+                    </td>
+                    <td className="p-5">
+                      {c.project_id ? (
+                        <Link href={`/teams/${c.project_id}`} className="inline-flex items-center gap-1.5 font-bold text-primary dark:text-white hover:underline whitespace-nowrap">
+                          {c.project_name || `Team #${c.project_id}`} <ExternalLink size={12} />
+                        </Link>
+                      ) : <span className="text-slate-400">—</span>}
+                    </td>
+                    <td className="p-5 font-mono text-xs text-slate-400 whitespace-nowrap">{c.created_at ? new Date(c.created_at).toLocaleDateString() : ""}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+      <Pager page={page} pages={Math.max(1, Math.ceil(rows.length / PAGE))} total={rows.length} onPage={setPage} />
+    </div>
+  );
+}
+
 /* ────────────────────────────── System ───────────────────────────────────── */
 
 function SystemSection() {
@@ -763,6 +856,7 @@ const SECTIONS: SectionDef[] = [
   { key: "users", label: "Users & Trust", icon: <Users size={18} /> },
   { key: "moderation", label: "Moderation", icon: <ShieldAlert size={18} /> },
   { key: "content", label: "Content", icon: <FileText size={18} /> },
+  { key: "collaborations", label: "Collaborations", icon: <Handshake size={18} /> },
   { key: "invitations", label: "Invitations", icon: <UserPlus size={18} />, superOnly: true },
   { key: "audit", label: "Audit Log", icon: <ScrollText size={18} /> },
   { key: "system", label: "System", icon: <Settings2 size={18} /> },
@@ -833,6 +927,7 @@ export default function AdminPanelPage() {
             {tab === "users" && <UsersSection />}
             {tab === "moderation" && <ModerationSection />}
             {tab === "content" && <ContentSection />}
+            {tab === "collaborations" && <CollaborationsSection />}
             {tab === "invitations" && <InvitationsSection isSuperAdmin={isSuperAdmin} />}
             {tab === "audit" && <AuditSection />}
             {tab === "system" && <SystemSection />}

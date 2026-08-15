@@ -126,6 +126,37 @@ const templates = {
     `,
   }),
 
+  collaborationRequest: (fromName, proposalTitle) => ({
+    subject: `${fromName} proposed a research collaboration on ResearchBridge`,
+    html: `
+      <div style="font-family: sans-serif; max-width: 600px; margin: auto; padding: 24px;">
+        <h2 style="color: #4F46E5;">New Collaboration Proposal</h2>
+        <p><strong>${fromName}</strong> invited you to collaborate on <em>"${proposalTitle}"</em> on <strong>ResearchBridge</strong>.</p>
+        <p>Accepting the proposal will create a shared research team for both of you.</p>
+        <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/teams"
+           style="display:inline-block;padding:12px 24px;background:#4F46E5;color:#fff;border-radius:8px;text-decoration:none;margin-top:16px;">
+          Review Proposal
+        </a>
+        <p style="color:#888;margin-top:24px;font-size:12px;">ResearchBridge — Smart Research Collaboration Platform</p>
+      </div>
+    `,
+  }),
+
+  collaborationAccepted: (fromName, proposalTitle) => ({
+    subject: `${fromName} accepted your collaboration proposal on ResearchBridge`,
+    html: `
+      <div style="font-family: sans-serif; max-width: 600px; margin: auto; padding: 24px;">
+        <h2 style="color: #10B981;">Collaboration Accepted!</h2>
+        <p><strong>${fromName}</strong> accepted your proposal <em>"${proposalTitle}"</em> — your research team has been created.</p>
+        <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/teams"
+           style="display:inline-block;padding:12px 24px;background:#10B981;color:#fff;border-radius:8px;text-decoration:none;margin-top:16px;">
+          Open Your Team
+        </a>
+        <p style="color:#888;margin-top:24px;font-size:12px;">ResearchBridge — Smart Research Collaboration Platform</p>
+      </div>
+    `,
+  }),
+
   forumReply: (replierName, postTitle) => ({
     subject: `${replierName} replied to your post on ResearchBridge`,
     html: `

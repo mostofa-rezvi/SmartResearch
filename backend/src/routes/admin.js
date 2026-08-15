@@ -51,6 +51,35 @@ router.get('/users',
   }
 );
 
+// @route   GET /api/v1/admin/collaborations?status=&limit=
+// @desc    List collaboration requests + auto-created teams (admin only)
+router.get('/collaborations',
+  [auth, requireRole(['admin', 'super_admin'])],
+  async (req, res, next) => {
+    try {
+      const params = [];
+      const where = [];
+      if (req.query.status) { params.push(req.query.status); where.push(`cr.status = $${params.length}`); }
+      params.push(Math.min(parseInt(req.query.limit) || 100, 500));
+      const sql = `SELECT cr.id, cr.status, cr.proposal_title, cr.proposal_message,
+                          cr.created_at, cr.responded_at, cr.project_id, p.name AS project_name,
+                          cr.requester_id, u1.name AS requester_name,
+                          cr.recipient_user_id,
+                          COALESCE(u2.name, cr.recipient_name) AS recipient_name,
+                          cr.recipient_institution,
+                          (cr.recipient_user_id IS NULL) AS external_recipient
+                     FROM collaboration_requests cr
+                     JOIN users u1 ON u1.id = cr.requester_id
+                     LEFT JOIN users u2 ON u2.id = cr.recipient_user_id
+                     LEFT JOIN projects p ON p.id = cr.project_id
+                    ${where.length ? 'WHERE ' + where.join(' AND ') : ''}
+                    ORDER BY cr.created_at DESC LIMIT $${params.length}`;
+      const { rows } = await db.query(sql, params);
+      res.json(envelope(rows));
+    } catch (err) { next(err); }
+  }
+);
+
 // @route   PATCH /api/v1/admin/users/:id/trust-tier
 // @desc    Manually set a user's trust tier (admin only)
 router.patch('/users/:id/trust-tier',
