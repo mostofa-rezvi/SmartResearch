@@ -15,3 +15,5 @@ env/
 # Local report working backups (keep only the final deliverable)
 report/*_BACKUP.docx
 report/*_PREUPGRADE.docx
+report/*_BEFORE_*.docx
+*_log.txt
